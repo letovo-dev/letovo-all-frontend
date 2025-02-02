@@ -1,0 +1,62 @@
+.wrapper {
+  height: 100%;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  user-select: none;
+
+  .header {
+    width: 100%;
+    padding: 0 1rem;
+    position: absolute;
+    white-space: nowrap;
+    top: 0;
+
+    .version {
+      font-size: $textSmall;
+      color: $grey;
+    }
+
+    .title {
+      margin-top: 1rem;
+      font-size: $textBig * 1.5;
+      color: $primary;
+    }
+  }
+
+  .authCard {
+    min-width: 20rem;
+    max-width: 25rem;
+    padding: 1.5rem;
+
+    .title {
+      margin-bottom: 1rem;
+      text-align: center;
+      font-size: $textBig;
+    }
+
+    .error {
+      color: $red;
+      font-size: $textLabel;
+      white-space: pre-line;
+      margin-top: 1rem;
+    }
+
+    .bottomBar {
+      display: flex;
+      justify-content: space-between;
+      align-items: flex-end;
+      margin-top: 1.5rem;
+      gap: 0.5rem;
+
+      button:first-of-type {
+        opacity: 0.75;
+        font-size: $textSmall;
+      }
+
+      button:last-of-type {
+        min-width: 5rem;
+      }
+    }
+  }
+}
