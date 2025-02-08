@@ -1,3 +1,5 @@
+/* eslint-disable @typescript-eslint/no-explicit-any */
+
 import { API, IApiReturn } from '@/shared/lib/ApiSPA';
 import { LoginPayload } from '../../authService';
 import { API_AUTH_SCHEME } from '../settings';

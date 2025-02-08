@@ -11,3 +11,20 @@
 //     linear-gradient(#fff 0 0);
 //   mask-composite: exclude;
 // }
+
+.buttonsContainer {
+  display: flex;
+  gap: 10px;
+  justify-content: space-between;
+  margin-top: 10px;
+  width: 100%;
+}
+.forgetPass {
+  text-decoration: underline;
+  padding-top: 10px;
+  width: 50%;
+}
+
+.textMessage {
+  height: 10px;
+}

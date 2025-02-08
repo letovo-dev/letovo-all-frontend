@@ -3,39 +3,43 @@ import React, { useEffect, useState } from 'react';
 import { LockOutlined, UserOutlined } from '@ant-design/icons';
 import { Button, Form, Input, Card, Typography, ConfigProvider } from 'antd';
 import { authStore } from '@/shared/stores/auth-store';
-import { useApi } from '@/shared/hooks/useApi';
 import { redirect } from 'next/navigation';
 import style from './EnterForm.module.scss';
 
 function EnterForm() {
   const { Title, Text } = Typography;
-  const [formData, setFormData] = useState(undefined);
-  const user = authStore.getState().userData;
-
   const authed = authStore(state => state.userData.authed);
+  const error = authStore(state => state.error);
+  const user = localStorage.getItem('user');
+  const userData = JSON.parse(user);
+  console.log('error --', error);
+  const [form] = Form.useForm();
 
   useEffect(() => {
-    if (authed) {
+    if (authed || userData?.authed) {
       redirect('/');
     }
-  }, [authed]);
+  }, [authed, userData]);
 
-  const { request } = useApi(authStore.getState().login, {
-    payload: formData,
-    requestOnInit: true,
-    onmount: false,
-    // messages: {
-    //   success: 'Данные пользователей успешно загружены!',
-    //   errorData: 'Не удалось загрузить данные пользователей.',
-    //   errorRequest: 'Ошибка запроса. Проверьте соединение.',
-    // },
-    debugRequest: () => console.log('Запрос к API отправлен.'),
-  });
+  const [formData, setFormData] = useState({ login: undefined, password: undefined });
 
   const onFinish = async values => {
-    setFormData(values);
-    await request(values);
+    authStore.getState().login(values);
   };
+
+  const handleNameChange = e => {
+    setFormData(prev => {
+      return { ...prev, login: e.target.value };
+    });
+  };
+
+  const handlePassChange = e => {
+    setFormData(prev => {
+      return { ...prev, password: e.target.value };
+    });
+  };
+
+  console.log(formData);
 
   return (
     <div
@@ -47,24 +51,19 @@ function EnterForm() {
         justifyContent: 'center',
       }}
     >
-      <Card>
-        <div style={{ marginBottom: '10px' }}>
-          <Title level={4}>
-            <b>Welcome!</b>
-          </Title>
-          <Text type="secondary">{'Login to continue'}</Text>
-        </div>
-        <Form
-          name="login"
-          // initialValues={
-          //     action === 'login'
-          //         ? { email: user.remember ? user.email : '', remember: user.remember }
-          //         : { remember: true }
-          // }
-          style={{ minWidth: '100%' }}
-          onFinish={onFinish}
-        >
-          {/* <ConfigProvider
+      <Form
+        name="form"
+        // initialValues={
+        //     action === 'login'
+        //         ? { email: user.remember ? user.email : '', remember: user.remember }
+        //         : { remember: true }
+        // }
+        // style={{ minWidth: '100%' }}
+        onFinish={onFinish}
+        form={form}
+      >
+        <Card>
+          <ConfigProvider
             theme={{
               token: {
                 // Seed Token
@@ -75,22 +74,31 @@ function EnterForm() {
                 colorBgContainer: 'rgba(5,5,5,0.06)',
               },
             }}
-          > */}
-          <Form.Item name="login" rules={[{ required: true, message: 'Please input your login!' }]}>
-            <Input className={style.inputForm} prefix={<UserOutlined />} placeholder="Kotya" />
-          </Form.Item>
-          <Form.Item
-            name="password"
-            rules={[{ required: true, message: 'Please input your Password!' }]}
           >
-            <Input
-              className={style.inputForm}
-              prefix={<LockOutlined />}
-              type="password"
-              placeholder="Password"
-            />
-          </Form.Item>
-          {/* </ConfigProvider> */}
+            <div style={{ marginBottom: '10px' }}>
+              <Text type="secondary">{'Логин'}</Text>
+            </div>
+            <Form.Item name="login" rules={[{ required: true, message: 'Введите логин' }]}>
+              <Input
+                onChange={handleNameChange}
+                className={style.inputForm}
+                prefix={<UserOutlined />}
+                placeholder="Kotya"
+              />
+            </Form.Item>
+            <div style={{ marginBottom: '10px' }}>
+              <Text type="secondary">{'Пароль'}</Text>
+            </div>
+            <Form.Item name="password" rules={[{ required: true, message: 'Введите пароль' }]}>
+              <Input
+                className={style.inputForm}
+                prefix={<LockOutlined />}
+                type="password"
+                placeholder="Password"
+                onChange={handlePassChange}
+              />
+            </Form.Item>
+          </ConfigProvider>
 
           {/* <div>
                         <Form.Item
@@ -108,19 +116,29 @@ function EnterForm() {
                             </div>
                         ) : null}
                     </div> */}
-
+          <div className={style.textMessage}>{error && <Text type="danger">{error}</Text>}</div>
+        </Card>
+        <div className={style.buttonsContainer}>
+          <Button color="default" variant="link">
+            <span className={style.forgetPass}> забыл пароль</span>
+          </Button>
           <Form.Item>
-            <Button block type="primary" htmlType="submit" style={{ marginBottom: '10px' }}>
-              Login
+            <Button
+              type="primary"
+              htmlType="submit"
+              style={{ marginRight: 20 }}
+              disabled={!formData.login || !formData.password}
+            >
+              Войти
             </Button>
+
             {/* <Text type="secondary">
                             {action === 'login' ? 'Already have an account?' : "Don't have an account?"}
                         </Text>{' '}
                         {action === 'login' ? <NavLink to="/signup">Signup</NavLink> : <NavLink to="/">Login</NavLink>} */}
           </Form.Item>
-        </Form>
-        {/* {error && <Text type="danger">{error}</Text>} */}
-      </Card>
+        </div>
+      </Form>
       {/* </Spin> */}
     </div>
   );

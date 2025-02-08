@@ -6,11 +6,13 @@ interface ISuccessResponseProps {
     };
     status: any;
     statusText: any;
+    headers?: any;
   };
   noNestedData?: boolean;
 }
 
 export const SuccessResponse = ({ data, noNestedData }: ISuccessResponseProps) => {
+  const authorizationHeader = data?.headers?.authorization;
   return {
     success: true,
     data: noNestedData ? data?.data : (data?.data?.data ?? data?.data),
@@ -18,6 +20,7 @@ export const SuccessResponse = ({ data, noNestedData }: ISuccessResponseProps) =
     codeMessage: codeTranslator(data?.status),
     meta: data?.data?.meta,
     statusText: data?.statusText ?? null,
+    authorization: authorizationHeader,
   };
 };
 
@@ -26,26 +29,43 @@ interface IErrorResponseProps {
 }
 
 export const ErrorResponse = ({ error }: IErrorResponseProps) => {
-  console.error('error --->>>>', error);
+  console.log('ErrorResponse');
+
   const errResponse = {
     success: false,
     data: undefined,
-    error: error,
+    codeMessage: codeTranslator(error?.status ?? error?.code),
+    message: error?.message,
+    code: error?.status,
   };
   return errResponse;
 };
 
-export const codeTranslator = (code: number) => {
+export const codeTranslator = (code: number | string) => {
   let message;
 
   switch (code) {
     case 200:
       message = 'Успешно';
       break;
+    case 400:
+      message = 'Некорректный запрос';
+      break;
     case 404:
       message = 'Страница не найдена';
       break;
-
+    case 401:
+      message = 'Неверный логин или пароль';
+      break;
+    case 403:
+      message = 'Доступ запрещен';
+      break;
+    case 500:
+      message = 'Ошибка сервера';
+      break;
+    case 'ERR_NETWORK':
+      message = 'Ошибка сети';
+      break;
     default:
       message = 'Не удалось определить ошибку';
       break;

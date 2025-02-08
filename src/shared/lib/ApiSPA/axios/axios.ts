@@ -1,5 +1,4 @@
 import axios from 'axios';
-import { redirect } from 'next/navigation';
 
 const instance = axios.create({
   baseURL: process.env.NEXT_PUBLIC_BASE_URL,
@@ -25,16 +24,14 @@ instance.interceptors.response.use(
     return dataResponse;
   },
   function (error) {
-    if (logoutErrors.includes(error?.response?.status)) {
-      //   authStore.getState().setAuth(false);
-
-      if (window.location.pathname === '/auth/login') {
-        return;
-      }
-      localStorage.removeItem('token');
-      redirect('./login');
-    }
-
+    console.log('error?.response?.status', error?.response?.status);
+    console.log('axios error', error);
+    // if (logoutErrors.includes(error?.response?.status)) {
+    //   if (window.location.pathname === '/login') {
+    //     return
+    //   } else {
+    // }
+    // }
     return Promise.reject(error);
   },
 );

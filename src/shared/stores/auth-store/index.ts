@@ -3,8 +3,6 @@
 import { auth } from '@/shared/api/auth/models/auth';
 import { login } from '@/shared/api/auth/models/login';
 import { AuthService } from '@/shared/api/authService';
-import { Utils } from '@/shared/api/utils';
-import { useApi } from '@/shared/hooks/useApi';
 import { IApiReturn } from '@/shared/lib/ApiSPA';
 import { dAuthUser, TAuthUser } from '@/shared/types/user';
 import { TStore } from '@/shared/types/zustand';
@@ -38,38 +36,43 @@ export const authStore: TStore<TAuthStoreState> = create<TAuthStoreState>((set, 
     set({ error: undefined, loading: true });
     try {
       const response = await login(payload);
-      // const response = {
-      //   data: {
-      //     token: '6eb796c9e7947df61ba4fdeca6139094c3434fc2ed3233f5aff7110a2739f18f',
-      //     role: 'student',
-      //   },
-      //   success: true,
-      //   error: false,
-      // };
-      if (response.success) {
-        const { token, role } = response.data;
-        // if (typeof window !== 'undefined') {
-        localStorage.setItem('token', token);
-        localStorage.setItem('user', JSON.stringify({ login: payload.login, role }));
-        // }
-        get().setUser({ login: payload.login, role: role });
-      } else {
-        set({ userData: dUserState });
-        console.log('response===+++++++++++++>>>>', response);
+      console.log('login response', response);
 
-        return response;
+      if (response && response.code === 200) {
+        const {
+          data: { result },
+        } = response;
+
+        const role = result[0]?.userrights;
+        const token = response?.authorization;
+        console.log('response', response);
+
+        if (token) {
+          localStorage.setItem('token', token);
+        }
+        localStorage.setItem(
+          'user',
+          JSON.stringify({
+            login: payload.login,
+            role: role === '' ? 'student' : role,
+            logged: true,
+            authed: true,
+          }),
+        );
+        get().setUser({ login: payload.login, role: role === '' ? 'student' : role });
+      } else {
+        set({ error: response.codeMessage });
+        return;
       }
     } catch (error) {
       console.error(error);
-      set({ userData: dUserState });
+      set({ userData: dUserState, error: 'Network or system error' });
     } finally {
       set({ loading: false });
     }
   },
   auth: async (): Promise<any> => {
     const token = localStorage.getItem('token');
-    console.log('token---', token);
-
     if (!token) {
       get().logout();
       redirect('./login');
@@ -77,15 +80,8 @@ export const authStore: TStore<TAuthStoreState> = create<TAuthStoreState>((set, 
     set({ error: undefined, loading: true });
     try {
       const response = await auth();
+      console.log('auth resp', response);
 
-      // const response = {
-      //   data: {
-      //     token: '6eb796c9e7947df61ba4fdeca6139094c3434fc2ed3233f5aff7110a2739f18f',
-      //     role: 'student',
-      //   },
-      //   success: true,
-      //   error: false,
-      // };
       if (response.success) {
         const userString = localStorage.getItem('user');
         if (userString) {
@@ -99,15 +95,13 @@ export const authStore: TStore<TAuthStoreState> = create<TAuthStoreState>((set, 
           console.log('No user data in localStorage.');
         }
       } else {
+        set({ userData: dUserState, error: response.codeMessage });
         get().logout();
-        return {
-          success: false,
-          data: undefined,
-        };
+        return;
       }
     } catch (error: any) {
       console.error(error);
-      set({ userData: dUserState, error });
+      set({ userData: dUserState, error: 'Network or system error' });
       return {
         success: false,
         data: undefined,
@@ -121,6 +115,7 @@ export const authStore: TStore<TAuthStoreState> = create<TAuthStoreState>((set, 
     localStorage.removeItem('token');
     localStorage.removeItem('user');
     set({ userData: dUserState });
+    set({ error: undefined, loading: false });
   },
   changePass: login => {
     set({ error: undefined, loading: true });
@@ -136,10 +131,3 @@ export const authStore: TStore<TAuthStoreState> = create<TAuthStoreState>((set, 
     // .finally(() => set({ loading: false }));
   },
 }));
-
-// Utils.setupApp();
-
-//? Пользователь уже входил если есть токен
-
-// if (Consts.isEnvDev && env.VITE_USER && process.env.VITE_PASS)
-//     authStore.getState().login(process.env.VITE_USER, process.env.VITE_PASS)

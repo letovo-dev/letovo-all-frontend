@@ -16,6 +16,8 @@ export interface IApiReturn<T> {
   errors?: Record<string, string[]>;
   error?: AxiosError;
   id?: number;
+  status?: number;
+  authorization?: string;
 }
 
 export interface ISchemeMethod {

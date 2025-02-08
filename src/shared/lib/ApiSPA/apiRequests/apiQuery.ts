@@ -2,9 +2,7 @@
 import { AxiosRequestConfig, AxiosResponse, Method } from 'axios';
 import axiosInstance from '../axios/axios';
 import { IApiReturn, libConfig } from '../index';
-
 import { SuccessResponse, ErrorResponse, applyLibConfig } from '../utils';
-
 interface IApiQueryProps {
   method: Method;
   url: string;
@@ -29,7 +27,6 @@ export const apiQuery = async <T = any>({
   noNestedData,
 }: IApiQueryProps): Promise<IApiReturn<T | undefined>> => {
   try {
-    // eslint-disable-next-line prefer-const
     let config: AxiosRequestConfig = {
       url,
       method,
@@ -50,8 +47,6 @@ export const apiQuery = async <T = any>({
 
     config = applyLibConfig(libConfig, config);
 
-    console.log('config', config);
-
     if (extraHeaders) {
       config.headers = extraHeaders;
     }
@@ -59,10 +54,8 @@ export const apiQuery = async <T = any>({
     const response: AxiosResponse = await axiosInstance(config);
 
     if (debug) {
-      console.log('debag');
-
-      console.log('response config', config);
-      console.log('response response', response);
+      console.log('debag response config', config);
+      console.log('debag response', response);
     }
 
     return SuccessResponse({
@@ -71,7 +64,7 @@ export const apiQuery = async <T = any>({
     });
   } catch (error) {
     return ErrorResponse({
-      error: error,
+      error,
     });
   }
 };
