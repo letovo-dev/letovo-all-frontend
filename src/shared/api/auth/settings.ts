@@ -2,26 +2,28 @@ import { IApiEntityScheme } from '../../lib/ApiSPA';
 
 type IEndpoint = (typeof API_AUTH_ENDPOINTS)[number];
 
+const baseUrl = process.env.NEXT_PUBLIC_BASE_URL;
+
 export const API_AUTH_SCHEME: IApiEntityScheme<IEndpoint> = {
   login: {
     method: 'POST',
-    url: `${process.env.NEXT_PUBLIC_BASE_URL}/auth/login`,
+    url: `${baseUrl}/auth/login`,
   },
   auth: {
     method: 'GET',
-    url: `${process.env.NEXT_PUBLIC_BASE_URL}/auth/amiauthed/`,
+    url: `${baseUrl}/auth/amiauthed/`,
   },
   logout: {
     method: 'PUT',
-    url: `${process.env.NEXT_PUBLIC_BASE_URL}/auth/logout`,
+    url: `${baseUrl}/auth/logout`,
   },
   changePass: {
     method: 'PUT',
-    url: `${process.env.NEXT_PUBLIC_BASE_URL}/auth/change_password`,
+    url: `${baseUrl}/auth/change_password`,
   },
   changeLogin: {
     method: 'PUT',
-    url: `${process.env.NEXT_PUBLIC_BASE_URL}/auth/change_username`,
+    url: `${baseUrl}/auth/change_username`,
   },
 };
 

@@ -19,7 +19,7 @@ type TOptions<T, P> = {
   messages?: TMessages;
 };
 
-export const useApi2 = <T, P = IApiGetPayload>(
+export const useApi = <T, P = IApiGetPayload>(
   apiCall: TRequest<T, P>,
   options?: Partial<TOptions<T, P>>,
 ) => {
@@ -30,7 +30,7 @@ export const useApi2 = <T, P = IApiGetPayload>(
   };
 
   let state = options?.state ?? ([] as any);
-  let requestOnMount = options?.onmount ?? true;
+  let requestOnMount = options?.onmount ?? false;
 
   if (options?.onmount === 'item') {
     state = {};
@@ -42,7 +42,7 @@ export const useApi2 = <T, P = IApiGetPayload>(
   const [error, setError] = useState('');
   const [response, setResponse] = useState<IApiReturn<T | undefined>>();
 
-  const request = async (payload = options?.payload): Promise<IApiReturn<T>> => {
+  const request = async (payload = options?.payload) => {
     const params = payload || { all: true };
 
     options?.debugRequest?.();
@@ -52,20 +52,20 @@ export const useApi2 = <T, P = IApiGetPayload>(
 
     try {
       const response = await apiCall(params as any);
+      console.log('response===>>>>', response);
+
       if (response.data) {
         setResponse(response);
       } else {
         const errorText = messages?.errorData || response.message || 'Networking error';
         setError(errorText);
         if (errorText) {
-          // message.error(errorText);
+          message.error(errorText);
         }
         setResponse({ success: false, data: undefined });
       }
-      return response;
     } catch (error) {
       setResponse({ success: false, data: undefined });
-      return { success: false, data: undefined };
     } finally {
       setLoading(false);
     }

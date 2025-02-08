@@ -24,7 +24,7 @@ export const apiQuery = async <T = any>({
   page,
   limit,
   extraHeaders,
-  debug = false,
+  debug = true,
   transitional,
   noNestedData,
 }: IApiQueryProps): Promise<IApiReturn<T | undefined>> => {
@@ -50,6 +50,8 @@ export const apiQuery = async <T = any>({
 
     config = applyLibConfig(libConfig, config);
 
+    console.log('config', config);
+
     if (extraHeaders) {
       config.headers = extraHeaders;
     }
@@ -57,6 +59,8 @@ export const apiQuery = async <T = any>({
     const response: AxiosResponse = await axiosInstance(config);
 
     if (debug) {
+      console.log('debag');
+
       console.log('response config', config);
       console.log('response response', response);
     }

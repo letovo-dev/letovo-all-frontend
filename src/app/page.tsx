@@ -1,21 +1,33 @@
 'use client';
-import React, { useEffect, Suspense } from 'react';
+import React, { useEffect } from 'react';
 import { LoadingOutlined } from '@ant-design/icons';
 import { Spin } from 'antd';
 import styles from './page.module.css';
 // import EnterForm from '../features/login/ui/EnterForm';
 import { authStore } from '@/shared/stores/auth-store';
-import Login from './login/page';
-import { useRouter, redirect } from 'next/navigation';
+
+import { redirect } from 'next/navigation';
 import '@ant-design/v5-patch-for-react-19';
+import { useApi } from '@/shared/hooks/useApi';
 
 export default function Home() {
   const authed = authStore(state => state.userData.authed);
-  const router = useRouter();
+  // const user = authStore.getState().userData;
+  // console.log('user', user);
+  // console.log('authed', authed);
+  // console.log('loading', authStore.getState().loading);
 
+  // const isClient = typeof window !== 'undefined';
+
+  // const token = typeof window !== 'undefined' ? localStorage.getItem('token') : null;
+  // console.log('token++++++', Boolean(token));
+
+  useApi(authStore.getState().auth, {
+    // onmount: Boolean(token),
+    onmount: false,
+  });
   useEffect(() => {
     if (!authed && !authStore.getState().loading) {
-      // router.push('/login');
       redirect('./login');
     }
   }, [authed]);
@@ -23,7 +35,7 @@ export default function Home() {
   return (
     <div className={styles.main}>
       {authStore.getState().loading ? (
-        <Spin indicator={<LoadingOutlined spin />} size="large" />
+        <Spin className={styles.spinner} indicator={<LoadingOutlined spin />} size="large" />
       ) : (
         <div>Hello</div>
       )}

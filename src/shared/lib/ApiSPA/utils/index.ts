@@ -26,13 +26,13 @@ interface IErrorResponseProps {
 }
 
 export const ErrorResponse = ({ error }: IErrorResponseProps) => {
-  console.error(error);
-
-  return {
+  console.error('error --->>>>', error);
+  const errResponse = {
     success: false,
     data: undefined,
     error: error,
   };
+  return errResponse;
 };
 
 export const codeTranslator = (code: number) => {

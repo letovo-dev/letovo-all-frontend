@@ -1,11 +1,14 @@
 'use client';
 
+import { auth } from '@/shared/api/auth/models/auth';
 import { login } from '@/shared/api/auth/models/login';
 import { AuthService } from '@/shared/api/authService';
 import { Utils } from '@/shared/api/utils';
-import { useApi2 } from '@/shared/hooks/useApi';
+import { useApi } from '@/shared/hooks/useApi';
+import { IApiReturn } from '@/shared/lib/ApiSPA';
 import { dAuthUser, TAuthUser } from '@/shared/types/user';
 import { TStore } from '@/shared/types/zustand';
+import { redirect } from 'next/navigation';
 import { create } from 'zustand';
 
 export type TAuthStoreState = {
@@ -14,7 +17,7 @@ export type TAuthStoreState = {
   userData: { user: TAuthUser; logged: boolean; authed: boolean };
   setUser: (user: TAuthUser) => void;
   login: (data: { login: string; password: string }) => void;
-  _auth: () => void;
+  auth: () => Promise<IApiReturn<unknown>>;
   logout: () => void;
   changePass: (url: string, login: string, onDone?: () => void) => void;
   changeLogin: (url: string, login: string, onDone?: () => void) => void;
@@ -26,67 +29,92 @@ export const authStore: TStore<TAuthStoreState> = create<TAuthStoreState>((set, 
   loading: false,
   error: undefined,
   userData: dUserState,
-  setUser: newUser =>
-    set(s => ({ userData: { ...s.userData, user: newUser, logged: true, authed: true } })),
-  // login: payload => {
-  //   const { login, password } = payload;
-  //   set({ error: undefined, loading: true });
+  setUser: newUser => {
+    console.log('newUser', newUser);
 
-  //   // AuthService.login(login, password)
-  //   //   .then(r => {
-  //   //     if (!r) return;
-  //   //     const { token, role } = r;
-  //   //     if (typeof window !== 'undefined') {
-  //   //       localStorage.setItem('token', token);
-  //   //       localStorage.setItem('user', JSON.stringify({ login, role }));
-  //   //     }
-  //   //     get().setUser({ login, role: r.role });
-  //   //     // set((s) => ({ user: { ...s.user, logged: true } }))
-  //   //   })
-  //   //   .catch(({ message }) => set({ userData: dUserState, error: message }))
-  //   //   .finally(() => set({ loading: false }));
-  // },
+    set(s => ({ userData: { ...s.userData, user: newUser, logged: true, authed: true } }));
+  },
   login: async (payload: any) => {
+    set({ error: undefined, loading: true });
     try {
       const response = await login(payload);
+      // const response = {
+      //   data: {
+      //     token: '6eb796c9e7947df61ba4fdeca6139094c3434fc2ed3233f5aff7110a2739f18f',
+      //     role: 'student',
+      //   },
+      //   success: true,
+      //   error: false,
+      // };
       if (response.success) {
         const { token, role } = response.data;
-        if (typeof window !== 'undefined') {
-          localStorage.setItem('token', token);
-          localStorage.setItem('user', JSON.stringify({ login, role }));
-        }
-        get().setUser({ login: payload.login, role });
+        // if (typeof window !== 'undefined') {
+        localStorage.setItem('token', token);
+        localStorage.setItem('user', JSON.stringify({ login: payload.login, role }));
+        // }
+        get().setUser({ login: payload.login, role: role });
       } else {
         set({ userData: dUserState });
-        return response.error;
+        console.log('response===+++++++++++++>>>>', response);
+
+        return response;
       }
     } catch (error) {
       console.error(error);
       set({ userData: dUserState });
+    } finally {
+      set({ loading: false });
     }
   },
-  _auth: () => {
+  auth: async (): Promise<any> => {
     const token = localStorage.getItem('token');
+    console.log('token---', token);
+
     if (!token) {
-      if (get().userData.logged) {
-        get().logout();
-      }
-      return;
+      get().logout();
+      redirect('./login');
     }
-    set({ loading: true });
-    AuthService.auth()
-      .then(r => {
-        if (!r) {
-          get().logout();
-          return;
+    set({ error: undefined, loading: true });
+    try {
+      const response = await auth();
+
+      // const response = {
+      //   data: {
+      //     token: '6eb796c9e7947df61ba4fdeca6139094c3434fc2ed3233f5aff7110a2739f18f',
+      //     role: 'student',
+      //   },
+      //   success: true,
+      //   error: false,
+      // };
+      if (response.success) {
+        const userString = localStorage.getItem('user');
+        if (userString) {
+          try {
+            const { login, role } = JSON.parse(userString);
+            get().setUser({ login, role });
+          } catch (error) {
+            console.error('Error parsing user data:', error);
+          }
+        } else {
+          console.log('No user data in localStorage.');
         }
-        set({
-          userData: { authed: true, logged: true, user: get().userData.user },
-          error: undefined,
-        });
-      })
-      .catch(({ message }) => set({ userData: dUserState, error: message }))
-      .finally(() => set({ loading: false }));
+      } else {
+        get().logout();
+        return {
+          success: false,
+          data: undefined,
+        };
+      }
+    } catch (error: any) {
+      console.error(error);
+      set({ userData: dUserState, error });
+      return {
+        success: false,
+        data: undefined,
+      };
+    } finally {
+      set({ loading: false });
+    }
   },
 
   logout: () => {
@@ -102,13 +130,14 @@ export const authStore: TStore<TAuthStoreState> = create<TAuthStoreState>((set, 
   },
   changeLogin: login => {
     set({ error: undefined, loading: true });
-    AuthService.changeLogin(login)
-      .catch(({ message }) => set({ userData: dUserState, error: message }))
-      .finally(() => set({ loading: false }));
+    AuthService.changeLogin(login).catch(({ message }) =>
+      set({ userData: dUserState, error: message }),
+    );
+    // .finally(() => set({ loading: false }));
   },
 }));
 
-Utils.setupApp();
+// Utils.setupApp();
 
 //? Пользователь уже входил если есть токен
 

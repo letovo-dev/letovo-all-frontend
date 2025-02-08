@@ -1,29 +1,26 @@
 'use client';
-import React, { useState } from 'react';
-import { LoadingOutlined, LockOutlined, UserOutlined } from '@ant-design/icons';
-import { Button, Form, Input, Card, Typography, Spin } from 'antd';
+import React, { useEffect, useState } from 'react';
+import { LockOutlined, UserOutlined } from '@ant-design/icons';
+import { Button, Form, Input, Card, Typography, ConfigProvider } from 'antd';
 import { authStore } from '@/shared/stores/auth-store';
-import { useApi2 } from '@/shared/hooks/useApi';
-import { AuthService } from '@/shared/api/authService';
+import { useApi } from '@/shared/hooks/useApi';
+import { redirect } from 'next/navigation';
+import style from './EnterForm.module.scss';
 
 function EnterForm() {
   const { Title, Text } = Typography;
   const [formData, setFormData] = useState(undefined);
+  const user = authStore.getState().userData;
 
-  // const onFinish = values => {
-  //   setFormData(values);
-  //   const { login, password } = values;
+  const authed = authStore(state => state.userData.authed);
 
-  // authStore.getState().login(values);
-  // };
-  // const { login: authenticate, loading, error } = useAuth();
+  useEffect(() => {
+    if (authed) {
+      redirect('/');
+    }
+  }, [authed]);
 
-  // const onFinish = async values => {
-  //   const { login, password } = values;
-  //   await authenticate(login, password);
-
-  // };
-  const { request } = useApi2(authStore.getState().login, {
+  const { request } = useApi(authStore.getState().login, {
     payload: formData,
     requestOnInit: true,
     onmount: false,
@@ -38,7 +35,6 @@ function EnterForm() {
   const onFinish = async values => {
     setFormData(values);
     await request(values);
-    // authStore.getState().login(values);
   };
 
   return (
@@ -68,16 +64,34 @@ function EnterForm() {
           style={{ minWidth: '100%' }}
           onFinish={onFinish}
         >
-          <Form.Item name="login" rules={[{ required: true, message: 'Please input your login!' }]}>
-            <Input prefix={<UserOutlined />} placeholder="Kotya" />
-          </Form.Item>
+          {/* <ConfigProvider
+            theme={{
+              token: {
+                // Seed Token
+                colorPrimary: '#ffa39e',
+                borderRadius: 20,
 
+                // Alias Token
+                colorBgContainer: 'rgba(5,5,5,0.06)',
+              },
+            }}
+          > */}
+          <Form.Item name="login" rules={[{ required: true, message: 'Please input your login!' }]}>
+            <Input className={style.inputForm} prefix={<UserOutlined />} placeholder="Kotya" />
+          </Form.Item>
           <Form.Item
             name="password"
             rules={[{ required: true, message: 'Please input your Password!' }]}
           >
-            <Input prefix={<LockOutlined />} type="password" placeholder="Password" />
+            <Input
+              className={style.inputForm}
+              prefix={<LockOutlined />}
+              type="password"
+              placeholder="Password"
+            />
           </Form.Item>
+          {/* </ConfigProvider> */}
+
           {/* <div>
                         <Form.Item
                             name="remember"

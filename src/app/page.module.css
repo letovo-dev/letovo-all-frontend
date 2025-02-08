@@ -31,6 +31,7 @@
   display: flex;
   flex-direction: column;
   gap: 32px;
+  height: 90vh;
 }
 
 .main ol {
@@ -164,4 +165,11 @@ a.secondary {
   .logo {
     filter: invert();
   }
+}
+
+.spinner {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  height: 100%;
 }

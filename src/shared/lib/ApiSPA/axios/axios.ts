@@ -1,33 +1,23 @@
-// import { authStore } from '@shared/stores/auth';
 import axios from 'axios';
+import { redirect } from 'next/navigation';
 
 const instance = axios.create({
   baseURL: process.env.NEXT_PUBLIC_BASE_URL,
 });
 
-instance.interceptors.request.use(config => {
-  if (!config?.headers) {
-    throw new Error('Expected config and config.headers not to be undefined');
-  }
-
-  config.headers.Authorization = `Bearer ${localStorage.getItem('token')}`;
-
-  return config;
-});
-
-// request
 instance.interceptors.request.use(
-  function (config) {
+  config => {
+    if (!config?.headers) {
+      throw new Error('Expected config and config.headers not to be undefined');
+    }
+    config.headers.Authorization = `Bearer ${localStorage.getItem('token')}`;
     return config;
   },
-  function (error) {
+  error => {
     return Promise.reject(error);
   },
 );
-// const logOut = () => {
-//     accountStore.logOut()
-//     AuthActionCreators.logout()(store.dispatch)
-// }
+
 const logoutErrors = [401, 403];
 
 instance.interceptors.response.use(
@@ -42,6 +32,7 @@ instance.interceptors.response.use(
         return;
       }
       localStorage.removeItem('token');
+      redirect('./login');
     }
 
     return Promise.reject(error);
