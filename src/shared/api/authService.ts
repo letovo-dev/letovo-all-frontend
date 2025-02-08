@@ -24,7 +24,7 @@ export class AuthService {
   // };
   static login = async ({ login, password }: LoginPayload): Promise<IApiReturn<TLRes | null>> => {
     try {
-      const response = await axios.post(`${process.env.NEXT_PUBLIC_BASE_URL}/auth/login`, {
+      const response = await axios.post(`/auth/login`, {
         login,
         password,
       });
@@ -38,7 +38,7 @@ export class AuthService {
   static auth = async () =>
     axios({
       method: 'GET',
-      url: `${Consts.authServer}/auth/amiauthed/`,
+      url: `/auth/amiauthed/`,
     }).then(({ data }) => {
       if (data !== 'yes') throw new Error('Authentication error');
       return true;
