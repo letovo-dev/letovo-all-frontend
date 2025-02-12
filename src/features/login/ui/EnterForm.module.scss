@@ -23,8 +23,7 @@
 
 .buttonsContainer {
   display: flex;
-  gap: 10px;
-  justify-content: space-between;
+  justify-content: space-evenly;
   margin-top: 10px;
   width: 100%;
 }
@@ -32,8 +31,31 @@
   text-decoration: underline;
   padding-top: 10px;
   width: 50%;
+  cursor: pointer;
+}
+
+.inputTextHeader {
+  margin: 0 0 5px 10px;
+}
+
+.formItem {
+  margin-bottom: 15px;
+}
+
+.formItemPass {
+  margin-bottom: 10px;
 }
 
 .textMessage {
   height: 10px;
+}
+
+.submitButton {
+  background-color: var(--orange);
+  color: var(--background);
+  margin-right: 20;
+  width: 138.12px;
+  height: 27.74px;
+  border-radius: 7.68px;
+  border-color: var(--orange);
 }

@@ -31,12 +31,19 @@ body {
   flex-direction: column; /* Устанавливаем вертикальную колонку */
   color: var(--graphics9);
   background: var(--background);
-  font-family: Arial, Helvetica, sans-serif;
+  // font-family: calleo, sans-serif;
   -webkit-font-smoothing: antialiased;
   -moz-osx-font-smoothing: grayscale;
   margin: 0;
   padding: 0;
   min-height: 100vh; /* Минимальная высота равна высоте экрана */
+}
+
+@font-face {
+  font-family: 'Caleo';
+  src: url('../fonts//Calleo.woff') format('woff2');
+  font-weight: normal;
+  font-style: normal;
 }
 
 main {

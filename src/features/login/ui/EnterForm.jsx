@@ -1,7 +1,7 @@
 'use client';
 import React, { useEffect, useState } from 'react';
-import { LockOutlined, UserOutlined } from '@ant-design/icons';
-import { Button, Form, Input, Card, Typography, ConfigProvider, Spin } from 'antd';
+import { ExclamationCircleOutlined, LockOutlined, UserOutlined } from '@ant-design/icons';
+import { Button, Form, Input, Card, Typography, ConfigProvider, Spin, Flex } from 'antd';
 import { authStore } from '@/shared/stores/auth-store';
 import { redirect } from 'next/navigation';
 import style from './EnterForm.module.scss';
@@ -72,7 +72,15 @@ function EnterForm() {
         onFinish={onFinish}
         form={form}
       >
-        <Card>
+        <Card
+          style={{
+            width: '332px',
+            height: '186px',
+            borderRadius: '7.35px',
+            boxShadow: 'inset 0px 1.22px 0px 0px rgba(0, 0, 0, 0.25)',
+            background: 'rgb(242, 242, 242)',
+          }}
+        >
           <ConfigProvider
             theme={{
               token: {
@@ -82,10 +90,15 @@ function EnterForm() {
               },
             }}
           >
-            <div style={{ marginBottom: '10px' }}>
-              <Text type="secondary">{'Логин'}</Text>
-            </div>
-            <Form.Item name="login" rules={[{ required: true, message: 'Введите логин' }]}>
+            <Text className={style.inputTextHeader} type="secondary">
+              {'Логин'}
+            </Text>
+
+            <Form.Item
+              name="login"
+              rules={[{ required: true, message: 'Введите логин' }]}
+              className={style.formItem}
+            >
               <Input
                 onChange={handleNameChange}
                 className={style.inputForm}
@@ -93,10 +106,14 @@ function EnterForm() {
                 placeholder="Nickname"
               />
             </Form.Item>
-            <div style={{ marginBottom: '10px' }}>
-              <Text type="secondary">{'Пароль'}</Text>
-            </div>
-            <Form.Item name="password" rules={[{ required: true, message: 'Введите пароль' }]}>
+            <Text className={style.inputTextHeader} type="secondary">
+              {'Пароль'}
+            </Text>
+            <Form.Item
+              className={style.formItemPass}
+              name="password"
+              rules={[{ required: true, message: 'Введите пароль' }]}
+            >
               <Input
                 className={style.inputForm}
                 prefix={<LockOutlined />}
@@ -106,22 +123,42 @@ function EnterForm() {
               />
             </Form.Item>
           </ConfigProvider>
-          <div className={style.textMessage}>{error && <Text type="danger">{error}</Text>}</div>
+          {error && (
+            <Flex vertical={false} justify={'center'} align={'center'} gap="small">
+              <ExclamationCircleOutlined style={{ color: '#FB4724' }} />
+              <Text type="danger">{error}</Text>
+            </Flex>
+          )}
         </Card>
         <div className={style.buttonsContainer}>
-          <Button color="default" variant="link">
-            <span className={style.forgetPass}> забыл пароль</span>
-          </Button>
+          {/* <Button color="default" variant="link">
+            забыли пароль */}
+          <span className={style.forgetPass} onClick={() => console.log('забыли пароль')}>
+            {' '}
+            забыли пароль
+          </span>
+          {/* </Button> */}
+
           <Form.Item>
-            <Button
-              type="primary"
-              color="#FB4724"
-              htmlType="submit"
-              style={{ marginRight: 20 }}
-              disabled={!formData.login || !formData.password}
+            <ConfigProvider
+              theme={{
+                components: {
+                  Button: {
+                    defaultHoverBorderColor: '#ffffff',
+                    defaultHoverColor: '#ffffff',
+                    defaultHoverBg: '#FB4724',
+                  },
+                },
+              }}
             >
-              Войти
-            </Button>
+              <Button
+                htmlType="submit"
+                disabled={!formData.login || !formData.password}
+                className={style.submitButton}
+              >
+                Войти
+              </Button>
+            </ConfigProvider>
 
             {/* <Text type="secondary">
                             {action === 'login' ? 'Already have an account?' : "Don't have an account?"}
