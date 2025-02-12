@@ -12,12 +12,11 @@ function EnterForm() {
   const error = authStore(state => state.error);
   const user = localStorage.getItem('user');
   const userData = JSON.parse(user);
-  console.log('error --', error);
   const [form] = Form.useForm();
 
   useEffect(() => {
-    if (authed || userData?.authed) {
-      redirect('/');
+    if (userData?.login && (authed || userData?.authed)) {
+      redirect(`/user/${userData.login}`);
     }
   }, [authed, userData]);
 
@@ -39,18 +38,9 @@ function EnterForm() {
     });
   };
 
-  console.log(formData);
-
   return (
-    <div
-      style={{
-        height: '100vh',
-        width: '100vw',
-        display: 'flex',
-        alignItems: 'center',
-        justifyContent: 'center',
-      }}
-    >
+    <div className={style.loginFormWrapper}>
+      <Title level={4}>ВХОД</Title>
       <Form
         name="form"
         // initialValues={
@@ -66,11 +56,8 @@ function EnterForm() {
           <ConfigProvider
             theme={{
               token: {
-                // Seed Token
-                colorPrimary: '#ffa39e',
+                colorPrimary: '#FB4724',
                 borderRadius: 20,
-
-                // Alias Token
                 colorBgContainer: 'rgba(5,5,5,0.06)',
               },
             }}
@@ -83,7 +70,7 @@ function EnterForm() {
                 onChange={handleNameChange}
                 className={style.inputForm}
                 prefix={<UserOutlined />}
-                placeholder="Kotya"
+                placeholder="Nickname"
               />
             </Form.Item>
             <div style={{ marginBottom: '10px' }}>
@@ -94,28 +81,11 @@ function EnterForm() {
                 className={style.inputForm}
                 prefix={<LockOutlined />}
                 type="password"
-                placeholder="Password"
+                placeholder="123abc"
                 onChange={handlePassChange}
               />
             </Form.Item>
           </ConfigProvider>
-
-          {/* <div>
-                        <Form.Item
-                            name="remember"
-                            valuePropName="checked"
-                            style={{ visibility: 'visible', marginBottom: 10 }}
-                        >
-                            <Checkbox style={{ visibility: 'visible' }}>
-                                <Text type="secondary">Remember me</Text>
-                            </Checkbox>
-                        </Form.Item>
-                        {action === 'login' ? (
-                            <div style={{ marginBottom: 10 }}>
-                                <a href="">Forgot password</a>
-                            </div>
-                        ) : null}
-                    </div> */}
           <div className={style.textMessage}>{error && <Text type="danger">{error}</Text>}</div>
         </Card>
         <div className={style.buttonsContainer}>
@@ -125,6 +95,7 @@ function EnterForm() {
           <Form.Item>
             <Button
               type="primary"
+              color="#FB4724"
               htmlType="submit"
               style={{ marginRight: 20 }}
               disabled={!formData.login || !formData.password}
@@ -139,7 +110,6 @@ function EnterForm() {
           </Form.Item>
         </div>
       </Form>
-      {/* </Spin> */}
     </div>
   );
 }

@@ -8,6 +8,7 @@ import { dAuthUser, TAuthUser } from '@/shared/types/user';
 import { TStore } from '@/shared/types/zustand';
 import { redirect } from 'next/navigation';
 import { create } from 'zustand';
+import userStore, { IUserStore } from '../user-store';
 
 export type TAuthStoreState = {
   loading: boolean;
@@ -42,6 +43,13 @@ export const authStore: TStore<TAuthStoreState> = create<TAuthStoreState>((set, 
         const {
           data: { result },
         } = response;
+        userStore.setState((draft: IUserStore) => {
+          console.log('result[0]', result[0]);
+          console.log('draft', draft);
+          console.log('draft', draft.store);
+
+          draft.store.userData = result[0];
+        });
 
         const role = result[0]?.userrights;
         const token = response?.authorization;
