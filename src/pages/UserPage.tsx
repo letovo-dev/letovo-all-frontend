@@ -3,6 +3,9 @@ import React, { useEffect } from 'react';
 import style from './UserPage.module.scss';
 import { authStore } from '@/shared/stores/auth-store';
 import userStore from '@/shared/stores/user-store';
+import { Button, Select } from 'antd';
+import { LockOutlined, UserOutlined } from '@ant-design/icons';
+import CustomSelect from '@/shared/ui/select/CustomSelect';
 
 const data = [
   { id: 1, text: 'Элемент 1' },
@@ -20,6 +23,13 @@ const UserPage = () => {
   const { userData } = userStore.getState().store;
   const getAllUserAchievements = userStore(state => state.getAllUserAchievements);
   console.log('userData', userData);
+  const changeLogin = () => {
+    userStore.getState().changeLogin('newUser');
+  };
+
+  const changePass = () => {
+    userStore.getState().changePass('new_pass');
+  };
 
   useEffect(() => {
     getAllUserAchievements(userData.username);
@@ -30,6 +40,12 @@ const UserPage = () => {
   const col3 = data.filter((item, index) => index % 3 === 2);
   return (
     <div className={style.wrap}>
+      <Button onClick={changeLogin}> Change login </Button>
+      <Button onClick={changePass}> Change pass </Button>
+      <CustomSelect />
+      {/* <div className={style.skewedInputContainer}> */}
+      <input className={style.inputWrapper} type="text" placeholder="Введите текст" />
+      {/* </div> */}
       <div className={style.container}>
         {/* Первая колонка */}
         <div className={style.column}>

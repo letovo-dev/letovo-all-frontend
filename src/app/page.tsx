@@ -9,17 +9,6 @@ export default function Home() {
   const username = authStore(state => state.userData.user.login);
   const auth = authStore(state => state.auth);
   const router = useRouter();
-
-  const a = {
-    bmc: {
-      list: 'event_name',
-      inventory: {
-        update: 'event_name',
-        last: 'event_name',
-      },
-    },
-  };
-
   useEffect(() => {
     if (!authed) {
       auth();

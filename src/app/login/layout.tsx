@@ -2,7 +2,6 @@ import type { Metadata } from 'next';
 import { Geist, Geist_Mono } from 'next/font/google';
 import './globals.scss';
 import '@ant-design/v5-patch-for-react-19';
-import Footer from '@/shared/ui/footer/Footer';
 
 const geistSans = Geist({
   variable: '--font-geist-sans',
@@ -22,16 +21,14 @@ export const metadata: Metadata = {
   },
 };
 
-export default function RootLayout({
+export default function LoginLayout({
   children,
 }: Readonly<{
   children: React.ReactNode;
 }>) {
   return (
-    <html lang="en">
-      <body className={` ${geistMono.variable}`}>
-        <main>{children}</main> <Footer />
-      </body>
-    </html>
+    <>
+      <main>{children}</main>
+    </>
   );
 }

@@ -1,0 +1,38 @@
+.customSelect {
+  position: relative;
+  display: inline-block;
+  font-family: sans-serif;
+}
+
+.customSelectBtn {
+  padding: 10px 20px;
+  background: #f0f0f0;
+  border: 1px solid #ccc;
+  cursor: pointer;
+  user-select: none;
+  color: 'black';
+}
+
+.customSelectDropdown {
+  position: absolute;
+  top: calc(100% + 20px); // 20px ниже кнопки
+  left: 0;
+  right: 0;
+  background: #fff;
+  border: 1px solid #ccc;
+  box-shadow: 0 2px 5px rgba(0, 0, 0, 0.1);
+  max-height: 200px; // Ограничение по высоте
+  overflow-y: auto;
+  z-index: 10;
+  color: 'black';
+}
+
+.customSelectOption {
+  padding: 10px;
+  cursor: pointer;
+
+  &:hover {
+    background: #e0e0e0;
+    color: 'black';
+  }
+}

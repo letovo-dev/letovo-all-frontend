@@ -23,24 +23,14 @@ html,
 body {
   max-width: 100vw;
   overflow-x: hidden;
-  // overflow-y: hidden;
 }
 
 body {
-  display: flex;
-  flex-direction: column; /* Устанавливаем вертикальную колонку */
-  color: var(--graphics9);
+  color: var(--foreground);
   background: var(--background);
   font-family: Arial, Helvetica, sans-serif;
   -webkit-font-smoothing: antialiased;
   -moz-osx-font-smoothing: grayscale;
-  margin: 0;
-  padding: 0;
-  min-height: 100vh; /* Минимальная высота равна высоте экрана */
-}
-
-main {
-  flex: 1; /* Основное содержимое растягивается, заполняя свободное пространство */
 }
 
 * {

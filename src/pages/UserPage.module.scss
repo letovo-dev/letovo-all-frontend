@@ -1,9 +1,9 @@
 .wrap {
   width: 100vw;
-  height: 100vh;
   display: flex;
   align-items: center;
   justify-content: center;
+  flex-direction: column;
 }
 .container {
   width: 100%;
@@ -49,3 +49,51 @@
 
 //   }
 // }
+
+.inputWrapper {
+  $clip-path: polygon(
+    10px 0,
+    calc(100% - 10px) 0,
+    100% 10px,
+    100% calc(100% - 10px),
+    calc(100% - 10px) 100%,
+    10px 100%,
+    0 calc(100% - 10px),
+    0 10px
+  );
+
+  position: relative;
+  z-index: 2;
+  width: 300px;
+  height: 40px;
+  padding: 10px;
+  border: none;
+  outline: none;
+  background: #fff;
+  -webkit-clip-path: $clip-path;
+  clip-path: $clip-path;
+  background-clip: padding-box;
+
+  &::before {
+    content: '';
+    position: absolute;
+    top: -2px;
+    left: -2px;
+    right: -2px;
+    bottom: -2px;
+    background: #000; // Цвет обводки
+    z-index: -1;
+    $clip-path-before: polygon(
+      12px 0,
+      calc(100% - 12px) 0,
+      100% 12px,
+      100% calc(100% - 12px),
+      calc(100% - 12px) 100%,
+      12px 100%,
+      0 calc(100% - 12px),
+      0 12px
+    );
+    -webkit-clip-path: $clip-path-before;
+    clip-path: $clip-path-before;
+  }
+}

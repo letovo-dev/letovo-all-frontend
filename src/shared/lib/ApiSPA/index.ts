@@ -2,8 +2,8 @@ import { apiQuery } from './apiRequests/apiQuery';
 import axios from './axios/axios';
 
 export const libConfig = {
-  replacePatchToPost: true,
-  replacePutToPost: true,
+  replacePatchToPost: false,
+  replacePutToPost: false,
 };
 
 export const API = {

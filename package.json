@@ -47,5 +47,10 @@
     "*.{json,css,scss,md}": [
       "prettier --write"
     ]
-  }
+  },
+  "eslint.validate": [
+    "javascript",
+    "css",
+    "scss"
+  ]
 }

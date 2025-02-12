@@ -1,7 +1,7 @@
 'use client';
 import React, { useEffect, useState } from 'react';
 import { LockOutlined, UserOutlined } from '@ant-design/icons';
-import { Button, Form, Input, Card, Typography, ConfigProvider } from 'antd';
+import { Button, Form, Input, Card, Typography, ConfigProvider, Spin } from 'antd';
 import { authStore } from '@/shared/stores/auth-store';
 import { redirect } from 'next/navigation';
 import style from './EnterForm.module.scss';
@@ -13,6 +13,7 @@ function EnterForm() {
   const user = localStorage.getItem('user');
   const userData = JSON.parse(user);
   const [form] = Form.useForm();
+  const loading = authStore(state => state.loading);
 
   useEffect(() => {
     if (userData?.login && (authed || userData?.authed)) {
@@ -37,6 +38,25 @@ function EnterForm() {
       return { ...prev, password: e.target.value };
     });
   };
+
+  if (loading) {
+    return (
+      <div className={style.loginFormWrapper}>
+        {loading && (
+          <ConfigProvider
+            theme={{
+              token: {
+                colorPrimary: '#FB4724',
+              },
+            }}
+          >
+            {' '}
+            <Spin size={'Large'} />
+          </ConfigProvider>
+        )}
+      </div>
+    );
+  }
 
   return (
     <div className={style.loginFormWrapper}>

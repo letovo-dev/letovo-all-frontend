@@ -2,13 +2,13 @@
 
 import { auth } from '@/shared/api/auth/models/auth';
 import { login } from '@/shared/api/auth/models/login';
-import { AuthService } from '@/shared/api/authService';
 import { IApiReturn } from '@/shared/lib/ApiSPA';
 import { dAuthUser, TAuthUser } from '@/shared/types/user';
 import { TStore } from '@/shared/types/zustand';
 import { redirect } from 'next/navigation';
 import { create } from 'zustand';
 import userStore, { IUserStore } from '../user-store';
+import { SERVICES_USERS } from '@/shared/api/user';
 
 export type TAuthStoreState = {
   loading: boolean;
@@ -18,8 +18,6 @@ export type TAuthStoreState = {
   login: (data: { login: string; password: string }) => void;
   auth: () => Promise<IApiReturn<unknown>>;
   logout: () => void;
-  changePass: (url: string, login: string, onDone?: () => void) => void;
-  changeLogin: (url: string, login: string, onDone?: () => void) => void;
 };
 
 const dUserState = { user: dAuthUser, logged: false, authed: false };
@@ -29,8 +27,6 @@ export const authStore: TStore<TAuthStoreState> = create<TAuthStoreState>((set, 
   error: undefined,
   userData: dUserState,
   setUser: newUser => {
-    console.log('newUser', newUser);
-
     set(s => ({ userData: { ...s.userData, user: newUser, logged: true, authed: true } }));
   },
   login: async (payload: any) => {
@@ -44,17 +40,11 @@ export const authStore: TStore<TAuthStoreState> = create<TAuthStoreState>((set, 
           data: { result },
         } = response;
         userStore.setState((draft: IUserStore) => {
-          console.log('result[0]', result[0]);
-          console.log('draft', draft);
-          console.log('draft', draft.store);
-
           draft.store.userData = result[0];
         });
 
         const role = result[0]?.userrights;
         const token = response?.authorization;
-        console.log('response', response);
-
         if (token) {
           localStorage.setItem('token', token);
         }
@@ -124,18 +114,5 @@ export const authStore: TStore<TAuthStoreState> = create<TAuthStoreState>((set, 
     localStorage.removeItem('user');
     set({ userData: dUserState });
     set({ error: undefined, loading: false });
-  },
-  changePass: login => {
-    set({ error: undefined, loading: true });
-    AuthService.changePass(login)
-      .catch(({ message }) => set({ userData: dUserState, error: message }))
-      .finally(() => set({ loading: false }));
-  },
-  changeLogin: login => {
-    set({ error: undefined, loading: true });
-    AuthService.changeLogin(login).catch(({ message }) =>
-      set({ userData: dUserState, error: message }),
-    );
-    // .finally(() => set({ loading: false }));
   },
 }));

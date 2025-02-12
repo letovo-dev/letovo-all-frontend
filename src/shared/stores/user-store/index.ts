@@ -5,7 +5,6 @@ import { immer } from 'zustand/middleware/immer';
 import { Modal } from 'antd';
 import { StoreStates } from '@/shared/types/storeStates';
 import { SERVICES_USERS } from '@/shared/api/user';
-import { authStore } from '../auth-store';
 
 export interface IUserAchData {
   id: string;
@@ -34,7 +33,7 @@ export interface IUserData {
 
 export interface IUserStore {
   store: {
-    userData: IUserData | undefined;
+    userData: IUserData;
     userAchievements: IUserAchData | undefined;
     allPossibleUserAchievements: IUserAchData[] | undefined;
     state: StoreStates;
@@ -46,10 +45,23 @@ export interface IUserStore {
   setEndPreload: (value: boolean) => void;
   setError: (error?: string) => void;
   resetState: () => void;
+  changePass: (url: string, login: string, onDone?: () => void) => void;
+  changeLogin: (url: string, login: string, onDone?: () => void) => void;
+  loading: boolean;
+  error?: string;
 }
 
 const initialState = {
-  userData: undefined,
+  userData: {
+    userid: '',
+    username: '',
+    userrights: '',
+    jointime: '',
+    avatar_pic: '',
+    active: '',
+    departmentid: '',
+    rolename: '',
+  },
   userAchievements: undefined,
   allPossibleUserAchievements: undefined,
   error: '',
@@ -79,70 +91,76 @@ const userStore = create(
             });
           },
           getAllUserAchievements: async (login: string) => {
-            // const {
-            //   user: { login },
-            // } = authStore.getState().userData;
-            console.log('login', login);
-
             try {
               const response = await SERVICES_USERS.UsersData.getAllUserAchievements(login);
               console.log('response', response);
-            } catch (e) {
-              console.log(e);
+              //     if (response?.success) {
+              //       if (response?.data !== undefined && response?.data.length > 0) {
+              //         const trains = createTrainMap(response.data);
+              //         // produce((draft: IUserStore) => {
+              //         //   draft.store.trainsData = trains;
+              //         // });
+              //         set((draft: IUserStore) => {
+              //           draft.store.trainsData = trains;
+              //         });
+              //         // await new Promise((resolve) => {
+              //         //   set((draft: IUserStore) => {
+              //         //     draft.store.trainsData = trains;
+              //         //   });
+              //         //   resolve(null);
+              //         // });
+              //       } else {
+              //         get().setError('Нет данных');
+              //       }
+              //     } else {
+              //       get().setError('Ошибка загрузки данных с сервера');
+              //       Modal.error({
+              //         title: 'Ошибка загрузки данных с сервера',
+              //         content: `${get().error}`,
+              //       });
+              //     }
+              // setSelectedTrain: (value: any) => {
+              //   set((state: IUserStore) => {
+              //     state.store.selectedTrain = value;
+              //   });
+              // },
+            } catch (error: any) {
+              produce(get(), (draft: IUserStore) => {
+                draft.store.state = StoreStates.ERROR;
+                draft.store.error = error instanceof Error ? error.message : String(error);
+              });
             }
           },
-          // setSelectedTrain: (value: any) => {
-          //   set((state: IUserStore) => {
-          //     state.store.selectedTrain = value;
-          //   });
-          // },
-
-          // getTrainsData: async () => {
-          //   try {
-          //     const {
-          //       // @ts-ignore
-          //       root: { row },
-          //     } = TRAINS;
-
-          //     const response = {
-          //       code: 200,
-          //       codeMessage: 'Успешно',
-          //       data: row,
-          //       statusText: 'OK',
-          //       success: row ? true : false,
-          //     };
-          //     if (response?.success) {
-          //       if (response?.data !== undefined && response?.data.length > 0) {
-          //         const trains = createTrainMap(response.data);
-          //         // produce((draft: IUserStore) => {
-          //         //   draft.store.trainsData = trains;
-          //         // });
-          //         set((draft: IUserStore) => {
-          //           draft.store.trainsData = trains;
-          //         });
-          //         // await new Promise((resolve) => {
-          //         //   set((draft: IUserStore) => {
-          //         //     draft.store.trainsData = trains;
-          //         //   });
-          //         //   resolve(null);
-          //         // });
-          //       } else {
-          //         get().setError('Нет данных');
-          //       }
-          //     } else {
-          //       get().setError('Ошибка загрузки данных с сервера');
-          //       Modal.error({
-          //         title: 'Ошибка загрузки данных с сервера',
-          //         content: `${get().error}`,
-          //       });
-          //     }
-          //   } catch (error: any) {
-          //     produce(get(), (draft: IUserStore) => {
-          //       draft.store.state = StoreStates.ERROR;
-          //       draft.store.error = error instanceof Error ? error.message : String(error);
-          //     });
-          //   }
-          // },
+          changePass: async (pass: string) => {
+            set({ error: undefined, loading: true });
+            try {
+              const response = await SERVICES_USERS.UsersData.changePass({
+                unlogin: false,
+                new_password: pass,
+              });
+              console.log('changePass response', response);
+            } catch (err) {
+              console.error(err);
+              set({ error: 'Не удалось сменить пароль' });
+            } finally {
+              () => set({ loading: false });
+            }
+          },
+          changeLogin: async (new_username: string) => {
+            set({ error: undefined, loading: true });
+            try {
+              const response = await SERVICES_USERS.UsersData.changeNick({ new_username });
+              console.log('changeLogin response', response);
+              // set((state: IUserStore) => {
+              //   state.store.userData.username = '';
+              // });
+            } catch (err) {
+              console.error(err);
+              set({ error: 'Не удалось сменить никнейм' });
+            } finally {
+              () => set({ loading: false });
+            }
+          },
         })),
       ),
     ),

@@ -25,6 +25,22 @@ export const API_USER_SCHEME: IApiEntityScheme<IEndpoint> = {
     method: 'GET',
     url: `/actives/user_actives`,
   },
+  setAvatar: {
+    method: 'PUT',
+    url: `/user/set_avatar`,
+  },
+  addRole: {
+    method: 'POST',
+    url: `/user/add_role`,
+  },
+  changePass: {
+    method: 'PUT',
+    url: `/auth/change_password`,
+  },
+  changeNick: {
+    method: 'PUT',
+    url: `/auth/change_username`,
+  },
 };
 
 export const API_USER_ENDPOINTS = [
@@ -33,4 +49,8 @@ export const API_USER_ENDPOINTS = [
   'userHistory',
   'userActives',
   'userAchivAllEnable',
+  'setAvatar',
+  'addRole',
+  'changePass',
+  'changeNick',
 ] as const;
