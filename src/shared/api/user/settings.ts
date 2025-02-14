@@ -39,7 +39,11 @@ export const API_USER_SCHEME: IApiEntityScheme<IEndpoint> = {
   },
   changeNick: {
     method: 'PUT',
-    url: `/auth/change_username`,
+    url: `/api/auth/change_username`,
+  },
+  getAuthor: {
+    method: 'GET',
+    url: `/post/author`,
   },
 };
 
@@ -53,4 +57,5 @@ export const API_USER_ENDPOINTS = [
   'addRole',
   'changePass',
   'changeNick',
+  'getAuthor',
 ] as const;

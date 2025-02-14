@@ -1,0 +1,17 @@
+{
+  "name": "Letovo",
+  "short_name": "Letovo",
+  "description": "Letovo app",
+  "icons": [
+    {
+      "src": "/favicon.ico",
+      "sizes": "48x48",
+      "type": "image/x-icon"
+    }
+  ],
+  "start_url": "/",
+  "id": "/",
+  "display": "standalone",
+  "background_color": "#ffffff",
+  "theme_color": "#000000"
+}

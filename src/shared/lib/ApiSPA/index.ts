@@ -6,7 +6,11 @@ export const libConfig = {
   replacePutToPost: false,
 };
 
-export const API = {
+interface APIType {
+  apiQuery: typeof apiQuery;
+}
+
+export const API: APIType = {
   apiQuery,
 };
 

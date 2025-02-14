@@ -36,7 +36,6 @@ export interface IUserStore {
     userData: IUserData;
     userAchievements: IUserAchData | undefined;
     allPossibleUserAchievements: IUserAchData[] | undefined;
-    state: StoreStates;
     error: string | undefined;
   };
   localeName: string;
@@ -65,7 +64,6 @@ const initialState = {
   userAchievements: undefined,
   allPossibleUserAchievements: undefined,
   error: '',
-  state: StoreStates.NONE,
 };
 
 const userStore = create(
@@ -94,39 +92,23 @@ const userStore = create(
             try {
               const response = await SERVICES_USERS.UsersData.getAllUserAchievements(login);
               console.log('response', response);
-              //     if (response?.success) {
-              //       if (response?.data !== undefined && response?.data.length > 0) {
-              //         const trains = createTrainMap(response.data);
-              //         // produce((draft: IUserStore) => {
-              //         //   draft.store.trainsData = trains;
-              //         // });
-              //         set((draft: IUserStore) => {
-              //           draft.store.trainsData = trains;
-              //         });
-              //         // await new Promise((resolve) => {
-              //         //   set((draft: IUserStore) => {
-              //         //     draft.store.trainsData = trains;
-              //         //   });
-              //         //   resolve(null);
-              //         // });
-              //       } else {
-              //         get().setError('Нет данных');
-              //       }
-              //     } else {
-              //       get().setError('Ошибка загрузки данных с сервера');
-              //       Modal.error({
-              //         title: 'Ошибка загрузки данных с сервера',
-              //         content: `${get().error}`,
-              //       });
-              //     }
-              // setSelectedTrain: (value: any) => {
-              //   set((state: IUserStore) => {
-              //     state.store.selectedTrain = value;
-              //   });
-              // },
+              if (response?.success && response.code === 200) {
+                // produce((draft: IUserStore) => {
+                //   draft.store.trainsData = trains;
+                // });
+                const { result } = response?.data as { result: IUserAchData[] };
+                set((draft: IUserStore) => {
+                  draft.store.allPossibleUserAchievements = result;
+                });
+              } else {
+                get().setError('Ошибка загрузки данных с сервера');
+                Modal.error({
+                  title: 'Ошибка загрузки данных с сервера',
+                  content: `${get().error}`,
+                });
+              }
             } catch (error: any) {
               produce(get(), (draft: IUserStore) => {
-                draft.store.state = StoreStates.ERROR;
                 draft.store.error = error instanceof Error ? error.message : String(error);
               });
             }

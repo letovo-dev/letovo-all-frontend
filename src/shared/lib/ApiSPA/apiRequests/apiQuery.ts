@@ -45,7 +45,11 @@ export const apiQuery = async <T = any>({
             },
     };
 
+    console.log('config', config);
+
     config = applyLibConfig(libConfig, config);
+
+    console.log('config ---->>>>>>', config);
 
     if (extraHeaders) {
       config.headers = extraHeaders;

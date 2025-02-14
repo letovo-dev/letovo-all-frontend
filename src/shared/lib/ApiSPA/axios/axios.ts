@@ -26,12 +26,9 @@ instance.interceptors.response.use(
   function (error) {
     console.log('error?.response?.status', error?.response?.status);
     console.log('axios error', error);
-    // if (logoutErrors.includes(error?.response?.status)) {
-    //   if (window.location.pathname === '/login') {
-    //     return
-    //   } else {
-    // }
-    // }
+    if (logoutErrors.includes(error?.response?.status) && window.location.href !== '/login') {
+      // window.location.href = '/login';
+    }
     return Promise.reject(error);
   },
 );

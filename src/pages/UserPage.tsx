@@ -1,28 +1,24 @@
 'use client';
-import React, { useEffect } from 'react';
+import React, { useEffect, useState } from 'react';
 import style from './UserPage.module.scss';
-import { authStore } from '@/shared/stores/auth-store';
-import userStore from '@/shared/stores/user-store';
-import { Button, Select } from 'antd';
-import { LockOutlined, UserOutlined } from '@ant-design/icons';
+import userStore, { IUserAchData } from '@/shared/stores/user-store';
+import { Button } from 'antd';
 import CustomSelect from '@/shared/ui/select/CustomSelect';
+import QRScanner from '@/features/qr-scanner/QrScanner';
+import TableElement from '@/features/qr-scanner/Table';
 
-const data = [
-  { id: 1, text: 'Элемент 1' },
-  { id: 2, text: 'Элемент 2' },
-  { id: 3, text: 'Элемент 3' },
-  { id: 4, text: 'Элемент 4' },
-  { id: 5, text: 'Элемент 5' },
-  { id: 6, text: 'Элемент 6' },
-  { id: 7, text: 'Элемент 7' },
-  { id: 8, text: 'Элемент 8' },
-  { id: 9, text: 'Элемент 9' },
-];
 const UserPage = () => {
-  // const userData = userStore(state => state.userData);
   const { userData } = userStore.getState().store;
   const getAllUserAchievements = userStore(state => state.getAllUserAchievements);
-  console.log('userData', userData);
+  const allPossibleUserAchievements = userStore(state => state.store.allPossibleUserAchievements);
+  const [data, setData] = useState<IUserAchData[][]>([]);
+
+  useEffect(() => {
+    if (userData?.username) {
+      getAllUserAchievements(userData.username);
+    }
+  }, [userData?.username]);
+
   const changeLogin = () => {
     userStore.getState().changeLogin('newUser');
   };
@@ -32,49 +28,69 @@ const UserPage = () => {
   };
 
   useEffect(() => {
-    getAllUserAchievements(userData.username);
-  }, []);
+    if (allPossibleUserAchievements) {
+      console.log('allPossibleUserAchievements', allPossibleUserAchievements);
+      const col1 = allPossibleUserAchievements?.filter(
+        (item: IUserAchData, index: number) => index % 3 === 0,
+      );
+      console.log('col1', col1);
 
-  const col1 = data.filter((item, index) => index % 3 === 0);
-  const col2 = data.filter((item, index) => index % 3 === 1);
-  const col3 = data.filter((item, index) => index % 3 === 2);
+      const col2 = allPossibleUserAchievements?.filter(
+        (item: IUserAchData, index: number) => index % 3 === 1,
+      );
+      console.log('col2', col2);
+      const col3 = allPossibleUserAchievements?.filter(
+        (item: IUserAchData, index: number) => index % 3 === 2,
+      );
+      console.log('col3', col3);
+      setData([[...col1], [...col2], [...col3]]);
+    }
+  }, [allPossibleUserAchievements]);
+
+  console.log('col4', allPossibleUserAchievements);
+
   return (
     <div className={style.wrap}>
+      {/* <div style={{ marginTop: '200px' }}></div>
+      <TableElement /> */}
       <Button onClick={changeLogin}> Change login </Button>
       <Button onClick={changePass}> Change pass </Button>
       <CustomSelect />
       {/* <div className={style.skewedInputContainer}> */}
       <input className={style.inputWrapper} type="text" placeholder="Введите текст" />
       {/* </div> */}
-      <div className={style.container}>
-        {/* Первая колонка */}
-        <div className={style.column}>
-          {col1.map(item => (
-            <div key={item.id} className={style.item}>
-              {item.text}
-            </div>
-          ))}
-        </div>
+      {data.length > 0 && (
+        <div className={style.container}>
+          {/* Первая колонка */}
+          <div className={style.column}>
+            {data[0]?.map(item => (
+              <div key={item.id} className={style.item}>
+                {item.achivement_name}
+              </div>
+            ))}
+          </div>
 
-        {/* Вторая колонка с дополнительным div, занимающим свободное место сверху */}
-        <div className={style.column}>
-          <div className={style.spacer}>TEXT</div>
-          {col2.map(item => (
-            <div key={item.id} className={style.item}>
-              {item.text}
-            </div>
-          ))}
-        </div>
+          {/* Вторая колонка с дополнительным div, занимающим свободное место сверху */}
+          <div className={style.column}>
+            <div className={style.spacer}>TEXT</div>
+            {/* <QRScanner /> */}
+            {data[1]?.map(item => (
+              <div key={item.id} className={style.item}>
+                {item.achivement_name}
+              </div>
+            ))}
+          </div>
 
-        {/* Третья колонка */}
-        <div className={style.column}>
-          {col3.map(item => (
-            <div key={item.id} className={style.item}>
-              {item.text}
-            </div>
-          ))}
+          {/* Третья колонка */}
+          <div className={style.column}>
+            {data[2]?.map(item => (
+              <div key={item.id} className={style.item}>
+                {item.achivement_name}
+              </div>
+            ))}
+          </div>
         </div>
-      </div>
+      )}
     </div>
   );
 };
