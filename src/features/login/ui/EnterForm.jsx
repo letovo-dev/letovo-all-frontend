@@ -2,38 +2,44 @@
 import React, { useEffect, useState } from 'react';
 import { ExclamationCircleOutlined, LockOutlined, UserOutlined } from '@ant-design/icons';
 import { Button, Form, Input, Card, Typography, ConfigProvider, Spin, Flex } from 'antd';
-import { authStore } from '@/shared/stores/auth-store';
+import authStore from '@/shared/stores/auth-store';
 import { redirect } from 'next/navigation';
 import style from './EnterForm.module.scss';
+import { setDataToLocaleStorage } from '@/shared/lib/ApiSPA/axios/helpers';
+import userStore from '@/shared/stores/user-store';
 
 function EnterForm() {
   const { Title, Text } = Typography;
-  const authed = authStore(state => state.userData.authed);
+  const userStatus = authStore(state => state.userStatus);
+  const userName = userStore(state => state.store.userData.username);
   const error = authStore(state => state.error);
-  const user = localStorage.getItem('user');
-  const userData = JSON.parse(user);
   const [form] = Form.useForm();
   const loading = authStore(state => state.loading);
-
-  useEffect(() => {
-    if (userData?.login && (authed || userData?.authed)) {
-      redirect(`/user/${userData.login}`);
-    }
-  }, [authed, userData]);
-
   const [formData, setFormData] = useState({ login: undefined, password: undefined });
 
-  const onFinish = async values => {
+  useEffect(() => {
+    if (userStatus.logged && userStatus.registered) {
+      // if (userStatus.logged) {
+      setDataToLocaleStorage('token', userStatus.token);
+      redirect(`/user/${userName}`);
+    }
+    if (userStatus.logged && !userStatus.registered) {
+      setDataToLocaleStorage('token', userStatus.token);
+      redirect('./registration');
+    }
+  }, [userStatus.logged, userStatus.registered, userStatus.token, userName]);
+
+  const onFinish = values => {
     authStore.getState().login(values);
   };
 
-  const handleNameChange = e => {
+  const handleNameInput = e => {
     setFormData(prev => {
       return { ...prev, login: e.target.value };
     });
   };
 
-  const handlePassChange = e => {
+  const handlePassInput = e => {
     setFormData(prev => {
       return { ...prev, password: e.target.value };
     });
@@ -50,8 +56,7 @@ function EnterForm() {
               },
             }}
           >
-            {' '}
-            <Spin size={'Large'} />
+            <Spin size={'large'} />
           </ConfigProvider>
         )}
       </div>
@@ -81,26 +86,26 @@ function EnterForm() {
             background: 'rgb(242, 242, 242)',
           }}
         >
+          <Text className={style.inputTextHeader} type="secondary">
+            {'Логин'}
+          </Text>
           <ConfigProvider
             theme={{
-              token: {
-                colorPrimary: '#FB4724',
-                borderRadius: 20,
-                colorBgContainer: 'rgba(5,5,5,0.06)',
+              components: {
+                Input: {
+                  activeBorderColor: '#fb4724',
+                  hoverBorderColor: '#fb4724',
+                },
               },
             }}
           >
-            <Text className={style.inputTextHeader} type="secondary">
-              {'Логин'}
-            </Text>
-
             <Form.Item
               name="login"
               rules={[{ required: true, message: 'Введите логин' }]}
               className={style.formItem}
             >
               <Input
-                onChange={handleNameChange}
+                onChange={handleNameInput}
                 className={style.inputForm}
                 prefix={<UserOutlined />}
                 placeholder="Nickname"
@@ -119,10 +124,11 @@ function EnterForm() {
                 prefix={<LockOutlined />}
                 type="password"
                 placeholder="123abc"
-                onChange={handlePassChange}
+                onChange={handlePassInput}
               />
             </Form.Item>
           </ConfigProvider>
+
           {error && (
             <Flex vertical={false} justify={'center'} align={'center'} gap="small">
               <ExclamationCircleOutlined style={{ color: '#FB4724' }} />
@@ -131,14 +137,10 @@ function EnterForm() {
           )}
         </Card>
         <div className={style.buttonsContainer}>
-          {/* <Button color="default" variant="link">
-            забыли пароль */}
           <span className={style.forgetPass} onClick={() => console.log('забыли пароль')}>
             {' '}
             забыли пароль
           </span>
-          {/* </Button> */}
-
           <Form.Item>
             <ConfigProvider
               theme={{

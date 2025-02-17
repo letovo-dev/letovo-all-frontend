@@ -52,8 +52,6 @@ export const useApi = <T, P = IApiGetPayload>(
 
     try {
       const response = await apiCall(params as any);
-      console.log('response===>>>>', response);
-
       if (response.data) {
         setResponse(response);
       } else {

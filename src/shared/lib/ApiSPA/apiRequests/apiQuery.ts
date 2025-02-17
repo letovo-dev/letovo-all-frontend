@@ -44,13 +44,7 @@ export const apiQuery = async <T = any>({
               clarifyTimeoutError: false,
             },
     };
-
-    console.log('config', config);
-
     config = applyLibConfig(libConfig, config);
-
-    console.log('config ---->>>>>>', config);
-
     if (extraHeaders) {
       config.headers = extraHeaders;
     }

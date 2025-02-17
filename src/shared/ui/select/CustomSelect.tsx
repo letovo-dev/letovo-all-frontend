@@ -1,67 +1,66 @@
-import React, { useState, useRef, useEffect } from 'react';
+import React from 'react';
+import { ConfigProvider, Select } from 'antd';
 import styles from './CustomSelect.module.scss';
+import {
+  BaiduOutlined,
+  DockerOutlined,
+  InsuranceOutlined,
+  MessageOutlined,
+} from '@ant-design/icons';
 
-const CustomSelect = () => {
-  const [isOpen, setIsOpen] = useState(false);
-  const [selected, setSelected] = useState('Выбрать опцию');
-  const containerRef = useRef(null);
-
-  // Функция для переключения открытия/закрытия списка
-  const toggleDropdown = e => {
-    e.stopPropagation();
-    setIsOpen(prev => !prev);
+const CustomSelect = ({ value, onChange }) => {
+  const handleChange = value => {
+    if (onChange) {
+      onChange(value);
+    }
   };
-
-  // Обработка клика по опции
-  const handleOptionClick = option => {
-    setSelected(option);
-    setIsOpen(false);
-  };
-
-  // Закрываем список при клике вне компонента
-  useEffect(() => {
-    const handleClickOutside = e => {
-      if (containerRef.current && !containerRef.current.contains(e.target)) {
-        setIsOpen(false);
-      }
-    };
-
-    document.addEventListener('click', handleClickOutside);
-    return () => document.removeEventListener('click', handleClickOutside);
-  }, []);
-
-  const options = [
-    'Опция 1',
-    'Опция 2',
-    'Опция 3',
-    'Опция 4',
-    'Опция 5',
-    'Опция 6',
-    'Опция 7',
-    'Опция 8',
-    'Опция 9',
-    'Опция 10',
-  ];
 
   return (
-    <div className={styles.customSelect} ref={containerRef}>
-      <div className={styles.customSelectBtn} onClick={toggleDropdown}>
-        {selected}
-      </div>
-      {isOpen && (
-        <div className={styles.customSelectDropdown}>
-          {options.map((option, index) => (
-            <div
-              key={index}
-              className={styles.customSelectOption}
-              onClick={() => handleOptionClick(option)}
-            >
-              {option}
-            </div>
-          ))}
-        </div>
-      )}
-    </div>
+    <ConfigProvider
+      theme={{
+        token: {
+          colorBorder: 'none',
+        },
+        components: {
+          Select: {
+            optionHeight: 46,
+            optionPadding: '10px 12px',
+            // activeBorderColor: '#f0f0f0',
+            // hoverBorderColor: '#f0f0f0',
+            // multipleItemColorDisabled: '#f0f0f0',
+            // activeOutlineColor: '#f0f0f0',
+            // multipleItemBg: '#f0f0f0',
+            // multipleSelectorBgDisabled: '#f0f0f0',
+            // optionActiveBg: '#f0f0f0',
+            // optionSelectedColor: '#f0f0f0',
+          },
+        },
+      }}
+    >
+      <Select
+        style={{ width: '60px' }}
+        defaultValue={'option1'}
+        value={value}
+        onChange={handleChange}
+        suffixIcon={null}
+        maxTagCount={3}
+        listHeight={100}
+        dropdownStyle={{ width: '60px', border: 'none' }}
+      >
+        <Select.Option value="option1">
+          <BaiduOutlined style={{ fontSize: '20px' }} />
+        </Select.Option>
+        <Select.Option value="option2">
+          <DockerOutlined style={{ fontSize: '20px' }} />
+        </Select.Option>
+        <Select.Option value="option3">
+          <InsuranceOutlined style={{ fontSize: '20px' }} />
+        </Select.Option>
+        <Select.Option value="option4">
+          <MessageOutlined style={{ fontSize: '20px' }} />
+        </Select.Option>
+      </Select>
+    </ConfigProvider>
   );
 };
 

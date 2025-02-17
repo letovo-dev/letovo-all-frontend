@@ -6,6 +6,7 @@ import { getUserAchievements } from './getUserAchievements';
 import { getUserData } from './getUserData';
 import { setAvatar } from './setAvatar';
 
+// eslint-disable-next-line import/no-anonymous-default-export
 export default {
   getAllUserAchievements,
   getUserAchievements,

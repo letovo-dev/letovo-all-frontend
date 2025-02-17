@@ -13,7 +13,6 @@ const Footer: React.FC = () => {
   } = userStore.getState().store;
 
   const [activeKey, setActiveKey] = useState('user');
-  console.log('pathname', pathname);
 
   useEffect(() => {
     const currentKey = pathname?.split('/')[1] || 'user';
@@ -43,8 +42,6 @@ const Footer: React.FC = () => {
 
   const handleTabClick = (key: string) => {
     if (key === 'user') {
-      console.log('username', username);
-
       router.push(`/user/${username}`);
     } else {
       router.push('/' + key);

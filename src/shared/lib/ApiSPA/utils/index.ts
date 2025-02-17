@@ -29,8 +29,6 @@ interface IErrorResponseProps {
 }
 
 export const ErrorResponse = ({ error }: IErrorResponseProps) => {
-  console.log('ErrorResponse');
-
   const errResponse = {
     success: false,
     data: undefined,

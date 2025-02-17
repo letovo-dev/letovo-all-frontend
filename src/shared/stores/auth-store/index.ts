@@ -1,118 +1,136 @@
-'use client';
-
-import { auth } from '@/shared/api/auth/models/auth';
-import { login } from '@/shared/api/auth/models/login';
-import { IApiReturn } from '@/shared/lib/ApiSPA';
-import { dAuthUser, TAuthUser } from '@/shared/types/user';
-import { TStore } from '@/shared/types/zustand';
-import { redirect } from 'next/navigation';
 import { create } from 'zustand';
-import userStore, { IUserStore } from '../user-store';
 import { SERVICES_USERS } from '@/shared/api/user';
+import { persist } from 'zustand/middleware';
+import { SERVICES_AUTH } from '@/shared/api/auth';
+import { immer } from 'zustand/middleware/immer';
+import userStore, { IUserStore } from '../user-store';
 
 export type TAuthStoreState = {
   loading: boolean;
   error?: string;
-  userData: { user: TAuthUser; logged: boolean; authed: boolean };
-  setUser: (user: TAuthUser) => void;
-  login: (data: { login: string; password: string }) => void;
-  auth: () => Promise<IApiReturn<unknown>>;
-  logout: () => void;
+  userStatus: {
+    logged: boolean;
+    authed: boolean;
+    registered: boolean;
+    token: string | undefined;
+  };
+  login: (data: { login: string; password: string }) => Promise<void>;
+  auth: (token: string | null) => Promise<void>;
+  changePass: (pass: string) => Promise<void>;
+  register: () => Promise<void>;
+  logout: () => Promise<void>;
 };
 
-const dUserState = { user: dAuthUser, logged: false, authed: false };
+const dUserState = { logged: false, authed: false, registered: false, token: '' };
 
-export const authStore: TStore<TAuthStoreState> = create<TAuthStoreState>((set, get) => ({
+const initialState = {
   loading: false,
   error: undefined,
-  userData: dUserState,
-  setUser: newUser => {
-    set(s => ({ userData: { ...s.userData, user: newUser, logged: true, authed: true } }));
-  },
-  login: async (payload: any) => {
-    set({ error: undefined, loading: true });
-    try {
-      const response = await login(payload);
-      console.log('login response', response);
+  userStatus: dUserState,
+};
 
-      if (response && response.code === 200) {
-        const {
-          data: { result },
-        } = response;
-        userStore.setState((draft: IUserStore) => {
-          draft.store.userData = result[0];
-        });
-
-        const role = result[0]?.userrights;
-        const token = response?.authorization;
-        if (token) {
-          localStorage.setItem('token', token);
-        }
-        localStorage.setItem(
-          'user',
-          JSON.stringify({
-            login: payload.login,
-            role: role === '' ? 'student' : role,
-            logged: true,
-            authed: true,
-          }),
-        );
-        get().setUser({ login: payload.login, role: role === '' ? 'student' : role });
-      } else {
-        set({ error: response.codeMessage });
-        return;
-      }
-    } catch (error) {
-      console.error(error);
-      set({ userData: dUserState, error: 'Network or system error' });
-    } finally {
-      set({ loading: false });
-    }
-  },
-  auth: async (): Promise<any> => {
-    const token = localStorage.getItem('token');
-    if (!token) {
-      get().logout();
-      redirect('./login');
-    }
-    set({ error: undefined, loading: true });
-    try {
-      const response = await auth();
-      console.log('auth resp', response);
-
-      if (response.success) {
-        const userString = localStorage.getItem('user');
-        if (userString) {
-          try {
-            const { login, role } = JSON.parse(userString);
-            get().setUser({ login, role });
-          } catch (error) {
-            console.error('Error parsing user data:', error);
+const authStore = create<TAuthStoreState>()(
+  persist(
+    immer((set: (partial: Partial<any>) => void, get: () => any) => ({
+      userStatus: {
+        ...initialState,
+      },
+      login: async (payload: any): Promise<any> => {
+        set({ error: undefined, loading: true });
+        try {
+          const response = await SERVICES_AUTH.Auth.login(payload);
+          if (response && response.code === 200) {
+            const {
+              data: { result },
+            } = response;
+            userStore.setState((draft: IUserStore) => {
+              draft.store.userData = result[0];
+            });
+            const token = response?.authorization;
+            const registered = result[0]?.registered === 'f' ? false : true;
+            set({
+              userStatus: { logged: true, authed: true, registered: registered, token },
+            });
+          } else {
+            set({ error: response.codeMessage });
+            return { token: undefined, authed: false };
           }
-        } else {
-          console.log('No user data in localStorage.');
+        } catch (error) {
+          console.error(error);
+          set({ userStatus: dUserState, error: 'Network or system error' });
+        } finally {
+          set({ loading: false });
         }
-      } else {
-        set({ userData: dUserState, error: response.codeMessage });
-        get().logout();
-        return;
-      }
-    } catch (error: any) {
-      console.error(error);
-      set({ userData: dUserState, error: 'Network or system error' });
-      return {
-        success: false,
-        data: undefined,
-      };
-    } finally {
-      set({ loading: false });
-    }
-  },
+      },
+      auth: async (): Promise<any> => {
+        set({ error: undefined, loading: true });
+        try {
+          const response = await SERVICES_AUTH.Auth.auth();
+          if (response.success && response.code === 200) {
+            const responseData = response?.data as { status: string };
+            if (responseData.status === 't') {
+              set((s: TAuthStoreState) => ({ userStatus: { ...s.userStatus, authed: true } }));
+            } else {
+              get().logout();
+            }
+          } else {
+            get().logout();
+          }
+        } catch (error: any) {
+          console.error(error);
+          set({ userStatus: dUserState, error: 'Network or system error' });
+          return {
+            success: false,
+          };
+        } finally {
+          set({ loading: false });
+        }
+      },
 
-  logout: () => {
-    localStorage.removeItem('token');
-    localStorage.removeItem('user');
-    set({ userData: dUserState });
-    set({ error: undefined, loading: false });
-  },
-}));
+      register: async () => {
+        set({ error: undefined, loading: true });
+        try {
+          const response = await SERVICES_AUTH.Auth.register();
+          if (response.success && response.code === 200) {
+            set((s: TAuthStoreState) => ({
+              userStatus: { ...s.userStatus, registered: true },
+            }));
+          } else {
+            get().logout();
+          }
+        } catch (error: any) {
+          console.error(error);
+          set({ userStatus: dUserState, error: 'Network or system error' });
+          return {
+            success: false,
+          };
+        } finally {
+          set({ loading: false });
+        }
+      },
+      changePass: async (pass: string) => {
+        set({ error: undefined, loading: true });
+        try {
+          const response = await SERVICES_USERS.UsersData.changePass({
+            unlogin: false,
+            new_password: pass,
+          });
+        } catch (err) {
+          console.error(err);
+          set({ error: 'Не удалось сменить пароль' });
+        } finally {
+          set({ loading: false });
+        }
+      },
+      logout: () => {
+        set((s: TAuthStoreState) => ({
+          userStatus: { ...s.userStatus, logged: false, authed: false, token: '' },
+        }));
+        set({ error: undefined, loading: false });
+      },
+    })),
+    { name: 'authStore' },
+  ),
+);
+
+export default authStore;

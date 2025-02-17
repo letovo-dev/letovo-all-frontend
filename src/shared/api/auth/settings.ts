@@ -25,6 +25,17 @@ export const API_AUTH_SCHEME: IApiEntityScheme<IEndpoint> = {
     method: 'PUT',
     url: `/auth/change_username`,
   },
+  register: {
+    method: 'PUT',
+    url: `/auth/register_true`,
+  },
 };
 
-export const API_AUTH_ENDPOINTS = ['login', 'auth', 'logout', 'changePass', 'changeLogin'] as const;
+export const API_AUTH_ENDPOINTS = [
+  'login',
+  'auth',
+  'logout',
+  'changePass',
+  'changeLogin',
+  'register',
+] as const;

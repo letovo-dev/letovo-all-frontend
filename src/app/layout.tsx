@@ -59,7 +59,7 @@ export default function RootLayout({
       <body className={` ${caleo.className}`}>
         <div className="layout-container">
           <main className="content">{children}</main>
-          <footer className={'footer'}>{<Footer />}</footer>
+          {/* <footer className={'footer'}>{<Footer />}</footer> */}
         </div>
       </body>
     </html>

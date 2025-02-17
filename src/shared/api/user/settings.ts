@@ -39,7 +39,7 @@ export const API_USER_SCHEME: IApiEntityScheme<IEndpoint> = {
   },
   changeNick: {
     method: 'PUT',
-    url: `/api/auth/change_username`,
+    url: `/auth/change_username`,
   },
   getAuthor: {
     method: 'GET',

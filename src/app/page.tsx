@@ -1,27 +1,32 @@
 'use client';
 import React, { useEffect } from 'react';
-import { authStore } from '@/shared/stores/auth-store';
 import '@ant-design/v5-patch-for-react-19';
 import { useRouter } from 'next/navigation';
+import userStore from '@/shared/stores/user-store';
+import authStore from '@/shared/stores/auth-store';
 
 export default function Home() {
-  const authed = authStore(state => state.userData.authed);
-  const username = authStore(state => state.userData.user.login);
-  const auth = authStore(state => state.auth);
+  const auth = authStore.getState().auth;
+  const { authed, registered } = authStore(state => state.userStatus);
+  const username = userStore.getState().store.userData.username;
   const router = useRouter();
-  useEffect(() => {
-    if (!authed) {
-      auth();
-    }
-  }, [authed]);
+  const token = localStorage.getItem('token');
+  const error = userStore(state => state.error);
 
   useEffect(() => {
-    if (username) {
-      router.push(`/user/${username}`);
+    async function checkAuth() {
+      if (!token || !authed) {
+        router.push('./login');
+      } else {
+        await auth(token);
+        if (error === undefined && username && !registered) {
+          router.push('/registration');
+        }
+        router.push(`/user/${username}`);
+      }
     }
-  }, [username, router]);
-
-  console.log(username);
+    checkAuth();
+  }, [token, authed, username]);
 
   return <></>;
 }
