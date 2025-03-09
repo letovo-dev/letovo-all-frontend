@@ -3,7 +3,7 @@
   "version": "0.1.0",
   "private": true,
   "scripts": {
-    "dev": "next dev",
+    "dev": "next dev --turbopack",
     "build": "next build",
     "start": "next start",
     "prepare": "husky"
@@ -15,11 +15,11 @@
     "antd": "^5.23.3",
     "axios": "^1.7.9",
     "immer": "^10.1.1",
-    "latest": "^0.2.0",
-    "next": "^15.1.6",
+    "next": "^15.2.1",
     "react": "^19.0.0",
     "react-dom": "^19.0.0",
     "sass": "^1.83.4",
+    "uuid": "^11.1.0",
     "zustand": "^5.0.3"
   },
   "devDependencies": {
@@ -42,11 +42,11 @@
     }
   },
   "lint-staged": {
-    "*.{js,jsx,ts,tsx}": [
+    "src/**/*.{js,jsx,ts,tsx}": [
       "eslint --fix",
       "prettier --write"
     ],
-    "*.{json,css,scss,md}": [
+    "src/**/*.{json,css,scss,md}": [
       "prettier --write"
     ]
   },

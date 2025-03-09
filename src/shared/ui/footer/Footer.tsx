@@ -26,12 +26,12 @@ const Footer: React.FC = () => {
     {
       label: 'База знаний',
       key: 'articles',
-      disabled: false,
+      disabled: true,
     },
     {
       label: 'Новости',
       key: 'posts',
-      disabled: false,
+      disabled: true,
     },
     {
       label: 'Личный кабинет',
@@ -65,14 +65,15 @@ const Footer: React.FC = () => {
         },
       }}
     >
-      {' '}
-      <Tabs
-        className={style.footer}
-        activeKey={activeKey}
-        centered
-        items={items}
-        onTabClick={handleTabClick}
-      />
+      <div className={style.footerContainer}>
+        <Tabs
+          className={style.footer}
+          activeKey={activeKey}
+          centered
+          items={items}
+          onTabClick={handleTabClick}
+        />
+      </div>
     </ConfigProvider>
   );
 };

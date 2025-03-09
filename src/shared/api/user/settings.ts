@@ -7,43 +7,43 @@ const baseUrl = process.env.NEXT_PUBLIC_BASE_URL;
 export const API_USER_SCHEME: IApiEntityScheme<IEndpoint> = {
   userData: {
     method: 'GET',
-    url: `/user`,
+    url: `${baseUrl}/user`,
   },
   userAchiv: {
     method: 'GET',
-    url: `/achivements/user`,
+    url: `${baseUrl}/achivements/user`,
   },
   userAchivAllEnable: {
     method: 'GET',
-    url: `/achivements/user/full`,
+    url: `${baseUrl}/achivements/user/full`,
   },
   userHistory: {
     method: 'GET',
-    url: `/actives/user_history`,
+    url: `${baseUrl}/actives/user_history`,
   },
   userActives: {
     method: 'GET',
-    url: `/actives/user_actives`,
+    url: `${baseUrl}/actives/user_actives`,
   },
   setAvatar: {
     method: 'PUT',
-    url: `/user/set_avatar`,
+    url: `${baseUrl}/user/set_avatar`,
   },
   addRole: {
     method: 'POST',
-    url: `/user/add_role`,
+    url: `${baseUrl}/user/add_role`,
   },
   changePass: {
     method: 'PUT',
-    url: `/auth/change_password`,
+    url: `${baseUrl}/auth/change_password`,
   },
   changeNick: {
     method: 'PUT',
-    url: `/auth/change_username`,
+    url: `${baseUrl}/auth/change_username`,
   },
   getAuthor: {
     method: 'GET',
-    url: `/post/author`,
+    url: `${baseUrl}/post/author`,
   },
 };
 

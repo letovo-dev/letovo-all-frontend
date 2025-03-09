@@ -5,6 +5,7 @@ import { immer } from 'zustand/middleware/immer';
 import { Modal } from 'antd';
 import { SERVICES_USERS } from '@/shared/api/user';
 import authStore, { TAuthStoreState } from '../auth-store';
+import { setDataToLocaleStorage } from '@/shared/lib/ApiSPA/axios/helpers';
 
 export interface IUserAchData {
   id: string;
@@ -30,6 +31,8 @@ export interface IUserData {
   departmentid: string;
   rolename: string;
   registered: string;
+  balance: number | string;
+  times_visited: number | string;
 }
 
 export interface IUserStore {
@@ -37,7 +40,6 @@ export interface IUserStore {
     userData: IUserData;
     userAchievements: IUserAchData | undefined;
     allPossibleUserAchievements: IUserAchData[] | undefined;
-    error: string | undefined;
   };
   localeName: string;
   endPreload: boolean;
@@ -47,7 +49,6 @@ export interface IUserStore {
   resetState: () => void;
   setAvatar: (avatar: string) => Promise<void>;
   changeLogin: (login: string) => Promise<void>;
-
   loading: boolean;
   error?: string;
 }
@@ -63,10 +64,12 @@ const initialState = {
     departmentid: '',
     rolename: '',
     registered: '',
+    balance: '',
+    times_visited: '',
   },
   userAchievements: undefined,
   allPossibleUserAchievements: undefined,
-  error: '',
+  error: undefined,
 };
 
 const userStore = create<IUserStore>()(
@@ -79,13 +82,6 @@ const userStore = create<IUserStore>()(
           },
           localeName: 'User store',
           endPreload: false,
-          resetState: () => {
-            set((state: IUserStore) => {
-              state.store = {
-                ...initialState,
-              };
-            });
-          },
           setEndPreload: (value: any) => {
             set((state: IUserStore) => {
               state.endPreload = value;
@@ -94,6 +90,7 @@ const userStore = create<IUserStore>()(
           getAllUserAchievements: async (login: string) => {
             try {
               const response = await SERVICES_USERS.UsersData.getAllUserAchievements(login);
+              console.info('getAllUserAchievements', response);
               if (response?.success && response.code === 200) {
                 // produce((draft: IUserStore) => {
                 //   draft.store.trainsData = trains;
@@ -111,7 +108,7 @@ const userStore = create<IUserStore>()(
               }
             } catch (error: any) {
               produce(get(), (draft: IUserStore) => {
-                draft.store.error = error instanceof Error ? error.message : String(error);
+                draft.error = error instanceof Error ? error.message : String(error);
               });
             }
           },
@@ -142,11 +139,11 @@ const userStore = create<IUserStore>()(
             try {
               const response = await SERVICES_USERS.UsersData.changeNick({ new_username });
               if (response?.success && response.code === 200) {
-                const { token } = response?.data as {
-                  token: string;
-                };
+                const token = response.authorization;
+                // setDataToLocaleStorage('token', token);
+                // token && localStorage.setItem('token', token);
                 authStore.setState((draft: TAuthStoreState) => {
-                  draft.userStatus = { ...draft.userStatus, token };
+                  draft.userStatus = { ...draft.userStatus, token: token };
                 });
                 const {
                   data: { result },
@@ -154,13 +151,21 @@ const userStore = create<IUserStore>()(
                 userStore.setState((draft: IUserStore) => {
                   draft.store.userData = result[0];
                 });
-                set({ error: undefined });
+                set((draft: IUserStore) => ({ ...draft, error: undefined }));
+                if (result[0].registered === 't') {
+                  authStore.setState((draft: TAuthStoreState) => {
+                    draft.userStatus = { ...draft.userStatus, registered: true };
+                  });
+                }
               } else {
-                set({ error: response.codeMessage });
+                set((draft: IUserStore) => ({
+                  ...draft,
+                  error: response.codeMessage,
+                }));
               }
             } catch (err) {
               console.error(err);
-              set({ error: 'Не удалось сменить никнейм' });
+              set({ error: 'Не удалось сменить ник' });
             } finally {
               set({ loading: false });
             }

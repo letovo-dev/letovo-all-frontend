@@ -1,67 +1,65 @@
 import React from 'react';
-import { ConfigProvider, Select } from 'antd';
-import styles from './CustomSelect.module.scss';
-import {
-  BaiduOutlined,
-  DockerOutlined,
-  InsuranceOutlined,
-  MessageOutlined,
-} from '@ant-design/icons';
+import { Menu, MenuProps } from 'antd';
+import style from './CustomSelect.module.scss';
+import './CustomSelect.module.scss';
+import Image from 'next/image';
 
-const CustomSelect = ({ value, onChange }) => {
-  const handleChange = value => {
+type MenuItem = Required<MenuProps>['items'][number];
+
+interface CustomSelectProps {
+  value?: string;
+  onChange?: (value: string) => void;
+  visible: boolean;
+  setVisible: (value: boolean) => void;
+  avatars: string[];
+  userPageSelectPosition?: boolean;
+}
+
+const CustomSelect: React.FC<CustomSelectProps> = ({
+  value,
+  onChange,
+  visible,
+  setVisible,
+  avatars = [],
+  userPageSelectPosition,
+}) => {
+  const avatarsToSelect = avatars.map((avatar: string) => ({
+    key: avatar,
+    icon: (
+      <div className={style.avatarTemplate}>
+        <Image
+          src={`${process.env.NEXT_PUBLIC_BASE_URL_MEDIA}${avatar}`}
+          width={40}
+          height={40}
+          alt="avatar"
+        />
+      </div>
+    ),
+    label: null,
+  }));
+  const handleMenuClick = (e: any) => {
+    const selectedImage = e.key;
     if (onChange) {
-      onChange(value);
+      onChange(selectedImage);
     }
+    setVisible(false);
   };
 
-  return (
-    <ConfigProvider
-      theme={{
-        token: {
-          colorBorder: 'none',
-        },
-        components: {
-          Select: {
-            optionHeight: 46,
-            optionPadding: '10px 12px',
-            // activeBorderColor: '#f0f0f0',
-            // hoverBorderColor: '#f0f0f0',
-            // multipleItemColorDisabled: '#f0f0f0',
-            // activeOutlineColor: '#f0f0f0',
-            // multipleItemBg: '#f0f0f0',
-            // multipleSelectorBgDisabled: '#f0f0f0',
-            // optionActiveBg: '#f0f0f0',
-            // optionSelectedColor: '#f0f0f0',
-          },
-        },
-      }}
-    >
-      <Select
-        style={{ width: '60px' }}
-        defaultValue={'option1'}
-        value={value}
-        onChange={handleChange}
-        suffixIcon={null}
-        maxTagCount={3}
-        listHeight={100}
-        dropdownStyle={{ width: '60px', border: 'none' }}
-      >
-        <Select.Option value="option1">
-          <BaiduOutlined style={{ fontSize: '20px' }} />
-        </Select.Option>
-        <Select.Option value="option2">
-          <DockerOutlined style={{ fontSize: '20px' }} />
-        </Select.Option>
-        <Select.Option value="option3">
-          <InsuranceOutlined style={{ fontSize: '20px' }} />
-        </Select.Option>
-        <Select.Option value="option4">
-          <MessageOutlined style={{ fontSize: '20px' }} />
-        </Select.Option>
-      </Select>
-    </ConfigProvider>
-  );
+  return visible ? (
+    <div className={!userPageSelectPosition ? style.customSelect : style.customSelectUserPage}>
+      {/* // <div className={style.customSelect}> */}
+      {
+        <Menu
+          title={undefined}
+          mode="inline"
+          items={avatarsToSelect}
+          inlineCollapsed={true}
+          onSelect={e => handleMenuClick(e)}
+          className={style.customSelectDropdown}
+        />
+      }
+    </div>
+  ) : null;
 };
 
 export default CustomSelect;

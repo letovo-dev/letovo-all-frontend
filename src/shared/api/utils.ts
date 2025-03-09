@@ -1,5 +1,4 @@
 export class Utils {
-  static dateExpired = (date: string | Date) => new Date(date.toString()).valueOf() < Date.now();
   static isFunction = (o: any) => o !== undefined && o !== null && typeof o === 'function';
   static isIterable = (o: any) => o !== undefined && this.isFunction(o[Symbol.iterator]);
   static removeNulls = (obj: any) => {

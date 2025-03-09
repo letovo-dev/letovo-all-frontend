@@ -1,14 +1,115 @@
+@use '../../../app/_mixins.scss';
+
 .formWrapper {
-  background-image: url('/login_screen.png');
-  background-repeat: no-repeat;
-  background-size: contain;
-  background-position: center;
-  height: 100vh;
-  width: 100vw;
+  @extend %entryCover;
+  padding-top: 12vh;
+  .form {
+    @extend %transparentContainer;
+    background-image: url('/base_login.png');
+    background-size: 90% 90%;
+    width: 387px;
+    justify-content: space-evenly;
+    align-items: center;
+    height: 146px;
+    background-position: center;
+    margin-top: 10px;
+    font-size: 14px;
+    font-weight: 400;
+
+    .selectPhoto {
+      @extend %transparentContainer;
+      background-image: url('/SelectPhoto.png');
+      background-size: contain;
+      justify-content: center;
+      align-items: center;
+      height: 77px;
+      width: 79px;
+      background-position: center;
+      font-size: 12px;
+      overflow-wrap: break-word;
+      white-space: normal;
+      color: #fff;
+      text-align: center;
+      cursor: pointer;
+      line-height: normal;
+      position: relative;
+    }
+  }
+}
+
+.selectPhotoFormItem {
+  position: relative;
+}
+
+.titleBorder {
+  @extend %transparentContainer;
+  background-image: url('/title_login_empty.png');
+  width: 225px;
   display: flex;
-  align-items: center;
   justify-content: center;
-  flex-direction: column;
+  align-items: center;
+  height: 65px;
+  background-position: center;
+}
+
+%input {
+  @extend %transparentContainer;
+  width: 205px;
+  height: 38px;
+  justify-content: flex-start;
+  align-items: center;
+  background-position: left;
+  margin-bottom: 15px;
+}
+.inputForm {
+  @extend %input;
+  margin-bottom: 0px;
+  background-image: url('/base_registration_input.png');
+}
+.inputFormError {
+  @extend %input;
+  margin-bottom: 0px;
+  background-image: url('/base_registration_input_error.png');
+}
+
+.customInput {
+  background: transparent;
+  border: none;
+  outline: none;
+  color: #000;
+  font-size: 14px;
+  font-weight: 400;
+  width: 100%;
+  padding: 8px 4px 8px 16px;
+  cursor: text;
+}
+.customInput::placeholder {
+  color: #aaa;
+}
+.customInput:hover,
+.customInput:focus {
+  border: none;
+  outline: none;
+}
+
+.nickBox {
+  gap: 2px;
+}
+
+.infoPanel {
+  background-image: url('/messages_reg_form.png');
+  background-size: contain;
+  background-color: rgba(255, 255, 255, 0);
+  background-size: 90% 90%;
+  width: 387px;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  height: 220px;
+  background-repeat: no-repeat;
+  background-position: center;
+  font-size: 14px;
+  font-weight: 400;
 }
 
 .textCard {
@@ -21,6 +122,10 @@
 .text {
   line-height: 0.5;
   text-decoration: line-through;
+}
+.warning {
+  color: var(--orange);
+  padding-top: 3px;
 }
 
 .submitButton {
@@ -41,4 +146,15 @@
 .icon {
   margin-right: 5px;
   font-size: 15px;
+}
+
+.avatarTemplate {
+  @extend %avatarTemplate;
+  position: relative;
+}
+
+.selectedAvatar {
+  position: absolute;
+  left: 25%;
+  bottom: 25%;
 }

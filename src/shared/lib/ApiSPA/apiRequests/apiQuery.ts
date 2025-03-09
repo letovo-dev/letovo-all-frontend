@@ -1,7 +1,7 @@
 /* eslint-disable @typescript-eslint/no-explicit-any */
 import { AxiosRequestConfig, AxiosResponse, Method } from 'axios';
 import axiosInstance from '../axios/axios';
-import { IApiReturn, libConfig } from '../index';
+import { IApiReturn } from '../index';
 import { SuccessResponse, ErrorResponse, applyLibConfig } from '../utils';
 interface IApiQueryProps {
   method: Method;
@@ -15,6 +15,10 @@ interface IApiQueryProps {
   noNestedData?: boolean;
 }
 
+const libConfig = {
+  replacePatchToPost: false,
+  replacePutToPost: false,
+};
 export const apiQuery = async <T = any>({
   method,
   url,

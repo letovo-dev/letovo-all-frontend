@@ -10,7 +10,13 @@
   --graphics9: #2d2d2d;
   --graphics10: #494949;
   --graphics11: #b2b2b2;
-  --vh: 100%;
+  --vh: 100vh;
+  --science: #50c787;
+  --enginery: #edc731;
+  --it: #5a88ff;
+  --art: #c061f3;
+  --management: #fd4948;
+  --proj: #a7e265;
 }
 
 // @media (prefers-color-scheme: dark) {
@@ -22,62 +28,86 @@
 
 html,
 body {
-  max-width: 100vw;
+  // max-height: 100vh;
   overflow-x: hidden;
-  background-image: url('/login_screen.png') !important;
-  background-repeat: no-repeat !important;
-  background-size: contain !important;
-  background-position: center !important;
-  // overflow-y: hidden;
+  overflow-y: hidden;
+  // background-image: url('/background_mobile.png') !important;
+  // background-repeat: no-repeat !important;
+  // background-size: contain !important;
+  // background-position: center !important;
+  // font-family: 'Caleo', sans-serif;
 }
 
 body {
   display: flex;
-  flex-direction: column; /* Устанавливаем вертикальную колонку */
+  flex-direction: column;
   color: var(--graphics9);
   background: var(--background);
-  // font-family: calleo, sans-serif;
   -webkit-font-smoothing: antialiased;
   -moz-osx-font-smoothing: grayscale;
   margin: 0;
   padding: 0;
-  height: 100%;
+  // height: 100%;
 }
 
 @font-face {
   font-family: 'Caleo';
-  src: url('../fonts//Calleo.woff') format('woff2');
+  src: url('/fonts/Calleo.woff') format('woff');
   font-weight: normal;
   font-style: normal;
+}
+
+.caleo-font {
+  font-family: 'Caleo', sans-serif;
 }
 
 .layout-container {
   display: flex;
   flex-direction: column;
-  height: calc(var(--vh, 1vh) * 100);
-  // padding-bottom: env(safe-area-inset-bottom);
-}
-
-.content {
-  flex: 1;
-}
-.footer {
-  position: absolute;
-  bottom: 0;
-  left: 50%;
-  transform: translateX(-50%);
-  display: flex;
-  justify-content: center;
-  align-items: center;
-  z-index: 10;
-  background: var(--background);
-  padding: 0 30px 0 30px;
+  height: 100%;
 }
 
 * {
   box-sizing: border-box;
   padding: 0;
   margin: 0;
+}
+
+.ant-menu-item {
+  height: 80px !important;
+  line-height: 73px !important;
+  padding: 0 12px !important;
+}
+
+.ant-menu-item {
+  margin-bottom: 0px !important;
+}
+.ant-tooltip {
+  display: none !important;
+}
+
+.ant-tabs-top {
+  margin: 0px !important;
+}
+
+.ant-typography {
+  margin-bottom: 0px !important;
+}
+
+// .ant-menu,
+// .ant-space,
+// .ant-typography,
+// .ant-btn,
+// .ant-input,
+// .ant-modal,
+// .ant-dropdown,
+// .ant-select {
+//   font-family: 'Caleo', sans-serif !important;
+// }
+
+[class^='ant-'],
+[class*=' ant-'] {
+  font-family: 'Caleo', sans-serif !important;
 }
 
 a {

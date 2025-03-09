@@ -1,0 +1,20 @@
+@use '../../app/mixins.scss';
+
+.selectPhoto {
+  @extend %transparentContainer;
+  background-image: url('/SelectPhoto.png');
+  background-size: contain;
+  justify-content: center;
+  align-items: center;
+  height: 77px;
+  width: 79px;
+  background-position: center;
+  font-size: 12px;
+  overflow-wrap: break-word;
+  white-space: normal;
+  color: #fff;
+  text-align: center;
+  cursor: pointer;
+  line-height: normal;
+  position: relative;
+}

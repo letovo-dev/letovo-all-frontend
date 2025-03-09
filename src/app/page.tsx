@@ -4,29 +4,50 @@ import '@ant-design/v5-patch-for-react-19';
 import { useRouter } from 'next/navigation';
 import userStore from '@/shared/stores/user-store';
 import authStore from '@/shared/stores/auth-store';
+import { ConfigProvider, Spin } from 'antd';
+import style from './page.module.scss';
 
 export default function Home() {
   const auth = authStore.getState().auth;
-  const { authed, registered } = authStore(state => state.userStatus);
-  const username = userStore.getState().store.userData.username;
+  const userStatus = authStore(state => state.userStatus);
+  const userData = userStore(state => state.store?.userData);
   const router = useRouter();
-  const token = localStorage.getItem('token');
   const error = userStore(state => state.error);
+  const loading = authStore(state => state.loading);
 
   useEffect(() => {
     async function checkAuth() {
-      if (!token || !authed) {
+      if (!userStatus?.token || !userStatus?.authed) {
         router.push('./login');
       } else {
-        await auth(token);
-        if (error === undefined && username && !registered) {
+        await auth(userStatus?.token);
+        if (!error && userData.username && !userStatus?.registered) {
           router.push('/registration');
         }
-        router.push(`/user/${username}`);
+        if (!error && userData?.username && userStatus?.registered) {
+          router.push(`/user/${userData?.username}`);
+        }
       }
     }
     checkAuth();
-  }, [token, authed, username]);
+  }, [userStatus?.token, userStatus?.authed, userData?.username]);
 
+  if (loading) {
+    return (
+      <div className={style.spinWrapper}>
+        {loading && (
+          <ConfigProvider
+            theme={{
+              token: {
+                colorPrimary: '#FB4724',
+              },
+            }}
+          >
+            <Spin size={'large'} />
+          </ConfigProvider>
+        )}
+      </div>
+    );
+  }
   return <></>;
 }

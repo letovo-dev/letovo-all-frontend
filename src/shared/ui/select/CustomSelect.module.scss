@@ -1,38 +1,102 @@
+@use '../../../app/_mixins.scss';
+
 .customSelect {
-  position: relative;
-  display: inline-block;
-  font-family: sans-serif;
-}
-
-.customSelectBtn {
-  padding: 10px 20px;
-  background: #f0f0f0;
-  border: 1px solid #ccc;
-  cursor: pointer;
-  user-select: none;
-  color: 'black';
-}
-
-.customSelectDropdown {
-  position: absolute;
-  top: calc(100% + 20px); // 20px ниже кнопки
-  left: 0;
-  right: 0;
-  background: #fff;
-  border: 1px solid #ccc;
-  box-shadow: 0 2px 5px rgba(0, 0, 0, 0.1);
-  max-height: 200px; // Ограничение по высоте
+  background-image: url('/Base_PhotoSelection_PC.png');
+  background-color: rgba(255, 255, 255, 0);
+  left: -15px;
+  top: 200%;
   overflow-y: auto;
+  background-repeat: no-repeat;
+  background-position: center;
+  margin-top: 5px;
+  position: absolute;
+  width: 109px;
+  height: calc(109px * (442 / 139));
+  background-size: contain;
   z-index: 10;
-  color: 'black';
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: flex-start;
+
+  &::-webkit-scrollbar {
+    width: 10px !important;
+    // height: 50px !important; // Высота скроллбара
+    // position: absolute !important;
+    padding-left: 100px !important;
+  }
+
+  &::-webkit-scrollbar-track {
+    background: #3f3c3c !important;
+    // margin-top: 5px !important; // Отступ сверху
+    // margin-bottom: 5px !important; // Отступ снизу
+    // height: 50px !important;
+  }
+
+  &::-webkit-scrollbar-thumb {
+    background: #554c4c !important;
+    // border-radius: 3px !important;
+    // max-height: 50px !important;
+  }
+
+  &::-webkit-scrollbar-thumb:hover {
+    background: #ece7e7 !important;
+  }
+  .customSelectDropdown {
+    width: 100%;
+    display: flex;
+    flex-direction: column;
+    gap: 8px;
+    position: relative;
+    background: none !important;
+    border: none !important;
+    padding-inline: 0 !important;
+    padding: 3px;
+  }
 }
 
-.customSelectOption {
-  padding: 10px;
-  cursor: pointer;
+.customSelectUserPage {
+  @extend .customSelect;
+  left: -6px;
+  top: 275%;
 
-  &:hover {
-    background: #e0e0e0;
-    color: 'black';
-  }
+  // &::-webkit-scrollbar {
+  //   width: 10px !important;
+  //   // height: 50px !important; // Высота скроллбара
+  //   // position: absolute !important;
+  //   padding-left: 100px !important;
+  // }
+
+  // &::-webkit-scrollbar-track {
+  //   background: #3f3c3c !important;
+  //   // margin-top: 5px !important; // Отступ сверху
+  //   // margin-bottom: 5px !important; // Отступ снизу
+  //   // height: 50px !important;
+  // }
+
+  // &::-webkit-scrollbar-thumb {
+  //   background: #554c4c !important;
+  //   // border-radius: 3px !important;
+  //   // max-height: 50px !important;
+  // }
+
+  // &::-webkit-scrollbar-thumb:hover {
+  //   background: #ece7e7 !important;
+  // }
+
+  // .customSelectDropdown {
+  //   width: 100%;
+  //   display: flex;
+  //   flex-direction: column;
+  //   gap: 8px;
+  //   position: relative;
+  //   background: none !important;
+  //   border: none !important;
+  //   padding-inline: 0 !important;
+  //   padding: 3px;
+  // }
+}
+
+.avatarTemplate {
+  @extend %avatarTemplate;
 }

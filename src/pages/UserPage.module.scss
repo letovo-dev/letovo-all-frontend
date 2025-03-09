@@ -1,38 +1,228 @@
+@use '../app/mixins.scss';
+
 .wrap {
+  @extend %entryCover;
+  background-image: url('/background_account.png');
+  position: relative;
   width: 100vw;
+  background-size: contain;
+  background-position: top center;
+  overflow: hidden;
+  display: flex;
+  flex-direction: column;
+  height: 100vh;
+  // min-height: 844px;
+}
+.accountDiv {
+  position: absolute;
+  z-index: 1;
+  top: 6%;
+  @extend %entryCover;
+  background-image: url('/Background_Account_Base.png');
+  width: 390px;
+  background-size: 390px;
+  height: 233px;
+}
+
+.logOutButton {
+  position: absolute;
+  @extend %transparentContainer;
+  background-size: contain;
+  background-image: url('/button_LogOut.png');
+  width: 60px;
+  z-index: 5;
+  height: 36px;
+  border: none;
+  position: absolute;
+  cursor: pointer;
+  right: -10px;
+  top: 2%;
+}
+
+.form {
+  position: absolute;
+  z-index: 4;
+  left: 50%;
+  transform: translate(-50%, -50%) translate(-126px); /* Центрируем элемент и добавляем фиксированное смещение */
+}
+
+.avatarTemplate {
+  @extend %avatarTemplate;
+  height: calc(100px * (112 / 106));
+  width: 100px;
+}
+
+.userData {
+  z-index: 2;
+  margin-bottom: 112px;
+  display: flex;
+  flex-direction: column;
+
+  .userName {
+    font-size: 18px;
+    font-weight: 600;
+  }
+  .userOnBoard {
+    font-size: 14px;
+    font-weight: 400;
+    margin-top: 10px;
+    color: var(--orange);
+  }
+  .userRest {
+    @extend .userOnBoard;
+    color: var(--graphics11);
+  }
+  .userPosition {
+    font-size: 12px;
+    font-weight: 600;
+    color: var(--foreground);
+    margin-top: 5px;
+  }
+}
+
+.science {
+  background-color: var(--science);
+}
+.enginery {
+  background-color: var(--enginery);
+}
+.it {
+  background-color: var(--it);
+}
+.art {
+  background-color: var(--art);
+}
+.management {
+  background-color: var(--management);
+}
+.proj {
+  background-color: var(--proj);
+}
+.defaultColor {
+  background-color: var(--graphics8);
+}
+
+.onBoardContainer {
+  display: flex;
+  align-items: center;
+  position: absolute;
+  z-index: 3;
+  left: calc(11% - 4px); // Фиксируем левую границу относительно центра с учетом смещения
+  transform: translateY(40%);
+  gap: 20px;
+  .timeOnBoard {
+    @extend %transparentContainer;
+    background-size: contain;
+    background-image: url('/Frame_SavedThePlanet.png');
+    width: 63px;
+    height: 28px;
+    align-items: center;
+    justify-content: space-around;
+    color: var(--orange);
+    .time {
+      padding-bottom: 2px;
+    }
+  }
+  .department {
+    padding: 5px 10px 5px 12px;
+    border-radius: 20px;
+    font-size: 14px;
+    font-weight: 400;
+    color: var(--background);
+  }
+}
+
+.money {
+  width: 100%;
+  z-index: 3;
+  @extend %transparentContainer;
+  background-image: url('/Button_TransferMoney.png');
+  width: 390px;
+  height: 50px;
+  transform: translateY(144%);
+  position: absolute;
+  padding-left: 30px;
+  justify-content: left;
+  align-items: center;
+  cursor: pointer;
+  gap: 10px;
+  .count {
+    font-size: 12px;
+    font-weight: 600;
+    color: var(--foreground);
+  }
+  .text {
+    @extend .count;
+    color: var(--graphics11);
+  }
+}
+
+.achieveHeader {
+  width: 100%;
+  z-index: 3;
+  padding: 0 50px 0 50px;
   display: flex;
   align-items: center;
   justify-content: center;
-  flex-direction: column;
+  position: absolute;
+  top: 218px;
+
+  .text {
+    @extend .count;
+    color: var(--foreground);
+  }
 }
-.container {
-  width: 100%;
+
+.achContainer {
+  width: 390px;
   display: flex;
   align-items: flex-start;
   justify-content: center;
-  box-sizing: border-box; /* Выравниваем все колонки по верхнему краю */
-  max-width: 40vw;
+  box-sizing: border-box;
+  overflow: scroll;
+  position: absolute;
+  top: 325px;
+  flex-grow: 1;
+  max-height: calc(100vh - 400px); // Не превышает видимую область минус высота .accountDiv
+  overflow-y: auto;
+  overflow-x: hidden;
 }
-
 .column {
-  padding: 5px;
-  background-color: #f0f0f0;
-  margin: 0 0 0 5px; /* Горизонтальные отступы между колонками */
+  padding: 0px;
+  margin: 0 0 0 0px;
   flex: 1 1 calc(33.33% - 20px);
   max-width: 110px;
 }
 
-/* Блок, занимающий свободное место в 30px сверху во втором столбце */
+.extraColumn {
+  @extend .column;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+}
+
 .spacer {
-  height: 30px;
+  @extend %transparentContainer;
+  background-image: url('/Button_ScanQR.png');
+  width: 95px;
+  height: 55px;
+  cursor: pointer;
+  margin-bottom: 5px;
 }
 
 .item {
-  margin-bottom: 10px; /* Отступ между элементами внутри колонок */
-  padding: 10px;
-  background-color: #fff;
-  border: 1px solid #ddd;
-  border-radius: 4px;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  .itemImg {
+    cursor: pointer;
+    margin-bottom: 5px;
+  }
+  .achTextInactive {
+    font-size: 11px;
+    font-weight: 400;
+    color: var(--graphics11);
+  }
 }
 @media screen and (max-width: 424px) {
   .item {
@@ -40,60 +230,11 @@
   }
 }
 
-// @media screen and (max-width: 424px) {
-//   .column {
-//   background-color: #f0f0f0;
-//   margin: 0 0 0 5px;         /* Горизонтальные отступы между колонками */
-//   flex: 1 1 calc(33.33% - 5px);
-//   padding: 5px;
-
-//   }
-// }
-
-.inputWrapper {
-  $clip-path: polygon(
-    10px 0,
-    calc(100% - 10px) 0,
-    100% 10px,
-    100% calc(100% - 10px),
-    calc(100% - 10px) 100%,
-    10px 100%,
-    0 calc(100% - 10px),
-    0 10px
-  );
-
-  position: relative;
-  z-index: 2;
-  width: 300px;
-  height: 40px;
-  padding: 10px;
-  border: none;
-  outline: none;
-  background: #fff;
-  -webkit-clip-path: $clip-path;
-  clip-path: $clip-path;
-  background-clip: padding-box;
-
-  &::before {
-    content: '';
-    position: absolute;
-    top: -2px;
-    left: -2px;
-    right: -2px;
-    bottom: -2px;
-    background: #000; // Цвет обводки
-    z-index: -1;
-    $clip-path-before: polygon(
-      12px 0,
-      calc(100% - 12px) 0,
-      100% 12px,
-      100% calc(100% - 12px),
-      calc(100% - 12px) 100%,
-      12px 100%,
-      0 calc(100% - 12px),
-      0 12px
-    );
-    -webkit-clip-path: $clip-path-before;
-    clip-path: $clip-path-before;
-  }
+.footer {
+  @extend %transparentContainer;
+  background-image: url('/base_bottom.png');
+  width: 390px;
+  height: 85px;
+  position: absolute;
+  bottom: 0px;
 }

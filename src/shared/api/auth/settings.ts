@@ -7,27 +7,27 @@ const baseUrl = process.env.NEXT_PUBLIC_BASE_URL;
 export const API_AUTH_SCHEME: IApiEntityScheme<IEndpoint> = {
   login: {
     method: 'POST',
-    url: `/auth/login`,
+    url: `${baseUrl}/auth/login`,
   },
   auth: {
     method: 'GET',
-    url: `/auth/amiauthed/`,
+    url: `${baseUrl}/auth/amiauthed/`,
   },
   logout: {
     method: 'PUT',
-    url: `/auth/logout`,
+    url: `${baseUrl}/auth/logout`,
   },
   changePass: {
     method: 'PUT',
-    url: `/auth/change_password`,
+    url: `${baseUrl}/auth/change_password`,
   },
   changeLogin: {
     method: 'PUT',
-    url: `/auth/change_username`,
+    url: `${baseUrl}/auth/change_username`,
   },
   register: {
     method: 'PUT',
-    url: `/auth/register_true`,
+    url: `${baseUrl}/auth/register_true`,
   },
 };
 

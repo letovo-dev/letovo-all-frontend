@@ -1,14 +1,49 @@
+@use '../../../app/_mixins.scss';
+
 .loginFormWrapper {
-  background-image: url('/login_screen.png');
-  background-repeat: no-repeat;
-  background-size: contain;
-  background-position: center;
-  height: 100vh;
-  width: 100vw;
+  @extend %entryCover;
+  padding-top: 14vh;
+}
+
+.card {
+  @extend %transparentContainer;
+  background-image: url('/base_login.png');
+  width: 332px;
   display: flex;
-  align-items: center;
   justify-content: center;
-  flex-direction: column;
+  align-items: center;
+  height: 220px;
+  background-position: center;
+}
+
+%input {
+  @extend %transparentContainer;
+  width: 291px;
+  height: 40px;
+  justify-content: flex-start;
+  align-items: center;
+  background-position: left;
+  margin-bottom: 15px;
+}
+
+.inputForm {
+  @extend %input;
+  background-image: url('/base_login_input.png');
+}
+.inputFormError {
+  @extend %input;
+  background-image: url('/base_login_input_error.png');
+}
+
+.titleBorder {
+  @extend %transparentContainer;
+  background-image: url('/title_login_empty.png');
+  width: 91px;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  height: 26px;
+  background-position: center;
 }
 
 .buttonsContainer {
@@ -32,6 +67,28 @@
   margin-bottom: 15px;
 }
 
+.customInput {
+  background: transparent;
+  border: none;
+  outline: none; /* Убирает обводку при фокусе */
+  color: #000; /* Цвет текста */
+  font-size: 14px; /* Размер шрифта */
+  font-weight: 400;
+  width: 100%; /* Занимает всю ширину родительского контейнера */
+  padding: 8px 4px 8px 16px; /* Внутренние отступы для удобства */
+  cursor: text; /* Курсор при наведении */
+}
+
+.customInput::placeholder {
+  color: #aaa; /* Цвет плейсхолдера */
+}
+
+.customInput:hover,
+.customInput:focus {
+  border: none; /* Убирает рамки даже при наведении и фокусе */
+  outline: none; /* Убирает обводку при фокусе */
+}
+
 .formItemPass {
   margin-bottom: 10px;
 }
@@ -48,4 +105,18 @@
   height: 27.74px;
   border-radius: 7.68px;
   border-color: var(--orange);
+}
+
+.submitButton:not([disabled]):hover {
+  background-color: var(--orange);
+  color: var(--background);
+}
+.modalText {
+  font-weight: bold;
+  margin-bottom: 20px;
+}
+
+.modalTextOrange {
+  color: var(--orange);
+  font-weight: bold;
 }

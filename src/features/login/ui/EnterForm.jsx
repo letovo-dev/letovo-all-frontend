@@ -1,33 +1,41 @@
 'use client';
 import React, { useEffect, useState } from 'react';
-import { ExclamationCircleOutlined, LockOutlined, UserOutlined } from '@ant-design/icons';
-import { Button, Form, Input, Card, Typography, ConfigProvider, Spin, Flex } from 'antd';
+import { ExclamationCircleOutlined } from '@ant-design/icons';
+import { Button, Form, Typography, ConfigProvider, Spin, Flex } from 'antd';
 import authStore from '@/shared/stores/auth-store';
 import { redirect } from 'next/navigation';
 import style from './EnterForm.module.scss';
 import { setDataToLocaleStorage } from '@/shared/lib/ApiSPA/axios/helpers';
 import userStore from '@/shared/stores/user-store';
+import CustomModal from './CustomForgetPassModal';
 
 function EnterForm() {
   const { Title, Text } = Typography;
   const userStatus = authStore(state => state.userStatus);
-  const userName = userStore(state => state.store.userData.username);
+  const userName = userStore(state => state.store?.userData.username);
   const error = authStore(state => state.error);
   const [form] = Form.useForm();
   const loading = authStore(state => state.loading);
-  const [formData, setFormData] = useState({ login: undefined, password: undefined });
+  const [formData, setFormData] = useState({ login: '', password: '' });
+  const [open, setOpen] = useState(false);
 
   useEffect(() => {
-    if (userStatus.logged && userStatus.registered) {
-      // if (userStatus.logged) {
-      setDataToLocaleStorage('token', userStatus.token);
+    // redirect('./registration');
+
+    if (userStatus?.logged && userStatus?.registered) {
+      setDataToLocaleStorage('token', userStatus?.token);
       redirect(`/user/${userName}`);
     }
-    if (userStatus.logged && !userStatus.registered) {
-      setDataToLocaleStorage('token', userStatus.token);
+    if (userStatus?.logged && !userStatus?.registered) {
+      console.log(
+        'userStatus?.logged && !userStatus?.registered',
+        userStatus?.logged && !userStatus?.registered,
+      );
+
+      setDataToLocaleStorage('token', userStatus?.token);
       redirect('./registration');
     }
-  }, [userStatus.logged, userStatus.registered, userStatus.token, userName]);
+  }, [userStatus]);
 
   const onFinish = values => {
     authStore.getState().login(values);
@@ -35,15 +43,23 @@ function EnterForm() {
 
   const handleNameInput = e => {
     setFormData(prev => {
-      return { ...prev, login: e.target.value };
+      return { ...prev, login: e.target.value || '' };
     });
   };
 
   const handlePassInput = e => {
     setFormData(prev => {
-      return { ...prev, password: e.target.value };
+      return { ...prev, password: e.target.value || '' };
     });
   };
+
+  const showModal = () => {
+    setOpen(true);
+  };
+
+  console.log('error', error);
+
+  const disabledButton = !formData?.login || !formData?.password;
 
   if (loading) {
     return (
@@ -65,80 +81,58 @@ function EnterForm() {
 
   return (
     <div className={style.loginFormWrapper}>
-      <Title level={4}>ВХОД</Title>
-      <Form
-        name="form"
-        // initialValues={
-        //     action === 'login'
-        //         ? { email: user.remember ? user.email : '', remember: user.remember }
-        //         : { remember: true }
-        // }
-        // style={{ minWidth: '100%' }}
-        onFinish={onFinish}
-        form={form}
-      >
-        <Card
-          style={{
-            width: '332px',
-            height: '186px',
-            borderRadius: '7.35px',
-            boxShadow: 'inset 0px 1.22px 0px 0px rgba(0, 0, 0, 0.25)',
-            background: 'rgb(242, 242, 242)',
-          }}
-        >
-          <Text className={style.inputTextHeader} type="secondary">
-            {'Логин'}
-          </Text>
-          <ConfigProvider
-            theme={{
-              components: {
-                Input: {
-                  activeBorderColor: '#fb4724',
-                  hoverBorderColor: '#fb4724',
-                },
-              },
-            }}
-          >
+      <div className={style.titleBorder}>
+        <Title level={4}>ВХОД</Title>
+      </div>
+      <Form name="form" onFinish={onFinish} form={form}>
+        <div className={style.card}>
+          <div style={{ width: '90%' }}>
+            <Text className={style.inputTextHeader} type="secondary">
+              {'Логин'}
+            </Text>
             <Form.Item
               name="login"
-              rules={[{ required: true, message: 'Введите логин' }]}
-              className={style.formItem}
+              initialValue={formData.login}
+              className={!error ? style.inputForm : style.inputFormError}
             >
-              <Input
-                onChange={handleNameInput}
-                className={style.inputForm}
-                prefix={<UserOutlined />}
+              <input
+                type="text"
+                className={style.customInput}
                 placeholder="Nickname"
+                autoComplete="username"
+                onChange={handleNameInput}
+                value={formData.login || ''}
               />
             </Form.Item>
             <Text className={style.inputTextHeader} type="secondary">
               {'Пароль'}
             </Text>
             <Form.Item
-              className={style.formItemPass}
+              className={!error ? style.inputForm : style.inputFormError}
               name="password"
-              rules={[{ required: true, message: 'Введите пароль' }]}
+              initialValue={formData.password}
             >
-              <Input
-                className={style.inputForm}
-                prefix={<LockOutlined />}
+              <input
+                className={style.customInput}
                 type="password"
-                placeholder="123abc"
+                id="form_password"
                 onChange={handlePassInput}
+                autoComplete="current-password"
+                placeholder="Password"
+                value={formData.password || ''}
               />
             </Form.Item>
-          </ConfigProvider>
 
-          {error && (
-            <Flex vertical={false} justify={'center'} align={'center'} gap="small">
-              <ExclamationCircleOutlined style={{ color: '#FB4724' }} />
-              <Text type="danger">{error}</Text>
-            </Flex>
-          )}
-        </Card>
+            {error && (
+              <Flex vertical={false} justify={'center'} align={'center'} gap="small">
+                <ExclamationCircleOutlined style={{ color: '#FB4724' }} />
+                <Text type="danger">{error}</Text>
+              </Flex>
+            )}
+          </div>
+        </div>
         <div className={style.buttonsContainer}>
-          <span className={style.forgetPass} onClick={() => console.log('забыли пароль')}>
-            {' '}
+          <span className={style.forgetPass} onClick={() => showModal()}>
             забыли пароль
           </span>
           <Form.Item>
@@ -146,29 +140,21 @@ function EnterForm() {
               theme={{
                 components: {
                   Button: {
-                    defaultHoverBorderColor: '#ffffff',
-                    defaultHoverColor: '#ffffff',
-                    defaultHoverBg: '#FB4724',
+                    defaultHoverBorderColor: disabledButton ? '' : '#ffffff',
+                    defaultHoverColor: disabledButton ? '' : '#ffffff',
+                    defaultHoverBg: disabledButton ? '' : '#FB4724',
                   },
                 },
               }}
             >
-              <Button
-                htmlType="submit"
-                disabled={!formData.login || !formData.password}
-                className={style.submitButton}
-              >
+              <Button htmlType="submit" disabled={disabledButton} className={style.submitButton}>
                 Войти
               </Button>
             </ConfigProvider>
-
-            {/* <Text type="secondary">
-                            {action === 'login' ? 'Already have an account?' : "Don't have an account?"}
-                        </Text>{' '}
-                        {action === 'login' ? <NavLink to="/signup">Signup</NavLink> : <NavLink to="/">Login</NavLink>} */}
           </Form.Item>
         </div>
       </Form>
+      {open && <CustomModal open={open} setOpen={setOpen} title="Забыли пароль?" />}
     </div>
   );
 }

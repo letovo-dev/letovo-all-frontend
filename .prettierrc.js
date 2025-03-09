@@ -6,4 +6,12 @@ module.exports = {
   useTabs: false,
   arrowParens: 'avoid',
   printWidth: 100,
+  overrides: [
+    {
+      files: '*.scss',
+      options: {
+        parser: 'scss',
+      },
+    },
+  ],
 };

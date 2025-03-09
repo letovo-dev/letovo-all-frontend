@@ -7,7 +7,7 @@ import userStore, { IUserStore } from '../user-store';
 
 export type TAuthStoreState = {
   loading: boolean;
-  error?: string;
+  error: string;
   userStatus: {
     logged: boolean;
     authed: boolean;
@@ -32,14 +32,12 @@ const initialState = {
 const authStore = create<TAuthStoreState>()(
   persist(
     immer((set: (partial: Partial<any>) => void, get: () => any) => ({
-      userStatus: {
-        ...initialState,
-      },
+      // ...initialState,
       login: async (payload: any): Promise<any> => {
         set({ error: undefined, loading: true });
         try {
           const response = await SERVICES_AUTH.Auth.login(payload);
-          if (response && response.code === 200) {
+          if (response.success && response.code === 200) {
             const {
               data: { result },
             } = response;
@@ -50,14 +48,14 @@ const authStore = create<TAuthStoreState>()(
             const registered = result[0]?.registered === 'f' ? false : true;
             set({
               userStatus: { logged: true, authed: true, registered: registered, token },
+              error: undefined,
             });
           } else {
-            set({ error: response.codeMessage });
-            return { token: undefined, authed: false };
+            set({ ...initialState, error: response.codeMessage });
           }
         } catch (error) {
           console.error(error);
-          set({ userStatus: dUserState, error: 'Network or system error' });
+          set({ ...initialState, error: 'Network or system error' });
         } finally {
           set({ loading: false });
         }
@@ -69,7 +67,11 @@ const authStore = create<TAuthStoreState>()(
           if (response.success && response.code === 200) {
             const responseData = response?.data as { status: string };
             if (responseData.status === 't') {
-              set((s: TAuthStoreState) => ({ userStatus: { ...s.userStatus, authed: true } }));
+              set((s: TAuthStoreState) => ({
+                ...s,
+                userStatus: { ...s.userStatus, authed: true },
+                error: undefined,
+              }));
             } else {
               get().logout();
             }
@@ -91,12 +93,19 @@ const authStore = create<TAuthStoreState>()(
         set({ error: undefined, loading: true });
         try {
           const response = await SERVICES_AUTH.Auth.register();
-          if (response.success && response.code === 200) {
+          if (response.success && response.code === 200 && response.data === 'ok') {
             set((s: TAuthStoreState) => ({
               userStatus: { ...s.userStatus, registered: true },
+              error: undefined,
             }));
           } else {
-            get().logout();
+            set((s: TAuthStoreState) => ({
+              userStatus: {
+                ...s.userStatus,
+                registered: false,
+              },
+              error: 'Ошибка регистрации',
+            }));
           }
         } catch (error: any) {
           console.error(error);
@@ -127,6 +136,11 @@ const authStore = create<TAuthStoreState>()(
           userStatus: { ...s.userStatus, logged: false, authed: false, token: '' },
         }));
         set({ error: undefined, loading: false });
+      },
+      resetState: () => {
+        set((s: TAuthStoreState) => ({
+          ...initialState,
+        }));
       },
     })),
     { name: 'authStore' },

@@ -1,0 +1,48 @@
+%entryCover {
+  background-image: url('/background_mobile.png');
+  background-repeat: no-repeat;
+  background-size: contain;
+  background-position: center;
+  height: 100vh;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  flex-direction: column;
+  margin: 0 auto;
+  @media screen and (max-width: 424px) {
+    background-size: cover;
+  }
+}
+
+%transparentContainer {
+  background-size: contain;
+  background-color: rgba(255, 255, 255, 0);
+  background-repeat: no-repeat;
+  display: flex;
+}
+
+%primaryButton {
+  background-color: var(--orange);
+  color: var(--background);
+  margin-right: 20;
+  width: 138.12px;
+  height: 27.74px;
+  border-radius: 7.68px;
+  border-color: var(--orange);
+}
+
+%avatarTemplate {
+  background-image: url('/avatar_template.png');
+  background-size: contain;
+  background-color: rgba(255, 255, 255, 0);
+  justify-content: center;
+  height: calc(79px * (112 / 106));
+  width: 79px;
+  background-repeat: no-repeat;
+  background-position: center;
+  overflow-wrap: break-word;
+  white-space: normal;
+  cursor: pointer;
+  position: relative;
+  padding: 3px;
+}

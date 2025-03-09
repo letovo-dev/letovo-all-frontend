@@ -7,27 +7,27 @@ const baseUrl = process.env.NEXT_PUBLIC_BASE_URL;
 export const API_ACHIEVEMENTS_SCHEME: IApiEntityScheme<IEndpoint> = {
   create: {
     method: 'POST',
-    url: `/achivements/create`,
+    url: `${baseUrl}/achivements/create`,
   },
   pictures: {
     method: 'GET',
-    url: `/achivements/pictures/`,
+    url: `${baseUrl}/achivements/pictures/`,
   },
   info: {
     method: 'GET',
-    url: `/achivements/info`,
+    url: `${baseUrl}/achivements/info`,
   },
   tree: {
     method: 'GET',
-    url: `/achivements/tree`,
+    url: `${baseUrl}/achivements/tree`,
   },
   add: {
     method: 'POST',
-    url: `/achivements/add`,
+    url: `${baseUrl}/achivements/add`,
   },
   delete: {
     method: 'DELETE',
-    url: `/achivements/delete`,
+    url: `${baseUrl}/achivements/delete`,
   },
 };
 
