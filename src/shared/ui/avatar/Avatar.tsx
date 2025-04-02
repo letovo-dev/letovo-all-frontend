@@ -1,17 +1,12 @@
 import React from 'react';
-import Image from 'next/image';
 import style from './Avatar.module.scss';
+import { Avatar } from 'antd';
 
-const Avatar = (
-  avatar: string | undefined,
-  size: { width: number; height: number },
-): JSX.Element => {
+const AvatarElement = (avatar: string | undefined): JSX.Element => {
   return avatar ? (
-    <Image
-      src={`${process.env.NEXT_PUBLIC_BASE_URL_MEDIA}${avatar}`}
-      width={size.width}
-      height={size.height}
-      alt="avatar"
+    <Avatar
+      src={`${process.env.NEXT_PUBLIC_BASE_URL_MEDIA}/${avatar}`}
+      size={60}
       className={style.selectedAvatar}
     />
   ) : (
@@ -19,4 +14,4 @@ const Avatar = (
   );
 };
 
-export default Avatar;
+export default AvatarElement;

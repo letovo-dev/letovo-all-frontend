@@ -1,0 +1,24 @@
+.autoHeightTextarea {
+  min-height: 20px; // Минимальная высота
+  max-height: 200px; // Максимальная высота
+  width: 80%;
+  padding: 0;
+  resize: none; // Убираем ручное изменение размера
+  overflow: hidden; // Убираем скроллбар
+  box-sizing: border-box;
+  border: none;
+  font-family: inherit;
+  font-size: 12px;
+  transition: height 0.4s ease; // Плавное изменение высоты
+  line-height: 1; // Удобная высота строк
+  -webkit-box-sizing: border-box;
+  -moz-box-sizing: border-box;
+  background: var(--background);
+  align-content: center;
+
+  &:focus {
+    outline: none;
+    border-color: transparent;
+    box-shadow: var(--secondaryGray);
+  }
+}

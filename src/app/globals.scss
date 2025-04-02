@@ -28,14 +28,7 @@
 
 html,
 body {
-  // max-height: 100vh;
   overflow-x: hidden;
-  overflow-y: hidden;
-  // background-image: url('/background_mobile.png') !important;
-  // background-repeat: no-repeat !important;
-  // background-size: contain !important;
-  // background-position: center !important;
-  // font-family: 'Caleo', sans-serif;
 }
 
 body {
@@ -47,7 +40,6 @@ body {
   -moz-osx-font-smoothing: grayscale;
   margin: 0;
   padding: 0;
-  // height: 100%;
 }
 
 @font-face {
@@ -94,15 +86,14 @@ body {
   margin-bottom: 0px !important;
 }
 
-// .ant-menu,
-// .ant-space,
-// .ant-typography,
-// .ant-btn,
-// .ant-input,
-// .ant-modal,
-// .ant-dropdown,
-// .ant-select {
-//   font-family: 'Caleo', sans-serif !important;
+.ant-carousel .slick-prev,
+.ant-carousel .slick-next,
+.ant-carousel .slick-prev:hover,
+.ant-carousel .slick-next:hover {
+  color: var(--orange);
+}
+// .ant-carousel {
+//   margin-top: -100px;
 // }
 
 [class^='ant-'],

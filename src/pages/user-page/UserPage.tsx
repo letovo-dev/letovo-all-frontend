@@ -3,7 +3,7 @@ import React, { useEffect, useRef, useState } from 'react';
 import { redirect, useRouter } from 'next/navigation';
 import style from './UserPage.module.scss';
 import userStore, { IUserAchData } from '@/shared/stores/user-store';
-import { Form } from 'antd';
+import { ConfigProvider, Form, Spin } from 'antd';
 import CustomSelect from '@/shared/ui/select/CustomSelect';
 import QRScanner from '@/features/qr-scanner/QrScanner';
 import TableElement from '@/features/qr-scanner/Table';
@@ -19,17 +19,14 @@ import { AchievementModal } from '@/entities/achievement/ui/modal';
 import { TransferModal } from '@/features/moneyTranfer/ui';
 
 const UserPage = () => {
-  const router = useRouter();
-  const [form] = Form.useForm();
-  const changeAvatar = userStore(state => state.setAvatar);
-  const getAvatars = dataStore(state => state.getAvatars);
-
+  const [error, setError] = useState(null);
+  const [dataScanner, setDataScanner] = useState(null);
   const { userAchievements } = userStore.getState().store;
   const { allPossibleUserAchievements } = userStore.getState().store;
   const getAllUserAchievements = userStore(state => state.getAllUserAchievements);
-  // const [data, setData] = useState<IUserAchData[][]>([]);
-  const [error, setError] = useState(null);
-  const [dataScanner, setDataScanner] = useState(null);
+  const [form] = Form.useForm();
+  const changeAvatar = userStore(state => state.setAvatar);
+  const getAvatars = dataStore(state => state.getAvatars);
   const userStatus = authStore(state => state.userStatus);
   const avatars = dataStore(state => state.data?.avatars);
   const [visible, setVisible] = useState(false);
@@ -42,26 +39,10 @@ const UserPage = () => {
   const [avatar, setAvatar] = useState<string | undefined>(undefined);
   const avatarRef = useRef<HTMLDivElement>(null);
   const [openTransferModal, setOpenTransferModal] = useState(false);
-
-  const goToFullScreen = () => {
-    const element = document.documentElement;
-    if (element.requestFullscreen) {
-      element.requestFullscreen().catch(err => {
-        console.error('Ошибка при входе в полноэкранный режим:', err);
-      });
-    }
-  };
-
-  useEffect(() => {
-    // setAvatar(userStore.getState().store.userData.avatar_pic);
-
-    const isMobile = /Mobi|Android/i.test(navigator.userAgent);
-    if (isMobile) {
-      setTimeout(() => {
-        goToFullScreen();
-      }, 100); // Задержка для завершения рендера
-    }
-  }, []);
+  const [data, setData] = useState<IUserAchData[][]>([]);
+  const { setFooterHidden } = dataStore(state => state);
+  const wrapRef = useRef<HTMLDivElement>(null);
+  const lastScrollTop = useRef(0);
 
   useEffect(() => {
     if (userData?.username) {
@@ -73,16 +54,36 @@ const UserPage = () => {
   }, [userData?.username, avatars]);
 
   useEffect(() => {
-    const initialData = userStore.getState().store.userData;
-    if (!userStatus?.logged || !userStatus?.token || !userStatus?.registered) {
-      redirect('/login');
-    } else {
+    const loadData = async () => {
+      const initialData = userStore.getState().store.userData;
+      if (!userStatus?.logged || !userStatus?.token || !userStatus?.registered) {
+        redirect('/login');
+      }
+
       setUserData(initialData);
       setAvatar(initialData.avatar_pic);
-      setIsLoading(false); // Данные есть, завершаем загрузку
-    }
 
-    // Подписка на изменения Zustand
+      if (initialData?.username) {
+        setIsLoading(true);
+        await getAllUserAchievements(initialData.username);
+        if (!avatars || avatars.length === 0) {
+          await getAvatars();
+        }
+
+        const achievements = userStore.getState().store.allPossibleUserAchievements;
+        if (achievements && achievements.length > 0) {
+          setData([
+            achievements.filter((_, i) => i % 3 === 0),
+            achievements.filter((_, i) => i % 3 === 1),
+            achievements.filter((_, i) => i % 3 === 2),
+          ]);
+        }
+        setIsLoading(false);
+      }
+    };
+
+    loadData();
+
     const unsubscribe = userStore.subscribe(state => {
       setUserData(state.store.userData);
       setAvatar(state.store.userData?.avatar_pic);
@@ -90,23 +91,7 @@ const UserPage = () => {
     });
 
     return () => unsubscribe();
-  }, []);
-
-  // useEffect(() => {
-  //   if (!userStatus?.logged || !userStatus?.token || !userStatus?.registered) {
-  //     redirect('./login');
-
-  //     // router.push('/login');
-  //   }
-  // }, [userData]);
-
-  const changeLogin = () => {
-    userStore.getState().changeLogin('front');
-  };
-
-  const changePass = () => {
-    authStore.getState().changePass('new_pass');
-  };
+  }, [userStatus, avatars]);
 
   const logout = () => {
     authStore.getState().logout();
@@ -123,6 +108,9 @@ const UserPage = () => {
   const toggleVisible = () => {
     setVisible(!visible);
   };
+
+  console.log('data', data);
+  console.log('data allPossibleUserAchievements', allPossibleUserAchievements);
 
   const ViewFinder = () => (
     <>
@@ -152,26 +140,6 @@ const UserPage = () => {
       </svg>
     </>
   );
-  const [data, setData] = useState<IUserAchData[][]>([]);
-
-  const initialData = allPossibleUserAchievements
-    ? [
-        allPossibleUserAchievements.filter((_, i) => i % 3 === 0),
-        allPossibleUserAchievements.filter((_, i) => i % 3 === 1),
-        allPossibleUserAchievements.filter((_, i) => i % 3 === 2),
-      ]
-    : [];
-
-  useEffect(() => {
-    if (allPossibleUserAchievements && data.length === 0) {
-      setData([
-        allPossibleUserAchievements.filter((_, i) => i % 3 === 0),
-        allPossibleUserAchievements.filter((_, i) => i % 3 === 1),
-        allPossibleUserAchievements.filter((_, i) => i % 3 === 2),
-      ]);
-    }
-  }, [allPossibleUserAchievements]);
-
   const args = {
     ViewFinder,
     videoId: 'video',
@@ -209,10 +177,53 @@ const UserPage = () => {
     );
     setOpen(true);
   };
+
+  useEffect(() => {
+    const handleScroll = () => {
+      if (wrapRef.current) {
+        const currentScrollTop = wrapRef.current.scrollTop;
+        const scrollHeight = wrapRef.current.scrollHeight;
+        const clientHeight = wrapRef.current.clientHeight;
+        const isAtBottom = currentScrollTop + clientHeight >= scrollHeight - 1; // -1 для учета погрешности
+        console.log(
+          'currentScrollTop',
+          currentScrollTop,
+          'lastScrollTop.current',
+          lastScrollTop.current,
+        );
+        console.log('scrollHeight:', wrapRef.current.scrollHeight);
+        console.log('clientHeight:', wrapRef.current.clientHeight);
+        console.log('scrollTop:', wrapRef.current.scrollTop);
+
+        if (currentScrollTop > lastScrollTop.current) {
+          // setScrollDirection('down');
+          if (currentScrollTop > 50) {
+            setFooterHidden(true);
+          }
+        } else if (currentScrollTop < lastScrollTop.current && !isAtBottom) {
+          // setScrollDirection('up');
+          setFooterHidden(false);
+        }
+
+        lastScrollTop.current = currentScrollTop;
+      }
+    };
+    const wrapElement = wrapRef.current;
+    if (wrapElement) {
+      wrapElement.addEventListener('scroll', handleScroll);
+    }
+
+    return () => {
+      if (wrapElement) {
+        wrapElement.removeEventListener('scroll', handleScroll);
+      }
+    };
+  }, [setFooterHidden, wrapRef.current]);
+
   useEffect(() => {
     const handleClickOutside = (event: MouseEvent) => {
       if (avatarRef.current && !avatarRef.current.contains(event.target as Node)) {
-        setVisible(false); // Закрываем, если клик вне контейнера
+        setVisible(false);
       }
     };
 
@@ -225,12 +236,38 @@ const UserPage = () => {
     };
   }, [visible]);
 
+  const uploadPhoto = () => {
+    const input = document.createElement('input');
+    input.type = 'file';
+    input.accept = 'image/*';
+    input.onchange = async () => {
+      const file = input.files?.[0];
+      if (file) {
+        // await changeAvatar(file);
+        console.log('file', file);
+      }
+    };
+    input.click();
+  };
+
   if (isLoading) {
-    return <div>Loading...</div>;
+    return (
+      <div className={style.wrap}>
+        <ConfigProvider
+          theme={{
+            token: {
+              colorPrimary: '#FB4724',
+            },
+          }}
+        >
+          <Spin size={'large'} />
+        </ConfigProvider>
+      </div>
+    );
   }
 
   return (
-    <div className={style.wrap}>
+    <div className={style.wrap} ref={wrapRef}>
       <button onClick={logout} className={style.logOutButton} type="button" />
       <div className={style.accountDiv}>
         <section className={style.onBoardContainer}>
@@ -247,7 +284,7 @@ const UserPage = () => {
           <p className={userData?.active === 't' ? style.userOnBoard : style.userRest}>
             {userOnBoard}
           </p>
-          <p className={style.userPosition}>{userData?.rolename}</p>
+          <p className={style.userPosition}>{userData?.role}</p>
         </section>
         <section className={style.money} onClick={() => setOpenTransferModal(true)}>
           <Image src="/Icon_Wallet.png" alt="wallet" height={26} width={24} />
@@ -257,6 +294,16 @@ const UserPage = () => {
             {`|`} &nbsp;{`2000 мон. / д`}
           </p>
         </section>
+        {userData?.userrights === 'admin' && (
+          <Image
+            src="/UploadPhoto_1.png"
+            alt="upload"
+            height={30}
+            width={30}
+            className={style.upload}
+            onClick={uploadPhoto}
+          />
+        )}
         <Form form={form} onValuesChange={onValuesChange} className={style.form}>
           <div
             ref={avatarRef}
@@ -361,7 +408,7 @@ const UserPage = () => {
           openTransferModal={openTransferModal}
           setOpenTransferModal={setOpenTransferModal}
           title="Перевод"
-          selfMoney={userData?.balance ?? 100}
+          selfMoney={Number(userData.balance) ?? 0}
         />
       )}
       {/* <Button onClick={changeLogin}> Change login </Button>

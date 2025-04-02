@@ -5,7 +5,6 @@ import { immer } from 'zustand/middleware/immer';
 import { Modal } from 'antd';
 import { SERVICES_USERS } from '@/shared/api/user';
 import authStore, { TAuthStoreState } from '../auth-store';
-import { setDataToLocaleStorage } from '@/shared/lib/ApiSPA/axios/helpers';
 
 export interface IUserAchData {
   id: string;
@@ -19,6 +18,7 @@ export interface IUserAchData {
   achivement_tree: string;
   level: string;
   stages: string;
+  done?: boolean;
 }
 
 export interface IUserData {
@@ -29,7 +29,7 @@ export interface IUserData {
   avatar_pic: string;
   active: string;
   departmentid: string;
-  rolename: string;
+  role: string;
   registered: string;
   balance: number | string;
   times_visited: number | string;
@@ -44,13 +44,15 @@ export interface IUserStore {
   localeName: string;
   endPreload: boolean;
   getAllUserAchievements: (value: string) => void;
-  setEndPreload: (value: boolean) => void;
+  isRequireUserInDatabase: (value: string) => boolean;
+  transferMoney: (data: { receiver: string; amount: number }) => Promise<any>;
+  setEndPreload: (value: boolean) => Promise<void>;
   setError: (error?: string) => void;
   resetState: () => void;
   setAvatar: (avatar: string) => Promise<void>;
   changeLogin: (login: string) => Promise<void>;
   loading: boolean;
-  error?: string;
+  error?: string | undefined;
 }
 
 const initialState = {
@@ -91,7 +93,7 @@ const userStore = create<IUserStore>()(
             try {
               const response = await SERVICES_USERS.UsersData.getAllUserAchievements(login);
               console.info('getAllUserAchievements', response);
-              if (response?.success && response.code === 200) {
+              if (response?.success && response.code !== undefined && response.code === 200) {
                 // produce((draft: IUserStore) => {
                 //   draft.store.trainsData = trains;
                 // });
@@ -112,10 +114,85 @@ const userStore = create<IUserStore>()(
               });
             }
           },
+          isRequireUserInDatabase: async (userName: string) => {
+            set({ loading: true });
+            try {
+              const response = await SERVICES_USERS.UsersData.getUserData(userName);
+              console.log('isRequireUserInDatabase', response);
+
+              if (response?.success && response.code === 200) {
+                const { result } = response?.data as { result: IUserData[] };
+                if (result[0].username === userStore.getState().store.userData.username) {
+                  set({ error: 'Перевод себе невозможен' });
+                  return undefined;
+                }
+                set({ error: undefined });
+                return { userName: result[0].username, avatar: result[0].avatar_pic };
+              } else {
+                set({ error: response.codeMessage });
+                return undefined;
+              }
+            } catch (error) {
+              console.error(error);
+              set({ error: 'Something went wrong, try later' });
+            } finally {
+              set({ loading: false });
+            }
+          },
+          transferMoney: async (data: { receiver: string; amount: number }) => {
+            set({ error: undefined, loading: true });
+            try {
+              const response: {
+                code?: number;
+                data: string;
+                codeMessage?: string;
+              } = await SERVICES_USERS.UsersData.transferPrepare(data);
+              if (response && response.code === 200) {
+                try {
+                  const responseToSend: {
+                    code?: number;
+                    data: { result: any };
+                    codeMessage?: string;
+                    statusText?: string;
+                  } = await SERVICES_USERS.UsersData.transferSend({ tr_id: response.data });
+                  if (
+                    responseToSend &&
+                    responseToSend.code === 200 &&
+                    responseToSend?.statusText === 'OK'
+                  ) {
+                    console.log('received =========', responseToSend);
+                    set({ error: undefined });
+                    return 'success';
+                  } else {
+                    set({ error: responseToSend.codeMessage });
+                  }
+                } catch (error) {
+                  console.error(error);
+                  set({ error: 'Something went wrong, try later' });
+                } finally {
+                  set({ loading: false });
+                }
+                console.log('received ', response);
+
+                set({ error: undefined });
+              } else {
+                set({ error: response.codeMessage });
+              }
+            } catch (error) {
+              console.error(error);
+              set({ error: 'Something went wrong, try later' });
+            } finally {
+              set({ loading: false });
+            }
+          },
           setAvatar: async (avatar: string) => {
             set({ error: undefined, loading: true });
             try {
-              const response = await SERVICES_USERS.UsersData.setAvatar({ avatar });
+              const response: {
+                code?: number;
+                data: { result: IUserData[] };
+                codeMessage?: string;
+              } = await SERVICES_USERS.UsersData.setAvatar({ avatar });
               if (response && response.code === 200) {
                 const {
                   data: { result },
@@ -137,7 +214,13 @@ const userStore = create<IUserStore>()(
           changeLogin: async (new_username: string) => {
             set({ error: undefined, loading: true });
             try {
-              const response = await SERVICES_USERS.UsersData.changeNick({ new_username });
+              const response: {
+                code?: number;
+                success: boolean;
+                authorization?: string;
+                data: { result: IUserData[] };
+                codeMessage?: string;
+              } = await SERVICES_USERS.UsersData.changeNick({ new_username });
               if (response?.success && response.code === 200) {
                 const token = response.authorization;
                 // setDataToLocaleStorage('token', token);

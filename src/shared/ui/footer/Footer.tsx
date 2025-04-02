@@ -30,8 +30,8 @@ const Footer: React.FC = () => {
     },
     {
       label: 'Новости',
-      key: 'posts',
-      disabled: true,
+      key: 'news',
+      disabled: false,
     },
     {
       label: 'Личный кабинет',

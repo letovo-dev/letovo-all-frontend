@@ -1,0 +1,31 @@
+@use '../../../app/_mixins.scss';
+
+.commentInputContainer {
+  display: flex;
+  align-items: center;
+  width: 100%;
+  .avatarTemplate {
+    @extend %avatarTemplate;
+    height: 45px;
+    .avatar {
+      margin-top: 4px;
+      margin-left: 16px;
+    }
+  }
+  .sendButton {
+    cursor: pointer;
+    margin-right: 10px;
+  }
+}
+
+.inputDivider {
+  margin: 0px;
+}
+.inputLastDivider {
+  @extend .inputDivider;
+  padding-bottom: 30px;
+}
+.inputDividerBottom {
+  @extend .inputDivider;
+  padding-bottom: 15px;
+}

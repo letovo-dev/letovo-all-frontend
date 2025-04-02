@@ -159,6 +159,9 @@ const Registration = () => {
                     defaultHoverBorderColor: '#ffffff',
                     defaultHoverColor: '#ffffff',
                     defaultHoverBg: '#FB4724',
+                    defaultActiveColor: '#ffffff',
+                    defaultActiveBorderColor: '#ffffff',
+                    defaultActiveBg: '#FB4724',
                   },
                 },
               }}

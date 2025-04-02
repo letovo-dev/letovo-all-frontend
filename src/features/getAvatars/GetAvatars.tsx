@@ -1,5 +1,5 @@
 import React from 'react';
-import Avatar from '@/shared/ui/avatar';
+import AvatarElement from '@/shared/ui/avatar';
 import CustomSelect from '@/shared/ui/select/CustomSelect';
 import { Form, FormInstance } from 'antd';
 import style from './GetAvatars.module.scss';
@@ -23,7 +23,6 @@ const GetAvatars: React.FC<ComponentProps> = ({
   avatar,
   avatars,
   setAvatar,
-  avatarSize,
   userPageSelectPosition,
 }) => {
   return (
@@ -41,7 +40,7 @@ const GetAvatars: React.FC<ComponentProps> = ({
           userPageSelectPosition={userPageSelectPosition}
         />
       </Form.Item>
-      {Avatar(avatar, avatarSize ?? { width: 40, height: 40 })}
+      {AvatarElement(avatar)}
     </div>
   );
 };

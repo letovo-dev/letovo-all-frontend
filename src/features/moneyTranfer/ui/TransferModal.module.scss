@@ -24,7 +24,24 @@ $overlay-color: rgba(0, 0, 0, 0.5);
   background-repeat: no-repeat;
   z-index: 1001;
   position: relative;
-  overflow: hidden;
+  overflow: visible;
+  .backgroundDiv {
+    @extend %transparentContainer;
+    background-image: url('/Mask group.png');
+    width: 391px;
+    height: 291px;
+    background-size: contain;
+    background-repeat: no-repeat;
+    z-index: 1002;
+    position: absolute;
+  }
+  .spinWrapper {
+    position: absolute;
+    top: 50%;
+    left: 50%;
+    transform: translate(-50%, -50%); /* Центрирование по горизонтали и вертикали */
+    z-index: 1002; /* Выше, чем у .modalContainer и других элементов */
+  }
   .closeButton {
     @extend %transparentContainer;
     background-size: contain;
@@ -45,35 +62,198 @@ $overlay-color: rgba(0, 0, 0, 0.5);
     display: flex;
     align-items: center;
     left: 42%;
-    top: 3%;
+    top: 6%;
   }
   .modalContainerItem {
     position: absolute;
-    top: 16%;
+    top: -15%;
     width: 100%;
+    height: 100%;
     display: flex;
     flex-direction: column;
     text-align: center;
     justify-content: center;
     align-items: center;
-    .text {
-      color: var(--graphics11);
-      font-weight: 600;
-      padding-bottom: 30px;
-    }
-    .slider {
+    .modalContainerItemContent {
       display: flex;
-      align-items: center;
-      justify-content: space-between;
-      width: 85%;
-      position: relative;
+      flex-direction: column;
+      align-items: flex-end;
+      justify-content: center;
+      width: 100%;
       height: 100%;
+      overflow: visible;
+      position: relative;
+      .walletMoney {
+        display: flex;
+        width: 100%;
+        justify-content: flex-end;
+        gap: 10px;
+        padding-right: 30px;
+        align-items: center;
+        .text {
+          color: var(--foreground);
+        }
+      }
+      .success {
+        @extend .walletMoney;
+        justify-content: flex-start;
+        width: 100%;
+        align-items: normal;
+        margin-right: 20px;
+      }
+      .imageStyle {
+        margin-top: 10px;
+        width: 50%;
+        max-width: none;
+        transform: translateX(22.33%);
+      }
+      .form {
+        width: 100%;
+        padding: 0 30px 0 30px;
+        position: absolute;
+        top: 52%;
+        height: fit-content;
+      }
+      .receiverContainer {
+        width: 100%;
+        display: flex;
+        gap: 5px;
+        justify-content: space-evenly;
+        align-items: flex-end;
+        %input {
+          @extend %transparentContainer;
+          width: 205px;
+          height: 38px;
+          justify-content: flex-start;
+          align-items: center;
+          background-position: left;
+          margin-bottom: 15px;
+        }
+        .inputForm {
+          @extend %input;
+          margin-bottom: 5px;
+          background-image: url('/base_registration_input.png');
+        }
+        .inputFormError {
+          @extend %input;
+          margin-bottom: 0px;
+          background-image: url('/base_registration_input_error.png');
+        }
+
+        .customInput {
+          background: transparent;
+          border: none;
+          outline: none;
+          color: #000;
+          font-size: 14px;
+          font-weight: 400;
+          width: 100%;
+          padding: 8px 4px 8px 16px;
+          cursor: text;
+        }
+        .customInput::placeholder {
+          color: #aaa;
+        }
+        .customInput:hover,
+        .customInput:focus {
+          border: none;
+          outline: none;
+        }
+
+        .nickBox {
+          gap: 2px;
+          .nickText {
+            color: var(--foreground);
+            font-size: 16px;
+            padding-left: 10px;
+            font-weight: 400;
+          }
+        }
+        .avatarTemplate {
+          @extend %avatarTemplate;
+        }
+      }
+      .errorContainer {
+        width: 100%;
+        display: flex;
+        height: 30px;
+        padding-left: 115px;
+      }
     }
   }
+}
+
+.warning {
+  color: var(--orange);
+}
+.submitButtonSpace {
+  width: 90%;
+  position: absolute;
+  bottom: -68px;
+}
+
+.rejectButton {
+  width: 126px;
+  height: 27.74px;
+  border-radius: 7.68px;
+}
+
+.submitButton {
+  @extend .rejectButton;
+  background-color: var(--orange);
+  color: var(--background);
+  border-color: var(--orange);
+}
+.submitButtonSpaceTransfer {
+  @extend .submitButtonSpace;
+  justify-content: space-around;
+  right: 4%;
+  bottom: -68px;
+}
+
+.warnText {
+  color: var(--orange);
+  font-size: 10px;
+  font-weight: 400;
 }
 .modalContainerTransfer {
   @extend .modalContainer;
   background-image: url('/Base_Transfer2.png');
   width: 391px;
   height: 376px;
+  .modalContainerHeaderTransfer {
+    @extend .modalContainerHeader;
+    top: 5%;
+  }
+  .modalContainerItemTransfer {
+    @extend .modalContainerItem;
+    top: -24%;
+    .modalContainerItemContentTransfer {
+      @extend .modalContainerItemContent;
+      overflow: visible;
+      .receiverContainerAdditional {
+        @extend .receiverContainer;
+        margin-top: 20px;
+      }
+    }
+    .modalContainerItemContentFinished {
+      @extend .modalContainerItemContentTransfer;
+      top: 6%;
+      .imageEarth {
+        position: absolute;
+        right: 4%;
+        bottom: -65px;
+      }
+      .readyButton {
+        @extend .submitButtonSpace;
+        justify-content: end;
+        right: 12%;
+        bottom: -42px;
+      }
+    }
+  }
+}
+
+.loading {
+  color: var(--orange);
 }

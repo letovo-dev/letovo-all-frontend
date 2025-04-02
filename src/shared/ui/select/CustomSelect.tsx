@@ -1,10 +1,7 @@
 import React from 'react';
-import { Menu, MenuProps } from 'antd';
+import { Avatar, Menu } from 'antd';
 import style from './CustomSelect.module.scss';
 import './CustomSelect.module.scss';
-import Image from 'next/image';
-
-type MenuItem = Required<MenuProps>['items'][number];
 
 interface CustomSelectProps {
   value?: string;
@@ -23,20 +20,21 @@ const CustomSelect: React.FC<CustomSelectProps> = ({
   avatars = [],
   userPageSelectPosition,
 }) => {
-  const avatarsToSelect = avatars.map((avatar: string) => ({
-    key: avatar,
-    icon: (
-      <div className={style.avatarTemplate}>
-        <Image
-          src={`${process.env.NEXT_PUBLIC_BASE_URL_MEDIA}${avatar}`}
-          width={40}
-          height={40}
-          alt="avatar"
-        />
-      </div>
-    ),
-    label: null,
-  }));
+  const avatarsToSelect = avatars
+    .filter(avatar => avatar !== value)
+    .map((avatar: string) => ({
+      key: avatar,
+      icon: (
+        <div className={style.avatarTemplate}>
+          <Avatar
+            src={`${process.env.NEXT_PUBLIC_BASE_URL_MEDIA}/${avatar}`}
+            size={45}
+            className={style.selectedAvatar}
+          />
+        </div>
+      ),
+      label: null,
+    }));
   const handleMenuClick = (e: any) => {
     const selectedImage = e.key;
     if (onChange) {
@@ -47,7 +45,6 @@ const CustomSelect: React.FC<CustomSelectProps> = ({
 
   return visible ? (
     <div className={!userPageSelectPosition ? style.customSelect : style.customSelectUserPage}>
-      {/* // <div className={style.customSelect}> */}
       {
         <Menu
           title={undefined}

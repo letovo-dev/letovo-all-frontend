@@ -6,14 +6,6 @@
 }
 
 .footerContainer {
-  // // height: 100%;
-  // width: 240px !important;
-  // // background-image: url('/base_bottom.png');
-  // // background-size: 106% 100%;
-  // background-color: rgba(255, 255, 255, 0);
-  // justify-content: center;
-  // background-repeat: no-repeat;
-  // background-position: center;
   @extend %transparentContainer;
   background-image: url('/base_bottom.png');
   width: 390px;

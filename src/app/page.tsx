@@ -35,17 +35,15 @@ export default function Home() {
   if (loading) {
     return (
       <div className={style.spinWrapper}>
-        {loading && (
-          <ConfigProvider
-            theme={{
-              token: {
-                colorPrimary: '#FB4724',
-              },
-            }}
-          >
-            <Spin size={'large'} />
-          </ConfigProvider>
-        )}
+        <ConfigProvider
+          theme={{
+            token: {
+              colorPrimary: '#FB4724',
+            },
+          }}
+        >
+          <Spin size={'large'} />
+        </ConfigProvider>
       </div>
     );
   }

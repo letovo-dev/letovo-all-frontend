@@ -1,0 +1,103 @@
+@use '../../app/_mixins.scss';
+
+$overlay-color: rgba(0, 0, 0, 0.5);
+
+.newsContainer {
+  position: relative;
+  margin: 0 auto;
+  box-sizing: border-box;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: flex-start;
+  overflow-y: overlay;
+  overflow-x: hidden;
+  width: 100%;
+  height: 100vh;
+  @media (min-width: 933px) {
+    padding-left: 16px;
+  }
+  &.commentsOpen {
+    overflow-y: hidden;
+  }
+
+  .containerWrapper {
+    background-color: var(--graphics7);
+    margin: 0 auto;
+    width: 392px;
+    box-sizing: border-box;
+    height: 90px;
+    z-index: 1001;
+    position: fixed;
+  }
+  .wrap {
+    z-index: 3;
+    width: 390px;
+    display: flex;
+    justify-content: flex-start;
+    flex-direction: column;
+    margin: 0 auto;
+    box-sizing: border-box;
+    overflow: visible;
+    margin-top: 91px;
+    padding-bottom: 55px;
+    box-sizing: border-box;
+    height: 100%;
+    box-shadow:
+      0 4px 8px rgba(0, 0, 0, 0.1),
+      0 -4px 8px rgba(0, 0, 0, 0.05);
+  }
+
+  .commentsOpen {
+    overflow: hidden;
+  }
+
+  .wrapDark {
+    @extend .wrap;
+    background-color: $overlay-color;
+    position: absolute;
+    z-index: 4;
+    height: 97%;
+    .commentsContainer {
+      width: 390px;
+
+      height: fit-content;
+      max-height: 700px;
+      box-shadow:
+        0 4px 8px rgba(0, 0, 0, 0.1),
+        0 -4px 8px rgba(0, 0, 0, 0.05);
+      border-radius: 12px 12px 0 0;
+      background-color: var(--background);
+      position: fixed;
+      bottom: 0;
+      display: flex;
+      flex-direction: column;
+      justify-content: flex-end;
+      .headerBox {
+        width: 100%;
+        display: flex;
+        flex-direction: column;
+        .commentsHeader {
+          display: flex;
+          align-items: center;
+          justify-content: flex-end;
+          .commentsTitle {
+            margin-right: 85px;
+            color: var(--foreground);
+            font-weight: 600;
+            font-size: 18px;
+          }
+        }
+        .inputDivider {
+          margin: 5px 0 5px 0;
+        }
+      }
+      .commentsBox {
+        width: 100%;
+        height: fit-content;
+        max-height: 625px;
+        overflow-y: auto;
+      }
+    }
+  }
+}

@@ -44,12 +44,11 @@
 .titleBorder {
   @extend %transparentContainer;
   background-image: url('/title_login_empty.png');
-  width: 225px;
-  display: flex;
+  width: 280px;
   justify-content: center;
   align-items: center;
-  height: 65px;
-  background-position: center;
+  height: 55px;
+  background-size: 100% 55px;
 }
 
 %input {

@@ -5,6 +5,8 @@ import { getAllUserAchievements } from './getAllUserAchievements';
 import { getUserAchievements } from './getUserAchievements';
 import { getUserData } from './getUserData';
 import { setAvatar } from './setAvatar';
+import { transferPrepare } from './transferPrepare';
+import { transferSend } from './transferSend';
 
 // eslint-disable-next-line import/no-anonymous-default-export
 export default {
@@ -15,4 +17,6 @@ export default {
   addRole,
   changeNick,
   changePass,
+  transferPrepare,
+  transferSend,
 };

@@ -27,20 +27,20 @@
   }
 
   &::-webkit-scrollbar-track {
-    background: #3f3c3c !important;
+    background: transparent !important;
     // margin-top: 5px !important; // Отступ сверху
     // margin-bottom: 5px !important; // Отступ снизу
     // height: 50px !important;
   }
 
   &::-webkit-scrollbar-thumb {
-    background: #554c4c !important;
+    background: transparent !important;
     // border-radius: 3px !important;
     // max-height: 50px !important;
   }
 
   &::-webkit-scrollbar-thumb:hover {
-    background: #ece7e7 !important;
+    background: transparent !important;
   }
   .customSelectDropdown {
     width: 100%;

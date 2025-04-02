@@ -45,6 +45,14 @@ export const API_USER_SCHEME: IApiEntityScheme<IEndpoint> = {
     method: 'GET',
     url: `${baseUrl}/post/author`,
   },
+  transactionsPrepare: {
+    method: 'POST',
+    url: `${baseUrl}/transactions/prepare`,
+  },
+  transactionsSend: {
+    method: 'POST',
+    url: `${baseUrl}/transactions/send`,
+  },
 };
 
 export const API_USER_ENDPOINTS = [
@@ -58,4 +66,6 @@ export const API_USER_ENDPOINTS = [
   'changePass',
   'changeNick',
   'getAuthor',
+  'transactionsPrepare',
+  'transactionsSend',
 ] as const;

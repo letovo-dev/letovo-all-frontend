@@ -1,0 +1,24 @@
+@use '../../../app/_mixins.scss';
+
+.infoContainer {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  margin-left: 10px;
+  .avatarTemplate {
+    @extend %avatarTemplate;
+  }
+  .avatar {
+    margin-top: 15px;
+    margin-left: 11px;
+  }
+}
+.newsText {
+  padding: 0 15px 0 15px;
+  font-size: 12px;
+  font-weight: 400;
+}
+.infoContainerFirst {
+  @extend .infoContainer;
+  margin-top: 12px;
+}

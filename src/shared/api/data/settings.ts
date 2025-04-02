@@ -9,6 +9,10 @@ export const API_DATA_SCHEME: IApiEntityScheme<IEndpoint> = {
     method: 'GET',
     url: `${baseUrl}/user/all_avatars`,
   },
+  getNews: {
+    method: 'POST',
+    url: `${baseUrl}/news/limit_news`,
+  },
 };
 
-export const API_DATA_ENDPOINTS = ['getAvatars'] as const;
+export const API_DATA_ENDPOINTS = ['getAvatars', 'getNews'] as const;

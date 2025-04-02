@@ -1,0 +1,89 @@
+@use '../../app/mixins.scss';
+
+$overlay-color: rgba(0, 0, 0, 0.5);
+.spinWrapper {
+  height: 100vh;
+  width: 100%;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+}
+
+.modalOverlay {
+  position: fixed;
+  top: 0;
+  left: 50%;
+  transform: translateX(-50%);
+  width: 392px;
+  height: 100%;
+  background-color: $overlay-color;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  z-index: 100;
+  .sidebarContainer {
+    position: absolute;
+    top: 0;
+    left: 0%;
+    width: 75%;
+    height: 100%;
+    background-color: var(--secondaryGray);
+    .sidebarItem {
+      margin-top: 27px;
+      margin-left: 35px;
+      cursor: pointer;
+    }
+    .sidebarItemSaved {
+      @extend .sidebarItem;
+      display: flex;
+      gap: 7px;
+    }
+    .sidebarItemNews {
+      @extend .sidebarItem;
+      display: flex;
+      gap: 2px;
+      padding-left: 7px;
+    }
+  }
+}
+
+%input {
+  @extend %transparentContainer;
+  width: 267px;
+  height: 38px;
+  justify-content: flex-start;
+  align-items: center;
+  background-position: left;
+}
+
+.inputForm {
+  @extend %input;
+  background-image: url('/Base_Sidebar_Search.png');
+  margin-top: 105px;
+  margin-left: 28px;
+}
+
+.customInput {
+  background: transparent;
+  border: none;
+  outline: none; /* Убирает обводку при фокусе */
+  color: #000; /* Цвет текста */
+  font-size: 14px; /* Размер шрифта */
+  font-weight: 400;
+  width: 100%; /* Занимает всю ширину родительского контейнера */
+  padding: 26px 0px 0px 16px; /* Внутренние отступы для удобства */
+  cursor: text; /* Курсор при наведении */
+}
+
+.customInput::placeholder {
+  color: #aaa; /* Цвет плейсхолдера */
+}
+
+.customInput:hover,
+.customInput:focus {
+  border: none; /* Убирает рамки даже при наведении и фокусе */
+  outline: none; /* Убирает обводку при фокусе */
+}
+.searchButtonItem {
+  margin-bottom: 0;
+}

@@ -1,0 +1,15 @@
+@use '../../app/mixins';
+$overlay-color: rgba(0, 0, 0, 0.5);
+
+.commentsStyle {
+  z-index: 5;
+  height: 100%;
+  width: 100%;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  flex-direction: column;
+  background-color: $overlay-color;
+  width: 390px;
+  position: relative;
+}

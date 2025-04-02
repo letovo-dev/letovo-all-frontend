@@ -1,0 +1,73 @@
+@use '../../../app/mixins.scss';
+
+.actionContainer {
+  @extend %transparentContainer;
+  width: 87px;
+  height: 36px;
+  background-size: contain;
+  background-repeat: no-repeat;
+  gap: 10px;
+  align-items: center;
+  justify-content: center;
+  cursor: pointer;
+}
+
+.sectionContainer {
+  display: flex;
+  justify-content: space-between;
+  padding: 0;
+  .firstSection {
+    display: flex;
+    gap: 3px;
+    align-items: center;
+    justify-content: center;
+    .likesContainer {
+      @extend %transparentContainer;
+      @extend .actionContainer;
+      background-image: url('/Frame_Like_1.png');
+    }
+    .likesContainerLiked {
+      @extend .likesContainer;
+      background-image: url('/Frame_Like_2.png');
+    }
+    .likesCount {
+      font-size: 14px;
+      font-weight: 400;
+      color: var(--orange);
+    }
+
+    .dislikesContainer {
+      @extend %transparentContainer;
+      @extend .actionContainer;
+      background-image: url('/Frame_Dislike_1.png');
+    }
+    .dislikesContainerDisLiked {
+      @extend .dislikesContainer;
+      background-image: url('/Frame_Dislike_2.png');
+    }
+    .dislikesCount {
+      font-size: 14px;
+      font-weight: 400;
+      color: var(--graphics10);
+    }
+
+    .commentsContainer {
+      @extend %transparentContainer;
+      @extend .actionContainer;
+      background-image: url('/Frame_CommentAndFavourite.png');
+    }
+    .dislikesCount {
+      font-size: 14px;
+      font-weight: 400;
+      color: var(--graphics10);
+    }
+  }
+  .saveContainer {
+    @extend .actionContainer;
+    background-image: url('/Frame_Dislike_1.png');
+  }
+  .saveContainerSaved {
+    @extend .actionContainer;
+    background-image: url('/Frame_Favourite2.png');
+  }
+}

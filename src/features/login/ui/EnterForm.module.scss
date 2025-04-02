@@ -14,6 +14,12 @@
   align-items: center;
   height: 220px;
   background-position: center;
+  .spinWrapper {
+    position: absolute;
+    left: 50%;
+    transform: translate(-50%, -50%);
+    z-index: 1002;
+  }
 }
 
 %input {
@@ -38,12 +44,11 @@
 .titleBorder {
   @extend %transparentContainer;
   background-image: url('/title_login_empty.png');
-  width: 91px;
-  display: flex;
+  width: 95px;
   justify-content: center;
   align-items: center;
-  height: 26px;
-  background-position: center;
+  height: 35px;
+  background-size: 100% 35px;
 }
 
 .buttonsContainer {

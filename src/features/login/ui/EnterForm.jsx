@@ -61,24 +61,6 @@ function EnterForm() {
 
   const disabledButton = !formData?.login || !formData?.password;
 
-  if (loading) {
-    return (
-      <div className={style.loginFormWrapper}>
-        {loading && (
-          <ConfigProvider
-            theme={{
-              token: {
-                colorPrimary: '#FB4724',
-              },
-            }}
-          >
-            <Spin size={'large'} />
-          </ConfigProvider>
-        )}
-      </div>
-    );
-  }
-
   return (
     <div className={style.loginFormWrapper}>
       <div className={style.titleBorder}>
@@ -86,6 +68,19 @@ function EnterForm() {
       </div>
       <Form name="form" onFinish={onFinish} form={form}>
         <div className={style.card}>
+          {loading && (
+            <div className={style.spinWrapper}>
+              <ConfigProvider
+                theme={{
+                  token: {
+                    colorPrimary: '#FB4724',
+                  },
+                }}
+              >
+                <Spin size={'large'} />
+              </ConfigProvider>
+            </div>
+          )}
           <div style={{ width: '90%' }}>
             <Text className={style.inputTextHeader} type="secondary">
               {'Логин'}
@@ -143,6 +138,9 @@ function EnterForm() {
                     defaultHoverBorderColor: disabledButton ? '' : '#ffffff',
                     defaultHoverColor: disabledButton ? '' : '#ffffff',
                     defaultHoverBg: disabledButton ? '' : '#FB4724',
+                    defaultActiveColor: '#ffffff',
+                    defaultActiveBorderColor: '#ffffff',
+                    defaultActiveBg: '#FB4724',
                   },
                 },
               }}

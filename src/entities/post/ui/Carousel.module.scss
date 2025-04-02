@@ -1,0 +1,23 @@
+@use '../../../app/_mixins.scss';
+
+.imageBackground {
+  width: 390px;
+  max-width: 390px;
+  // border: var(--graphics8) solid 1px;
+  border: none;
+  margin: 10px 0 30px 0;
+}
+.video {
+  object-fit: contain;
+  display: block;
+  margin: 0 auto;
+}
+
+.footer {
+  @extend %transparentContainer;
+  background-image: url('/base_bottom.png');
+  width: 390px;
+  height: 85px;
+  position: absolute;
+  bottom: 0px;
+}
