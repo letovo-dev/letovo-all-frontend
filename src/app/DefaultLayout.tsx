@@ -1,8 +1,10 @@
 'use client';
-import Footer from '@/shared/ui/footer/Footer';
 import style from './page.module.scss';
 import { useEffect, useRef } from 'react';
 import dataStore from '@/shared/stores/data-store';
+import Footer from '@/shared/ui/footer';
+import Image from 'next/image';
+import Menu from '@/shared/ui/menu';
 
 export default function DefaultLayout({ children }: { children: React.ReactNode }) {
   const layoutRef = useRef<HTMLDivElement>(null);
@@ -48,6 +50,18 @@ export default function DefaultLayout({ children }: { children: React.ReactNode 
   return (
     <>
       <div ref={layoutRef} className={style.layoutContainer}>
+        <header className={style.header}>
+          <Image
+            className={style.letovoCorp}
+            src="/Logo_Mini.svg"
+            alt="Letovo.corp"
+            height={25}
+            width={250}
+          />
+          <div className={style.headerMenu}>
+            <Menu />
+          </div>
+        </header>
         <main className={style.content}>{children}</main>
         <footer
           className={`${style.footer} ${isFooterHidden ? style.footerHidden : ''}`}

@@ -22,7 +22,6 @@ const NewsPage: React.FC<NewsProps> = ({ children, open, setOpen, subjects, save
   const { openComments, news } = dataStore(state => state.data);
   const { setFooterHidden } = dataStore(state => state);
   const [comments, setComments] = useState<Comment[]>([]);
-  // const [scrollDirection, setScrollDirection] = useState<'up' | 'down' | null>(null);
   const wrapRef = useRef<HTMLDivElement>(null);
   const lastScrollTop = useRef(0);
 

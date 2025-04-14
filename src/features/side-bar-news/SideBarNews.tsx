@@ -4,6 +4,7 @@ import { Button, ConfigProvider, Form, Spin } from 'antd';
 import dataStore, { News } from '@/shared/stores/data-store';
 import { SearchOutlined } from '@ant-design/icons';
 import Image from 'next/image';
+import SideBarNewsContent from './SideBarNewsContent';
 
 const SideBarNews = ({
   open,
@@ -55,38 +56,13 @@ const SideBarNews = ({
     open && (
       <div className={style.modalOverlay}>
         <div className={style.sidebarContainer}>
-          <Form name="form" onFinish={onFinish} form={form}>
-            {loading && (
-              <div className={style.spinWrapper}>
-                <ConfigProvider
-                  theme={{
-                    token: {
-                      colorPrimary: '#FB4724',
-                    },
-                  }}
-                >
-                  <Spin size={'large'} />
-                </ConfigProvider>
-              </div>
-            )}
-            <div className={style.inputForm}>
-              <Form.Item name="search_query" initialValue={formData.search_query}>
-                <input
-                  type="text"
-                  className={style.customInput}
-                  placeholder="Введите текст для поиска"
-                  autoComplete="text"
-                  onChange={handleNameInput}
-                  value={formData.search_query || ''}
-                />
-              </Form.Item>
-              <Form.Item className={style.searchButtonItem}>
-                <Button htmlType="submit" disabled={false} type="link">
-                  <SearchOutlined style={{ fontSize: 18, color: ' rgba(0, 0, 0, 0.5)' }} />
-                </Button>
-              </Form.Item>
-            </div>
-          </Form>
+          <SideBarNewsContent
+            loading={loading}
+            formData={formData}
+            form={form}
+            handleNameInput={handleNameInput}
+            onFinish={onFinish}
+          />
           {Object.keys(mainSections).map((section, index) => {
             return section === 'news' ? (
               <div key={index} className={style.sidebarItem} onClick={mainSections[section].method}>

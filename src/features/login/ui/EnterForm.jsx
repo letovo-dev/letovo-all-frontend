@@ -27,11 +27,6 @@ function EnterForm() {
       redirect(`/user/${userName}`);
     }
     if (userStatus?.logged && !userStatus?.registered) {
-      console.log(
-        'userStatus?.logged && !userStatus?.registered',
-        userStatus?.logged && !userStatus?.registered,
-      );
-
       setDataToLocaleStorage('token', userStatus?.token);
       redirect('./registration');
     }

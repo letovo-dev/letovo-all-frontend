@@ -1,5 +1,5 @@
 %entryCover {
-  background-image: url('/background_mobile.png');
+  background-image: url('/Background_LoginScreen_WithLogo_PC.png');
   background-repeat: no-repeat;
   background-size: contain;
   background-position: center;
@@ -12,6 +12,22 @@
   @media screen and (max-width: 424px) {
     background-size: cover;
   }
+}
+
+%entryPcCover {
+  background-image: url('/Background_LoginScreen_WithLogo_PC.png');
+  background-repeat: no-repeat;
+  background-size: contain;
+  background-position: center;
+  height: 100vh;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  flex-direction: column;
+  margin: 0 auto;
+  // @media screen and (max-width: 424px) {
+  //   background-size: cover;
+  // }
 }
 
 %transparentContainer {
@@ -32,7 +48,7 @@
 }
 
 %avatarTemplate {
-  background-image: url('/avatar_template.png');
+  background-image: url('/Avatar_Template.svg');
   background-size: contain;
   background-color: rgba(255, 255, 255, 0);
   justify-content: center;

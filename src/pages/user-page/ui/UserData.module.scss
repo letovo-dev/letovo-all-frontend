@@ -1,0 +1,31 @@
+.userDataDesktop {
+  z-index: 2;
+  display: flex;
+  flex-direction: column;
+  display: block;
+  transform: translate(-237px, 16px);
+  @media screen and (max-width: 960px) {
+    display: none;
+  }
+
+  .userName {
+    font-size: 18px;
+    font-weight: 600;
+  }
+  .userOnBoard {
+    font-size: 14px;
+    font-weight: 400;
+    margin-top: 10px;
+    color: var(--orange);
+  }
+  .userRest {
+    @extend .userOnBoard;
+    color: var(--graphics11);
+  }
+  .userPosition {
+    font-size: 12px;
+    font-weight: 600;
+    color: var(--foreground);
+    margin-top: 5px;
+  }
+}

@@ -1,0 +1,60 @@
+@use '../../../app/mixins.scss';
+
+.onBoardContainer {
+  display: flex;
+  align-items: center;
+  z-index: 3;
+  margin-left: 75px;
+  gap: 20px;
+  @media screen and (max-width: 960px) {
+    position: absolute;
+    left: calc(11% - 4px);
+    transform: translateY(40%);
+    margin-left: 0px;
+  }
+  .timeOnBoard {
+    @extend %transparentContainer;
+    background-size: contain;
+    background-image: url('/Frame_SavedThePlanet.png');
+    width: 63px;
+    height: 28px;
+    align-items: center;
+    justify-content: space-around;
+    color: var(--orange);
+    .time {
+      padding-bottom: 2px;
+    }
+  }
+  .department {
+    padding: 5px 10px 5px 12px;
+    border-radius: 20px;
+    font-size: 14px;
+    font-weight: 400;
+    color: var(--background);
+  }
+  @media screen and (max-width: 960px) {
+    margin-top: 10px;
+  }
+}
+
+.science {
+  background-color: var(--science);
+}
+.enginery {
+  background-color: var(--enginery);
+}
+.it {
+  background-color: var(--it);
+}
+.art {
+  background-color: var(--art);
+}
+.management {
+  background-color: var(--management);
+}
+.proj {
+  background-color: var(--proj);
+}
+.defaultColor {
+  background-color: var(--graphics8);
+}

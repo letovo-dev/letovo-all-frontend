@@ -1,0 +1,32 @@
+<svg width="112.000000" height="106.000000" viewBox="0 0 112 106" fill="none" xmlns="http://www.w3.org/2000/svg" xmlns:xlink="http://www.w3.org/1999/xlink">
+	<desc>
+			Created with Pixso.
+	</desc>
+	<defs>
+		<filter id="filter_148_18840_dd" x="2.263550" y="2.839447" width="107.756104" height="101.349792" filterUnits="userSpaceOnUse" color-interpolation-filters="sRGB">
+			<feFlood flood-opacity="0" result="BackgroundImageFix"/>
+			<feBlend mode="normal" in="SourceGraphic" in2="BackgroundImageFix" result="shape"/>
+			<feColorMatrix in="SourceAlpha" type="matrix" values="0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 127 0" result="hardAlpha"/>
+			<feOffset dx="0.7905" dy="1.581"/>
+			<feGaussianBlur stdDeviation="0"/>
+			<feComposite in2="hardAlpha" operator="arithmetic" k2="-1" k3="1"/>
+			<feColorMatrix type="matrix" values="0 0 0 0 0.10196 0 0 0 0 0.10196 0 0 0 0 0.10196 0 0 0 0.15 0"/>
+			<feBlend mode="normal" in2="shape" result="effect_innerShadow_1"/>
+		</filter>
+		<clipPath id="clip148_18841">
+			<rect id="Запирание" width="24.000000" height="24.000000" transform="translate(44.000000 42.000000)" fill="white" fill-opacity="0"/>
+		</clipPath>
+		<clipPath id="clip148_18839">
+			<rect id="Avatar_Template" width="112.000000" height="106.000000" fill="white" fill-opacity="0"/>
+		</clipPath>
+		<linearGradient x1="89.500008" y1="104.000015" x2="22.499954" y2="7.999989" id="paint_linear_148_18840_0" gradientUnits="userSpaceOnUse">
+			<stop stop-color="#F2F2F2"/>
+			<stop offset="1.000000" stop-color="#FAFAFA"/>
+		</linearGradient>
+	</defs>
+	<g clip-path="url(#clip148_18839)">
+		<g filter="url(#filter_148_18840_dd)" style="mix-blend-mode:normal">
+			<path id="Polygon 80" d="M108.04 45.85L88.72 10.98C85.94 5.95 80.64 2.83 74.89 2.83L37.38 2.83C31.63 2.83 26.34 5.95 23.55 10.98L4.24 45.85C1.6 50.61 1.6 56.4 4.24 61.17L23.55 96.04C26.34 101.06 31.63 104.18 37.38 104.18L74.89 104.18C80.64 104.18 85.94 101.06 88.72 96.04L108.04 61.17C110.68 56.4 110.68 50.61 108.04 45.85Z" fill="url(#paint_linear_148_18840_0)" fill-opacity="1.000000" fill-rule="evenodd"/>
+		</g>
+	</g>
+</svg>

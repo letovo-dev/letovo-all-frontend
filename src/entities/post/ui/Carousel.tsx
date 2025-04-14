@@ -8,7 +8,6 @@ const CarouselElement = ({ imgs }: { imgs: string[] }) => {
   const videoRefs = useRef<HTMLVideoElement[]>([]);
 
   const onChange = (currentSlide: number) => {
-    console.log(currentSlide);
     videoRefs.current.forEach(video => {
       if (video) video.pause();
     });

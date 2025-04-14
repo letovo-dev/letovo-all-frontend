@@ -72,13 +72,11 @@ const TransferModal: React.FC<ModalProps> = ({
   const onFinish = async (values: FormValues) => {
     if (values.nick && !values.sum) {
       const user = await isRequireUserInDatabase(values?.nick);
-      console.log('values', user);
       setReceiver(user ? values.nick : undefined);
       setAvatar(user?.avatar);
       form.resetFields();
     }
     if (values.nick && values.sum) {
-      console.log('values', values);
       const res = await transferMoney({ receiver: values.nick, amount: Number(values.sum) });
       if (res && res === 'success') {
         userStore.setState(state => ({
@@ -118,7 +116,6 @@ const TransferModal: React.FC<ModalProps> = ({
                 </ConfigProvider>
               </div>
             )}
-            ;
             <button onClick={onClose} className={style.closeButton} type="button" />
             <h5
               className={

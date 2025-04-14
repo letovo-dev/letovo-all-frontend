@@ -1,0 +1,28 @@
+.menu {
+  text-align: center;
+  :global {
+    .ant-tabs-tab {
+      position: relative;
+      padding: 6px 16px !important;
+      &:not(:last-child) {
+        &::after {
+          content: '';
+          position: absolute;
+          right: -8px;
+          top: 50%;
+          transform: translateY(-50%);
+          width: 1px;
+          height: 20px;
+          background-color: var(--graphics11);
+        }
+      }
+      @media screen and (max-width: 960px) {
+        padding: 12px 0 !important;
+        padding-top: 20px;
+      }
+    }
+    .ant-tabs-tab + .ant-tabs-tab {
+      margin-left: 16px;
+    }
+  }
+}

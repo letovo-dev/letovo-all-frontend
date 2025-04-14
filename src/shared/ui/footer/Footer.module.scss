@@ -1,19 +1,16 @@
 @use '../../../app/_mixins.scss';
 
-.footer {
-  text-align: center;
-  padding-top: 20px;
-}
-
 .footerContainer {
   @extend %transparentContainer;
-  background-image: url('/base_bottom.png');
+  background-image: none;
   width: 390px;
   height: 85px;
-  position: absolute;
   bottom: 0px;
   display: flex;
   align-items: center;
   position: relative;
   justify-content: center;
+  @media screen and (max-width: 960px) {
+    background-image: url('/base_bottom.png');
+  }
 }

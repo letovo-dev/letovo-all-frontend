@@ -12,7 +12,7 @@ interface ComponentProps {
   avatar: string | undefined;
   setAvatar: React.Dispatch<React.SetStateAction<string | undefined>>;
   avatars: string[];
-  avatarSize?: { width: number; height: number };
+  avatarSize?: number | undefined;
   userPageSelectPosition?: boolean;
 }
 
@@ -24,6 +24,7 @@ const GetAvatars: React.FC<ComponentProps> = ({
   avatars,
   setAvatar,
   userPageSelectPosition,
+  avatarSize = 60,
 }) => {
   return (
     <div>
@@ -40,7 +41,7 @@ const GetAvatars: React.FC<ComponentProps> = ({
           userPageSelectPosition={userPageSelectPosition}
         />
       </Form.Item>
-      {AvatarElement(avatar)}
+      {AvatarElement(avatar, avatarSize)}
     </div>
   );
 };

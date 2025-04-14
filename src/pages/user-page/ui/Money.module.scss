@@ -1,0 +1,39 @@
+@use '../../../app/mixins.scss';
+
+.money {
+  width: 100%;
+  z-index: 3;
+  @extend %transparentContainer;
+  background-image: url('/Button_TransferMoney.png');
+  width: 390px;
+  height: 50px;
+  justify-content: left;
+  align-items: center;
+  cursor: pointer;
+  gap: 10px;
+  @media screen and (max-width: 960px) {
+    transform: translateY(144%);
+    position: absolute;
+    padding-left: 30px;
+  }
+  .count {
+    font-size: 12px;
+    font-weight: 600;
+    color: var(--foreground);
+  }
+  .text {
+    @extend .count;
+    color: var(--graphics11);
+  }
+}
+
+.upload {
+  z-index: 5;
+  position: absolute;
+  left: 18%;
+  top: 81px;
+  @media screen and (max-width: 960px) {
+    left: 50%;
+    transform: translate(-50%, -10%) translate(-81px);
+  }
+}

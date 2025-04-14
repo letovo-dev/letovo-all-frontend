@@ -1,0 +1,16 @@
+.sidebarItem {
+  margin-top: 27px;
+  margin-left: 35px;
+  cursor: pointer;
+}
+.sidebarItemSaved {
+  @extend .sidebarItem;
+  display: flex;
+  gap: 7px;
+}
+.sidebarItemNews {
+  @extend .sidebarItem;
+  display: flex;
+  gap: 2px;
+  padding-left: 7px;
+}

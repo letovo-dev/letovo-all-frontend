@@ -9,8 +9,6 @@ const NewsPage = () => {
   const [open, setOpen] = useState(false);
   const { news, saved, subjects } = dataStore(state => state.data.news);
 
-  console.log('news', news);
-
   useEffect(() => {
     dataStore.getState().getNews();
   }, []);

@@ -17,6 +17,7 @@
   --art: #c061f3;
   --management: #fd4948;
   --proj: #a7e265;
+  --scale-factor: 1;
 }
 
 // @media (prefers-color-scheme: dark) {
@@ -79,6 +80,9 @@ body {
 }
 
 .ant-tabs-top {
+  margin: 0px !important;
+}
+.ant-tabs-nav {
   margin: 0px !important;
 }
 

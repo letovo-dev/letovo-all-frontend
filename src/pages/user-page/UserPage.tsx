@@ -17,6 +17,18 @@ import Image from 'next/image';
 import { v4 as uuidv4 } from 'uuid';
 import { AchievementModal } from '@/entities/achievement/ui/modal';
 import { TransferModal } from '@/features/moneyTranfer/ui';
+import OnBoard from './ui/OnBoard';
+import Money from './ui/Money';
+import User from '@/app/user/[username]/page';
+import UserData from './ui/UserData';
+import AchieveBlock from './ui/AchieveBlock';
+import AchieveBlockMobile from './ui/AchieveBlockMobile';
+
+interface PositionedElement {
+  ref: React.RefObject<HTMLElement>;
+  targetX: number;
+  targetY: number;
+}
 
 const UserPage = () => {
   const [error, setError] = useState(null);
@@ -32,6 +44,7 @@ const UserPage = () => {
   const [visible, setVisible] = useState(false);
   const [open, setOpen] = useState(false);
   const [currentItem, setCurrentItem] = useState<IUserAchData | null>(null);
+  const achievements = userStore.getState().store.allPossibleUserAchievements;
 
   const [currentImageElement, setCurrentImageElement] = useState<JSX.Element | null>(null);
   const [userData, setUserData] = useState(userStore.getState().store.userData);
@@ -39,10 +52,18 @@ const UserPage = () => {
   const [avatar, setAvatar] = useState<string | undefined>(undefined);
   const avatarRef = useRef<HTMLDivElement>(null);
   const [openTransferModal, setOpenTransferModal] = useState(false);
-  const [data, setData] = useState<IUserAchData[][]>([]);
   const { setFooterHidden } = dataStore(state => state);
   const wrapRef = useRef<HTMLDivElement>(null);
   const lastScrollTop = useRef(0);
+  const [windowWidth, setWindowWidth] = useState(window.innerWidth);
+
+  useEffect(() => {
+    const handleResize = () => setWindowWidth(window.innerWidth);
+
+    window.addEventListener('resize', handleResize);
+
+    return () => window.removeEventListener('resize', handleResize);
+  }, []);
 
   useEffect(() => {
     if (userData?.username) {
@@ -70,14 +91,6 @@ const UserPage = () => {
           await getAvatars();
         }
 
-        const achievements = userStore.getState().store.allPossibleUserAchievements;
-        if (achievements && achievements.length > 0) {
-          setData([
-            achievements.filter((_, i) => i % 3 === 0),
-            achievements.filter((_, i) => i % 3 === 1),
-            achievements.filter((_, i) => i % 3 === 2),
-          ]);
-        }
         setIsLoading(false);
       }
     };
@@ -108,9 +121,6 @@ const UserPage = () => {
   const toggleVisible = () => {
     setVisible(!visible);
   };
-
-  console.log('data', data);
-  console.log('data allPossibleUserAchievements', allPossibleUserAchievements);
 
   const ViewFinder = () => (
     <>
@@ -151,19 +161,6 @@ const UserPage = () => {
 
   const userOnBoard = userData?.active === 't' ? 'Работает' : 'В отпуске';
 
-  const colorClasses: { [key: string]: { color: string; name: string } } = {
-    '0': { color: style.science, name: 'Наука' },
-    '1': { color: style.enginery, name: 'Энергетика' },
-    '2': { color: style.it, name: 'IT' },
-    '3': { color: style.management, name: 'Менеджмент' },
-    '4': { color: style.proj, name: 'Проекты' },
-    '5': { color: style.art, name: 'Искусство' },
-  };
-
-  const getColorClass = (depId: string | undefined) => {
-    return depId ? colorClasses[depId]?.color || style.defaultColor : style.defaultColor;
-  };
-
   const openModal = (item: IUserAchData, done = false) => {
     setCurrentItem(item);
     setCurrentImageElement(
@@ -184,27 +181,15 @@ const UserPage = () => {
         const currentScrollTop = wrapRef.current.scrollTop;
         const scrollHeight = wrapRef.current.scrollHeight;
         const clientHeight = wrapRef.current.clientHeight;
-        const isAtBottom = currentScrollTop + clientHeight >= scrollHeight - 1; // -1 для учета погрешности
-        console.log(
-          'currentScrollTop',
-          currentScrollTop,
-          'lastScrollTop.current',
-          lastScrollTop.current,
-        );
-        console.log('scrollHeight:', wrapRef.current.scrollHeight);
-        console.log('clientHeight:', wrapRef.current.clientHeight);
-        console.log('scrollTop:', wrapRef.current.scrollTop);
+        const isAtBottom = currentScrollTop + clientHeight >= scrollHeight - 1;
 
         if (currentScrollTop > lastScrollTop.current) {
-          // setScrollDirection('down');
           if (currentScrollTop > 50) {
             setFooterHidden(true);
           }
         } else if (currentScrollTop < lastScrollTop.current && !isAtBottom) {
-          // setScrollDirection('up');
           setFooterHidden(false);
         }
-
         lastScrollTop.current = currentScrollTop;
       }
     };
@@ -252,7 +237,7 @@ const UserPage = () => {
 
   if (isLoading) {
     return (
-      <div className={style.wrap}>
+      <div className={style.spinner}>
         <ConfigProvider
           theme={{
             token: {
@@ -266,19 +251,64 @@ const UserPage = () => {
     );
   }
 
+  console.log('userData', userData);
+
   return (
     <div className={style.wrap} ref={wrapRef}>
+      <div className={style.desktopContent}>
+        <div className={style.accountDivPC}>
+          <div className={style.topContainer}>
+            {windowWidth > 960 && (
+              <Form form={form} onValuesChange={onValuesChange} className={style.formDesktop}>
+                <div
+                  ref={avatarRef}
+                  className={style.avatarTemplate}
+                  onClick={() => {
+                    toggleVisible();
+                  }}
+                >
+                  <GetAvatars
+                    form={form}
+                    setVisible={setVisible}
+                    visible={visible}
+                    avatar={avatar}
+                    avatars={avatars}
+                    setAvatar={setAvatar}
+                    avatarSize={75}
+                    userPageSelectPosition={true}
+                  />
+                </div>
+              </Form>
+            )}
+            <UserData userData={userData} userOnBoard={userOnBoard} />
+            <button onClick={logout} className={style.logOutButtonDesktop} type="button" />
+          </div>
+          <div className={style.moneyContainer}>
+            <OnBoard userData={userData} />
+            <Money
+              userData={userData}
+              setOpenTransferModal={setOpenTransferModal}
+              uploadPhoto={uploadPhoto}
+            />
+          </div>
+          <section className={style.achieveHeaderDesktop}>
+            <Image
+              src="/Achievement_AllBased_Active.png"
+              alt="achievement"
+              height={50}
+              width={50}
+            />
+            <Image src="/Achievement_Element.png" alt="line" height={2} width={40} />
+            <p className={style.textAchieveHeaderDesktop}>Достижения</p>
+            <Image src="/Achievement_Element.png" alt="line" height={2} width={40} />
+            <Image src="/Achievement_Управление_Active.png" alt="sign" height={50} width={50} />
+          </section>
+        </div>
+      </div>
+
       <button onClick={logout} className={style.logOutButton} type="button" />
       <div className={style.accountDiv}>
-        <section className={style.onBoardContainer}>
-          <div className={`${style.department} ${getColorClass(userData!.departmentid)}`}>
-            {colorClasses[userData?.departmentid]?.name}
-          </div>
-          <div className={style.timeOnBoard}>
-            <Image src="/Element_New_Achiv.png" alt="*" height={20} width={20} />
-            <p className={style.time}>{userData.times_visited}</p>
-          </div>
-        </section>
+        <OnBoard userData={userData} />
         <section className={style.userData}>
           <h4 className={style.userName}>{userData?.username}</h4>
           <p className={userData?.active === 't' ? style.userOnBoard : style.userRest}>
@@ -286,44 +316,35 @@ const UserPage = () => {
           </p>
           <p className={style.userPosition}>{userData?.role}</p>
         </section>
-        <section className={style.money} onClick={() => setOpenTransferModal(true)}>
-          <Image src="/Icon_Wallet.png" alt="wallet" height={26} width={24} />
-          <p className={style.count}>{`${userData?.balance ?? 100} мон.`}</p>
-          <Image src="/Icon_Time.png" alt="clock" height={24} width={24} />
-          <p className={style.text}>
-            {`|`} &nbsp;{`2000 мон. / д`}
-          </p>
-        </section>
-        {userData?.userrights === 'admin' && (
-          <Image
-            src="/UploadPhoto_1.png"
-            alt="upload"
-            height={30}
-            width={30}
-            className={style.upload}
-            onClick={uploadPhoto}
-          />
+        <Money
+          userData={userData}
+          setOpenTransferModal={setOpenTransferModal}
+          uploadPhoto={uploadPhoto}
+        />
+
+        {windowWidth <= 960 && (
+          <Form form={form} onValuesChange={onValuesChange} className={style.form}>
+            <div
+              ref={avatarRef}
+              className={style.avatarTemplate}
+              onClick={() => {
+                toggleVisible();
+              }}
+            >
+              <GetAvatars
+                form={form}
+                setVisible={setVisible}
+                visible={visible}
+                avatar={avatar}
+                avatars={avatars}
+                setAvatar={setAvatar}
+                avatarSize={60}
+                userPageSelectPosition={true}
+              />
+            </div>
+          </Form>
         )}
-        <Form form={form} onValuesChange={onValuesChange} className={style.form}>
-          <div
-            ref={avatarRef}
-            className={style.avatarTemplate}
-            onClick={() => {
-              toggleVisible();
-            }}
-          >
-            <GetAvatars
-              form={form}
-              setVisible={setVisible}
-              visible={visible}
-              avatar={avatar}
-              avatars={avatars}
-              setAvatar={setAvatar}
-              avatarSize={{ width: 50, height: 50 }}
-              userPageSelectPosition={true}
-            />
-          </div>
-        </Form>
+
         <section className={style.achieveHeader}>
           <Image src="/Achievement_AllBased_Active.png" alt="achievement" height={50} width={50} />
           <Image src="/Achievement_Element.png" alt="line" height={2} width={40} />
@@ -333,65 +354,15 @@ const UserPage = () => {
         </section>
       </div>
 
-      {data.length > 0 && (
-        <div className={style.achContainer}>
-          {/* Первая колонка */}
-          <div className={style.column}>
-            {data[0]?.map(item => (
-              <div key={uuidv4()} className={style.item} onClick={() => openModal(item)}>
-                <Image
-                  className={style.itemImg}
-                  src="/Achievement_Closed.png"
-                  alt="sign"
-                  height={106}
-                  width={106}
-                />
-                <p className={style.achTextInactive}>{item.achivement_name}</p>
-              </div>
-            ))}
+      {achievements &&
+        achievements.length > 0 &&
+        (windowWidth <= 960 ? (
+          <AchieveBlockMobile achievements={achievements ?? []} openModal={openModal} />
+        ) : (
+          <div className={style.achieveBlockContainer}>
+            <AchieveBlock achievements={achievements ?? []} openModal={openModal} />
           </div>
-
-          {/* Вторая колонка с дополнительным div, занимающим свободное место сверху */}
-          <div className={style.extraColumn}>
-            <div className={style.spacer} />
-            {/* <QRScanner /> */}
-            {/* <div className={style.column}> */}
-            {data[1]?.map(item => (
-              <div
-                key={uuidv4()}
-                className={style.item}
-                onClick={() => openModal({ ...item, done: true }, true)}
-              >
-                <Image
-                  className={style.itemImg}
-                  src="/Achievement_Closed.png"
-                  alt="sign"
-                  height={106}
-                  width={106}
-                />
-                <p className={style.achTextInactive}>{item.achivement_name}</p>
-              </div>
-            ))}
-            {/* </div> */}
-          </div>
-
-          {/* Третья колонка */}
-          <div className={style.column}>
-            {data[2]?.map(item => (
-              <div key={uuidv4()} className={style.item} onClick={() => openModal(item)}>
-                <Image
-                  className={style.itemImg}
-                  src="/Achievement_Closed.png"
-                  alt="sign"
-                  height={106}
-                  width={106}
-                />
-                <p className={style.achTextInactive}>{item.achivement_name}</p>
-              </div>
-            ))}
-          </div>
-        </div>
-      )}
+        ))}
       {open && (
         <AchievementModal
           open={open}
@@ -411,6 +382,7 @@ const UserPage = () => {
           selfMoney={Number(userData.balance) ?? 0}
         />
       )}
+
       {/* <Button onClick={changeLogin}> Change login </Button>
       <Button onClick={changePass}> Change pass </Button> */}
 

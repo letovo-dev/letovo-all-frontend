@@ -29,7 +29,7 @@ const CustomSelect: React.FC<CustomSelectProps> = ({
           <Avatar
             src={`${process.env.NEXT_PUBLIC_BASE_URL_MEDIA}/${avatar}`}
             size={45}
-            className={style.selectedAvatar}
+            // className={style.selectedAvatar}
           />
         </div>
       ),

@@ -34,11 +34,8 @@ const NewsPost: React.FC<OnePostProps> = ({ el, index, isSaved, lastNews }) => {
 
   const commentToDisplay = el.comments.length > 0 ? (filteredByLikes ?? filteredByDate) : undefined;
 
-  console.log('filteredByDate', filteredByLikes);
-
   useEffect(() => {
     // getComments(commentsOpen)
-    console.log('commentsOpen', commentsOpen);
   }, [commentsOpen]);
 
   return (

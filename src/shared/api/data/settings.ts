@@ -13,6 +13,24 @@ export const API_DATA_SCHEME: IApiEntityScheme<IEndpoint> = {
     method: 'POST',
     url: `${baseUrl}/news/limit_news`,
   },
+  getComments: {
+    method: 'POST',
+    url: `${baseUrl}/social/comments`,
+  },
+  getMedia: {
+    method: 'GET',
+    url: `${baseUrl}/social/media`,
+  },
+  setLike: {
+    method: 'POST',
+    url: `${baseUrl}/social/like`,
+  },
 };
 
-export const API_DATA_ENDPOINTS = ['getAvatars', 'getNews'] as const;
+export const API_DATA_ENDPOINTS = [
+  'getAvatars',
+  'getNews',
+  'getComments',
+  'getMedia',
+  'setLike',
+] as const;

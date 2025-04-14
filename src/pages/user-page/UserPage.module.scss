@@ -1,50 +1,148 @@
 @use '../../app/mixins.scss';
 
+.spinner {
+  width: 100vw;
+  height: 100vh;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
 .wrap {
   @extend %entryCover;
-  background-image: url('/background_account.png');
+  background-image: url('/Background_Account_WithElements_PC_2.png');
   position: relative;
   width: 100vw;
-  background-size: contain;
+  background-size: auto;
   background-position: top center;
   display: flex;
   flex-direction: column;
   height: 100vh;
   box-sizing: border-box;
-  overflow-y: scroll;
   overflow-x: hidden;
-}
-.accountDiv {
-  position: absolute;
-  z-index: 1;
-  top: 6%;
-  @extend %entryCover;
-  background-image: url('/Background_Account_Base.png');
-  width: 390px;
-  background-size: 390px;
-  height: 233px;
+  overflow-y: hidden;
+  @media screen and (max-width: 960px) {
+    background-image: url('/background_account.png');
+    overflow-y: scroll;
+  }
+  @media screen and (min-width: 961px) {
+    justify-content: flex-start;
+  }
 }
 
-.logOutButton {
-  position: absolute;
+.accountDiv {
+  display: none;
+  @media screen and (max-width: 960px) {
+    display: block;
+    height: 100vh;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    flex-direction: column;
+    margin: 0 auto;
+    background-image: none;
+    position: absolute;
+    z-index: 1;
+    top: 6%;
+    background-image: url('/Background_Account_Base.png');
+    width: 390px;
+    background-size: 390px;
+    height: 233px;
+  }
+}
+
+.desktopContent {
+  z-index: 10;
+  width: 980px;
+  height: fit-content;
+  margin-top: 160px;
+  // border: solid 1px var(--graphics11);
+  display: flex;
+  flex-direction: column;
+  @media screen and (max-width: 960px) {
+    display: none;
+  }
+}
+
+.accountDivPC {
+  width: inherit;
+  position: fixed;
+  .topContainer {
+    display: flex;
+    justify-content: space-between;
+  }
+  .moneyContainer {
+    @extend .topContainer;
+  }
+  .achieveHeaderDesktop {
+    width: 100%;
+    z-index: 3;
+    padding: 0 50px 0 50px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    margin-top: 35px;
+    .textAchieveHeaderDesktop {
+      font-size: 16px;
+      font-weight: 400;
+      color: var(--foreground);
+      padding: 0 5px;
+    }
+  }
+}
+
+.achieveBlockContainer {
+  width: 100%;
+  display: flex;
+  justify-content: center;
+  overflow: auto;
+  margin-top: 300px;
+}
+
+.logOutButtonDesktop {
   @extend %transparentContainer;
   background-size: contain;
   background-image: url('/button_LogOut.png');
+  cursor: pointer;
   width: 60px;
   z-index: 5;
   height: 36px;
   border: none;
-  position: absolute;
-  cursor: pointer;
-  right: -10px;
-  top: 2%;
+  transform: translate(3px, 7px);
+  @media screen and (max-width: 960px) {
+    display: none;
+  }
+}
+
+.logOutButton {
+  @extend .logOutButtonDesktop;
+  display: none;
+  @media screen and (max-width: 960px) {
+    display: block;
+    transform: translate(0px, 0px);
+    position: absolute;
+    right: -10px;
+    top: 2%;
+    margin-top: 0px;
+  }
 }
 
 .form {
-  position: absolute;
-  z-index: 4;
-  left: 50%;
-  transform: translate(-50%, -50%) translate(-126px); /* Центрируем элемент и добавляем фиксированное смещение */
+  display: none;
+  @media screen and (max-width: 960px) {
+    display: block;
+    position: absolute;
+    z-index: 4;
+    left: 50%;
+    transform: translate(-50%, -50%) translate(-126px);
+  }
+}
+
+.formDesktop {
+  margin-left: 73px;
+  @media screen and (max-width: 960px) {
+    display: none;
+  }
 }
 
 .upload {
@@ -56,16 +154,24 @@
 
 .avatarTemplate {
   @extend %avatarTemplate;
-  height: calc(100px * (112 / 106));
-  width: 100px;
+  height: calc(120px * (112 / 106));
+  width: 130px;
+
+  @media screen and (max-width: 960px) {
+    height: calc(100px * (112 / 106));
+    width: 100px;
+  }
 }
 
 .userData {
   z-index: 2;
-  margin-bottom: 111px;
   display: flex;
   flex-direction: column;
-
+  display: none;
+  @media screen and (max-width: 960px) {
+    margin-bottom: 111px;
+    display: block;
+  }
   .userName {
     font-size: 18px;
     font-weight: 600;
@@ -88,83 +194,6 @@
   }
 }
 
-.science {
-  background-color: var(--science);
-}
-.enginery {
-  background-color: var(--enginery);
-}
-.it {
-  background-color: var(--it);
-}
-.art {
-  background-color: var(--art);
-}
-.management {
-  background-color: var(--management);
-}
-.proj {
-  background-color: var(--proj);
-}
-.defaultColor {
-  background-color: var(--graphics8);
-}
-
-.onBoardContainer {
-  display: flex;
-  align-items: center;
-  position: absolute;
-  z-index: 3;
-  left: calc(11% - 4px); // Фиксируем левую границу относительно центра с учетом смещения
-  transform: translateY(40%);
-  gap: 20px;
-  .timeOnBoard {
-    @extend %transparentContainer;
-    background-size: contain;
-    background-image: url('/Frame_SavedThePlanet.png');
-    width: 63px;
-    height: 28px;
-    align-items: center;
-    justify-content: space-around;
-    color: var(--orange);
-    .time {
-      padding-bottom: 2px;
-    }
-  }
-  .department {
-    padding: 5px 10px 5px 12px;
-    border-radius: 20px;
-    font-size: 14px;
-    font-weight: 400;
-    color: var(--background);
-  }
-}
-
-.money {
-  width: 100%;
-  z-index: 3;
-  @extend %transparentContainer;
-  background-image: url('/Button_TransferMoney.png');
-  width: 390px;
-  height: 50px;
-  transform: translateY(144%);
-  position: absolute;
-  padding-left: 30px;
-  justify-content: left;
-  align-items: center;
-  cursor: pointer;
-  gap: 10px;
-  .count {
-    font-size: 12px;
-    font-weight: 600;
-    color: var(--foreground);
-  }
-  .text {
-    @extend .count;
-    color: var(--graphics11);
-  }
-}
-
 .achieveHeader {
   width: 100%;
   z-index: 3;
@@ -174,9 +203,9 @@
   justify-content: center;
   position: absolute;
   top: 218px;
-
   .text {
-    @extend .count;
+    font-size: 12px;
+    font-weight: 400;
     color: var(--foreground);
   }
 }
@@ -189,7 +218,10 @@
   box-sizing: border-box;
   top: 325px;
   padding-bottom: 10px;
-  position: absolute;
+  position: relative;
+  @media screen and (max-width: 960px) {
+    position: absolute;
+  }
 }
 .column {
   padding: 0px;
@@ -233,12 +265,3 @@
     font-size: auto !important;
   }
 }
-
-// .footer {
-//   @extend %transparentContainer;
-//   background-image: url('/base_bottom.png');
-//   width: 390px;
-//   height: 85px;
-//   position: absolute;
-//   bottom: 0px;
-// }

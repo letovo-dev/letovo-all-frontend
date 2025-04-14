@@ -64,7 +64,7 @@ const initialState = {
     avatar_pic: '',
     active: '',
     departmentid: '',
-    rolename: '',
+    role: '',
     registered: '',
     balance: '',
     times_visited: '',
@@ -118,7 +118,6 @@ const userStore = create<IUserStore>()(
             set({ loading: true });
             try {
               const response = await SERVICES_USERS.UsersData.getUserData(userName);
-              console.log('isRequireUserInDatabase', response);
 
               if (response?.success && response.code === 200) {
                 const { result } = response?.data as { result: IUserData[] };
@@ -160,7 +159,6 @@ const userStore = create<IUserStore>()(
                     responseToSend.code === 200 &&
                     responseToSend?.statusText === 'OK'
                   ) {
-                    console.log('received =========', responseToSend);
                     set({ error: undefined });
                     return 'success';
                   } else {
@@ -172,7 +170,6 @@ const userStore = create<IUserStore>()(
                 } finally {
                   set({ loading: false });
                 }
-                console.log('received ', response);
 
                 set({ error: undefined });
               } else {

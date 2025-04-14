@@ -309,8 +309,6 @@ const dataStore = create<TDataStoreState>()(
         const response = await SERVICES_DATA.Data.getNews(params);
         if (response) {
           const { result } = response?.data as NewsData;
-          console.log('newsRes', result);
-
           set((s: TDataStoreState) => ({
             data: {
               ...s.data,

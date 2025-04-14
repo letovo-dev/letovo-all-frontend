@@ -16,8 +16,6 @@ const Comments = () => {
     setComments(newsById?.comments ?? []);
   }, [openComments, news]);
 
-  console.log('setComments', comments);
-
   return openComments ? (
     <div className={style.wrapDark}>
       <div className={style.commentsContainer}>
