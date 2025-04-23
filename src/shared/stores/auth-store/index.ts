@@ -15,7 +15,7 @@ export type TAuthStoreState = {
     token: string | undefined;
   };
   login: (data: { login: string; password: string }) => Promise<void>;
-  auth: (token: string | null) => Promise<void>;
+  auth: () => Promise<void>;
   changePass: (pass: string) => Promise<void>;
   register: () => Promise<void>;
   logout: () => Promise<void>;
@@ -72,18 +72,19 @@ const authStore = create<TAuthStoreState>()(
                 userStatus: { ...s.userStatus, authed: true },
                 error: undefined,
               }));
+              return { success: true, data: responseData };
             } else {
               get().logout();
+              return { success: false, message: 'Invalid status' };
             }
           } else {
             get().logout();
+            return { success: false, message: 'Request failed' };
           }
         } catch (error: any) {
           console.error(error);
           set({ userStatus: dUserState, error: 'Network or system error' });
-          return {
-            success: false,
-          };
+          return { success: false, error: 'Network or system error' };
         } finally {
           set({ loading: false });
         }

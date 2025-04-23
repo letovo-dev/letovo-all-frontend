@@ -25,6 +25,22 @@ export const API_DATA_SCHEME: IApiEntityScheme<IEndpoint> = {
     method: 'POST',
     url: `${baseUrl}/social/like`,
   },
+  getTitles: {
+    method: 'GET',
+    url: `${baseUrl}/social/titles`,
+  },
+  getCurrentNews: {
+    method: 'GET',
+    url: `${baseUrl}/social/new/`,
+  },
+  getLimitNewsComments: {
+    method: 'GET',
+    url: `${baseUrl}/social/comments`,
+  },
+  getLimitNews: {
+    method: 'GET',
+    url: `${baseUrl}/social/news`,
+  },
 };
 
 export const API_DATA_ENDPOINTS = [
@@ -33,4 +49,8 @@ export const API_DATA_ENDPOINTS = [
   'getComments',
   'getMedia',
   'setLike',
+  'getTitles',
+  'getCurrentNews',
+  'getLimitNewsComments',
+  'getLimitNews',
 ] as const;

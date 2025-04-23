@@ -1,6 +1,9 @@
 import { create } from 'zustand';
 import { immer } from 'zustand/middleware/immer';
 import { SERVICES_DATA } from '@/shared/api/data';
+import { getCurrentNews } from '../../api/data/models/getCurrentNews';
+import { IApiReturn } from '@/shared/lib/ApiSPA';
+import { getLimitNewsComments } from '@/shared/api/data/models/getLimitNewsComments';
 
 interface Author {
   id: string;
@@ -31,6 +34,11 @@ export interface News {
   liked?: boolean;
   disliked?: boolean;
 }
+export interface CurrentNews {
+  news: News;
+  media: string[];
+  comments: Comment[];
+}
 
 interface NewsData {
   news: News[];
@@ -43,6 +51,11 @@ export type Params = {
   skip: number;
 };
 
+export type Titles = {
+  post_id: string;
+  title: string;
+};
+
 export type TDataStoreState = {
   loading: boolean;
   error: string;
@@ -53,9 +66,12 @@ export type TDataStoreState = {
     filteredNews?: News[];
     openComments: string;
     commentReply: string;
+    newsTitles: Titles[];
+    currentNews: CurrentNews;
   };
   getAvatars: () => Promise<void>;
   getNews: () => Promise<void>;
+  getTitles: () => Promise<void>;
   getNewsBySubject: () => Promise<void>;
   getFilteredNews: () => Promise<void>;
   addComment: (comment: string) => Promise<void>;
@@ -66,6 +82,9 @@ export type TDataStoreState = {
   isFooterHidden: boolean;
   setFooterHidden: (hidden: boolean) => void;
   toggleFooter: () => void;
+  getCurrentNews: (id: number) => Promise<IApiReturn<unknown>>;
+  getLimitNewsComments: (post_id: number, start: number, size: number) => Promise<void>;
+  getLimitNews: (start: number, size: number) => Promise<void>;
 };
 
 const newsData: NewsData = {
@@ -295,6 +314,41 @@ const dataStore = create<TDataStoreState>()(
         set({ loading: false });
       }
     },
+    getTitles: async (): Promise<any> => {
+      set({ error: undefined, loading: true });
+      try {
+        const response = await SERVICES_DATA.Data.getTitles();
+        if (response.success && response.code === 200) {
+          const { result } = response?.data as { result: string[] };
+          set((s: TDataStoreState) => ({
+            data: {
+              ...s.data,
+              newsTitles: result,
+            },
+            error: undefined,
+          }));
+        } else {
+          set((s: TDataStoreState) => ({
+            data: {
+              ...s.data,
+              newsTitles: [],
+            },
+            error: undefined,
+          }));
+        }
+      } catch (error: any) {
+        console.error(error);
+        set((s: TDataStoreState) => ({
+          data: {
+            ...s.data,
+            newsTitles: [],
+          },
+          error: error.message,
+        }));
+      } finally {
+        set({ loading: false });
+      }
+    },
     getNews: async (params: Params): Promise<any> => {
       set({ error: undefined, loading: true });
 
@@ -308,7 +362,7 @@ const dataStore = create<TDataStoreState>()(
       try {
         const response = await SERVICES_DATA.Data.getNews(params);
         if (response) {
-          const { result } = response?.data as NewsData;
+          const { result } = response?.data as { result: News[] };
           set((s: TDataStoreState) => ({
             data: {
               ...s.data,
@@ -326,6 +380,82 @@ const dataStore = create<TDataStoreState>()(
         set({ loading: false });
       }
     },
+    getCurrentNews: async (id: number): Promise<any> => {
+      set({ error: undefined, loading: true });
+      try {
+        const response = await SERVICES_DATA.Data.getCurrentNews(id);
+        if (response) {
+          const result = response?.data as News;
+          set((s: TDataStoreState) => ({
+            data: {
+              ...s.data,
+              currentNews: {
+                ...s.data.currentNews,
+                news: result,
+              },
+            },
+            error: undefined,
+          }));
+        } else {
+          // set({ ...initialState, error: response.codeMessage });
+        }
+      } catch (error) {
+        console.error(error);
+      } finally {
+        set({ loading: false });
+      }
+    },
+    getCurrentNewsPics: async (id: number): Promise<any> => {
+      set({ error: undefined, loading: true });
+      try {
+        const response = await SERVICES_DATA.Data.getCurrentNews(id);
+        if (response) {
+          const result = response?.data as unknown as string[];
+          set((s: TDataStoreState) => ({
+            data: {
+              ...s.data,
+              currentNews: {
+                ...s.data.currentNews,
+                media: result,
+              },
+            },
+            error: undefined,
+          }));
+        } else {
+          // set({ ...initialState, error: response.codeMessage });
+        }
+      } catch (error) {
+        console.error(error);
+      } finally {
+        set({ loading: false });
+      }
+    },
+    getLimitNewsComments: async (post_id: number, start: number, size: number): Promise<any> => {
+      set({ error: undefined, loading: true });
+      try {
+        const response = await SERVICES_DATA.Data.getLimitNewsComments({ post_id, start, size });
+        if (response) {
+          const result = response?.data as Comment[];
+          set((s: TDataStoreState) => ({
+            data: {
+              ...s.data,
+              currentNews: {
+                ...s.data.currentNews,
+                comments: result,
+              },
+            },
+            error: undefined,
+          }));
+        } else {
+          // set({ ...initialState, error: response.codeMessage });
+        }
+      } catch (error) {
+        console.error(error);
+      } finally {
+        set({ loading: false });
+      }
+    },
+    // getLimitNews: async (start: number, size: number): Promise<any> => {
     resetState: () => {
       set((s: TDataStoreState) => ({
         s,

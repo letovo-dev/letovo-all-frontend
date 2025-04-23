@@ -14,6 +14,7 @@ import authStore from '@/shared/stores/auth-store';
 import dataStore from '@/shared/stores/data-store';
 import { setDataToLocaleStorage } from '@/shared/lib/ApiSPA/axios/helpers';
 import Avatar from '@/shared/ui/avatar';
+import Link from 'next/link';
 type FormData = {
   avatar?: string | undefined;
   nick?: string | undefined;
@@ -38,14 +39,15 @@ const Registration = () => {
   const router = useRouter();
 
   useEffect(() => {
-    if (!userStatus?.token || !userStatus?.authed) {
-      router.push('./login');
-    }
-    getAvatars();
     if (registered) {
       router.push(`/user/${userName}`);
     }
-  }, [registered, userName, router, userStatus?.authed, userStatus?.token]);
+    if (!userStatus?.authed) {
+      router.push('/login');
+    } else {
+      getAvatars();
+    }
+  }, [registered, userName, router]);
 
   const onValuesChange = (changedValues: any, allValues: any) => {
     if (changedValues.avatar) {
@@ -126,7 +128,7 @@ const Registration = () => {
                   avatars={avatars}
                 />
               </Form.Item>
-              {Avatar(avatar, { width: 40, height: 40 })}
+              {Avatar(avatar, 50)}
             </div>
             <Space direction="vertical" className={style.nickBox}>
               <Text>Придумайте ник</Text>

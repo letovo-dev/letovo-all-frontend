@@ -65,14 +65,21 @@ const UserPage = () => {
     return () => window.removeEventListener('resize', handleResize);
   }, []);
 
+  // useEffect(() => {
+  //   if (userData?.username) {
+  //     getAllUserAchievements(userData.username);
+  //   }
+  // }, [userData?.username]);
+
+  // useEffect(() => {
+  //   if (!avatars || avatars.length === 0) {
+  //     getAvatars();
+  //   }
+  // }, [avatars]);
+
   useEffect(() => {
-    if (userData?.username) {
-      getAllUserAchievements(userData.username);
-      if (!avatars || avatars.length === 0) {
-        getAvatars();
-      }
-    }
-  }, [userData?.username, avatars]);
+    userStore.setState({ store: { ...userStore.getState().store } });
+  }, []);
 
   useEffect(() => {
     const loadData = async () => {

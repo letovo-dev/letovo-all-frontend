@@ -1,23 +1,48 @@
 @use '../../../app/_mixins.scss';
 
 .imageBackground {
-  width: 390px;
-  max-width: 390px;
-  // border: var(--graphics8) solid 1px;
+  width: 760px;
+  max-width: 760px;
+  margin: 10px 0 30px 0px;
   border: none;
-  margin: 10px 0 30px 0;
+
+  @media screen and (max-width: 961px) {
+    width: 390px;
+    max-width: 390px;
+    margin: 10px 0 30px 0px;
+  }
 }
 .video {
   object-fit: contain;
   display: block;
   margin: 0 auto;
+  width: 760px;
+  max-width: 760px;
+
+  @media screen and (max-width: 961px) {
+    width: 394px;
+    max-width: 394px;
+  }
 }
 
 .footer {
   @extend %transparentContainer;
   background-image: url('/base_bottom.png');
-  width: 390px;
+  width: 760px;
   height: 85px;
   position: absolute;
   bottom: 0px;
+  @media screen and (max-width: 961px) {
+    width: 390px;
+  }
+}
+
+.image {
+  width: 760px !important;
+  max-width: 760px;
+
+  @media screen and (max-width: 961px) {
+    width: 394px;
+    max-width: 394px;
+  }
 }

@@ -2,7 +2,7 @@
 
 import React, { useEffect, useRef, useState } from 'react';
 import style from './News.module.scss';
-import SideBarNews from '@/features/side-bar-news';
+import SideBarNews, { SideBarNewsContent } from '@/features/side-bar-news';
 import Burger from '@/shared/ui/burger-menu/Burger';
 import dataStore, { News, Comment } from '@/shared/stores/data-store';
 import InputModule from '@/entities/post/ui/InputModule';
@@ -73,7 +73,6 @@ const NewsPage: React.FC<NewsProps> = ({ children, open, setOpen, subjects, save
         <div className={style.containerWrapper}>
           <Burger setOpen={setOpen} />
         </div>
-
         <div className={`${style.wrap} ${openComments ? style.commentsOpen : ''}`}>{children}</div>
         {openComments && (
           <div className={style.wrapDark}>

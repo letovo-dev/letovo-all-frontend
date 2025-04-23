@@ -1,3 +1,5 @@
+@use '../../app/mixins.scss';
+
 .sidebarItem {
   margin-top: 27px;
   margin-left: 35px;
@@ -13,4 +15,51 @@
   display: flex;
   gap: 2px;
   padding-left: 7px;
+}
+
+%input {
+  @extend %transparentContainer;
+  width: 267px;
+  height: 38px;
+  justify-content: flex-start;
+  align-items: center;
+  background-position: left;
+}
+
+.inputForm {
+  @extend %input;
+  background-image: url('/Base_Sidebar_Search.png');
+  margin-top: 105px;
+  margin-left: 28px;
+  @media screen and (max-width: 1427px) {
+    margin-top: 30px;
+  }
+  @media screen and (max-width: 960px) {
+    margin-top: 115px;
+  }
+}
+
+.customInput {
+  background: transparent;
+  border: none;
+  outline: none; /* Убирает обводку при фокусе */
+  color: #000; /* Цвет текста */
+  font-size: 14px; /* Размер шрифта */
+  font-weight: 400;
+  width: 100%; /* Занимает всю ширину родительского контейнера */
+  padding: 26px 0px 0px 16px; /* Внутренние отступы для удобства */
+  cursor: text; /* Курсор при наведении */
+}
+
+.customInput::placeholder {
+  color: #aaa; /* Цвет плейсхолдера */
+}
+
+.customInput:hover,
+.customInput:focus {
+  border: none; /* Убирает рамки даже при наведении и фокусе */
+  outline: none; /* Убирает обводку при фокусе */
+}
+.searchButtonItem {
+  margin-bottom: 0;
 }

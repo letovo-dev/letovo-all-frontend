@@ -42,8 +42,8 @@ const CarouselElement = ({ imgs }: { imgs: string[] }) => {
                     if (el) videoRefs.current[index] = el;
                   }}
                   src={item}
-                  width={394}
-                  max-width={394}
+                  // width={394}
+                  // max-width={394}
                   controls
                   muted
                   className={style.video}
@@ -51,17 +51,17 @@ const CarouselElement = ({ imgs }: { imgs: string[] }) => {
               ) : (
                 <Image
                   src={item}
-                  width={394}
-                  max-width={394}
+                  // width={394}
+                  // max-width={394}
                   preview={false}
                   alt={`img-${index}`}
+                  className={style.image}
                 />
               )}
             </div>
           ))}
         </Carousel>
       </ConfigProvider>
-      {/* <div style={{ height: '2000px', backgroundColor: 'red' }}>ok</div> */}
     </>
   );
 };

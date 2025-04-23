@@ -16,6 +16,9 @@
   display: flex;
   justify-content: space-between;
   padding: 0;
+  @media screen and (min-width: 961px) {
+    padding: 0 15px;
+  }
   .firstSection {
     display: flex;
     gap: 3px;

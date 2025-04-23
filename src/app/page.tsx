@@ -15,22 +15,32 @@ export default function Home() {
   const error = userStore(state => state.error);
   const loading = authStore(state => state.loading);
 
+  console.log(userStatus);
+
   useEffect(() => {
-    async function checkAuth() {
-      if (!userStatus?.token || !userStatus?.authed) {
-        router.push('./login');
-      } else {
-        await auth(userStatus?.token);
-        if (!error && userData.username && !userStatus?.registered) {
-          router.push('/registration');
-        }
-        if (!error && userData?.username && userStatus?.registered) {
+    async function handleAuthCheck() {
+      try {
+        await checkAuth();
+        const { userStatus } = authStore.getState();
+        if (!error && userData?.username && userStatus?.authed) {
           router.push(`/user/${userData?.username}`);
+          return;
         }
+        if (!userStatus.logged || !userStatus?.registered) {
+          router.push('/login');
+          return;
+        }
+      } catch (err) {
+        console.error('Ошибка авторизации:', err);
       }
     }
-    checkAuth();
-  }, [userStatus?.token, userStatus?.authed, userData?.username]);
+
+    handleAuthCheck();
+
+    async function checkAuth() {
+      return await auth();
+    }
+  }, []);
 
   if (loading) {
     return (

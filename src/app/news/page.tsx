@@ -8,9 +8,12 @@ import { Comments, OneNews } from '@/entities/post/ui';
 const NewsPage = () => {
   const [open, setOpen] = useState(false);
   const { news, saved, subjects } = dataStore(state => state.data.news);
+  const { getTitles, getNews } = dataStore(state => state);
 
   useEffect(() => {
-    dataStore.getState().getNews();
+    // dataStore.getState().getNews();
+    getNews();
+    getTitles();
   }, []);
 
   return (

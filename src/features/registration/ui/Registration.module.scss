@@ -2,6 +2,8 @@
 
 .formWrapper {
   @extend %entryCover;
+  background-image: url('/background_mobile_logo.png');
+
   padding-top: 12vh;
   .form {
     @extend %transparentContainer;

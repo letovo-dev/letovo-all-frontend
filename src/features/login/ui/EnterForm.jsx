@@ -20,17 +20,17 @@ function EnterForm() {
   const [open, setOpen] = useState(false);
 
   useEffect(() => {
-    // redirect('./registration');
-
     if (userStatus?.logged && userStatus?.registered) {
       setDataToLocaleStorage('token', userStatus?.token);
       redirect(`/user/${userName}`);
-    }
-    if (userStatus?.logged && !userStatus?.registered) {
-      setDataToLocaleStorage('token', userStatus?.token);
-      redirect('./registration');
+    } else if (userStatus?.logged && !userStatus?.registered) {
+      redirect('/registration');
     }
   }, [userStatus]);
+
+  useEffect(() => {
+    authStore.setState({ error: null });
+  }, []);
 
   const onFinish = values => {
     authStore.getState().login(values);
@@ -51,8 +51,6 @@ function EnterForm() {
   const showModal = () => {
     setOpen(true);
   };
-
-  console.log('error', error);
 
   const disabledButton = !formData?.login || !formData?.password;
 
