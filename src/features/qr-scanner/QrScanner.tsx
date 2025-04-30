@@ -43,7 +43,7 @@ function QRScanner() {
       alert(controls1.getText());
       setDisplay('none');
     } catch (error) {
-      console.log(error);
+      console.error(error);
     }
   }
 

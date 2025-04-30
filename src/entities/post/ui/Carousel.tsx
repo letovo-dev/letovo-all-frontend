@@ -41,7 +41,7 @@ const CarouselElement = ({ imgs }: { imgs: string[] }) => {
                   ref={el => {
                     if (el) videoRefs.current[index] = el;
                   }}
-                  src={item}
+                  src={`${process.env.NEXT_PUBLIC_BASE_URL_MEDIA}/${item}`}
                   // width={394}
                   // max-width={394}
                   controls
@@ -50,7 +50,7 @@ const CarouselElement = ({ imgs }: { imgs: string[] }) => {
                 />
               ) : (
                 <Image
-                  src={item}
+                  src={`${process.env.NEXT_PUBLIC_BASE_URL_MEDIA}/${item}`}
                   // width={394}
                   // max-width={394}
                   preview={false}

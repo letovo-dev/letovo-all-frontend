@@ -114,7 +114,6 @@ const commentsStore = create<TCommentsStoreState>()(
     {
       name: 'comments-store',
       storage: createJSONStorage(() => {
-        console.log('Storage context:', typeof window !== 'undefined' ? 'browser' : 'server');
         return typeof window !== 'undefined'
           ? localStorage
           : { getItem: () => null, setItem: () => {}, removeItem: () => {} };

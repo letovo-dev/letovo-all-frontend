@@ -7,7 +7,6 @@ import commentsStore from '@/shared/stores/comments-store';
 import SpinModule from '@/shared/ui/spiner';
 
 const MemoizedNews = memo(({ children }: { children: React.ReactNode }) => {
-  console.log('Rendering News');
   return <News>{children}</News>;
 });
 MemoizedNews.displayName = 'MemoizedNews';
@@ -22,8 +21,6 @@ const NewsPage = () => {
   const savedNews = dataStore(state => state.data.savedNews);
   const [renderNews, setRenderNews] = useState(normalizedNews);
 
-  console.log('normalizedNews', normalizedNews);
-
   useEffect(() => {
     getSavedNews();
     getLimitNews(0, 10);
@@ -34,20 +31,12 @@ const NewsPage = () => {
     if (currentNewsState.default) {
       setRenderNews(normalizedNews);
     } else if (currentNewsState.saved) {
-      console.log('selectedNews==', savedNews);
-
       setRenderNews(savedNews);
     } else if (currentNewsState.selectedNews) {
       const selectedNews = normalizedNews[currentNewsState.selectedNews];
-      console.log('selectedNews', {
-        [currentNewsState.selectedNews]: selectedNews ?? { media: [], news: {} },
-      });
-
       setRenderNews({ [currentNewsState.selectedNews]: selectedNews });
     }
   }, [currentNewsState, normalizedNews, savedNews]);
-
-  console.log('lenta');
 
   if (loading) {
     return <SpinModule />;

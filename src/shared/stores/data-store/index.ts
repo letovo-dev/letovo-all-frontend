@@ -419,8 +419,7 @@ const dataStore = create<TDataStoreState>()(
     },
     likeNewsOrComment: async (post_id: string, action: string): Promise<any> => {
       try {
-        const response = await SERVICES_DATA.Data.setLike(post_id, action);
-        console.log('likeNewsOrCommentResponse', response);
+        await SERVICES_DATA.Data.setLike(post_id, action);
       } catch (error) {
         console.error(error);
       }
@@ -428,8 +427,7 @@ const dataStore = create<TDataStoreState>()(
     dislikeNews: async (post_id: string, action: string): Promise<any> => {
       set({ error: undefined, loading: true });
       try {
-        const response = await SERVICES_DATA.Data.setDislike(post_id, action);
-        console.log('dislikeNewsResponse', response);
+        await SERVICES_DATA.Data.setDislike(post_id, action);
       } catch (error) {
         console.error(error);
       } finally {

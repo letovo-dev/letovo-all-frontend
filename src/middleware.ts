@@ -3,7 +3,7 @@ import type { NextRequest } from 'next/server';
 
 export function middleware(request: NextRequest) {
   if (request.nextUrl.pathname.startsWith('/api')) {
-    console.log('API request headers:', request.headers.get('Authorization'));
+    // console.log('API request headers:', request.headers.get('Authorization'));
   }
 
   // const token = request.headers.get('Authorization')?.replace('Bearer ', '');

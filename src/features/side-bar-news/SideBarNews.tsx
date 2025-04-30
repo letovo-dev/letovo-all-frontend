@@ -54,7 +54,7 @@ const SideBarNews = ({
   );
 
   const onFinish = (values: FormValues): void => {
-    console.log('Received values of form: ', values);
+    // console.log('Received values of form: ', values);
   };
 
   const handleNameInput = (e: React.ChangeEvent<HTMLInputElement>): void => {

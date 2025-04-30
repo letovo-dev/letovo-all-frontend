@@ -238,7 +238,6 @@ const UserPage = () => {
       const file = input.files?.[0];
       if (file) {
         // await changeAvatar(file);
-        console.log('file', file);
       }
     };
     input.click();
@@ -259,8 +258,6 @@ const UserPage = () => {
       </div>
     );
   }
-
-  console.log('userData', userData);
 
   return (
     <div className={style.wrap} ref={wrapRef}>

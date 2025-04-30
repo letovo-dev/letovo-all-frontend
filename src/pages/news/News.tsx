@@ -87,8 +87,6 @@ const NewsPage: React.FC<NewsProps> = ({ children }) => {
     };
   }, [setFooterHidden]);
 
-  console.log('Rendering NewsPage wrapper');
-
   return (
     <>
       <SideBarNews

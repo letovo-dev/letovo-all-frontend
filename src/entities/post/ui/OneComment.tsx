@@ -75,8 +75,6 @@ const OneComment: React.FC<OneCommentProps> = ({
   const handleLikeComment = () => {
     selLikeComment(prev => !prev);
     const likeSAction = likeComment ? 'delete' : 'like';
-    console.log('commentState', commentState);
-
     likeNewsOrComment(String(commentState?.post_id), likeSAction);
   };
 
