@@ -9,12 +9,12 @@ type InputModuleProps = {
   text: string;
   avatarSrc: string;
   handleSendComment: () => void;
-  setText: React.Dispatch<React.SetStateAction<string>>;
+  setText: (text: string) => void;
 };
 
 const InputModule: React.FC<InputModuleProps> = ({
   isLastNews = false,
-  text,
+  text = '',
   setText,
   handleSendComment,
   avatarSrc,

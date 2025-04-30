@@ -1,95 +1,95 @@
-@use '../../../app/_mixins.scss';
-$overlay-color: rgba(0, 0, 0, 0.5);
+// @use '../../../app/_mixins.scss';
+// $overlay-color: rgba(0, 0, 0, 0.5);
 
-.comment {
-  display: flex;
-  flex-direction: column;
-  gap: 10px;
-  margin-top: 10px;
-  .commentContainer {
-    display: flex;
-    gap: 10px;
-    .avatar {
-      margin-top: 4px;
-      margin-left: 16px;
-    }
-    .commentTextBox {
-      display: flex;
-      flex-direction: column;
-      gap: 5px;
-      padding-right: 10px;
-      width: 100%;
-      .commentAuthor {
-        font-size: 12px;
-        font-weight: 600;
-        color: var(--foreground);
-      }
-      .commentText {
-        font-size: 11px;
-        font-weight: 400;
-        color: var(--secondaryBlack);
-      }
-      .commentTextReply {
-        @extend .commentText;
-        cursor: pointer;
-      }
-      .likeHeart {
-        cursor: pointer;
-      }
-      .nextCommentText {
-        font-size: 10px;
-        font-weight: 400;
-        color: var(--orange);
-        cursor: pointer;
-      }
-      .footer {
-        width: 100%;
-        display: flex;
-        justify-content: space-between;
-        align-items: center;
-        margin-top: 5px;
-        padding-right: 10px;
-        .reply {
-          @extend .commentText;
-          cursor: pointer;
-        }
-      }
-    }
-  }
-  .inputDivider {
-    margin: 0px;
-  }
-  .inputLastDivider {
-    @extend .inputDivider;
-    padding-bottom: 30px;
-  }
-  .inputDividerBottom {
-    @extend .inputDivider;
-    padding-bottom: 15px;
-  }
-  .commentInputContainer {
-    display: flex;
-    align-items: center;
-    width: 100%;
-    .sendButton {
-      cursor: pointer;
-      margin-right: 10px;
-    }
-  }
-}
+// .comment {
+//   display: flex;
+//   flex-direction: column;
+//   gap: 10px;
+//   margin-top: 10px;
+//   .commentContainer {
+//     display: flex;
+//     gap: 10px;
+//     .avatar {
+//       margin-top: 4px;
+//       margin-left: 16px;
+//     }
+//     .commentTextBox {
+//       display: flex;
+//       flex-direction: column;
+//       gap: 5px;
+//       padding-right: 10px;
+//       width: 100%;
+//       .commentAuthor {
+//         font-size: 12px;
+//         font-weight: 600;
+//         color: var(--foreground);
+//       }
+//       .commentText {
+//         font-size: 11px;
+//         font-weight: 400;
+//         color: var(--secondaryBlack);
+//       }
+//       .commentTextReply {
+//         @extend .commentText;
+//         cursor: pointer;
+//       }
+//       .likeHeart {
+//         cursor: pointer;
+//       }
+//       .nextCommentText {
+//         font-size: 10px;
+//         font-weight: 400;
+//         color: var(--orange);
+//         cursor: pointer;
+//       }
+//       .footer {
+//         width: 100%;
+//         display: flex;
+//         justify-content: space-between;
+//         align-items: center;
+//         margin-top: 5px;
+//         padding-right: 10px;
+//         .reply {
+//           @extend .commentText;
+//           cursor: pointer;
+//         }
+//       }
+//     }
+//   }
+//   .inputDivider {
+//     margin: 0px;
+//   }
+//   .inputLastDivider {
+//     @extend .inputDivider;
+//     padding-bottom: 30px;
+//   }
+//   .inputDividerBottom {
+//     @extend .inputDivider;
+//     padding-bottom: 15px;
+//   }
+//   .commentInputContainer {
+//     display: flex;
+//     align-items: center;
+//     width: 100%;
+//     .sendButton {
+//       cursor: pointer;
+//       margin-right: 10px;
+//     }
+//   }
+// }
 
-.avatarTemplate {
-  @extend %avatarTemplate;
-  height: 45px;
-}
+// .avatarTemplate {
+//   @extend %avatarTemplate;
+//   height: 45px;
+// }
 
-.commentsLisBackground {
-  height: 100%;
-  width: 100%;
-  display: flex;
-  justify-content: center;
-  align-items: center;
-  flex-direction: column;
-  z-index: 1006;
-  background-color: $overlay-color;
-}
+// .commentsLisBackground {
+//   height: 100%;
+//   width: 100%;
+//   display: flex;
+//   justify-content: center;
+//   align-items: center;
+//   flex-direction: column;
+//   z-index: 1006;
+//   background-color: $overlay-color;
+// }

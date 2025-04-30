@@ -9,13 +9,10 @@ import style from './page.module.scss';
 
 export default function Home() {
   const auth = authStore.getState().auth;
-  const userStatus = authStore(state => state.userStatus);
   const userData = userStore(state => state.store?.userData);
   const router = useRouter();
   const error = userStore(state => state.error);
   const loading = authStore(state => state.loading);
-
-  console.log(userStatus);
 
   useEffect(() => {
     async function handleAuthCheck() {

@@ -1,34 +1,60 @@
 'use client';
 
-import React, { useEffect, useRef, useState } from 'react';
+import React, { Suspense, useEffect, useRef, useState } from 'react';
 import style from './News.module.scss';
-import SideBarNews, { SideBarNewsContent } from '@/features/side-bar-news';
+import SideBarNews from '@/features/side-bar-news';
 import Burger from '@/shared/ui/burger-menu/Burger';
-import dataStore, { News, Comment } from '@/shared/stores/data-store';
+import dataStore, { RealComment } from '@/shared/stores/data-store';
 import InputModule from '@/entities/post/ui/InputModule';
 import OneComment from '@/entities/post/ui/OneComment';
 import Image from 'next/image';
 import { Divider } from 'antd';
+import { useFooterContext } from '@/shared/ui/context/FooterContext';
+import userStore from '@/shared/stores/user-store';
+import commentsStore from '@/shared/stores/comments-store';
 
 interface NewsProps {
   children: React.ReactNode;
-  open: boolean;
-  setOpen: (value: boolean | ((prev: boolean) => boolean)) => void;
-  subjects: string[];
-  saved: News[];
 }
 
-const NewsPage: React.FC<NewsProps> = ({ children, open, setOpen, subjects, saved }) => {
-  const { openComments, news } = dataStore(state => state.data);
-  const { setFooterHidden } = dataStore(state => state);
-  const [comments, setComments] = useState<Comment[]>([]);
+const NewsPage: React.FC<NewsProps> = ({ children }) => {
+  const { newsTitles, postIds } = dataStore(state => state.data);
+  const { normalizedComments, saveComment } = commentsStore(state => state);
+  const { likeNewsOrComment } = dataStore(state => state);
+  const { setFooterHidden } = useFooterContext();
+  const [commentsToRender, setComments] = useState<RealComment[]>([]);
   const wrapRef = useRef<HTMLDivElement>(null);
   const lastScrollTop = useRef(0);
+  const savedScrollPosition = useRef(0);
+  const [open, setOpen] = useState(false);
+  const [text, setText] = useState('');
+  const { avatar_pic } = userStore(state => state.store.userData);
+
+  const openComments = commentsStore(state => {
+    return state.openComments;
+  });
+
+  const handleSendComment = () => {
+    if (text.length > 0) {
+      saveComment(text, openComments);
+      setText('');
+    }
+  };
 
   useEffect(() => {
-    const newsById = news.news.find(item => item.id === openComments) ?? { comments: [] };
-    setComments(newsById?.comments ?? []);
-  }, [openComments, news]);
+    if (openComments && wrapRef.current) {
+      savedScrollPosition.current = wrapRef.current.scrollTop;
+    } else if (!openComments && wrapRef.current) {
+      wrapRef.current.scrollTop = savedScrollPosition.current;
+    }
+  }, [openComments]);
+
+  useEffect(() => {
+    if (openComments && normalizedComments) {
+      const comments = normalizedComments[openComments];
+      setComments(comments);
+    }
+  }, [openComments, normalizedComments]);
 
   useEffect(() => {
     const handleScroll = () => {
@@ -36,15 +62,13 @@ const NewsPage: React.FC<NewsProps> = ({ children, open, setOpen, subjects, save
         const currentScrollTop = wrapRef.current.scrollTop;
         const scrollHeight = wrapRef.current.scrollHeight;
         const clientHeight = wrapRef.current.clientHeight;
-        const isAtBottom = currentScrollTop + clientHeight >= scrollHeight - 1; // -1 для учета погрешности
+        const isAtBottom = currentScrollTop + clientHeight >= scrollHeight - 1;
 
         if (currentScrollTop > lastScrollTop.current) {
-          // setScrollDirection('down');
           if (currentScrollTop > 50) {
             setFooterHidden(true);
           }
         } else if (currentScrollTop < lastScrollTop.current && !isAtBottom) {
-          // setScrollDirection('up');
           setFooterHidden(false);
         }
 
@@ -63,9 +87,15 @@ const NewsPage: React.FC<NewsProps> = ({ children, open, setOpen, subjects, save
     };
   }, [setFooterHidden]);
 
+  console.log('Rendering NewsPage wrapper');
+
   return (
     <>
-      <SideBarNews open={open} setOpen={setOpen} subjects={subjects} saved={saved} />
+      <SideBarNews
+        open={open}
+        setOpen={setOpen}
+        newsTitles={newsTitles.filter(title => postIds.includes(title.post_id))}
+      />
       <div
         ref={wrapRef}
         className={`${style.newsContainer} ${openComments ? style.commentsOpen : ''}`}
@@ -73,51 +103,59 @@ const NewsPage: React.FC<NewsProps> = ({ children, open, setOpen, subjects, save
         <div className={style.containerWrapper}>
           <Burger setOpen={setOpen} />
         </div>
-        <div className={`${style.wrap} ${openComments ? style.commentsOpen : ''}`}>{children}</div>
+        <div className={style.wrap}>{children}</div> {/* Убрали commentsOpen */}
         {openComments && (
-          <div className={style.wrapDark}>
-            <div className={style.commentsContainer}>
-              <div className={style.headerBox}>
-                <div className={style.commentsHeader}>
-                  <p className={style.commentsTitle}>Комментарии</p>
-                  <Image
-                    src={'/Icon_X_Big.png'}
-                    alt="like"
-                    width={35}
-                    height={35}
-                    className={style.closeButton}
-                    onClick={() =>
-                      dataStore.setState(state => {
-                        state.data.openComments = '';
-                      })
-                    }
+          <Suspense fallback={<div>Loading comments...</div>}>
+            <div className={style.wrapDark}>
+              <div className={style.commentsContainer}>
+                <div className={style.headerBox}>
+                  <div className={style.commentsHeader}>
+                    <p className={style.commentsTitle}>Комментарии</p>
+                    <Image
+                      src={'/Icon_X_Big.png'}
+                      alt="like"
+                      width={35}
+                      height={35}
+                      className={style.closeButton}
+                      onClick={() => {
+                        commentsStore.setState(state => {
+                          state.openComments = '';
+                        });
+                        setText('');
+                      }}
+                    />
+                  </div>
+                  <Divider className={style.inputDivider} />
+                </div>
+                <div className={style.commentsBox}>
+                  {commentsToRender.map(item => (
+                    <OneComment
+                      key={item.post_id}
+                      showMore={false}
+                      newsId={item.post_id}
+                      lastNews={false}
+                      showInput={false}
+                      saveComment={saveComment}
+                      avatar={item.avatar_pic}
+                      comment={item ?? {}}
+                      setCommentText={setText}
+                      commentText={text}
+                      likeNewsOrComment={likeNewsOrComment}
+                    />
+                  ))}
+                </div>
+                <div style={{ marginBottom: '10px' }}>
+                  <InputModule
+                    isLastNews={false}
+                    text={text}
+                    setText={setText}
+                    handleSendComment={handleSendComment}
+                    avatarSrc={`${process.env.NEXT_PUBLIC_BASE_URL_MEDIA}/${avatar_pic}`}
                   />
                 </div>
-                <Divider className={style.inputDivider} />
-              </div>
-              <div className={style.commentsBox}>
-                {comments.map(item => (
-                  <OneComment
-                    key={item.id}
-                    comment={item}
-                    showMore={false}
-                    newsId={item.id}
-                    lastNews={false}
-                    showInput={false}
-                  />
-                ))}
-              </div>
-              <div style={{ marginBottom: '10px' }}>
-                <InputModule
-                  isLastNews={false}
-                  text={'okay'}
-                  setText={() => {}}
-                  handleSendComment={() => {}}
-                  avatarSrc={'/img/pic4.png'}
-                />
               </div>
             </div>
-          </div>
+          </Suspense>
         )}
       </div>
     </>

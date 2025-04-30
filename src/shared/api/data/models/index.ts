@@ -1,16 +1,25 @@
 import { getAvatars } from './getAvatars';
 import { getCurrentNews } from './getCurrentNews';
+import { getLimitNews } from './getLimitNews';
 import { getLimitNewsComments } from './getLimitNewsComments';
-import { getNews } from './getNews';
+import { getNewsMedia } from './getNewsMedia';
+import { getSavedNews } from './getSavedNews';
 import { getTitles } from './getTitles';
+import { saveComments } from './saveComments';
+import { saveNews } from './saveNews';
+import { setDislike } from './setDislike';
+import { setLike } from './setLike';
 
 export default {
   getAvatars,
-  getNews,
   getTitles,
   getCurrentNews,
   getLimitNewsComments,
-  // getMedia,
-  // setLike,
-  // setComment
+  getLimitNews,
+  getSavedNews,
+  getNewsMedia,
+  saveNews,
+  saveComments,
+  setLike,
+  setDislike,
 };

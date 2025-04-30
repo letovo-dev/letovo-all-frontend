@@ -23,6 +23,7 @@ import User from '@/app/user/[username]/page';
 import UserData from './ui/UserData';
 import AchieveBlock from './ui/AchieveBlock';
 import AchieveBlockMobile from './ui/AchieveBlockMobile';
+import { useFooterContext } from '@/shared/ui/context/FooterContext';
 
 interface PositionedElement {
   ref: React.RefObject<HTMLElement>;
@@ -52,7 +53,8 @@ const UserPage = () => {
   const [avatar, setAvatar] = useState<string | undefined>(undefined);
   const avatarRef = useRef<HTMLDivElement>(null);
   const [openTransferModal, setOpenTransferModal] = useState(false);
-  const { setFooterHidden } = dataStore(state => state);
+  const { setFooterHidden } = useFooterContext();
+
   const wrapRef = useRef<HTMLDivElement>(null);
   const lastScrollTop = useRef(0);
   const [windowWidth, setWindowWidth] = useState(window.innerWidth);

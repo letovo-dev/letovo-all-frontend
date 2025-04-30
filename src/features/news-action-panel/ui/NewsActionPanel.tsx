@@ -1,40 +1,61 @@
 'use client';
-import React, { useState } from 'react';
+import React, { useEffect, useState } from 'react';
 import style from './NewsActionPanel.module.scss';
-import dataStore, { News } from '@/shared/stores/data-store';
+import dataStore, { RealNews } from '@/shared/stores/data-store';
 import Image from 'next/image';
+import commentsStore from '@/shared/stores/comments-store';
 
 const NewsActionPanel = ({
   newsItem,
-  isSaved,
-  savedCount,
   commentsCount,
+  likeNewsOrComment,
+  dislikeNews,
 }: {
-  newsItem: News;
-  isSaved: boolean;
+  newsItem: RealNews;
   savedCount: number;
   commentsCount: number;
+  likeNewsOrComment: (post_id: string, action: string) => Promise<void>;
+  dislikeNews: (post_id: string, action: string) => Promise<void>;
 }) => {
   const [actionsState, setActionsState] = useState({
-    liked: newsItem?.liked,
-    disliked: newsItem?.disliked,
-    likesCount: newsItem?.likes,
-    dislikesCount: newsItem?.dislikes,
-    saved: isSaved,
-    savedCountState: savedCount,
+    liked: Boolean(newsItem?.is_liked === 't'),
+    disliked: Boolean(newsItem?.is_disliked === 't'),
+    likesCount: Number(newsItem?.likes),
+    dislikesCount: Number(newsItem?.dislikes),
+    saved: Boolean(newsItem.saved === 't'),
+    savedCountState: Number(newsItem.saved_count) ?? 0,
   });
 
-  const { setOpenComments } = dataStore(state => state);
+  const { saveNews } = dataStore(state => state);
+  const { setOpenComments } = commentsStore(state => state);
+  const post = dataStore(state => state.data.normalizedNews[newsItem.post_id]);
+
+  useEffect(() => {
+    if (post) {
+      setActionsState({
+        liked: Boolean(post.news.is_liked === 't'),
+        disliked: Boolean(post.news.is_disliked === 't'),
+        likesCount: Number(post.news?.likes),
+        dislikesCount: Number(post.news?.dislikes),
+        saved: Boolean(post.news?.saved === 't'),
+        savedCountState: Number(post.news?.saved_count) ?? 0,
+      });
+    }
+  }, [post]);
 
   const handleLike = () => {
     setActionsState(prev => {
       if (prev.liked) {
+        likeNewsOrComment(String(newsItem.post_id), 'delete');
+
         return {
           ...prev,
           liked: false,
-          likesCount: prev.likesCount - 1,
+          likesCount: prev.likesCount === 0 ? prev.likesCount : prev.likesCount - 1,
         };
       } else {
+        likeNewsOrComment(String(newsItem.post_id), 'like');
+
         return {
           ...prev,
           liked: true,
@@ -49,12 +70,15 @@ const NewsActionPanel = ({
   const handleDislike = () => {
     setActionsState(prev => {
       if (prev.disliked) {
+        dislikeNews(String(newsItem.post_id), 'delete');
         return {
           ...prev,
           disliked: false,
           dislikesCount: prev.dislikesCount - 1,
         };
       } else {
+        dislikeNews(String(newsItem.post_id), 'like');
+
         return {
           ...prev,
           disliked: true,
@@ -67,7 +91,7 @@ const NewsActionPanel = ({
   };
 
   const handleComment = (id: string) => {
-    setOpenComments(id);
+    commentsCount > 0 ? setOpenComments(id) : setOpenComments('');
   };
 
   const handleSave = () => {
@@ -78,6 +102,8 @@ const NewsActionPanel = ({
         savedCountState: prev.saved ? prev.savedCountState - 1 : prev.savedCountState + 1,
       };
     });
+    const action = actionsState.saved ? 'delete' : 'save';
+    saveNews(String(newsItem.post_id), action);
   };
 
   return (
@@ -109,7 +135,10 @@ const NewsActionPanel = ({
           />
           <p className={style.dislikesCount}>{actionsState.dislikesCount}</p>
         </div>
-        <div className={style.commentsContainer} onClick={() => handleComment(newsItem.id)}>
+        <div
+          className={style.commentsContainer}
+          onClick={() => handleComment(String(newsItem.post_id))}
+        >
           <Image src={'/Icon_Comment.png'} alt="comment" width={22} height={22} />
           <p className={style.dislikesCount}>{commentsCount}</p>
         </div>

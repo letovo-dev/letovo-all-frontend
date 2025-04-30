@@ -1,6 +1,7 @@
 import type { Metadata } from 'next';
 import './globals.scss';
 import '@ant-design/v5-patch-for-react-19';
+import { FooterProvider } from '@/shared/ui/context/FooterContext';
 
 export const metadata: Metadata = {
   title: 'Letovo',
@@ -26,9 +27,11 @@ export default function RootLayout({
         />
       </head>
       <body className="caleo-font">
-        <div className="layout-container">
-          <main className="content">{children}</main>
-        </div>
+        <FooterProvider>
+          <div className="layout-container">
+            <main className="content">{children}</main>
+          </div>
+        </FooterProvider>
       </body>
     </html>
   );

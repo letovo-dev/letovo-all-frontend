@@ -1,1 +1,1 @@
-export { default as AllNewsComments } from './Comments';
+// export { default as AllNewsComments } from './Comments';

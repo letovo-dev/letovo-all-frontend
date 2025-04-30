@@ -24,8 +24,8 @@ instance.interceptors.response.use(
     return dataResponse;
   },
   function (error) {
-    console.log('error?.response?.status', error?.response?.status);
-    console.log('axios error', error);
+    // console.log('error?.response?.status', error?.response?.status);
+    // console.log('axios error', error);
     // if (logoutErrors.includes(error?.response?.status) && window.location.href !== '/login') {
     // window.location.href = '/login';
     // }

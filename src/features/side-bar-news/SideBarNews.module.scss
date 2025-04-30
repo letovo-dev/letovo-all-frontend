@@ -61,20 +61,27 @@ $overlay-color: rgba(0, 0, 0, 0.5);
   background-color: var(--secondaryGray);
   padding-bottom: 30px;
 }
-
+.sidebarItemNewsContainer {
+  width: 100%;
+  max-height: 60vh;
+  margin-top: 20px;
+  overflow-y: auto;
+  overflow-x: hidden;
+}
 .sidebarItem {
-  margin-top: 27px;
-  margin-left: 35px;
+  margin: 10px 0px 0px 20px;
+  max-width: 320px;
   cursor: pointer;
 }
 .sidebarItemSaved {
   @extend .sidebarItem;
   display: flex;
   gap: 7px;
+  margin-top: 20px;
 }
 .sidebarItemNews {
   @extend .sidebarItem;
   display: flex;
   gap: 2px;
-  padding-left: 7px;
+  max-width: 90%;
 }

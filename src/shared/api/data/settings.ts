@@ -9,21 +9,29 @@ export const API_DATA_SCHEME: IApiEntityScheme<IEndpoint> = {
     method: 'GET',
     url: `${baseUrl}/user/all_avatars`,
   },
-  getNews: {
-    method: 'POST',
-    url: `${baseUrl}/news/limit_news`,
+  getSavedNews: {
+    method: 'GET',
+    url: `${baseUrl}/social/saved`,
   },
-  getComments: {
+  saveNews: {
+    method: 'POST',
+    url: `${baseUrl}/social/save`,
+  },
+  saveComments: {
     method: 'POST',
     url: `${baseUrl}/social/comments`,
   },
-  getMedia: {
+  getNewsMedia: {
     method: 'GET',
-    url: `${baseUrl}/social/media`,
+    url: `${baseUrl}/social/media/pics/`,
   },
   setLike: {
     method: 'POST',
     url: `${baseUrl}/social/like`,
+  },
+  setDislike: {
+    method: 'DELETE',
+    url: `${baseUrl}/social/dislike`,
   },
   getTitles: {
     method: 'GET',
@@ -45,10 +53,12 @@ export const API_DATA_SCHEME: IApiEntityScheme<IEndpoint> = {
 
 export const API_DATA_ENDPOINTS = [
   'getAvatars',
-  'getNews',
-  'getComments',
-  'getMedia',
+  'getSavedNews',
+  'saveNews',
+  'saveComments',
+  'getNewsMedia',
   'setLike',
+  'setDislike',
   'getTitles',
   'getCurrentNews',
   'getLimitNewsComments',

@@ -1,7 +1,7 @@
 @use '../../app/mixins.scss';
 
 .sidebarItem {
-  margin-top: 27px;
+  margin-top: 20px;
   margin-left: 35px;
   cursor: pointer;
 }
@@ -9,6 +9,7 @@
   @extend .sidebarItem;
   display: flex;
   gap: 7px;
+  margin-top: 20px;
 }
 .sidebarItemNews {
   @extend .sidebarItem;

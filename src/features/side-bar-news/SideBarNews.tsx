@@ -3,44 +3,55 @@
 import React, { useEffect, useMemo, useState } from 'react';
 import style from './SideBarNews.module.scss';
 import { Form } from 'antd';
-import dataStore, { News } from '@/shared/stores/data-store';
+import dataStore, { Titles } from '@/shared/stores/data-store';
 import Image from 'next/image';
 import SideBarNewsContent from './SideBarNewsContent';
+
+interface FormValues {
+  search_query: string;
+}
+
+interface Section {
+  title: string;
+  method: () => void;
+}
+
+interface MainSections {
+  [key: string]: Section;
+}
 
 const SideBarNews = ({
   open,
   setOpen,
-  subjects,
-  saved,
+  newsTitles,
 }: {
   open: boolean;
   setOpen: (value: boolean | ((prev: boolean) => boolean)) => void;
-  subjects: string[];
-  saved: News[];
+  newsTitles: Titles[];
 }) => {
-  interface Section {
-    title: string;
-    method: () => void;
-  }
-
-  interface MainSections {
-    [key: string]: Section;
-  }
+  const [form] = Form.useForm();
+  const [formData, setFormData] = useState({ search_query: '' });
+  const { loading, setCurrentNewsState } = dataStore(state => state);
 
   const mainSections: MainSections = useMemo(
     () => ({
-      news: { title: 'Новости', method: () => setOpen(prev => !prev) },
-      saved: { title: 'Сохраненные', method: () => {} },
+      news: {
+        title: 'Новости',
+        method: () => {
+          setOpen(prev => !prev);
+          setCurrentNewsState({ default: true, saved: false, selectedNews: undefined });
+        },
+      },
+      saved: {
+        title: 'Сохраненные',
+        method: () => {
+          setCurrentNewsState({ default: false, saved: true, selectedNews: undefined }),
+            setOpen(prev => !prev);
+        },
+      },
     }),
-    [setOpen],
+    [setOpen, setCurrentNewsState],
   );
-
-  const [form] = Form.useForm();
-  const [formData, setFormData] = useState({ search_query: '' });
-  const { loading, error } = dataStore(state => state);
-  interface FormValues {
-    search_query: string;
-  }
 
   const onFinish = (values: FormValues): void => {
     console.log('Received values of form: ', values);
@@ -81,13 +92,27 @@ const SideBarNews = ({
           return section === 'news' ? (
             <div key={index} className={style.sidebarItem} onClick={mainSections[section].method}>
               <span>{mainSections[section].title}</span>
-              {subjects.map((subject, index) => {
-                return (
-                  <div key={index} className={style.sidebarItemNews}>
-                    <span>{subject}</span>
-                  </div>
-                );
-              })}
+              <div className={style.sidebarItemNewsContainer}>
+                {newsTitles.map((item, index) => {
+                  return item.title !== '' ? (
+                    <div
+                      key={item.post_id}
+                      className={style.sidebarItemNews}
+                      onClick={(e: React.MouseEvent<HTMLDivElement>) => {
+                        e.stopPropagation();
+                        setCurrentNewsState({
+                          default: false,
+                          saved: false,
+                          selectedNews: item.post_id,
+                        });
+                        setOpen(prev => !prev);
+                      }}
+                    >
+                      <span>{item.title}</span>
+                    </div>
+                  ) : null;
+                })}
+              </div>
             </div>
           ) : (
             <div

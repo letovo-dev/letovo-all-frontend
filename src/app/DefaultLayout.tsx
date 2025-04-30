@@ -5,10 +5,12 @@ import dataStore from '@/shared/stores/data-store';
 import Footer from '@/shared/ui/footer';
 import Image from 'next/image';
 import Menu from '@/shared/ui/menu';
+import { useFooterContext } from '@/shared/ui/context/FooterContext';
 
 export default function DefaultLayout({ children }: { children: React.ReactNode }) {
   const layoutRef = useRef<HTMLDivElement>(null);
-  const { isFooterHidden, setFooterHidden, toggleFooter } = dataStore();
+  // const { isFooterHidden, setFooterHidden, toggleFooter } = dataStore();
+  const { isFooterHidden, setFooterHidden, toggleFooter } = useFooterContext();
   const lastScrollTop = useRef(0);
 
   useEffect(() => {

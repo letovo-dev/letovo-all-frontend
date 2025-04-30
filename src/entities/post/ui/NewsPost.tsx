@@ -1,63 +1,70 @@
 'use client';
 
-import { memo, useState, useEffect } from 'react';
+import { memo } from 'react';
 import PostHeader from './PostHeader';
 import CarouselElement from './Carousel';
 import NewsActionPanel from '@/features/news-action-panel/ui';
 import OneComment from './OneComment';
 import { v4 as uuidv4 } from 'uuid';
-import { News } from '@/shared/stores/data-store';
-import Comments from './Comments';
+import { RealNews } from '@/shared/stores/data-store';
+import userStore from '@/shared/stores/user-store';
+import commentsStore from '@/shared/stores/comments-store';
 
 interface OnePostProps {
-  showMore: boolean;
   newsId: string;
-  lastNews: News;
-  isSaved: boolean;
+  lastNews: any;
   index: number;
-  el: News;
+  el: { news: RealNews; media: string[] };
+  likeNewsOrComment: (post_id: string, action: string) => Promise<void>;
+  dislikeNews: (post_id: string, action: string) => Promise<void>;
+  saveComment: (comment: string, post_id: string) => Promise<void>;
 }
 
-const NewsPost: React.FC<OnePostProps> = ({ el, index, isSaved, lastNews }) => {
-  const showMore = el.comments.length > 1;
-  const [commentsOpen, setCommentsOpen] = useState<string>('');
-  const [filteredByLikes] =
-    el.comments.length > 0
-      ? [...el.comments].filter(comment => comment.likes > 0).sort((a, b) => b.likes - a.likes)
-      : [];
-  const [filteredByDate] =
-    el.comments.length > 0
-      ? [...el.comments].sort(
-          (a, b) => new Date(b.timestamp).getTime() - new Date(a.timestamp).getTime(),
-        )
-      : [];
-
-  const commentToDisplay = el.comments.length > 0 ? (filteredByLikes ?? filteredByDate) : undefined;
-
-  useEffect(() => {
-    // getComments(commentsOpen)
-  }, [commentsOpen]);
+const NewsPost: React.FC<OnePostProps> = ({
+  el,
+  index,
+  lastNews,
+  likeNewsOrComment,
+  dislikeNews,
+  saveComment,
+  newsId,
+}) => {
+  const { avatar_pic } = userStore(state => state.store.userData);
+  const comments = commentsStore(
+    state => (state.normalizedComments ? (state.normalizedComments[newsId] ?? []) : []) || [],
+  );
+  const showMore = comments.length > 1;
 
   return (
-    <>
-      <div key={uuidv4()}>
-        <PostHeader index={index} author={el.author} text={el.text} />
-        <CarouselElement imgs={el.media} />
-        <NewsActionPanel
-          newsItem={el}
-          isSaved={isSaved}
-          savedCount={10}
-          commentsCount={el.comments.length}
-        />
-        <OneComment
-          comment={commentToDisplay}
-          showMore={showMore}
-          newsId={el.id}
-          lastNews={el === lastNews}
-          showInput={true}
-        />
-      </div>
-    </>
+    <div key={uuidv4()}>
+      <PostHeader
+        index={index}
+        author={{
+          username: el.news.author,
+          avatar: el.news.avatar_pic,
+          id: String(el.news.post_id),
+        }}
+        text={el.news.text}
+      />
+      <CarouselElement imgs={el.media} />
+      <NewsActionPanel
+        newsItem={el.news}
+        savedCount={10}
+        commentsCount={comments.length}
+        likeNewsOrComment={likeNewsOrComment}
+        dislikeNews={dislikeNews}
+      />
+      <OneComment
+        showMore={showMore}
+        newsId={String(el.news.post_id)}
+        lastNews={el.news.post_id === lastNews?.news?.post_id}
+        showInput={true}
+        saveComment={saveComment}
+        avatar={avatar_pic}
+        comments={comments}
+        likeNewsOrComment={likeNewsOrComment}
+      />
+    </div>
   );
 };
 
