@@ -3,6 +3,8 @@ import { immer } from 'zustand/middleware/immer';
 import { SERVICES_DATA } from '@/shared/api/data';
 import { IApiReturn } from '@/shared/lib/ApiSPA';
 import commentsStore from '../comments-store';
+import { searchNews } from '@/shared/api/data/models/searchNews';
+import { method } from 'lodash';
 
 interface Author {
   id: string;
@@ -81,6 +83,34 @@ export type Titles = {
   title: string;
 };
 
+interface GetLimitNewsParams {
+  start: number;
+  size: number;
+}
+
+interface SearchNewsParams {
+  search_query: string;
+}
+
+type GetSavedNewsParams = Record<string, never>; // Пустой объект для getSavedNews
+
+// Типы для параметров fetchNews
+interface FetchNewsParams {
+  type: 'getLimitNews' | 'getSavedNews' | 'searchNews';
+  start?: number; // Обязательно для getLimitNews
+  size?: number; // Обязательно для getLimitNews
+  searchQuery?: string; // Обязательно для searchNews
+}
+
+// Тип для конфигурации запроса
+interface RequestConfig {
+  method: (params: any) => Promise<any>; // Общий тип метода, уточняется ниже
+  params: GetLimitNewsParams | GetSavedNewsParams | SearchNewsParams;
+  newsField: keyof TDataStoreState['data'];
+  commentsField: string;
+  updatePostIds: boolean;
+}
+
 export type TDataStoreState = {
   loading: boolean;
   error: string;
@@ -92,6 +122,7 @@ export type TDataStoreState = {
     comments: Comment[];
     realNews: { news: RealNews; media: string[] }[];
     savedNews: Record<string, any>;
+    searchedNews: Record<string, any>;
     normalizedNews: Record<string, any>;
     postIds: string[];
   };
@@ -99,7 +130,6 @@ export type TDataStoreState = {
   selectedNews: RealNews[];
   openComments: string;
   getAvatars: () => Promise<void>;
-  getSavedNews: () => Promise<void>;
   getTitles: () => Promise<void>;
   getNewsBySubject: () => Promise<void>;
   getFilteredNews: () => Promise<void>;
@@ -107,9 +137,9 @@ export type TDataStoreState = {
   likeNewsOrComment: (post_id: string, action: string) => Promise<void>;
   dislikeNews: (post_id: string, action: string) => Promise<void>;
   getLimitNewsComments: (post_id: number, start: number, size: number) => Promise<void>;
-  getLimitNews: (start: number, size: number) => Promise<void>;
   saveNews: (id: string, action: 'save' | 'delete') => Promise<any>;
   setCurrentNewsState: (state: any) => void;
+  fetchNews: (params: FetchNewsParams) => Promise<any>;
 };
 
 const dataState = {
@@ -194,82 +224,6 @@ const dataStore = create<TDataStoreState>()(
         }));
       }
     },
-    getSavedNews: async (): Promise<any> => {
-      set({ error: undefined });
-      try {
-        const response = await SERVICES_DATA.Data.getSavedNews();
-        if (response && response.data) {
-          const newsData = (response.data as { result: RealNews[] })?.result;
-          let data;
-          try {
-            const promises = newsData.map(async news => {
-              const media = await commentsStore.getState().getCurrentNewsPics(news.post_id);
-              const comments = await commentsStore
-                .getState()
-                .getLimitNewsComments(news.post_id, 0, 500);
-              return { media, comments, news };
-            });
-            data = await Promise.all(promises);
-          } catch (error) {
-            console.error('Error in Promise.all:', error);
-            set({
-              error: 'Failed to load media or comments',
-            });
-            return response;
-          }
-
-          const news = data.map(post => {
-            const newsComments =
-              (post.comments ?? []).filter(
-                (comment: RealComment) => comment.parent_id === String(post.news.post_id),
-              ) ?? [];
-            const newsMedia = post.media.map((media: RealMedia) => media.media);
-            return { ...post, comments: newsComments, media: newsMedia };
-          });
-
-          const normalizedComments = news.reduce(
-            (acc, item) => ({
-              ...acc,
-              [item.news.post_id]: item.comments,
-            }),
-            {},
-          );
-
-          commentsStore.setState((s: any) => ({
-            normalizedSavedComments: normalizedComments,
-          }));
-
-          const normalizedNews = news.reduce(
-            (acc, item) => ({
-              ...acc,
-              [item.news.post_id]: item,
-            }),
-            {},
-          );
-
-          set((s: TDataStoreState) => ({
-            data: {
-              ...s.data,
-              savedNews: {
-                ...s.data.savedNews,
-                ...normalizedNews,
-              },
-            },
-            error: undefined,
-          }));
-
-          return response;
-        } else {
-          set((s: TDataStoreState) => ({
-            error: undefined,
-          }));
-          return response;
-        }
-      } catch (error) {
-        console.error(error);
-        set({ error: 'Network or system error' });
-      }
-    },
     saveNews: async (id: string, action: 'save' | 'delete'): Promise<any> => {
       set({ error: undefined, loading: true });
       try {
@@ -330,93 +284,134 @@ const dataStore = create<TDataStoreState>()(
         console.error(error);
       }
     },
-    getLimitNews: async (start: number, size: number, type: string): Promise<any> => {
+    fetchNews: async (params: FetchNewsParams): Promise<any> => {
+      const { type, start, size, searchQuery } = params;
+
+      const requestConfig: Record<FetchNewsParams['type'], RequestConfig> = {
+        getLimitNews: {
+          method: SERVICES_DATA.Data.getLimitNews,
+          params: { start: start, size: size } as GetLimitNewsParams,
+          newsField: 'normalizedNews',
+          commentsField: 'normalizedComments',
+          updatePostIds: true,
+        },
+        getSavedNews: {
+          method: SERVICES_DATA.Data.getSavedNews,
+          params: {} as GetSavedNewsParams,
+          newsField: 'savedNews',
+          commentsField: 'normalizedSavedComments',
+          updatePostIds: false,
+        },
+        searchNews: {
+          method: SERVICES_DATA.Data.searchNews,
+          params: { search_query: searchQuery! } as SearchNewsParams,
+          newsField: 'searchedNews',
+          commentsField: 'normalizedSearchedComments',
+          updatePostIds: false,
+        },
+      };
+
+      const config = requestConfig[type];
+
+      if (type === 'getLimitNews' && (start === undefined || size === undefined)) {
+        throw new Error('start and size are required for getLimitNews');
+      }
+      if (type === 'searchNews' && searchQuery === undefined) {
+        throw new Error('searchQuery is required for searchNews');
+      }
+
       set({ error: undefined, loading: true });
+
       try {
-        const method = type === 'news' ? 'getLimitNews' : 'getLimitSavedNews';
-        const response = await SERVICES_DATA.Data.getLimitNews({ start, size });
-        if (response && response.data) {
-          const newsData = (response.data as { result: RealNews[] })?.result;
-          let data;
-          try {
-            const promises = newsData.map(async news => {
-              const media = await commentsStore.getState().getCurrentNewsPics(news.post_id);
-              const comments = await commentsStore
-                .getState()
-                .getLimitNewsComments(news.post_id, 0, 500);
-              return { media, comments, news };
-            });
-            data = await Promise.all(promises);
-          } catch (error) {
-            console.error('Error in Promise.all:', error);
-            set({
-              error: 'Failed to load media or comments',
-              loading: false, // Сбрасываем loading при ошибке в Promise.all
-            });
-            return response; // Возвращаем основной ответ
-          }
-
-          const news = data.map(post => {
-            const newsComments =
-              (post.comments ?? []).filter(
-                (comment: RealComment) => comment.parent_id === String(post.news.post_id),
-              ) ?? [];
-            const newsMedia = post.media.map((media: RealMedia) => media.media);
-            return { ...post, comments: newsComments, media: newsMedia };
-          });
-
-          const normalizedComments = news.reduce(
-            (acc, item) => ({
-              ...acc,
-              [item.news.post_id]: item.comments,
-            }),
-            {},
-          );
-
-          commentsStore.setState((s: any) => ({
-            normalizedComments: normalizedComments,
-          }));
-
-          const normalizedNews = news.reduce(
-            (acc, item) => ({
-              ...acc,
-              [item.news.post_id]: item,
-            }),
-            {},
-          );
-          const postIds = news.map(item => item.news.post_id);
-
-          set((s: TDataStoreState) => ({
-            data: {
-              ...s.data,
-              normalizedNews: {
-                ...s.data.normalizedNews,
-                ...normalizedNews,
-              },
-              postIds: postIds,
-              realNews: [...s.data.realNews, ...news],
-            },
-            error: undefined,
-            loading: false, // Сбрасываем loading после всех операций
-          }));
-
-          return response;
-        } else {
-          set((s: TDataStoreState) => ({
-            error: undefined,
-            loading: false,
-          }));
+        const response = await config.method(config.params);
+        if (!response || !response.data) {
+          set({ error: 'No data received', loading: false });
           return response;
         }
-      } catch (error) {
-        console.error('Error in getLimitNews:', error);
+
+        const newsData = (response.data as { result: RealNews[] })?.result;
+
+        let data;
+        try {
+          const promises = newsData.map(async news => {
+            const media = await commentsStore.getState().getCurrentNewsPics(news.post_id);
+            const comments = await commentsStore
+              .getState()
+              .getLimitNewsComments(news.post_id, 0, 500);
+            return { media, comments, news };
+          });
+          data = await Promise.all(promises);
+        } catch (error) {
+          console.error('Error in Promise.all:', error);
+          set({
+            error: 'Failed to load media or comments',
+            loading: false,
+          });
+          return response;
+        }
+
+        const news = data.map(post => {
+          const newsComments =
+            (post.comments ?? []).filter(
+              (comment: RealComment) => comment.parent_id === String(post.news.post_id),
+            ) ?? [];
+          const newsMedia = post.media.map((media: RealMedia) => media.media);
+          return { ...post, comments: newsComments, media: newsMedia };
+        });
+
+        const normalizedComments = news.reduce(
+          (acc, item) => ({
+            ...acc,
+            [item.news.post_id]: item.comments,
+          }),
+          {},
+        );
+
+        commentsStore.setState((s: any) => ({
+          [config.commentsField]: normalizedComments,
+        }));
+
+        const normalizedNews = news.reduce(
+          (acc, item) => ({
+            ...acc,
+            [item.news.post_id]: item,
+          }),
+          {},
+        );
+
+        const updatedData: Partial<TDataStoreState['data']> = {
+          [config.newsField]: {
+            ...get().data[config.newsField],
+            ...normalizedNews,
+          },
+        };
+
+        if (config.updatePostIds) {
+          const postIds = news.map(item => item.news.post_id);
+          updatedData.postIds = postIds.map(String);
+          updatedData.realNews = [...get().data.realNews, ...news];
+        }
+
         set({
-          error: error instanceof Error ? error.message : 'Failed to load news',
+          data: {
+            ...get().data,
+            ...updatedData,
+          },
+          error: undefined,
+          loading: false,
+        });
+
+        return response;
+      } catch (error) {
+        console.error(`Error in fetchNews (${type}):`, error);
+        set({
+          error: error instanceof Error ? error.message : 'Network or system error',
           loading: false,
         });
         return null;
       }
     },
+
     likeNewsOrComment: async (post_id: string, action: string): Promise<any> => {
       try {
         await SERVICES_DATA.Data.setLike(post_id, action);

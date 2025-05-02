@@ -29,7 +29,6 @@ const NewsPage: React.FC<NewsProps> = ({ children }) => {
   const [open, setOpen] = useState(false);
   const [text, setText] = useState('');
   const { avatar_pic } = userStore(state => state.store.userData);
-
   const openComments = commentsStore(state => {
     return state.openComments;
   });
@@ -92,7 +91,7 @@ const NewsPage: React.FC<NewsProps> = ({ children }) => {
       <SideBarNews
         open={open}
         setOpen={setOpen}
-        newsTitles={newsTitles.filter(title => postIds.includes(title.post_id))}
+        newsTitles={newsTitles.filter(title => postIds?.includes(title.post_id))}
       />
       <div
         ref={wrapRef}
@@ -111,7 +110,7 @@ const NewsPage: React.FC<NewsProps> = ({ children }) => {
                     <p className={style.commentsTitle}>Комментарии</p>
                     <Image
                       src={'/Icon_X_Big.png'}
-                      alt="like"
+                      alt="X"
                       width={35}
                       height={35}
                       className={style.closeButton}

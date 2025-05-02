@@ -31,7 +31,7 @@
   @extend %input;
   background-image: url('/Base_Sidebar_Search.png');
   margin-top: 105px;
-  margin-left: 28px;
+  margin-left: 14px;
   @media screen and (max-width: 1427px) {
     margin-top: 30px;
   }
@@ -43,23 +43,23 @@
 .customInput {
   background: transparent;
   border: none;
-  outline: none; /* Убирает обводку при фокусе */
-  color: #000; /* Цвет текста */
-  font-size: 14px; /* Размер шрифта */
+  outline: none;
+  color: #000;
+  font-size: 14px;
   font-weight: 400;
-  width: 100%; /* Занимает всю ширину родительского контейнера */
-  padding: 26px 0px 0px 16px; /* Внутренние отступы для удобства */
-  cursor: text; /* Курсор при наведении */
+  width: 100%;
+  padding: 27px 0px 0px 16px;
+  cursor: text;
 }
 
 .customInput::placeholder {
-  color: #aaa; /* Цвет плейсхолдера */
+  color: #aaa;
 }
 
 .customInput:hover,
 .customInput:focus {
-  border: none; /* Убирает рамки даже при наведении и фокусе */
-  outline: none; /* Убирает обводку при фокусе */
+  border: none;
+  outline: none;
 }
 .searchButtonItem {
   margin-bottom: 0;

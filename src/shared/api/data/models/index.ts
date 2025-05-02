@@ -7,6 +7,7 @@ import { getSavedNews } from './getSavedNews';
 import { getTitles } from './getTitles';
 import { saveComments } from './saveComments';
 import { saveNews } from './saveNews';
+import { searchNews } from './searchNews';
 import { setDislike } from './setDislike';
 import { setLike } from './setLike';
 
@@ -22,4 +23,5 @@ export default {
   saveComments,
   setLike,
   setDislike,
+  searchNews,
 };

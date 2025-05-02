@@ -12,31 +12,39 @@ const MemoizedNews = memo(({ children }: { children: React.ReactNode }) => {
 MemoizedNews.displayName = 'MemoizedNews';
 
 const NewsPage = () => {
-  const { getTitles, getSavedNews, getLimitNews, likeNewsOrComment, dislikeNews } = dataStore(
-    state => state,
-  );
+  const { getTitles, likeNewsOrComment, dislikeNews, fetchNews } = dataStore(state => state);
   const { saveComment } = commentsStore(state => state);
   const normalizedNews = dataStore(state => state.data.normalizedNews);
   const { currentNewsState, loading } = dataStore(state => state);
   const savedNews = dataStore(state => state.data.savedNews);
+  const searchedNews = dataStore(state => state.data.searchedNews);
+
   const [renderNews, setRenderNews] = useState(normalizedNews);
 
   useEffect(() => {
-    getSavedNews();
-    getLimitNews(0, 10);
+    fetchNews({ type: 'getLimitNews', start: 0, size: 10 });
+    fetchNews({ type: 'getSavedNews' });
     getTitles();
   }, []);
 
-  useEffect(() => {
-    if (currentNewsState.default) {
-      setRenderNews(normalizedNews);
-    } else if (currentNewsState.saved) {
-      setRenderNews(savedNews);
-    } else if (currentNewsState.selectedNews) {
-      const selectedNews = normalizedNews[currentNewsState.selectedNews];
-      setRenderNews({ [currentNewsState.selectedNews]: selectedNews });
+  const getRenderNews = () => {
+    switch (true) {
+      case currentNewsState.default:
+        return normalizedNews;
+      case currentNewsState.saved:
+        return savedNews;
+      case currentNewsState.searched && searchedNews && Object.keys(searchedNews).length > 0:
+        return searchedNews;
+      case !!currentNewsState.selectedNews:
+        return { [currentNewsState.selectedNews]: normalizedNews[currentNewsState.selectedNews] };
+      default:
+        return normalizedNews;
     }
-  }, [currentNewsState, normalizedNews, savedNews]);
+  };
+
+  useEffect(() => {
+    setRenderNews(getRenderNews());
+  }, [currentNewsState, normalizedNews, savedNews, searchedNews]);
 
   if (loading) {
     return <SpinModule />;

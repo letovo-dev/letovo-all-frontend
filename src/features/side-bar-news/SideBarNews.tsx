@@ -30,8 +30,8 @@ const SideBarNews = ({
   newsTitles: Titles[];
 }) => {
   const [form] = Form.useForm();
-  const [formData, setFormData] = useState({ search_query: '' });
-  const { loading, setCurrentNewsState } = dataStore(state => state);
+  const { loading, setCurrentNewsState, fetchNews, currentNewsState } = dataStore(state => state);
+  const { searchedNews } = dataStore(state => state.data);
 
   const mainSections: MainSections = useMemo(
     () => ({
@@ -39,29 +39,46 @@ const SideBarNews = ({
         title: 'Новости',
         method: () => {
           setOpen(prev => !prev);
-          setCurrentNewsState({ default: true, saved: false, selectedNews: undefined });
+          setCurrentNewsState({
+            default: true,
+            saved: false,
+            selectedNews: undefined,
+            searched: false,
+          });
+          form.resetFields();
         },
       },
       saved: {
         title: 'Сохраненные',
         method: () => {
-          setCurrentNewsState({ default: false, saved: true, selectedNews: undefined }),
+          setCurrentNewsState({
+            default: false,
+            saved: true,
+            selectedNews: undefined,
+            searched: false,
+          }),
             setOpen(prev => !prev);
+          form.resetFields();
         },
       },
     }),
-    [setOpen, setCurrentNewsState],
+    [setOpen, setCurrentNewsState, form],
   );
 
-  const onFinish = (values: FormValues): void => {
-    // console.log('Received values of form: ', values);
+  const onFinish = async (values: FormValues): Promise<void> => {
+    await fetchNews({ type: 'searchNews', searchQuery: values.search_query });
+    setCurrentNewsState({
+      default: false,
+      saved: false,
+      selectedNews: undefined,
+      searched: true,
+    });
+    if (searchedNews && Object.keys(searchedNews).length > 0) {
+      setOpen(prev => !prev);
+      form.resetFields();
+    }
   };
 
-  const handleNameInput = (e: React.ChangeEvent<HTMLInputElement>): void => {
-    setFormData(prev => {
-      return { ...prev, search_query: e.target.value || '' };
-    });
-  };
   const [windowWidth, setWindowWidth] = useState<number | undefined>(undefined);
   useEffect(() => {
     setWindowWidth(window.innerWidth);
@@ -81,50 +98,51 @@ const SideBarNews = ({
   return (
     <div className={windowWidth && windowWidth < 960 && open ? style.modalOverlay : ''}>
       <div className={getSidebarClass()}>
-        <SideBarNewsContent
-          loading={loading}
-          formData={formData}
-          form={form}
-          handleNameInput={handleNameInput}
-          onFinish={onFinish}
-        />
-        {Object.keys(mainSections).map((section, index) => {
-          return section === 'news' ? (
-            <div key={index} className={style.sidebarItem} onClick={mainSections[section].method}>
-              <span>{mainSections[section].title}</span>
-              <div className={style.sidebarItemNewsContainer}>
-                {newsTitles.map((item, index) => {
-                  return item.title !== '' ? (
-                    <div
-                      key={item.post_id}
-                      className={style.sidebarItemNews}
-                      onClick={(e: React.MouseEvent<HTMLDivElement>) => {
-                        e.stopPropagation();
-                        setCurrentNewsState({
-                          default: false,
-                          saved: false,
-                          selectedNews: item.post_id,
-                        });
-                        setOpen(prev => !prev);
-                      }}
-                    >
-                      <span>{item.title}</span>
-                    </div>
-                  ) : null;
-                })}
+        <SideBarNewsContent loading={loading} form={form} onFinish={onFinish} />
+        {currentNewsState.searched && !searchedNews && (
+          <div className={style.noSearchResult}>По запросу ничего не найдено</div>
+        )}
+        <div className={style.sidebarItemsContainer}>
+          {Object.keys(mainSections).map((section, index) => {
+            return section === 'news' ? (
+              <div key={index} className={style.sidebarItem} onClick={mainSections[section].method}>
+                <span>{mainSections[section].title}</span>
+                <div className={style.sidebarItemNewsContainer}>
+                  {newsTitles.map((item, index) => {
+                    return item.title !== '' ? (
+                      <div
+                        key={item.post_id}
+                        className={style.sidebarItemNews}
+                        onClick={(e: React.MouseEvent<HTMLDivElement>) => {
+                          e.stopPropagation();
+                          setCurrentNewsState({
+                            default: false,
+                            saved: false,
+                            selectedNews: item.post_id,
+                            searched: false,
+                          });
+                          setOpen(prev => !prev);
+                          form.resetFields();
+                        }}
+                      >
+                        <span>{item.title}</span>
+                      </div>
+                    ) : null;
+                  })}
+                </div>
               </div>
-            </div>
-          ) : (
-            <div
-              key={index}
-              className={style.sidebarItemSaved}
-              onClick={mainSections[section].method}
-            >
-              <Image src="/Icon_Favorites.png" alt="saved" width={24} height={26} />
-              <span>{mainSections[section].title}</span>
-            </div>
-          );
-        })}
+            ) : (
+              <div
+                key={index}
+                className={style.sidebarItemSaved}
+                onClick={mainSections[section].method}
+              >
+                <Image src="/Icon_Favorites.png" alt="saved" width={24} height={26} />
+                <span>{mainSections[section].title}</span>
+              </div>
+            );
+          })}
+        </div>
       </div>
     </div>
   );

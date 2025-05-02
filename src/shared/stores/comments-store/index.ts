@@ -29,6 +29,7 @@ export type TCommentsStoreState = {
   openComments: string;
   normalizedComments: Record<string, OneComment[]> | null;
   normalizedSavedComments: Record<string, OneComment[]> | null;
+  normalizedSearchedComments: Record<string, OneComment[]> | null;
   addComment: (comment: string) => Promise<void>;
   setOpenComments: (id: string) => void;
   setCommentReply: (text: string) => void;
@@ -121,6 +122,8 @@ const commentsStore = create<TCommentsStoreState>()(
       partialize: state => ({
         openComments: state.openComments,
         normalizedComments: state.normalizedComments,
+        normalizedSavedComments: state.normalizedSavedComments,
+        normalizedSearchedComments: state.normalizedSearchedComments,
       }),
     },
   ),
