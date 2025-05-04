@@ -1,10 +1,7 @@
 import { create } from 'zustand';
 import { immer } from 'zustand/middleware/immer';
 import { SERVICES_DATA } from '@/shared/api/data';
-import { IApiReturn } from '@/shared/lib/ApiSPA';
 import commentsStore from '../comments-store';
-import { searchNews } from '@/shared/api/data/models/searchNews';
-import { method } from 'lodash';
 
 interface Author {
   id: string;
@@ -92,19 +89,17 @@ interface SearchNewsParams {
   search_query: string;
 }
 
-type GetSavedNewsParams = Record<string, never>; // Пустой объект для getSavedNews
+type GetSavedNewsParams = Record<string, never>;
 
-// Типы для параметров fetchNews
 interface FetchNewsParams {
   type: 'getLimitNews' | 'getSavedNews' | 'searchNews';
-  start?: number; // Обязательно для getLimitNews
-  size?: number; // Обязательно для getLimitNews
-  searchQuery?: string; // Обязательно для searchNews
+  start?: number;
+  size?: number;
+  searchQuery?: string;
 }
 
-// Тип для конфигурации запроса
 interface RequestConfig {
-  method: (params: any) => Promise<any>; // Общий тип метода, уточняется ниже
+  method: (params: any) => Promise<any>;
   params: GetLimitNewsParams | GetSavedNewsParams | SearchNewsParams;
   newsField: keyof TDataStoreState['data'];
   commentsField: string;
@@ -120,7 +115,6 @@ export type TDataStoreState = {
     filteredNews?: RealNews[];
     newsTitles: Titles[];
     comments: Comment[];
-    realNews: { news: RealNews; media: string[] }[];
     savedNews: Record<string, any>;
     searchedNews: Record<string, any>;
     normalizedNews: Record<string, any>;
@@ -156,6 +150,8 @@ const initialState = {
   data: dataState,
   currentNewsState: { default: true, saved: false, selectedNews: undefined },
 };
+
+const controllers: { [key: string]: AbortController } = {};
 
 const dataStore = create<TDataStoreState>()(
   immer((set: (partial: Partial<any>) => void, get: () => any) => ({
@@ -225,16 +221,19 @@ const dataStore = create<TDataStoreState>()(
       }
     },
     saveNews: async (id: string, action: 'save' | 'delete'): Promise<any> => {
-      set({ error: undefined, loading: true });
+      set({ error: undefined });
       try {
         const response = await SERVICES_DATA.Data.saveNews(id, action);
         if (response.code === 200) {
           set((state: TDataStoreState) => {
             const news = get().data.realNews.find((n: any) => String(n.news.post_id) === id);
-            const updatedSavedNews =
-              action === 'save'
-                ? [news.news, ...get().data.savedNews]
-                : state.data.savedNews.filter((n: any) => String(n.post_id) !== id);
+            let updatedSavedNews;
+            if (action === 'save') {
+              updatedSavedNews = { [id]: news, ...get().data.savedNews };
+            } else {
+              updatedSavedNews = { ...get().data.savedNews };
+              delete updatedSavedNews[id];
+            }
             return {
               data: {
                 ...state.data,
@@ -252,8 +251,6 @@ const dataStore = create<TDataStoreState>()(
       } catch (error) {
         console.error(error);
         set({ ...initialState, error: 'Network or system error' });
-      } finally {
-        set({ loading: false });
       }
     },
     getCurrentNewsPics: async (id: number): Promise<any> => {
@@ -367,9 +364,17 @@ const dataStore = create<TDataStoreState>()(
           {},
         );
 
-        commentsStore.setState((s: any) => ({
-          [config.commentsField]: normalizedComments,
-        }));
+        commentsStore.setState((state: any) => {
+          const currentComments = state[config.commentsField] || {};
+          const mergedComments = {
+            ...currentComments,
+            ...normalizedComments,
+          };
+
+          return {
+            [config.commentsField]: mergedComments,
+          };
+        });
 
         const normalizedNews = news.reduce(
           (acc, item) => ({
@@ -388,8 +393,8 @@ const dataStore = create<TDataStoreState>()(
 
         if (config.updatePostIds) {
           const postIds = news.map(item => item.news.post_id);
-          updatedData.postIds = postIds.map(String);
-          updatedData.realNews = [...get().data.realNews, ...news];
+          const prevPostIds = get().data.postIds || [];
+          updatedData.postIds = [...prevPostIds, ...postIds];
         }
 
         set({
@@ -413,20 +418,29 @@ const dataStore = create<TDataStoreState>()(
     },
 
     likeNewsOrComment: async (post_id: string, action: string): Promise<any> => {
+      set({ error: undefined });
+      if (controllers[post_id]) {
+        controllers[post_id].abort();
+      }
+
+      const controller = new AbortController();
+      controllers[post_id] = controller;
       try {
-        await SERVICES_DATA.Data.setLike(post_id, action);
+        await SERVICES_DATA.Data.setLike(post_id, action, { signal: controller.signal });
       } catch (error) {
         console.error(error);
+      } finally {
+        if (controllers[post_id] === controller) {
+          delete controllers[post_id];
+        }
       }
     },
     dislikeNews: async (post_id: string, action: string): Promise<any> => {
-      set({ error: undefined, loading: true });
+      set({ error: undefined });
       try {
         await SERVICES_DATA.Data.setDislike(post_id, action);
       } catch (error) {
         console.error(error);
-      } finally {
-        set({ loading: false });
       }
     },
     resetState: () => {

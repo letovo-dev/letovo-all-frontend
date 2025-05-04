@@ -13,6 +13,7 @@ interface IApiQueryProps {
   debug?: boolean;
   transitional?: any;
   noNestedData?: boolean;
+  signal?: AbortSignal;
 }
 
 const libConfig = {

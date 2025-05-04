@@ -39,11 +39,8 @@ const OneComment: React.FC<OneCommentProps> = ({
   const [commentState, setCommentState] = useState<RealComment | undefined>(undefined);
   const { setOpenComments } = commentsStore(state => state);
   const [text, setText] = useState('');
-
   const usageCommentText = setCommentText ?? setText;
   const usageCommentTextValue = commentText ?? text;
-
-  console.log('lastNewsId', lastNews);
 
   useEffect(() => {
     if (comments) {

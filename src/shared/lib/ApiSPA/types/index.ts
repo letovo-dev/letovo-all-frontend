@@ -23,6 +23,7 @@ export interface IApiReturn<T> {
 export interface ISchemeMethod {
   method: Method;
   url: string;
+  signal?: AbortSignal;
 }
 
 export type IApiEntityScheme<T extends string | number> = Record<T, ISchemeMethod>;

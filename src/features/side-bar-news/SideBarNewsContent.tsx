@@ -11,20 +11,7 @@ interface SideBarNewsContentProps {
 
 const SideBarNewsContent: React.FC<SideBarNewsContentProps> = ({ loading, form, onFinish }) => {
   return (
-    <Form name="form" onFinish={onFinish} form={form} initialValues={{ search_query: '' }}>
-      {loading && (
-        <div className={style.spinWrapper}>
-          <ConfigProvider
-            theme={{
-              token: {
-                colorPrimary: '#FB4724',
-              },
-            }}
-          >
-            <Spin size={'large'} />
-          </ConfigProvider>
-        </div>
-      )}
+    <Form form={form} name="form" onFinish={onFinish} initialValues={{ search_query: '' }}>
       <div className={style.inputForm}>
         <Form.Item name="search_query">
           <input
