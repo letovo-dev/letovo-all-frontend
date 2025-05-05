@@ -3,28 +3,47 @@ import React from 'react';
 import style from './AchieveBlock.module.scss';
 import Image from 'next/image';
 import { v4 as uuidv4 } from 'uuid';
+import { calculateOpacity } from '@/shared/utils';
+import { ImgWithBackground } from '@/shared/ui/image-background';
 
 const AchieveBlock = ({
   achievements,
   openModal,
 }: {
   achievements: IUserAchData[];
-  openModal: (item: IUserAchData) => void;
+  openModal: (item: IUserAchData, opacity: number, activeIcon: boolean) => void;
 }) => {
   return (
     <div className={style.achieveWrap}>
-      {achievements.map(item => (
-        <div key={uuidv4()} className={style.item} onClick={() => openModal(item)}>
-          <Image
-            className={style.itemImg}
-            src="/Achievement_Closed.png"
-            alt="sign"
-            height={106}
-            width={106}
-          />
-          <p className={style.achTextInactive}>{item.achivement_name}</p>
-        </div>
-      ))}
+      {achievements.map(item => {
+        const opacity = calculateOpacity(item.level, item.stage);
+        const activeIcon = Boolean(item.stages);
+        return (
+          <div
+            key={uuidv4()}
+            className={style.item}
+            onClick={() => openModal(item, opacity, activeIcon)}
+          >
+            {activeIcon ? (
+              <>
+                <ImgWithBackground
+                  // imgPath={`${process.env.NEXT_PUBLIC_BASE_URL_MEDIA}${item.achivement_pic}`}
+                  imgPath={'/изображение5.png'}
+                  size={60}
+                  imgType={'avatar'}
+                  opacity={opacity}
+                />
+                <p className={style.achTextActive}>{item.achivement_name}</p>
+              </>
+            ) : (
+              <>
+                <Image src="/Achievement_Closed.png" alt="" height={106} width={106} />
+                <p className={style.achTextInactive}>{item.achivement_name}</p>
+              </>
+            )}
+          </div>
+        );
+      })}
     </div>
   );
 };

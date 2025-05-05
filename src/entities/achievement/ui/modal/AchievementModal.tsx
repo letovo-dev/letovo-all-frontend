@@ -49,7 +49,7 @@ const AchievementModal: React.FC<ModalProps> = ({
     }
   };
 
-  const stage = currentItem?.stage === '' ? '0' : currentItem?.stage;
+  const stage = currentItem?.stages === '' ? '0' : currentItem?.stages;
 
   return (
     <div className={style.modalOverlay} onClick={onClose}>
@@ -72,7 +72,7 @@ const AchievementModal: React.FC<ModalProps> = ({
               />
             </div>
             <div className={style.achivDiv}>
-              {currentItem?.datetime !== '' ? (
+              {currentItem?.done ? (
                 <p className={style.resultBlockText}>Получена</p>
               ) : (
                 <p className={style.resultBlockRes}>Частей собрано:</p>

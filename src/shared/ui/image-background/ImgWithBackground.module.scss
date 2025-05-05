@@ -1,0 +1,11 @@
+@use '../../../app/_mixins.scss';
+
+.imgContainer {
+  @extend %avatarTemplate;
+  background-image: url('/Achievement_Empty.png');
+  height: 106px;
+  width: 106px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}

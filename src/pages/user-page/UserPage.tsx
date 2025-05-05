@@ -24,6 +24,8 @@ import UserData from './ui/UserData';
 import AchieveBlock from './ui/AchieveBlock';
 import AchieveBlockMobile from './ui/AchieveBlockMobile';
 import { useFooterContext } from '@/shared/ui/context/FooterContext';
+import AchievementItem from './ui/AchievementItem';
+import { ImgWithBackground } from '@/shared/ui/image-background';
 
 interface PositionedElement {
   ref: React.RefObject<HTMLElement>;
@@ -57,7 +59,7 @@ const UserPage = () => {
 
   const wrapRef = useRef<HTMLDivElement>(null);
   const lastScrollTop = useRef(0);
-  const [windowWidth, setWindowWidth] = useState(window.innerWidth);
+  const [windowWidth, setWindowWidth] = useState(window?.innerWidth ?? 0);
 
   useEffect(() => {
     const handleResize = () => setWindowWidth(window.innerWidth);
@@ -170,16 +172,28 @@ const UserPage = () => {
 
   const userOnBoard = userData?.active === 't' ? 'Работает' : 'В отпуске';
 
-  const openModal = (item: IUserAchData, done = false) => {
-    setCurrentItem(item);
+  const openModal = (item: IUserAchData, opacity: number, activeIcon: boolean) => {
+    const doneItem = item.stages === item.level;
+    setCurrentItem({ ...item, done: doneItem });
     setCurrentImageElement(
-      <Image
-        className={style.itemImg}
-        src={done ? '/изображение 5.png' : '/Achievement_Closed.png'}
-        alt="sign"
-        height={88}
-        width={86}
-      />,
+      <div key={uuidv4()} className={style.item}>
+        {activeIcon ? (
+          <>
+            <ImgWithBackground
+              imgPath={'/изображение5.png'}
+              size={60}
+              imgType={'avatar'}
+              opacity={opacity}
+            />
+            <p className={style.achTextActive}>{item.achivement_name}</p>
+          </>
+        ) : (
+          <>
+            <Image src="/Achievement_Closed.png" alt="" height={106} width={106} />
+            <p className={style.achTextActive}>{item.achivement_name}</p>
+          </>
+        )}
+      </div>,
     );
     setOpen(true);
   };

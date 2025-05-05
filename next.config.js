@@ -26,6 +26,13 @@ const nextConfig = {
         pathname: '/api/media/get/images/avatars/**',
         search: '',
       },
+      {
+        protocol: 'http',
+        hostname: 'localhost',
+        port: '',
+        pathname: '/api/media/get/img/**',
+        search: '',
+      },
     ],
   },
 };

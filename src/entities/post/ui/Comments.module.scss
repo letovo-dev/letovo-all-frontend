@@ -9,10 +9,13 @@ $overlay-color: rgba(0, 0, 0, 0.5);
   .commentContainer {
     display: flex;
     gap: 10px;
-    .avatar {
-      margin-top: 4px;
-      margin-left: 19px;
-    }
+    // .avatar {
+    //   margin-top: 4px;
+    //   margin-left: 21px;
+    //   @media screen and (max-width: 961px) {
+    //     margin-left: 19px;
+    //   }
+    // }
     .commentTextBox {
       display: flex;
       flex-direction: column;
@@ -81,6 +84,9 @@ $overlay-color: rgba(0, 0, 0, 0.5);
 .avatarTemplate {
   @extend %avatarTemplate;
   height: 45px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
 }
 
 .commentsLisBackground {

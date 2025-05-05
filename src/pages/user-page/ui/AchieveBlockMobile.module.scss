@@ -43,11 +43,19 @@
   .itemImg {
     cursor: pointer;
     margin-bottom: 5px;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
   }
   .achTextInactive {
     font-size: 11px;
     font-weight: 400;
     color: var(--graphics11);
+  }
+  .achTextActive {
+    font-size: 11px;
+    font-weight: 400;
+    color: var(--graphics9);
   }
 }
 @media screen and (max-width: 424px) {

@@ -7,10 +7,16 @@
   .avatarTemplate {
     @extend %avatarTemplate;
     height: 45px;
-    .avatar {
-      margin-top: 4px;
-      margin-left: 19px;
-    }
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    // .avatar {
+    // margin-top: 4px;
+    // margin-left: 21px;
+    // @media screen and (max-width: 961px) {
+    //   margin-left: 19px;
+    // }
+    // }
   }
   .sendButton {
     cursor: pointer;
