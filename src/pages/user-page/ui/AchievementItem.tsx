@@ -15,18 +15,14 @@ const AchievementItem = ({
   className: string;
 }) => {
   const opacity = calculateOpacity(item.level, item.stages);
-  const activeIcon = Boolean(item.stages);
+  const isActiveIcon = Boolean(item.stages);
+  const imgPath = `${process.env.NEXT_PUBLIC_BASE_URL_MEDIA}/${item.achivement_pic}`;
 
   return (
     <div key={uuidv4()} className={className} onClick={onClick}>
-      {activeIcon ? (
+      {isActiveIcon ? (
         <>
-          <ImgWithBackground
-            imgPath={'/изображение5.png'}
-            size={60}
-            imgType={'avatar'}
-            opacity={opacity}
-          />
+          <ImgWithBackground imgPath={imgPath} size={60} imgType={'avatar'} opacity={opacity} />
           <p className={style.achTextActive}>{item.achivement_name}</p>
         </>
       ) : (

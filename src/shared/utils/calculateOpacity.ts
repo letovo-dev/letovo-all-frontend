@@ -1,25 +1,20 @@
-const calculateOpacity = (level: string, stage: string): number => {
+const calculateOpacity = (level: string, stages: string): number => {
   const levelNum = Number(level);
-  const stageNum = Number(stage);
+  const stagesNum = Number(stages);
 
   const minOpacity = 0.1;
   const maxOpacity = 1.0;
 
-  const maxLevel = 1;
-
-  if (isNaN(levelNum) || isNaN(stageNum) || levelNum < 0 || stageNum < 0) {
+  if (isNaN(levelNum) || isNaN(stagesNum) || levelNum < 0 || stagesNum <= 0) {
     return minOpacity;
   }
 
-  if (levelNum === stageNum) {
+  if (levelNum === stagesNum) {
     return maxOpacity;
   }
 
-  const levelContribution = Math.min(levelNum, maxLevel) / maxLevel;
-  const baseOpacity = minOpacity + (maxOpacity - minOpacity) * levelContribution;
-
-  const stageContribution = stageNum > 0 ? stageNum / 10 : 0;
-  const finalOpacity = Math.min(baseOpacity + stageContribution * 0.05, maxOpacity);
+  const progress = levelNum / stagesNum;
+  const finalOpacity = minOpacity + (maxOpacity - minOpacity) * progress;
 
   return Math.round(finalOpacity * 100) / 100;
 };

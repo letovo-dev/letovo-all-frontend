@@ -50,6 +50,7 @@ const AchievementModal: React.FC<ModalProps> = ({
   };
 
   const stage = currentItem?.stages === '' ? '0' : currentItem?.stages;
+  const level = currentItem?.level === '' ? '0' : currentItem?.level;
 
   return (
     <div className={style.modalOverlay} onClick={onClose}>
@@ -77,7 +78,7 @@ const AchievementModal: React.FC<ModalProps> = ({
               ) : (
                 <p className={style.resultBlockRes}>Частей собрано:</p>
               )}
-              <p className={style.textConditionRes}>{`${stage}/${currentItem?.stages}`}</p>
+              <p className={style.textConditionRes}>{`${level}/${stage}`}</p>
             </div>
             <div className={style.directionDiv} onClick={showNextItem}>
               <Image

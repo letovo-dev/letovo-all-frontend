@@ -16,8 +16,14 @@ const AchieveBlock = ({
   return (
     <div className={style.achieveWrap}>
       {achievements.map(item => {
-        const opacity = calculateOpacity(item.level, item.stage);
+        const opacity = calculateOpacity(item.level, item.stages);
+        console.log(item);
+
+        console.log('opacity', opacity);
+
         const activeIcon = Boolean(item.stages);
+        const imgPath = `${process.env.NEXT_PUBLIC_BASE_URL_MEDIA}/${item.achivement_pic}`;
+
         return (
           <div
             key={uuidv4()}
@@ -27,8 +33,7 @@ const AchieveBlock = ({
             {activeIcon ? (
               <>
                 <ImgWithBackground
-                  // imgPath={`${process.env.NEXT_PUBLIC_BASE_URL_MEDIA}${item.achivement_pic}`}
-                  imgPath={'/изображение5.png'}
+                  imgPath={imgPath}
                   size={60}
                   imgType={'avatar'}
                   opacity={opacity}

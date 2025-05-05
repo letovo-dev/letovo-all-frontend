@@ -174,17 +174,14 @@ const UserPage = () => {
 
   const openModal = (item: IUserAchData, opacity: number, activeIcon: boolean) => {
     const doneItem = item.stages === item.level;
+    const imgPath = `${process.env.NEXT_PUBLIC_BASE_URL_MEDIA}/${item.achivement_pic}`;
+
     setCurrentItem({ ...item, done: doneItem });
     setCurrentImageElement(
       <div key={uuidv4()} className={style.item}>
         {activeIcon ? (
           <>
-            <ImgWithBackground
-              imgPath={'/изображение5.png'}
-              size={60}
-              imgType={'avatar'}
-              opacity={opacity}
-            />
+            <ImgWithBackground imgPath={imgPath} size={60} imgType={'avatar'} opacity={opacity} />
             <p className={style.achTextActive}>{item.achivement_name}</p>
           </>
         ) : (

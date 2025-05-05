@@ -30,7 +30,7 @@ const nextConfig = {
         protocol: 'http',
         hostname: 'localhost',
         port: '',
-        pathname: '/api/media/get/img/**',
+        pathname: '/api/media/get/pages/images/achivements/**',
         search: '',
       },
     ],

@@ -17,6 +17,8 @@ const ImgWithBackground = ({
   width?: number;
   opacity: number;
 }) => {
+  console.log('imgType', imgPath);
+
   return (
     <div className={style.imgContainer}>
       {imgType === 'avatar' ? (
