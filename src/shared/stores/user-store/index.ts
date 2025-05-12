@@ -92,11 +92,7 @@ const userStore = create<IUserStore>()(
           getAllUserAchievements: async (login: string) => {
             try {
               const response = await SERVICES_USERS.UsersData.getAllUserAchievements(login);
-              console.info('getAllUserAchievements', response);
               if (response?.success && response.code !== undefined && response.code === 200) {
-                // produce((draft: IUserStore) => {
-                //   draft.store.trainsData = trains;
-                // });
                 const { result } = response?.data as { result: IUserAchData[] };
                 set((draft: IUserStore) => {
                   draft.store.allPossibleUserAchievements = result;

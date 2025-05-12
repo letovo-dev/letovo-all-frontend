@@ -9,7 +9,6 @@ import rehypeRaw from 'rehype-raw';
 import axios from 'axios';
 import { extractImageUrls } from '@/shared/utils/utils';
 import { useRouter } from 'next/navigation';
-import { getDataFromLocaleStorage } from '@/shared/lib/ApiSPA/axios/helpers';
 
 const Articles = () => {
   const { article, getOneArticle, setCurrentArticle, normalizedArticles, loading } = articlesStore(
@@ -18,36 +17,36 @@ const Articles = () => {
 
   const router = useRouter();
   const [processedText, setProcessedText] = useState('');
-  const token = localStorage.getItem('token');
+  const [lsToken, setLsToken] = useState<string | null>(null);
 
   useEffect(() => {
-    if (!token) {
-      router.push(`/login`);
+    if (typeof window !== 'undefined') {
+      const token = localStorage.getItem('token');
+      setLsToken(token);
+
+      if (!token) {
+        router.push('/login');
+      }
     }
-  }, [token]);
+  }, [router]);
 
   useEffect(() => {
     const fetchImages = async () => {
       const markdownText = article?.text || '';
 
-      // // Шаг 1: Найти все URL изображений в тексте Markdown
       const imageRegex = /!\[.*?\]\((.*?)\)/g;
-      // const imageUrls = [...markdownText.matchAll(imageRegex)].map(match => match[1]);
       const imageUrls = extractImageUrls(markdownText);
-      console.log('imageUrls', imageUrls);
 
-      // Шаг 2: Загрузить изображения и заменить URL
       const urlMap: Record<string, string> = {};
       for (const url of imageUrls) {
         try {
           const response = await axios.get(url, {
             headers: {
-              Authorization: `Bearer ${token}`,
+              Authorization: `Bearer ${lsToken}`,
             },
             responseType: 'blob',
           });
 
-          // Создать временный URL для изображения
           const objectUrl = URL.createObjectURL(response.data);
           urlMap[url] = objectUrl;
         } catch (error) {

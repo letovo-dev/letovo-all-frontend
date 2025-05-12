@@ -34,13 +34,15 @@ const NewsPage: React.FC<NewsProps> = ({ children }) => {
   const openComments = commentsStore(state => {
     return state.openComments;
   });
-  const token = localStorage.getItem('token');
 
   useEffect(() => {
-    if (!token) {
-      router.push(`/login`);
+    if (typeof window !== 'undefined') {
+      const token = localStorage.getItem('token');
+      if (!token) {
+        router.push('/login');
+      }
     }
-  }, [token]);
+  }, [router]);
 
   const handleSendComment = () => {
     if (text.length > 0) {
