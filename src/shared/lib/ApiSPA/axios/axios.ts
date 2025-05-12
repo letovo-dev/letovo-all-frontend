@@ -17,7 +17,7 @@ instance.interceptors.request.use(
   },
 );
 
-const logoutErrors = [401, 403];
+// const logoutErrors = [401, 403];
 
 instance.interceptors.response.use(
   function (dataResponse) {

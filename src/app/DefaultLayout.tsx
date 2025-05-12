@@ -1,7 +1,6 @@
 'use client';
 import style from './page.module.scss';
 import { useEffect, useRef } from 'react';
-import dataStore from '@/shared/stores/data-store';
 import Footer from '@/shared/ui/footer';
 import Image from 'next/image';
 import Menu from '@/shared/ui/menu';
@@ -59,6 +58,7 @@ export default function DefaultLayout({ children }: { children: React.ReactNode 
             alt="Letovo.corp"
             height={25}
             width={250}
+            priority
           />
           <div className={style.headerMenu}>
             <Menu />

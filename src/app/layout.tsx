@@ -1,6 +1,5 @@
 import type { Metadata } from 'next';
 import './globals.scss';
-import '@ant-design/v5-patch-for-react-19';
 import { FooterProvider } from '@/shared/ui/context/FooterContext';
 
 export const metadata: Metadata = {

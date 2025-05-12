@@ -1,11 +1,11 @@
 import { add } from './add';
-import { create } from './craete';
+import { create } from './create';
 import { deleteAchievement } from './delete';
 import { info } from './info';
 import { pictures } from './pictures';
 import { tree } from './tree';
 
-export default {
+const achievements = {
   add,
   deleteAchievement,
   create,
@@ -13,3 +13,5 @@ export default {
   tree,
   info,
 };
+
+export default achievements;

@@ -20,8 +20,6 @@ const CustomSelect: React.FC<CustomSelectProps> = ({
   avatars = [],
   userPageSelectPosition,
 }) => {
-  console.log('avatars', avatars);
-
   const avatarsToSelect = avatars
     .filter(avatar => avatar !== value)
     .map((avatar: string) => ({

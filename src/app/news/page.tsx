@@ -1,6 +1,6 @@
 'use client';
 import { memo, useCallback, useEffect, useMemo, useRef, useState } from 'react';
-import News from '@/pages/news/News';
+import News from '@/pages_fsd/news/News';
 import dataStore from '@/shared/stores/data-store';
 import { OneNews } from '@/entities/post/ui';
 import commentsStore from '@/shared/stores/comments-store';

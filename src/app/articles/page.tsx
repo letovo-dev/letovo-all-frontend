@@ -1,7 +1,5 @@
-import React from 'react';
+import { ArticlesPage } from '@/pages_fsd/articles';
 
-const Articles = () => {
-  return <div>Articles</div>;
-};
-
-export default Articles;
+export default function Articles() {
+  return <ArticlesPage />;
+}

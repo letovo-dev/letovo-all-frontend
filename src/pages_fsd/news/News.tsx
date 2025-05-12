@@ -10,14 +10,16 @@ import OneComment from '@/entities/post/ui/OneComment';
 import Image from 'next/image';
 import { Divider } from 'antd';
 import { useFooterContext } from '@/shared/ui/context/FooterContext';
-import userStore from '@/shared/stores/user-store';
+import userStore, { IUserStore } from '@/shared/stores/user-store';
 import commentsStore from '@/shared/stores/comments-store';
+import { useRouter } from 'next/navigation';
 
 interface NewsProps {
   children: React.ReactNode;
 }
 
 const NewsPage: React.FC<NewsProps> = ({ children }) => {
+  const router = useRouter();
   const { newsTitles, postIds } = dataStore(state => state.data);
   const { normalizedComments, saveComment } = commentsStore(state => state);
   const { likeNewsOrComment } = dataStore(state => state);
@@ -28,10 +30,17 @@ const NewsPage: React.FC<NewsProps> = ({ children }) => {
   const savedScrollPosition = useRef(0);
   const [open, setOpen] = useState(false);
   const [text, setText] = useState('');
-  const { avatar_pic } = userStore(state => state.store.userData);
+  const { avatar_pic } = userStore((state: IUserStore) => state.store.userData);
   const openComments = commentsStore(state => {
     return state.openComments;
   });
+  const token = localStorage.getItem('token');
+
+  useEffect(() => {
+    if (!token) {
+      router.push(`/login`);
+    }
+  }, [token]);
 
   const handleSendComment = () => {
     if (text.length > 0) {
@@ -100,7 +109,7 @@ const NewsPage: React.FC<NewsProps> = ({ children }) => {
         <div className={style.containerWrapper}>
           <Burger setOpen={setOpen} />
         </div>
-        <div className={style.wrap}>{children}</div> {/* Убрали commentsOpen */}
+        <div className={style.wrap}>{children}</div>
         {openComments && (
           <Suspense fallback={<div>Loading comments...</div>}>
             <div className={style.wrapDark}>

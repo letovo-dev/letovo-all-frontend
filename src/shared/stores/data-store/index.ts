@@ -183,7 +183,7 @@ const dataStore = create<TDataStoreState>()(
       }
     },
     setCurrentNewsState: (state: Record<string, any>): void => {
-      set((s: TDataStoreState) => ({
+      set(() => ({
         currentNewsState: state,
       }));
     },
@@ -243,7 +243,7 @@ const dataStore = create<TDataStoreState>()(
             };
           });
         } else {
-          set((s: TDataStoreState) => ({
+          set(() => ({
             error: undefined,
           }));
           return response;
@@ -444,7 +444,7 @@ const dataStore = create<TDataStoreState>()(
       }
     },
     resetState: () => {
-      set((s: TDataStoreState) => ({
+      set(() => ({
         ...initialState,
       }));
     },

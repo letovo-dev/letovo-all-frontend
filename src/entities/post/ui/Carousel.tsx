@@ -32,30 +32,32 @@ const CarouselElement = ({ imgs }: { imgs: string[] }) => {
         },
       }}
     >
-      <Carousel afterChange={onChange} className={style.imageBackground}>
-        {imgs.map((item, index) => (
-          <div key={item} className={style.slideContainer}>
-            {isVideo(item) ? (
-              <video
-                ref={el => {
-                  if (el) videoRefs.current[index] = el;
-                }}
-                src={`${process.env.NEXT_PUBLIC_BASE_URL_MEDIA}/${item}`}
-                controls
-                muted
-                className={style.video}
-              />
-            ) : (
-              <Image
-                src={`${process.env.NEXT_PUBLIC_BASE_URL_MEDIA}/${item}`}
-                preview={false}
-                alt={`img-${index}`}
-                className={style.image}
-              />
-            )}
-          </div>
-        ))}
-      </Carousel>
+      {imgs && imgs.length > 0 ? (
+        <Carousel afterChange={onChange} className={style.imageBackground}>
+          {imgs.map((item, index) => (
+            <div key={item} className={style.slideContainer}>
+              {isVideo(item) ? (
+                <video
+                  ref={el => {
+                    if (el) videoRefs.current[index] = el;
+                  }}
+                  src={`${process.env.NEXT_PUBLIC_BASE_URL_MEDIA}/${item}`}
+                  controls
+                  muted
+                  className={style.video}
+                />
+              ) : (
+                <Image
+                  src={`${process.env.NEXT_PUBLIC_BASE_URL_MEDIA}/${item}`}
+                  preview={false}
+                  alt={`img-${index}`}
+                  className={style.image}
+                />
+              )}
+            </div>
+          ))}
+        </Carousel>
+      ) : null}
     </ConfigProvider>
   );
 };

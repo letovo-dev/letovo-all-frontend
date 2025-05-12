@@ -1,14 +1,14 @@
 'use client';
 
-import { memo } from 'react';
+import { memo, useMemo } from 'react';
 import PostHeader from './PostHeader';
 import CarouselElement from './Carousel';
 import NewsActionPanel from '@/features/news-action-panel/ui';
 import OneComment from './OneComment';
-import { v4 as uuidv4 } from 'uuid';
 import { RealNews } from '@/shared/stores/data-store';
-import userStore from '@/shared/stores/user-store';
+import userStore, { IUserStore } from '@/shared/stores/user-store';
 import commentsStore from '@/shared/stores/comments-store';
+import { generateKey } from '@/shared/api/utils';
 
 interface OnePostProps {
   newsId: string;
@@ -29,24 +29,29 @@ const NewsPost: React.FC<OnePostProps> = ({
   saveComment,
   newsId,
 }) => {
-  const { avatar_pic } = userStore(state => state.store.userData);
-  const comments = commentsStore(
-    state => (state.normalizedComments ? (state.normalizedComments[newsId] ?? []) : []) || [],
+  const { avatar_pic } = userStore((state: IUserStore) => state.store.userData);
+  const comments = useMemo(
+    () =>
+      commentsStore.getState().normalizedComments
+        ? (commentsStore.getState().normalizedComments?.[newsId] ?? [])
+        : [],
+    [newsId],
   );
+
   const showMore = comments.length > 1;
 
   return (
-    <div key={uuidv4()}>
+    <div key={generateKey()}>
       <PostHeader
         index={index}
         author={{
-          username: el.news.author,
-          avatar: el.news.avatar_pic,
+          username: el.news.author || 'Unknown',
+          avatar: el.news.avatar_pic || '',
           id: String(el.news.post_id),
         }}
-        text={el.news.text}
+        text={el.news.text || ''}
       />
-      <CarouselElement imgs={el.media} />
+      <CarouselElement imgs={el.media || []} />
       <NewsActionPanel
         newsItem={el.news}
         savedCount={10}

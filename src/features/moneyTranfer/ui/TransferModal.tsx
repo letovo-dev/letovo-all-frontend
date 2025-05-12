@@ -4,12 +4,12 @@ import style from './TransferModal.module.scss';
 import Image from 'next/image';
 import { Avatar, Button, ConfigProvider, Flex, Form, Space, Spin, Typography } from 'antd';
 import { ExclamationCircleOutlined } from '@ant-design/icons';
-import userStore from '@/shared/stores/user-store';
+import userStore, { IUserStore } from '@/shared/stores/user-store';
 
 interface ModalProps {
   openTransferModal: boolean;
   setOpenTransferModal: (value: boolean) => void;
-  title: string;
+  title?: string;
   selfMoney: number;
 }
 interface FormValues {
@@ -18,19 +18,17 @@ interface FormValues {
 }
 
 const TransferModal: React.FC<ModalProps> = ({
-  title: string,
   openTransferModal,
   setOpenTransferModal,
   selfMoney = 100,
-  title,
 }) => {
   const [receiver, setReceiver] = useState<string | undefined>(undefined);
-  const { error, loading } = userStore(state => state);
+  const { error, loading } = userStore((state: IUserStore) => state);
   const [form] = Form.useForm();
   const { Text } = Typography;
   const [nick, setNick] = useState<string | undefined>('');
   const [sum, setSum] = useState<number>(0);
-  const { isRequireUserInDatabase, transferMoney } = userStore(state => state);
+  const { isRequireUserInDatabase, transferMoney } = userStore((state: IUserStore) => state);
   const [finished, setFinished] = useState<boolean>(false);
   const [avatar, setAvatar] = useState<string | undefined>(undefined);
 
@@ -79,7 +77,7 @@ const TransferModal: React.FC<ModalProps> = ({
     if (values.nick && values.sum) {
       const res = await transferMoney({ receiver: values.nick, amount: Number(values.sum) });
       if (res && res === 'success') {
-        userStore.setState(state => ({
+        userStore.setState((state: IUserStore) => ({
           store: {
             ...state.store,
             userData: {

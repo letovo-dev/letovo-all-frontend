@@ -1,5 +1,5 @@
 import React from 'react';
-import { Button, ConfigProvider, Form, FormInstance, Spin } from 'antd';
+import { Button, Form, FormInstance } from 'antd';
 import style from './SideBarNewsContent.module.scss';
 import { SearchOutlined } from '@ant-design/icons';
 

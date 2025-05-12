@@ -8,11 +8,12 @@ import style from './EnterForm.module.scss';
 import { setDataToLocaleStorage } from '@/shared/lib/ApiSPA/axios/helpers';
 import userStore from '@/shared/stores/user-store';
 import CustomModal from './CustomForgetPassModal';
+import { IUserStore } from '@/shared/stores/user-store';
 
 function EnterForm() {
   const { Title, Text } = Typography;
   const userStatus = authStore(state => state.userStatus);
-  const userName = userStore(state => state.store?.userData.username);
+  const userName = userStore((state: IUserStore) => state.store?.userData.username);
   const error = authStore(state => state.error);
   const [form] = Form.useForm();
   const loading = authStore(state => state.loading);
@@ -29,20 +30,20 @@ function EnterForm() {
   }, [userStatus]);
 
   useEffect(() => {
-    authStore.setState({ error: null });
+    authStore.setState({ error: undefined });
   }, []);
 
-  const onFinish = values => {
+  const onFinish = (values: any) => {
     authStore.getState().login(values);
   };
 
-  const handleNameInput = e => {
+  const handleNameInput = (e: React.ChangeEvent<HTMLInputElement>) => {
     setFormData(prev => {
       return { ...prev, login: e.target.value || '' };
     });
   };
 
-  const handlePassInput = e => {
+  const handlePassInput = (e: React.ChangeEvent<HTMLInputElement>) => {
     setFormData(prev => {
       return { ...prev, password: e.target.value || '' };
     });

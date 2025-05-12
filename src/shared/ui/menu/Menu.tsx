@@ -25,7 +25,7 @@ const Menu: React.FC = () => {
     {
       label: 'База знаний',
       key: 'articles',
-      disabled: true,
+      disabled: false,
     },
     {
       label: 'Новости',

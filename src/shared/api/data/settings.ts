@@ -53,6 +53,22 @@ export const API_DATA_SCHEME: IApiEntityScheme<IEndpoint> = {
     method: 'GET',
     url: `${baseUrl}/social/search`,
   },
+  getArticlesCategories: {
+    method: 'GET',
+    url: `${baseUrl}/social/categories`,
+  },
+  getArticleById: {
+    method: 'GET',
+    url: `${baseUrl}/social/bycat`,
+  },
+  getArticleMd: {
+    method: 'GET',
+    url: `${baseUrl}/media/get`,
+  },
+  getMdMedia: {
+    method: 'GET',
+    url: `${baseUrl}/media/get`,
+  },
 };
 
 export const API_DATA_ENDPOINTS = [
@@ -68,4 +84,8 @@ export const API_DATA_ENDPOINTS = [
   'getLimitNewsComments',
   'getLimitNews',
   'searchNews',
+  'getArticlesCategories',
+  'getArticleById',
+  'getArticleMd',
+  'getMdMedia',
 ] as const;

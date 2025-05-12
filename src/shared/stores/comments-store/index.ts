@@ -80,7 +80,7 @@ const commentsStore = create<TCommentsStoreState>()(
         set({ openComments: commentId });
       },
       setCommentReply: (text: string) => {
-        set((s: TCommentsStoreState) => ({
+        set(() => ({
           commentReply: text,
         }));
       },

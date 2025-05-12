@@ -1,13 +1,13 @@
 import { create } from 'zustand';
-import { SERVICES_USERS } from '@/shared/api/user';
-import { persist } from 'zustand/middleware';
-import { SERVICES_AUTH } from '@/shared/api/auth';
+import { persist, PersistOptions } from 'zustand/middleware';
 import { immer } from 'zustand/middleware/immer';
+import { SERVICES_AUTH } from '@/shared/api/auth';
+import { SERVICES_USERS } from '@/shared/api/user';
 import userStore, { IUserStore } from '../user-store';
 
-export type TAuthStoreState = {
+export interface TAuthStoreState {
   loading: boolean;
-  error: string;
+  error: string | undefined;
   userStatus: {
     logged: boolean;
     authed: boolean;
@@ -15,25 +15,33 @@ export type TAuthStoreState = {
     token: string | undefined;
   };
   login: (data: { login: string; password: string }) => Promise<void>;
-  auth: () => Promise<void>;
+  auth: () => Promise<{ success: boolean; message?: string }>;
+  register: () => Promise<{ success: boolean }>;
   changePass: (pass: string) => Promise<void>;
-  register: () => Promise<void>;
-  logout: () => Promise<void>;
-};
+  logout: () => void;
+  resetState: () => void;
+}
 
-const dUserState = { logged: false, authed: false, registered: false, token: '' };
-
-const initialState = {
+const initialState: Pick<TAuthStoreState, 'loading' | 'error' | 'userStatus'> = {
   loading: false,
   error: undefined,
-  userStatus: dUserState,
+  userStatus: {
+    logged: false,
+    authed: false,
+    registered: false,
+    token: undefined,
+  },
+};
+
+const persistOptions: PersistOptions<TAuthStoreState> = {
+  name: 'authStore',
 };
 
 const authStore = create<TAuthStoreState>()(
   persist(
-    immer((set: (partial: Partial<any>) => void, get: () => any) => ({
-      // ...initialState,
-      login: async (payload: any): Promise<any> => {
+    immer((set, get) => ({
+      ...initialState,
+      login: async (payload: { login: string; password: string }): Promise<void> => {
         set({ error: undefined, loading: true });
         try {
           const response = await SERVICES_AUTH.Auth.login(payload);
@@ -47,7 +55,7 @@ const authStore = create<TAuthStoreState>()(
             const token = response?.authorization;
             const registered = result[0]?.registered === 'f' ? false : true;
             set({
-              userStatus: { logged: true, authed: true, registered: registered, token },
+              userStatus: { logged: true, authed: true, registered, token },
               error: undefined,
             });
           } else {
@@ -60,19 +68,19 @@ const authStore = create<TAuthStoreState>()(
           set({ loading: false });
         }
       },
-      auth: async (): Promise<any> => {
+      auth: async (): Promise<{ success: boolean; message?: string }> => {
         set({ error: undefined, loading: true });
         try {
           const response = await SERVICES_AUTH.Auth.auth();
           if (response.success && response.code === 200) {
             const responseData = response?.data as { status: string };
             if (responseData.status === 't') {
-              set((s: TAuthStoreState) => ({
-                ...s,
-                userStatus: { ...s.userStatus, authed: true },
+              set(state => ({
+                ...state,
+                userStatus: { ...state.userStatus, authed: true },
                 error: undefined,
               }));
-              return { success: true, data: responseData };
+              return { success: true, message: 'Authenticated' };
             } else {
               get().logout();
               return { success: false, message: 'Invalid status' };
@@ -81,70 +89,66 @@ const authStore = create<TAuthStoreState>()(
             get().logout();
             return { success: false, message: 'Request failed' };
           }
-        } catch (error: any) {
+        } catch (error) {
           console.error(error);
-          set({ userStatus: dUserState, error: 'Network or system error' });
-          return { success: false, error: 'Network or system error' };
+          set({ userStatus: initialState.userStatus, error: 'Network or system error' });
+          return { success: false, message: 'Network or system error' };
         } finally {
           set({ loading: false });
         }
       },
-
-      register: async () => {
+      register: async (): Promise<{ success: boolean }> => {
         set({ error: undefined, loading: true });
         try {
           const response = await SERVICES_AUTH.Auth.register();
           if (response.success && response.code === 200 && response.data === 'ok') {
-            set((s: TAuthStoreState) => ({
-              userStatus: { ...s.userStatus, registered: true },
+            set(state => ({
+              userStatus: { ...state.userStatus, registered: true },
               error: undefined,
             }));
+            return { success: true };
           } else {
-            set((s: TAuthStoreState) => ({
-              userStatus: {
-                ...s.userStatus,
-                registered: false,
-              },
-              error: 'Ошибка регистрации',
+            set(state => ({
+              userStatus: { ...state.userStatus, registered: false },
+              error: 'Registration failed',
             }));
+            return { success: false };
           }
-        } catch (error: any) {
+        } catch (error) {
           console.error(error);
-          set({ userStatus: dUserState, error: 'Network or system error' });
-          return {
-            success: false,
-          };
+          set({ userStatus: initialState.userStatus, error: 'Network or system error' });
+          return { success: false };
         } finally {
           set({ loading: false });
         }
       },
-      changePass: async (pass: string) => {
+      changePass: async (pass: string): Promise<void> => {
         set({ error: undefined, loading: true });
         try {
-          const response = await SERVICES_USERS.UsersData.changePass({
+          await SERVICES_USERS.UsersData.changePass({
             unlogin: false,
             new_password: pass,
           });
-        } catch (err) {
-          console.error(err);
-          set({ error: 'Не удалось сменить пароль' });
+          set({ error: undefined });
+        } catch (error) {
+          console.error(error);
+          set({ error: 'Failed to change password' });
         } finally {
           set({ loading: false });
         }
       },
-      logout: () => {
-        set((s: TAuthStoreState) => ({
-          userStatus: { ...s.userStatus, logged: false, authed: false, token: '' },
-        }));
-        set({ error: undefined, loading: false });
+      logout: (): void => {
+        set({
+          userStatus: { logged: false, authed: false, registered: false, token: undefined },
+          error: undefined,
+          loading: false,
+        });
       },
-      resetState: () => {
-        set((s: TAuthStoreState) => ({
-          ...initialState,
-        }));
+      resetState: (): void => {
+        set(initialState);
       },
     })),
-    { name: 'authStore' },
+    persistOptions,
   ),
 );
 

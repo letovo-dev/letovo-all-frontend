@@ -44,7 +44,7 @@ export interface IUserStore {
   localeName: string;
   endPreload: boolean;
   getAllUserAchievements: (value: string) => void;
-  isRequireUserInDatabase: (value: string) => boolean;
+  isRequireUserInDatabase: (value: string) => { userName: string; avatar: string };
   transferMoney: (data: { receiver: string; amount: number }) => Promise<any>;
   setEndPreload: (value: boolean) => Promise<void>;
   setError: (error?: string) => void;

@@ -1,17 +1,17 @@
+'use client';
 import { IUserAchData } from '@/shared/stores/user-store';
 import React, { useEffect, useState } from 'react';
-import style from './AchieveBlockMobile.module.scss';
-import { v4 as uuidv4 } from 'uuid';
+import styles from './AchieveBlockMobile.module.scss';
 import { calculateOpacity } from '@/shared/utils';
+import { generateKey } from '@/shared/api/utils';
 import AchievementItem from './AchievementItem';
 
-const AchieveBlockMobile = ({
-  achievements,
-  openModal,
-}: {
+interface AchieveBlockMobileProps {
   achievements: IUserAchData[];
   openModal: (item: IUserAchData, opacity: number, activeIcon: boolean) => void;
-}) => {
+}
+
+const AchieveBlockMobile: React.FC<AchieveBlockMobileProps> = ({ achievements, openModal }) => {
   const [data, setData] = useState<IUserAchData[][]>([]);
 
   useEffect(() => {
@@ -25,51 +25,51 @@ const AchieveBlockMobile = ({
   }, [achievements]);
 
   return (
-    <div className={style.achContainer}>
+    <div className={styles.achContainer}>
       {/* Первая колонка */}
-      <div className={style.column}>
+      <div className={styles.column}>
         {data[0]?.map(item => {
           const opacity = calculateOpacity(item.level, item.stages);
           const activeIcon = Boolean(item.stages);
           return (
             <AchievementItem
-              key={uuidv4()}
+              key={generateKey()}
               item={item}
               onClick={() => openModal(item, opacity, activeIcon)}
-              className={style.item}
+              className={styles.item}
             />
           );
         })}
       </div>
 
-      {/* Вторая колонка с дополнительным div, занимающим свободное место сверху */}
-      <div className={style.extraColumn}>
-        <div className={style.spacer} />
+      {/* Вторая колонка с дополнительным div */}
+      <div className={styles.extraColumn}>
+        <div className={styles.spacer} />
         {data[1]?.map(item => {
           const opacity = calculateOpacity(item.level, item.stages);
           const activeIcon = Boolean(item.stages);
           return (
             <AchievementItem
-              key={uuidv4()}
+              key={generateKey()}
               item={item}
               onClick={() => openModal(item, opacity, activeIcon)}
-              className={style.item}
+              className={styles.item}
             />
           );
         })}
       </div>
 
       {/* Третья колонка */}
-      <div className={style.column}>
+      <div className={styles.column}>
         {data[2]?.map(item => {
           const opacity = calculateOpacity(item.level, item.stages);
           const activeIcon = Boolean(item.stages);
           return (
             <AchievementItem
-              key={uuidv4()}
+              key={generateKey()}
               item={item}
               onClick={() => openModal(item, opacity, activeIcon)}
-              className={style.item}
+              className={styles.item}
             />
           );
         })}

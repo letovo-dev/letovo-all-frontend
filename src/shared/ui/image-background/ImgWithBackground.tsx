@@ -3,7 +3,7 @@ import style from './ImgWithBackground.module.scss';
 import Image from 'next/image';
 
 const ImgWithBackground = ({
-  imgPath = '/изображение5.png',
+  imgPath = '/img5.png',
   size,
   imgType,
   height = 90,
@@ -17,8 +17,7 @@ const ImgWithBackground = ({
   width?: number;
   opacity: number;
 }) => {
-  console.log('imgType', imgPath);
-
+  if (typeof window === 'undefined') return null;
   return (
     <div className={style.imgContainer}>
       {imgType === 'avatar' ? (

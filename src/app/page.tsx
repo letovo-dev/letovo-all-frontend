@@ -1,17 +1,16 @@
 'use client';
 import React, { useEffect } from 'react';
-import '@ant-design/v5-patch-for-react-19';
 import { useRouter } from 'next/navigation';
-import userStore from '@/shared/stores/user-store';
+import userStore, { IUserStore } from '@/shared/stores/user-store';
 import authStore from '@/shared/stores/auth-store';
 import { ConfigProvider, Spin } from 'antd';
 import style from './page.module.scss';
 
 export default function Home() {
   const auth = authStore.getState().auth;
-  const userData = userStore(state => state.store?.userData);
+  const userData = userStore((state: IUserStore) => state.store?.userData);
   const router = useRouter();
-  const error = userStore(state => state.error);
+  const error = userStore((state: IUserStore) => state.error);
   const loading = authStore(state => state.loading);
 
   useEffect(() => {

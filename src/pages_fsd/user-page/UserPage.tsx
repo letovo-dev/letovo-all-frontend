@@ -1,46 +1,40 @@
 'use client';
+
 import React, { useEffect, useRef, useState } from 'react';
-import { redirect, useRouter } from 'next/navigation';
 import style from './UserPage.module.scss';
-import userStore, { IUserAchData } from '@/shared/stores/user-store';
+import userStore, { IUserAchData, IUserStore } from '@/shared/stores/user-store';
 import { ConfigProvider, Form, Spin } from 'antd';
-import CustomSelect from '@/shared/ui/select/CustomSelect';
-import QRScanner from '@/features/qr-scanner/QrScanner';
-import TableElement from '@/features/qr-scanner/Table';
-import { QrReader } from '@/features/qr-scanner/QrReader';
-import Registration from '@/features/registration';
+import { useRouter } from 'next/navigation';
+
+// import CustomSelect from '@/shared/ui/select/CustomSelect';
+// import QRScanner from '@/features/qr-scanner/QrScanner';
+// import TableElement from '@/features/qr-scanner/Table';
+// import { QrReader } from '@/features/qr-scanner/QrReader';
+// import Registration from '@/features/registration';
 import authStore from '@/shared/stores/auth-store';
 import { setDataToLocaleStorage } from '@/shared/lib/ApiSPA/axios/helpers';
 import dataStore from '@/shared/stores/data-store';
 import GetAvatars from '@/features/getAvatars';
 import Image from 'next/image';
-import { v4 as uuidv4 } from 'uuid';
 import { AchievementModal } from '@/entities/achievement/ui/modal';
 import { TransferModal } from '@/features/moneyTranfer/ui';
 import OnBoard from './ui/OnBoard';
 import Money from './ui/Money';
-import User from '@/app/user/[username]/page';
 import UserData from './ui/UserData';
-import AchieveBlock from './ui/AchieveBlock';
+const AchieveBlock = dynamic(() => import('./ui/AchieveBlock'), { ssr: false });
+
 import AchieveBlockMobile from './ui/AchieveBlockMobile';
 import { useFooterContext } from '@/shared/ui/context/FooterContext';
-import AchievementItem from './ui/AchievementItem';
 import { ImgWithBackground } from '@/shared/ui/image-background';
-
-interface PositionedElement {
-  ref: React.RefObject<HTMLElement>;
-  targetX: number;
-  targetY: number;
-}
+import { generateKey } from '@/shared/api/utils';
+import dynamic from 'next/dynamic';
 
 const UserPage = () => {
-  const [error, setError] = useState(null);
-  const [dataScanner, setDataScanner] = useState(null);
-  const { userAchievements } = userStore.getState().store;
+  const router = useRouter();
   const { allPossibleUserAchievements } = userStore.getState().store;
-  const getAllUserAchievements = userStore(state => state.getAllUserAchievements);
+  const getAllUserAchievements = userStore((state: IUserStore) => state.getAllUserAchievements);
   const [form] = Form.useForm();
-  const changeAvatar = userStore(state => state.setAvatar);
+  const changeAvatar = userStore((state: IUserStore) => state.setAvatar);
   const getAvatars = dataStore(state => state.getAvatars);
   const userStatus = authStore(state => state.userStatus);
   const avatars = dataStore(state => state.data?.avatars);
@@ -59,7 +53,7 @@ const UserPage = () => {
 
   const wrapRef = useRef<HTMLDivElement>(null);
   const lastScrollTop = useRef(0);
-  const [windowWidth, setWindowWidth] = useState(window?.innerWidth ?? 0);
+  const [windowWidth, setWindowWidth] = useState(0);
 
   useEffect(() => {
     const handleResize = () => setWindowWidth(window.innerWidth);
@@ -69,18 +63,6 @@ const UserPage = () => {
     return () => window.removeEventListener('resize', handleResize);
   }, []);
 
-  // useEffect(() => {
-  //   if (userData?.username) {
-  //     getAllUserAchievements(userData.username);
-  //   }
-  // }, [userData?.username]);
-
-  // useEffect(() => {
-  //   if (!avatars || avatars.length === 0) {
-  //     getAvatars();
-  //   }
-  // }, [avatars]);
-
   useEffect(() => {
     userStore.setState({ store: { ...userStore.getState().store } });
   }, []);
@@ -89,7 +71,7 @@ const UserPage = () => {
     const loadData = async () => {
       const initialData = userStore.getState().store.userData;
       if (!userStatus?.logged || !userStatus?.token || !userStatus?.registered) {
-        redirect('/login');
+        router.push(`/login`);
       }
 
       setUserData(initialData);
@@ -108,7 +90,7 @@ const UserPage = () => {
 
     loadData();
 
-    const unsubscribe = userStore.subscribe(state => {
+    const unsubscribe = userStore.subscribe((state: IUserStore) => {
       setUserData(state.store.userData);
       setAvatar(state.store.userData?.avatar_pic);
       setIsLoading(false);
@@ -120,7 +102,7 @@ const UserPage = () => {
   const logout = () => {
     authStore.getState().logout();
     setDataToLocaleStorage('token', '');
-    redirect('/login');
+    router.push(`/login`);
   };
 
   const onValuesChange = async (changedValues: any, allValues: any) => {
@@ -178,7 +160,7 @@ const UserPage = () => {
 
     setCurrentItem({ ...item, done: doneItem });
     setCurrentImageElement(
-      <div key={uuidv4()} className={style.item}>
+      <div key={generateKey()} className={style.item}>
         {activeIcon ? (
           <>
             <ImgWithBackground imgPath={imgPath} size={60} imgType={'avatar'} opacity={opacity} />
@@ -396,7 +378,7 @@ const UserPage = () => {
           openTransferModal={openTransferModal}
           setOpenTransferModal={setOpenTransferModal}
           title="Перевод"
-          selfMoney={Number(userData.balance) ?? 0}
+          selfMoney={Number(userData.balance) || 0}
         />
       )}
 
@@ -422,5 +404,7 @@ const UserPage = () => {
     </div>
   );
 };
+
+export const getServerSideProps = () => ({ props: {} });
 
 export default UserPage;

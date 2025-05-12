@@ -4,10 +4,7 @@ interface PositionedElement {
   targetY: number;
 }
 
-export const updatePositions = (
-  wrapRef: React.RefObject<HTMLElement>,
-  elements: PositionedElement[],
-) => {
+const updatePositions = (wrapRef: React.RefObject<HTMLElement>, elements: PositionedElement[]) => {
   const wrap = wrapRef.current;
 
   if (!wrap || elements.some(el => !el.ref.current)) {
@@ -39,3 +36,5 @@ export const updatePositions = (
     element.style.top = `${pointY}px`;
   });
 };
+
+export default updatePositions;

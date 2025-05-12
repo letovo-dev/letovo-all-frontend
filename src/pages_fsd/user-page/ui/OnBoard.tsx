@@ -18,7 +18,7 @@ const getColorClass = (depId: string | undefined) => {
 const OnBoard = ({ userData }: { userData: any }) => {
   return (
     <section className={style.onBoardContainer}>
-      <div className={`${style.department} ${getColorClass(userData!.departmentid)}`}>
+      <div className={`${style.department} ${getColorClass(userData?.departmentid || '')}`}>
         {colorClasses[userData?.departmentid]?.name}
       </div>
       <div className={style.timeOnBoard}>

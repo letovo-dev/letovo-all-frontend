@@ -23,7 +23,7 @@ const NewsActionPanel = ({
     likesCount: Number(newsItem?.likes),
     dislikesCount: Number(newsItem?.dislikes),
     saved: Boolean(newsItem.saved === 't'),
-    savedCountState: Number(newsItem.saved_count) ?? 0,
+    savedCountState: Number(newsItem.saved_count),
   });
 
   const { saveNews } = dataStore(state => state);
@@ -38,7 +38,7 @@ const NewsActionPanel = ({
         likesCount: Number(post.news?.likes),
         dislikesCount: Number(post.news?.dislikes),
         saved: Boolean(post.news?.saved === 't'),
-        savedCountState: Number(post.news?.saved_count) ?? 0,
+        savedCountState: Number(post.news?.saved_count),
       });
     }
   }, [post]);
@@ -91,7 +91,11 @@ const NewsActionPanel = ({
   };
 
   const handleComment = (id: string) => {
-    commentsCount > 0 ? setOpenComments(id) : setOpenComments('');
+    if (commentsCount > 0) {
+      setOpenComments(id);
+    } else {
+      setOpenComments('');
+    }
   };
 
   const handleSave = () => {

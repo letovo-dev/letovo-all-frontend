@@ -8,14 +8,6 @@ export class Utils {
   };
 }
 
-const backErr = (e: any) => {
-  try {
-    return e.response.data.message;
-  } catch (_) {
-    try {
-      return e.message;
-    } catch (__) {
-      return e;
-    }
-  }
+export const generateKey = () => {
+  return Date.now().toString() + Math.random().toString(36).substring(2);
 };

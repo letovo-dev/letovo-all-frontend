@@ -56,8 +56,8 @@ const SideBarNews = ({
             saved: true,
             selectedNews: undefined,
             searched: false,
-          }),
-            setOpen(prev => !prev);
+          });
+          setOpen(prev => !prev);
           form.resetFields();
         },
       },

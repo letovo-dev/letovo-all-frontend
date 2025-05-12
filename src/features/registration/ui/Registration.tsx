@@ -9,20 +9,19 @@ import {
   ExclamationCircleOutlined,
   MinusCircleOutlined,
 } from '@ant-design/icons';
-import userStore from '@/shared/stores/user-store';
+import userStore, { IUserStore } from '@/shared/stores/user-store';
 import authStore from '@/shared/stores/auth-store';
 import dataStore from '@/shared/stores/data-store';
 import { setDataToLocaleStorage } from '@/shared/lib/ApiSPA/axios/helpers';
 import Avatar from '@/shared/ui/avatar';
-import Link from 'next/link';
 type FormData = {
   avatar?: string | undefined;
   nick?: string | undefined;
 };
 
 const Registration = () => {
-  const changeLogin = userStore(state => state.changeLogin);
-  const changeAvatar = userStore(state => state.setAvatar);
+  const changeLogin = userStore((state: IUserStore) => state.changeLogin);
+  const changeAvatar = userStore((state: IUserStore) => state.setAvatar);
   const register = authStore(state => state.register);
   const getAvatars = dataStore(state => state.getAvatars);
   const avatars = dataStore(state => state.data?.avatars);
@@ -33,8 +32,8 @@ const Registration = () => {
   const [avatar, setAvatar] = React.useState<string | undefined>('');
   const [nick, setNick] = React.useState<string | undefined>('');
   const registered = authStore(state => state.userStatus?.registered);
-  const userName = userStore(state => state.store.userData.username);
-  const loading = userStore(state => state.loading);
+  const userName = userStore((state: IUserStore) => state.store.userData.username);
+  const loading = userStore((state: IUserStore) => state.loading);
   const [visible, setVisible] = useState(false);
   const router = useRouter();
 
