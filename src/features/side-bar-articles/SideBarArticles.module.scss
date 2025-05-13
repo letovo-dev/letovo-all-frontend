@@ -33,6 +33,7 @@ $overlay-color: rgba(0, 0, 0, 0.5);
   z-index: 10;
   position: absolute;
   display: none;
+  left: 0;
   @media screen and (max-width: 960px) {
     display: block;
     top: 0;
@@ -45,8 +46,11 @@ $overlay-color: rgba(0, 0, 0, 0.5);
 .sidebarContainerDesktop {
   z-index: 10;
   position: absolute;
-  top: 13px;
-  left: calc(50% - 750px);
+  top: 7%;
+  height: 93vh;
+  left: 0;
+  width: 364px;
+  background-color: var(--secondaryGray);
   @media screen and (max-width: 1428px) {
     display: none;
   }
@@ -55,14 +59,16 @@ $overlay-color: rgba(0, 0, 0, 0.5);
 .sidebarContainerTablet {
   z-index: 10;
   position: fixed;
-  top: 175px;
-  left: 50%;
-  transform: translateX(-445px);
+  top: 125px;
+  left: 75px;
   background-color: var(--secondaryGray);
   padding-bottom: 30px;
 }
 .sidebarItemsContainer {
   margin-top: 35px;
+  @media screen and (max-width: 960px) {
+    margin-top: 105px;
+  }
 }
 .sidebarItemNewsContainer {
   width: 100%;
@@ -70,23 +76,10 @@ $overlay-color: rgba(0, 0, 0, 0.5);
   overflow-y: auto;
   overflow-x: hidden;
 }
-.sidebarItem {
-  margin: 10px 0px 0px 20px;
-  max-width: 320px;
-  cursor: pointer;
-}
-.sidebarItemSaved {
-  @extend .sidebarItem;
-  display: flex;
-  gap: 7px;
-  margin-top: 20px;
-}
-.sidebarItemNews {
-  @extend .sidebarItem;
-  margin-top: 10px;
-  display: flex;
-  gap: 2px;
-  max-width: 90%;
+
+.articleTitle {
+  padding-top: 0;
+  transition: color 0.3s ease;
   &:hover {
     color: var(--graphics11);
   }
@@ -94,9 +87,19 @@ $overlay-color: rgba(0, 0, 0, 0.5);
     color: var(--graphics11);
   }
 }
-.noSearchResult {
-  margin: 10px 0px 0px 20px;
-  font-size: 10px;
-  color: var(--management);
-  position: fixed;
+
+.articleTitleSelected {
+  @extend .articleTitle;
+  color: var(--foreground);
+  font-weight: bold;
+}
+
+.articleTitle:nth-child(n + 2) {
+  padding-top: 15px;
+  &:hover {
+    color: var(--graphics11);
+  }
+  &:active {
+    color: var(--graphics11);
+  }
 }

@@ -1,10 +1,12 @@
 'use client';
-import React, { useEffect } from 'react';
+import React, { useEffect, useState } from 'react';
 import { useRouter } from 'next/navigation';
 import userStore, { IUserStore } from '@/shared/stores/user-store';
 import authStore from '@/shared/stores/auth-store';
-import { ConfigProvider, Spin } from 'antd';
+import { ConfigProvider, Spin, Button } from 'antd';
 import style from './page.module.scss';
+
+export const dynamic = 'force-dynamic';
 
 export default function Home() {
   const auth = authStore.getState().auth;
@@ -12,46 +14,75 @@ export default function Home() {
   const router = useRouter();
   const error = userStore((state: IUserStore) => state.error);
   const loading = authStore(state => state.loading);
+  const [authChecked, setAuthChecked] = useState(false);
+
+  console.log('Home rendered', { userData, error, loading, authChecked });
 
   useEffect(() => {
     async function handleAuthCheck() {
       try {
-        await checkAuth();
+        console.log('Starting auth check');
+        const authResult = await auth();
         const { userStatus } = authStore.getState();
-        if (!error && userData?.username && userStatus?.authed) {
-          router.push(`/user/${userData?.username}`);
-          return;
-        }
-        if (!userStatus.logged || !userStatus?.registered) {
+        console.log('authResult:', authResult, 'userStatus:', userStatus);
+
+        if (authResult.success && userData?.username && userStatus?.authed) {
+          console.log('Redirecting to user page:', `/user/${userData.username}`);
+          router.push(`/user/${userData.username}`);
+        } else {
+          console.log('Redirecting to login');
           router.push('/login');
-          return;
         }
       } catch (err) {
-        console.error('Ошибка авторизации:', err);
+        console.error('Auth check failed:', err);
+        router.push('/login');
+      } finally {
+        setAuthChecked(true);
       }
     }
 
-    handleAuthCheck();
-
-    async function checkAuth() {
-      return await auth();
+    if (!authChecked) {
+      handleAuthCheck();
     }
+  }, [auth, router, userData, authChecked]);
+
+  useEffect(() => {
+    const handlePageShow = (event: PageTransitionEvent) => {
+      if (event.persisted) {
+        console.log('Page restored from cache, rechecking auth');
+        setAuthChecked(false);
+      }
+    };
+    window.addEventListener('pageshow', handlePageShow);
+    return () => window.removeEventListener('pageshow', handlePageShow);
   }, []);
 
-  if (loading) {
+  useEffect(() => {
+    const handleVisibilityChange = () => {
+      if (document.visibilityState === 'visible') {
+        console.log('App became visible, rechecking auth');
+        setAuthChecked(false);
+      }
+    };
+    document.addEventListener('visibilitychange', handleVisibilityChange);
+    return () => document.removeEventListener('visibilitychange', handleVisibilityChange);
+  }, []);
+
+  if (loading || !authChecked) {
     return (
       <div className={style.spinWrapper}>
-        <ConfigProvider
-          theme={{
-            token: {
-              colorPrimary: '#FB4724',
-            },
-          }}
-        >
-          <Spin size={'large'} />
+        <ConfigProvider theme={{ token: { colorPrimary: '#FB4724' } }}>
+          <Spin size="large" />
         </ConfigProvider>
       </div>
     );
   }
-  return <></>;
+
+  return (
+    <div className={style.spinWrapper}>
+      <ConfigProvider theme={{ token: { colorPrimary: '#FB4724' } }}>
+        <Spin size="large" />
+      </ConfigProvider>
+    </div>
+  );
 }

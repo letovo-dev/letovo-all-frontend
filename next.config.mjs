@@ -4,6 +4,30 @@ import { fileURLToPath } from 'url';
 const __filename = fileURLToPath(import.meta.url);
 const __dirname = path.dirname(__filename);
 
+import withPWA from 'next-pwa';
+
+const pwaConfig = {
+  dest: 'public',
+  disable: process.env.NODE_ENV === 'development', // Отключить PWA в разработке
+  register: true, // Автоматически регистрировать Service Worker
+  skipWaiting: true, // Пропускать ожидание для активации нового Service Worker
+  // Опционально: настройка кэширования
+  runtimeCaching: [
+    {
+      urlPattern: /^https?.*/, // Кэшировать все HTTP/HTTPS запросы
+      handler: 'NetworkFirst', // Сначала сеть, затем кэш
+      options: {
+        cacheName: 'offlineCache',
+        expiration: {
+          maxEntries: 200,
+        },
+      },
+    },
+  ],
+};
+
+const configuredWithPWA = withPWA(pwaConfig);
+
 const nextConfig = {
   reactStrictMode: true,
   experimental: {
@@ -100,4 +124,4 @@ const nextConfig = {
   },
 };
 
-export default nextConfig;
+export default configuredWithPWA(nextConfig);

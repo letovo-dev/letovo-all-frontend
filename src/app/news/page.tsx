@@ -1,4 +1,5 @@
 'use client';
+
 import { memo, useCallback, useEffect, useMemo, useRef, useState } from 'react';
 import News from '@/pages_fsd/news/News';
 import dataStore from '@/shared/stores/data-store';
@@ -30,20 +31,43 @@ const NewsPage = () => {
   const [newsLength, setNewsLength] = useState(0);
   const [loadedNewsLength, setLoadedNewsLength] = useState(0);
 
+  // Отладка ошибок
+  useEffect(() => {
+    const handleError = (event: ErrorEvent) => {
+      console.error('Uncaught error:', event.error);
+    };
+    window.addEventListener('error', handleError);
+    return () => window.removeEventListener('error', handleError);
+  }, []);
+
   useEffect(() => {
     setNewsLength(newsTitles.length);
   }, [newsTitles]);
 
   useEffect(() => {
-    setLoadedNewsLength(10);
+    setLoadedNewsLength(LOAD_NEWS_SIZE);
   }, []);
 
   useEffect(() => {
-    fetchNews({ type: 'getLimitNews', start: startNewsItem, size: LOAD_NEWS_SIZE });
-    fetchNews({ type: 'getSavedNews' });
-    getTitles();
-  }, []);
+    if (!navigator.onLine) {
+      console.warn('No internet connection, skipping fetchNews');
+      return;
+    }
 
+    const initializeData = async () => {
+      try {
+        await Promise.all([
+          fetchNews({ type: 'getLimitNews', start: startNewsItem, size: LOAD_NEWS_SIZE }),
+          fetchNews({ type: 'getSavedNews' }),
+          getTitles(),
+        ]);
+      } catch (error) {
+        console.error('Failed to initialize data:', error);
+      }
+    };
+
+    initializeData();
+  }, []);
   const getRenderNews = useCallback(() => {
     switch (true) {
       case currentNewsState.default:
@@ -60,20 +84,31 @@ const NewsPage = () => {
   }, [currentNewsState, normalizedNews, savedNews, searchedNews]);
 
   useEffect(() => {
-    setRenderNews(getRenderNews());
+    const news = getRenderNews();
+    if (news && Object.keys(news).length > 0) {
+      setRenderNews(news);
+    } else {
+      console.warn('No renderNews data available');
+      setRenderNews({});
+    }
   }, [getRenderNews]);
 
   const debouncedLoadMore = useMemo(
     () =>
       debounce(() => {
-        if (loading || !hasMore || !currentNewsState.default) return;
         const nextStart = startNewsItem + LOAD_NEWS_SIZE;
-        setLoadedNewsLength(loadedNewsLength + LOAD_NEWS_SIZE);
-        fetchNews({ type: 'getLimitNews', start: nextStart, size: LOAD_NEWS_SIZE });
-        setHasMore(newsLength >= loadedNewsLength);
-        setStartNewsItem(nextStart);
+        setLoadedNewsLength(prev => prev + LOAD_NEWS_SIZE);
+        fetchNews({ type: 'getLimitNews', start: nextStart, size: LOAD_NEWS_SIZE })
+          .then(() => {
+            setHasMore(newsLength >= loadedNewsLength + LOAD_NEWS_SIZE);
+            setStartNewsItem(nextStart);
+          })
+          .catch(error => {
+            console.error('Failed to load more news:', error);
+            setHasMore(false);
+          });
       }, 300),
-    [fetchNews, startNewsItem, loading, hasMore, newsLength],
+    [fetchNews, startNewsItem, loading, hasMore, newsLength, loadedNewsLength],
   );
 
   const loadMore = useCallback(() => {
@@ -81,9 +116,13 @@ const NewsPage = () => {
   }, [debouncedLoadMore]);
 
   useEffect(() => {
+    if (!currentNewsState.default) {
+      return;
+    }
+
     const observer = new IntersectionObserver(
       entries => {
-        if (entries[0].isIntersecting && hasMore && !loading && currentNewsState.default) {
+        if (entries[0].isIntersecting && hasMore && !loading) {
           loadMore();
         }
       },
@@ -98,44 +137,48 @@ const NewsPage = () => {
     return () => {
       if (observerRef.current) {
         observerRef.current.disconnect();
+        console.log('IntersectionObserver disconnected');
       }
     };
   }, [loadMore, hasMore, loading, currentNewsState.default]);
 
   useEffect(() => {
-    if (observerRef.current && lastElementRef.current && currentNewsState.default) {
-      observerRef.current.disconnect();
-      observerRef.current.observe(lastElementRef.current);
-    }
-  }, [renderNews, currentNewsState.default]);
+    return () => {
+      debouncedLoadMore.cancel();
+      console.log('Debounced loadMore cancelled');
+    };
+  }, [debouncedLoadMore]);
 
   if (loading && startNewsItem === 0) {
     return <SpinModule />;
   }
 
+  if (!renderNews || Object.keys(renderNews).length === 0) {
+    return <SpinModule />;
+  }
+
   return (
     <MemoizedNews>
-      {renderNews &&
-        Object.entries(renderNews).map((el, index) => {
-          const newsArr = Object.entries(renderNews);
-          const [lastNewsId] = newsArr[newsArr.length - 1];
-          const [id, data] = el;
-          const isLastElement = id === lastNewsId;
+      {Object.entries(renderNews).map((el, index) => {
+        const newsArr = Object.entries(renderNews);
+        const [lastNewsId] = newsArr[newsArr.length - 1];
+        const [id, data] = el;
+        const isLastElement = id === lastNewsId;
 
-          return (
-            <div ref={isLastElement ? lastElementRef : null} key={id}>
-              <OneNews
-                el={data ?? { media: [], news: {} }}
-                index={index}
-                lastNews={id === lastNewsId ? data : null}
-                newsId={String(id)}
-                likeNewsOrComment={likeNewsOrComment}
-                dislikeNews={dislikeNews}
-                saveComment={saveComment}
-              />
-            </div>
-          );
-        })}
+        return (
+          <div ref={isLastElement ? lastElementRef : null} key={id}>
+            <OneNews
+              el={data ?? { media: [], news: {} }}
+              index={index}
+              lastNews={id === lastNewsId ? data : null}
+              newsId={String(id)}
+              likeNewsOrComment={likeNewsOrComment}
+              dislikeNews={dislikeNews}
+              saveComment={saveComment}
+            />
+          </div>
+        );
+      })}
       {loading && startNewsItem > 0 && <SpinModule />}
     </MemoizedNews>
   );

@@ -52,6 +52,26 @@ const NewsPage: React.FC<NewsProps> = ({ children }) => {
   };
 
   useEffect(() => {
+    if (openComments) {
+      document.body.style.overflow = 'hidden';
+      document.body.style.height = '100vh';
+      document.body.style.width = '100%';
+      document.body.style.position = 'fixed';
+    } else {
+      document.body.style.overflow = '';
+      document.body.style.height = '';
+      document.body.style.width = '';
+      document.body.style.position = '';
+    }
+    return () => {
+      document.body.style.overflow = '';
+      document.body.style.height = '';
+      document.body.style.width = '';
+      document.body.style.position = '';
+    };
+  }, [openComments]);
+
+  useEffect(() => {
     if (openComments && wrapRef.current) {
       savedScrollPosition.current = wrapRef.current.scrollTop;
     } else if (!openComments && wrapRef.current) {
@@ -73,15 +93,11 @@ const NewsPage: React.FC<NewsProps> = ({ children }) => {
         const scrollHeight = wrapRef.current.scrollHeight;
         const clientHeight = wrapRef.current.clientHeight;
         const isAtBottom = currentScrollTop + clientHeight >= scrollHeight - 1;
-
-        if (currentScrollTop > lastScrollTop.current) {
-          if (currentScrollTop > 50) {
-            setFooterHidden(true);
-          }
-        } else if (currentScrollTop < lastScrollTop.current && !isAtBottom) {
+        if (currentScrollTop > lastScrollTop.current && currentScrollTop > 50) {
+          setFooterHidden(true);
+        } else if (currentScrollTop < lastScrollTop.current || isAtBottom) {
           setFooterHidden(false);
         }
-
         lastScrollTop.current = currentScrollTop;
       }
     };
@@ -89,14 +105,12 @@ const NewsPage: React.FC<NewsProps> = ({ children }) => {
     if (wrapElement) {
       wrapElement.addEventListener('scroll', handleScroll);
     }
-
     return () => {
       if (wrapElement) {
         wrapElement.removeEventListener('scroll', handleScroll);
       }
     };
   }, [setFooterHidden]);
-
   return (
     <>
       <SideBarNews

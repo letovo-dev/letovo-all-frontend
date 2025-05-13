@@ -184,12 +184,9 @@ const UserPage = () => {
         const scrollHeight = wrapRef.current.scrollHeight;
         const clientHeight = wrapRef.current.clientHeight;
         const isAtBottom = currentScrollTop + clientHeight >= scrollHeight - 1;
-
-        if (currentScrollTop > lastScrollTop.current) {
-          if (currentScrollTop > 50) {
-            setFooterHidden(true);
-          }
-        } else if (currentScrollTop < lastScrollTop.current && !isAtBottom) {
+        if (currentScrollTop > lastScrollTop.current && currentScrollTop > 50) {
+          setFooterHidden(true);
+        } else if (currentScrollTop < lastScrollTop.current || isAtBottom) {
           setFooterHidden(false);
         }
         lastScrollTop.current = currentScrollTop;
@@ -199,7 +196,6 @@ const UserPage = () => {
     if (wrapElement) {
       wrapElement.addEventListener('scroll', handleScroll);
     }
-
     return () => {
       if (wrapElement) {
         wrapElement.removeEventListener('scroll', handleScroll);

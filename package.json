@@ -19,6 +19,7 @@
     "immer": "^10.1.1",
     "lodash": "^4.17.21",
     "next": "14.2.28",
+    "next-pwa": "^5.6.0",
     "react": "^18.2.0",
     "react-dom": "^18.2.0",
     "react-markdown": "^8.0.7",

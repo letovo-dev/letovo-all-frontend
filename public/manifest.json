@@ -1,17 +1,24 @@
 {
-  "name": "Letovo",
+  "name": "Letovo Application",
   "short_name": "Letovo",
-  "description": "Letovo app",
+  "description": "Next.js Letovo Application",
   "icons": [
     {
-      "src": "/favicon.ico",
-      "sizes": "48x48",
-      "type": "image/x-icon"
+      "src": "/img/icon-192x192.png",
+      "sizes": "192x192",
+      "type": "image/png"
+    },
+    {
+      "src": "/img/icon-512x512.png",
+      "sizes": "512x512",
+      "type": "image/png"
     }
   ],
   "start_url": "/",
   "id": "/",
   "display": "standalone",
   "background_color": "#ffffff",
-  "theme_color": "#000000"
+  "theme_color": "#FB4724",
+  "orientation": "portrait",
+  "scope": "/"
 }

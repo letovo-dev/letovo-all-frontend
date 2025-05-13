@@ -93,8 +93,31 @@ body {
 .ant-carousel .slick-prev,
 .ant-carousel .slick-next,
 .ant-carousel .slick-prev:hover,
-.ant-carousel .slick-next:hover {
+.ant-carousel .slick-next:hover,
+.ant-collapse .ant-collapse-item > .ant-collapse-header .ant-collapse-arrow {
   color: var(--orange);
+}
+
+.ant-collapse .ant-collapse-content > .ant-collapse-content-box {
+  padding: 19px 58px;
+}
+
+.ant-collapse > .ant-collapse-item > .ant-collapse-header {
+  padding: 12px 38px;
+}
+
+.ant-collapse .ant-collapse-item > .ant-collapse-header .ant-collapse-header-text {
+  margin-inline-end: auto;
+  color: var(--foreground);
+  font-weight: 400;
+  font-size: 14px;
+  line-height: 130%;
+  font-weight: bold;
+}
+
+.ant-collapse .ant-collapse-content {
+  color: var(--graphics10);
+  cursor: pointer;
 }
 // .ant-carousel {
 //   margin-top: -100px;
