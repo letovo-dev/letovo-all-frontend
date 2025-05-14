@@ -30,11 +30,13 @@ export type TArticlesStoreState = {
   article: OneArticle | undefined;
   loading: boolean;
   error: string | null;
+  lastFetched: number | null;
   getArticlesCategories: () => Promise<ArticleCategory[]>;
   getOneArticle: (id: string, categoryId: string) => OneArticle;
   getArticleMd: (fileName: string) => Promise<any>;
   loadAllArticlesByCategory: (id: string) => Promise<void>;
   setCurrentArticle: (article: OneArticle) => void;
+  refreshArticles: () => Promise<void>;
 };
 
 const initialState = {
@@ -42,7 +44,10 @@ const initialState = {
   article: undefined,
   loading: false,
   error: null,
+  lastFetched: Date.now(),
 };
+
+const CACHE_DURATION = 1000 * 60 * 5; // 5 minutes
 
 const articlesStore = create<TArticlesStoreState>()(
   persist(
@@ -54,6 +59,22 @@ const articlesStore = create<TArticlesStoreState>()(
         });
       },
       getArticlesCategories: async () => {
+        const { lastFetched, articlesCategories } = get();
+        const now = Date.now();
+        console.log('lastFetched', lastFetched);
+        console.log('now', now);
+        console.log('CACHE_DURATION', CACHE_DURATION);
+
+        console.log(
+          'lastFetched && now - lastFetched < CACHE_DURATION && articlesCategories.length > 0',
+          lastFetched && now - lastFetched < CACHE_DURATION && articlesCategories.length > 0,
+        );
+
+        if (lastFetched && now - lastFetched < CACHE_DURATION && articlesCategories.length > 0) {
+          console.log('Returning cached categories');
+          return articlesCategories;
+        }
+
         set({ loading: true, error: null });
         try {
           const response = (await SERVICES_DATA.Data.getArticlesCategories()) as {
@@ -64,11 +85,11 @@ const articlesStore = create<TArticlesStoreState>()(
             const categories = response.data.result;
             set((draft: TArticlesStoreState) => {
               draft.articlesCategories = categories;
+              draft.lastFetched = now;
             });
 
             if (categories.length > 0) {
               await get().loadAllArticlesByCategory(categories[0].category);
-              set({ loading: false });
               categories.slice(1).forEach(category => {
                 get()
                   .loadAllArticlesByCategory(category.category)
@@ -81,6 +102,7 @@ const articlesStore = create<TArticlesStoreState>()(
               });
             }
 
+            set({ loading: false });
             return categories;
           } else {
             throw new Error(`Failed to fetch categories, code: ${response?.code}`);
@@ -89,6 +111,7 @@ const articlesStore = create<TArticlesStoreState>()(
           console.error('Error fetching categories:', error);
           set({
             error: error instanceof Error ? error.message : 'Failed to get articles categories',
+            loading: false,
           });
           return [];
         }
@@ -185,6 +208,10 @@ const articlesStore = create<TArticlesStoreState>()(
           (article: OneArticle) => article.post_id === id,
         );
       },
+      refreshArticles: async () => {
+        set({ lastFetched: null });
+        await get().getArticlesCategories();
+      },
     })),
 
     {
@@ -204,5 +231,3 @@ const articlesStore = create<TArticlesStoreState>()(
 );
 
 export default articlesStore;
-
-articlesStore.getState().getArticlesCategories();

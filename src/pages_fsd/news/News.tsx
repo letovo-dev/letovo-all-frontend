@@ -123,7 +123,7 @@ const NewsPage: React.FC<NewsProps> = ({ children }) => {
         className={`${style.newsContainer} ${openComments ? style.commentsOpen : ''}`}
       >
         <div className={style.containerWrapper}>
-          <Burger setOpen={setOpen} />
+          <Burger setOpen={setOpen} openComments={openComments} />
         </div>
         <div className={style.wrap}>{children}</div>
         {openComments && (

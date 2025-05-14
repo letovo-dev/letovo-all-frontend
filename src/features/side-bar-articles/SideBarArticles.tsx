@@ -23,8 +23,6 @@ const SideBarArticles = ({
     [],
   );
 
-  console.log(article);
-
   const [windowWidth, setWindowWidth] = useState<number | undefined>(undefined);
   useEffect(() => {
     setWindowWidth(window.innerWidth);
@@ -47,34 +45,38 @@ const SideBarArticles = ({
     setOpen(false);
   };
 
-  console.log('normalizedArticles', normalizedArticles);
-  console.log('articlesCategories', articlesCategories);
-
   useEffect(() => {
+    if (!articlesCategories?.length || !normalizedArticles) {
+      return;
+    }
     const preparedItems: CollapseProps['items'] = articlesCategories?.reduce(
       (acc: { key: string; label: string; children: React.JSX.Element }[], value) => {
         const { title } =
           normalizedArticles?.[value.category]?.find(
             (articleItem: OneArticle) => articleItem.post_id === value.category,
           ) || {};
+
         const item = {
-          key: String(value.category),
+          key: value.category,
           label: value.category_name,
           children: (
             <div>
-              {normalizedArticles?.[value.category]?.map((articleItem: OneArticle) => (
-                <p
-                  className={
-                    articleItem.post_id === article?.post_id
-                      ? style.articleTitleSelected
-                      : style.articleTitle
-                  }
-                  key={generateKey()}
-                  onClick={() => handleArticleClick(articleItem.post_id, value.category)}
-                >
-                  {articleItem.title}
-                </p>
-              )) || <p>No articles available</p>}
+              {normalizedArticles?.[value.category]?.map((articleItem: OneArticle) => {
+                const articleTitle = articleItem.title ? articleItem.title : 'Статья без названия';
+                return (
+                  <p
+                    className={
+                      articleItem.post_id === article?.post_id
+                        ? style.articleTitleSelected
+                        : style.articleTitle
+                    }
+                    key={generateKey()}
+                    onClick={() => handleArticleClick(articleItem.post_id, value.category)}
+                  >
+                    {articleTitle}
+                  </p>
+                );
+              }) || <p>No articles available</p>}
             </div>
           ),
         };
@@ -96,7 +98,7 @@ const SideBarArticles = ({
         <div className={style.sidebarItemsContainer}>
           <Collapse
             items={items}
-            defaultActiveKey={['1']}
+            defaultActiveKey={article && [article?.category]}
             ghost
             onChange={onChange}
             expandIconPosition={'end'}

@@ -12,9 +12,9 @@ $overlay-color: rgba(0, 0, 0, 0.5);
 .modalOverlay {
   position: fixed;
   top: 0;
-  left: 50%;
+  left: 49%;
   transform: translateX(-50%);
-  width: 392px;
+  width: 100vw;
   height: 100%;
   background-color: $overlay-color;
   display: flex;
@@ -28,6 +28,10 @@ $overlay-color: rgba(0, 0, 0, 0.5);
     left: 50%;
     transform: translateX(-50%);
   }
+  @media screen and (max-width: 960px) {
+    top: 36px;
+    left: 49%;
+  }
 }
 .sidebarContainer {
   z-index: 10;
@@ -39,6 +43,7 @@ $overlay-color: rgba(0, 0, 0, 0.5);
     top: 0;
     left: 0%;
     width: 75%;
+    max-width: 350px;
     height: 100%;
     background-color: var(--secondaryGray);
   }

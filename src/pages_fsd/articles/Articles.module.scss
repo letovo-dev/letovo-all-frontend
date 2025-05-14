@@ -15,10 +15,13 @@ $scrollbar-width: 17px;
   flex-direction: column;
   align-items: center;
   justify-content: flex-start;
-  overflow-y: overlay;
+  overflow-y: auto;
   overflow-x: hidden;
   width: 100%;
-  height: 100vh;
+  height: calc(var(--vh, 1vh) * 100);
+  min-height: calc(var(--vh, 1vh) * 100);
+  -webkit-overflow-scrolling: touch;
+  overscroll-behavior-y: contain;
   @media (min-width: 933px) {
     padding-left: 16px;
   }
@@ -28,40 +31,7 @@ $scrollbar-width: 17px;
     height: 100vh;
     @media screen and (max-width: 960px) {
       padding-right: 0;
-    }
-  }
-
-  .containerWrapper {
-    display: block;
-    background-color: var(--graphics7);
-    margin: 0 auto;
-    width: 392px;
-    box-sizing: border-box;
-    height: 90px;
-    z-index: 1001;
-    position: fixed;
-    top: 0;
-    @media screen and (min-width: 961px) and (max-width: 1427px) {
-      background-color: transparent;
-      margin: 0 auto;
-      width: -moz-fit-content;
-      width: fit-content;
-      box-sizing: border-box;
-      height: -moz-fit-content;
-      height: fit-content;
-      z-index: 1001;
-      position: absolute;
-      top: 92px;
-      left: 40px;
-    }
-    @media screen and (min-width: 1428px) {
-      display: none;
-    }
-    &.commentsOpen {
-      padding-right: $scrollbar-width;
-      @media screen and (max-width: 960px) {
-        padding-right: 0;
-      }
+      overflow-y: hidden;
     }
   }
   .wrap {
@@ -70,32 +40,56 @@ $scrollbar-width: 17px;
     top: 7%;
     position: absolute;
     display: flex;
-    justify-content: flex-start;
+    align-items: center;
     flex-direction: column;
     margin: 0 auto;
     box-sizing: border-box;
     overflow: visible;
     width: calc(100% - 364px);
-    height: 93vh;
+    height: fit-content;
+    min-height: 93%;
     box-shadow:
       0 4px 8px rgba(0, 0, 0, 0.1),
       0 -4px 8px rgba(0, 0, 0, 0.05);
-    background: var(--background);
     @media screen and (max-width: 960px) {
-      top: 0;
+      top: 48px;
       bottom: 0;
       left: 0%;
       width: 390px;
-      height: 100%;
+      height: fit-content;
+      min-height: 93%;
     }
     @media screen and (min-width: 961px) and (max-width: 1427px) {
       width: 100vw;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
     }
   }
 
   .mdContent {
+    line-height: 1.6;
+    font-size: 16px;
+
+    /* Стили для конкретных элементов Markdown */
+    h1 {
+      color: #333;
+      margin-bottom: 20px;
+    }
+    p {
+      margin: 10px 0;
+      color: #555;
+    }
+    img {
+      border-radius: 8px;
+      margin: 10px 0;
+    }
+    a {
+      color: #007bff;
+      text-decoration: underline;
+    }
     @media screen and (max-width: 960px) {
-      padding: 100px 10px;
+      padding: 15px 35px;
     }
     @media screen and (min-width: 961px) and (max-width: 1427px) {
       padding: 10px 115px;
@@ -103,5 +97,23 @@ $scrollbar-width: 17px;
     @media screen and (min-width: 1428px) {
       padding: 10px 25px;
     }
+  }
+}
+.burgerArticlesContainer {
+  z-index: 1001;
+  position: absolute;
+  width: fit-content;
+  @media screen and (min-width: 1428px) {
+    display: none;
+  }
+  @media screen and (min-width: 961px) and (max-width: 1427px) {
+    top: 95px;
+    left: 50px;
+  }
+  @media screen and (max-width: 960px) {
+    position: absolute;
+    top: -28px;
+    width: 100vw;
+    background: #fff;
   }
 }

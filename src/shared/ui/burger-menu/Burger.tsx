@@ -4,8 +4,10 @@ import style from './Burger.module.scss';
 
 const Burger = ({
   setOpen,
+  openComments,
 }: {
   setOpen: (value: boolean | ((prev: boolean) => boolean)) => void;
+  openComments?: string;
 }) => (
   <Image
     className={style.burger}
@@ -13,7 +15,13 @@ const Burger = ({
     alt="logo"
     width={24}
     height={20}
-    onClick={() => setOpen((prev: boolean) => !prev)}
+    onClick={() => {
+      if (openComments) {
+        return;
+      } else {
+        setOpen((prev: boolean) => !prev);
+      }
+    }}
   />
 );
 export default Burger;

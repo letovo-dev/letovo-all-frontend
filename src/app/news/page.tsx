@@ -137,7 +137,6 @@ const NewsPage = () => {
     return () => {
       if (observerRef.current) {
         observerRef.current.disconnect();
-        console.log('IntersectionObserver disconnected');
       }
     };
   }, [loadMore, hasMore, loading, currentNewsState.default]);
@@ -145,7 +144,6 @@ const NewsPage = () => {
   useEffect(() => {
     return () => {
       debouncedLoadMore.cancel();
-      console.log('Debounced loadMore cancelled');
     };
   }, [debouncedLoadMore]);
 

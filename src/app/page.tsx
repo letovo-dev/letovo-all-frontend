@@ -16,21 +16,15 @@ export default function Home() {
   const loading = authStore(state => state.loading);
   const [authChecked, setAuthChecked] = useState(false);
 
-  console.log('Home rendered', { userData, error, loading, authChecked });
-
   useEffect(() => {
     async function handleAuthCheck() {
       try {
-        console.log('Starting auth check');
         const authResult = await auth();
         const { userStatus } = authStore.getState();
-        console.log('authResult:', authResult, 'userStatus:', userStatus);
 
         if (authResult.success && userData?.username && userStatus?.authed) {
-          console.log('Redirecting to user page:', `/user/${userData.username}`);
           router.push(`/user/${userData.username}`);
         } else {
-          console.log('Redirecting to login');
           router.push('/login');
         }
       } catch (err) {
@@ -49,7 +43,6 @@ export default function Home() {
   useEffect(() => {
     const handlePageShow = (event: PageTransitionEvent) => {
       if (event.persisted) {
-        console.log('Page restored from cache, rechecking auth');
         setAuthChecked(false);
       }
     };
@@ -60,7 +53,6 @@ export default function Home() {
   useEffect(() => {
     const handleVisibilityChange = () => {
       if (document.visibilityState === 'visible') {
-        console.log('App became visible, rechecking auth');
         setAuthChecked(false);
       }
     };

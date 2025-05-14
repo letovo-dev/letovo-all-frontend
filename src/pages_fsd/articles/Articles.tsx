@@ -15,9 +15,8 @@ import Burger from '@/shared/ui/burger-menu/Burger';
 import { SideBarArticles } from '@/features/side-bar-articles';
 
 const Articles: React.FC = () => {
-  const { article, normalizedArticles, loading, articlesCategories } = articlesStore(
-    state => state,
-  );
+  const { article, normalizedArticles, loading, articlesCategories, getArticlesCategories } =
+    articlesStore(state => state);
 
   const router = useRouter();
   const [processedText, setProcessedText] = useState('');
@@ -35,9 +34,11 @@ const Articles: React.FC = () => {
 
       if (!token) {
         router.push('/login');
+      } else {
+        getArticlesCategories();
       }
     }
-  }, [router]);
+  }, [router, getArticlesCategories]);
 
   useEffect(() => {
     const handleScroll = () => {
@@ -47,20 +48,19 @@ const Articles: React.FC = () => {
         const clientHeight = wrapRef.current.clientHeight;
         const isAtBottom = currentScrollTop + clientHeight >= scrollHeight - 1;
 
-        if (currentScrollTop > lastScrollTop.current) {
-          if (currentScrollTop > 50) {
-            setFooterHidden(true);
-          }
-        } else if (currentScrollTop < lastScrollTop.current && !isAtBottom) {
+        if (currentScrollTop > lastScrollTop.current && currentScrollTop > 50) {
+          setFooterHidden(true);
+        } else if (currentScrollTop < lastScrollTop.current || isAtBottom) {
           setFooterHidden(false);
         }
 
         lastScrollTop.current = currentScrollTop;
       }
     };
+
     const wrapElement = wrapRef.current;
     if (wrapElement) {
-      wrapElement.addEventListener('scroll', handleScroll);
+      wrapElement.addEventListener('scroll', handleScroll, { passive: true });
     }
 
     return () => {
@@ -75,26 +75,20 @@ const Articles: React.FC = () => {
 
     const fetchImages = async () => {
       if (!isMounted || !article?.text || !lsToken) {
-        console.log('Skipping fetchImages: missing article.text or lsToken');
         return;
       }
 
       const markdownText = article.text;
       const imageUrls = extractImageUrls(markdownText);
 
-      console.log('Image URLs:', imageUrls);
-      console.log('Current imageCache:', imageCache);
-
       const newImageCache = { ...imageCache };
 
       for (const url of imageUrls) {
         if (newImageCache[url]) {
-          console.log(`Using cached URL for ${url}: ${newImageCache[url]}`);
           continue;
         }
 
         try {
-          console.log(`Fetching image: ${url}`);
           const response = await axios.get(url, {
             headers: {
               Authorization: `Bearer ${lsToken}`,
@@ -104,7 +98,6 @@ const Articles: React.FC = () => {
 
           const objectUrl = URL.createObjectURL(response.data);
           newImageCache[url] = objectUrl;
-          console.log(`Cached new URL for ${url}: ${objectUrl}`);
         } catch (error) {
           console.error(`Ошибка загрузки изображения ${url}:`, error);
         }
@@ -130,7 +123,6 @@ const Articles: React.FC = () => {
 
   useEffect(() => {
     return () => {
-      console.log('Component unmounted, cleaning up imageCache');
       Object.values(imageCache).forEach(url => URL.revokeObjectURL(url));
       setImageCache({});
     };
@@ -144,6 +136,9 @@ const Articles: React.FC = () => {
 
   return (
     <>
+      <div className={style.burgerArticlesContainer}>
+        <Burger setOpen={setOpen} />
+      </div>
       <SideBarArticles
         open={open}
         setOpen={setOpen}
@@ -151,9 +146,6 @@ const Articles: React.FC = () => {
         articlesCategories={articlesCategories}
       />
       <div ref={wrapRef} className={`${style.newsContainer}`}>
-        <div className={style.containerWrapper}>
-          <Burger setOpen={setOpen} />
-        </div>
         <div className={style.wrap}>
           <ReactMarkdown
             className={style.mdContent}

@@ -53,7 +53,9 @@ const UserPage = () => {
 
   const wrapRef = useRef<HTMLDivElement>(null);
   const lastScrollTop = useRef(0);
-  const [windowWidth, setWindowWidth] = useState(0);
+  const [windowWidth, setWindowWidth] = useState<number>(
+    typeof window !== 'undefined' ? window.innerWidth : 0,
+  );
 
   useEffect(() => {
     const handleResize = () => setWindowWidth(window.innerWidth);
