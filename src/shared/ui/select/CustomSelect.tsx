@@ -26,11 +26,7 @@ const CustomSelect: React.FC<CustomSelectProps> = ({
       key: avatar,
       icon: (
         <div className={style.avatarTemplate}>
-          <Avatar
-            src={`${process.env.NEXT_PUBLIC_BASE_URL_MEDIA}/${avatar}`}
-            size={45}
-            // className={style.selectedAvatar}
-          />
+          <Avatar src={`${process.env.NEXT_PUBLIC_BASE_URL_MEDIA}/${avatar}`} size={45} />
         </div>
       ),
       label: null,
@@ -45,7 +41,7 @@ const CustomSelect: React.FC<CustomSelectProps> = ({
 
   return visible ? (
     <div className={!userPageSelectPosition ? style.customSelect : style.customSelectUserPage}>
-      {
+      <div className={style.scrollContainer}>
         <Menu
           title={undefined}
           mode="inline"
@@ -54,7 +50,7 @@ const CustomSelect: React.FC<CustomSelectProps> = ({
           onSelect={e => handleMenuClick(e)}
           className={style.customSelectDropdown}
         />
-      }
+      </div>
     </div>
   ) : null;
 };

@@ -12,6 +12,7 @@ const Menu: React.FC = () => {
   } = userStore.getState().store;
 
   const [activeKey, setActiveKey] = useState('user');
+  const [isReady, setIsReady] = useState(false);
 
   useEffect(() => {
     const currentKey = pathname?.split('/')[1] || 'user';
@@ -20,6 +21,13 @@ const Menu: React.FC = () => {
     }
     setActiveKey(currentKey);
   }, [pathname, username]);
+
+  useEffect(() => {
+    const timer = setTimeout(() => {
+      setIsReady(true);
+    }, 300);
+    return () => clearTimeout(timer);
+  }, []);
 
   const items = [
     {
@@ -51,7 +59,7 @@ const Menu: React.FC = () => {
     return null;
   }
   return (
-    <div className={style.footerContainer}>
+    <div className={`${style.footerContainer} ${isReady ? style.ready : ''}`}>
       <ConfigProvider
         theme={{
           components: {
@@ -64,13 +72,17 @@ const Menu: React.FC = () => {
           },
         }}
       >
-        <Tabs
-          className={style.menu}
-          activeKey={activeKey}
-          centered
-          items={items}
-          onTabClick={handleTabClick}
-        />
+        {isReady ? (
+          <Tabs
+            className={style.menu}
+            activeKey={activeKey}
+            centered
+            items={items}
+            onTabClick={handleTabClick}
+          />
+        ) : (
+          <div className={style.placeholder} />
+        )}
       </ConfigProvider>
     </div>
   );

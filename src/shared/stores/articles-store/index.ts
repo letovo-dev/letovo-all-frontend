@@ -61,17 +61,8 @@ const articlesStore = create<TArticlesStoreState>()(
       getArticlesCategories: async () => {
         const { lastFetched, articlesCategories } = get();
         const now = Date.now();
-        console.log('lastFetched', lastFetched);
-        console.log('now', now);
-        console.log('CACHE_DURATION', CACHE_DURATION);
 
-        console.log(
-          'lastFetched && now - lastFetched < CACHE_DURATION && articlesCategories.length > 0',
-          lastFetched && now - lastFetched < CACHE_DURATION && articlesCategories.length > 0,
-        );
-
-        if (lastFetched && now - lastFetched < CACHE_DURATION && articlesCategories.length > 0) {
-          console.log('Returning cached categories');
+        if (lastFetched && now - lastFetched < CACHE_DURATION && articlesCategories?.length > 0) {
           return articlesCategories;
         }
 

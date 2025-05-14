@@ -3,12 +3,9 @@
 .customSelect {
   background-image: url('/Base_PhotoSelection_PC.png');
   background-color: rgba(255, 255, 255, 0);
-  // left: -15px;
-  // top: 200%;
   overflow-y: auto;
   background-repeat: no-repeat;
   background-position: center;
-  // margin-top: 5px;
   position: absolute;
   width: 109px;
   height: calc(109px * (442 / 139));
@@ -18,6 +15,7 @@
   flex-direction: column;
   align-items: center;
   justify-content: flex-start;
+  padding: 20px 0;
   @media screen and (max-width: 960px) {
     left: -15px;
     top: 200%;
@@ -41,7 +39,49 @@
   &::-webkit-scrollbar-thumb:hover {
     background: transparent !important;
   }
+  .scrollContainer {
+    width: 100%;
+    height: 100%;
+    overflow-y: auto;
+    padding: 12px 0; /* Отступы сверху и снизу для аватаров */
+    box-sizing: border-box;
+    @media screen and (max-width: 960px) {
+      padding: 10px 0; /* Меньший padding для мобильных */
+    }
 
+    &::-webkit-scrollbar {
+      width: 10px !important;
+      padding-left: 100px !important;
+    }
+
+    &::-webkit-scrollbar-track {
+      background: transparent !important;
+    }
+
+    &::-webkit-scrollbar-thumb {
+      background: transparent !important;
+    }
+
+    &::-webkit-scrollbar-thumb:hover {
+      background: transparent !important;
+    }
+    :global {
+      .ant-menu-item {
+        margin: 0 0 0 3px !important;
+        width: 100% !important;
+        background: none !important;
+        height: 80px !important;
+      }
+      .ant-menu-item-selected {
+        // background: none !important; /* Убираем фон при выборе */
+      }
+      .ant-menu {
+        // background: none !important;
+        // border: none !important;
+        // padding: 0 !important; /* Убираем padding от Ant Design */
+      }
+    }
+  }
   .customSelectDropdown {
     width: 100%;
     display: flex;
@@ -51,7 +91,9 @@
     background: none !important;
     border: none !important;
     padding-inline: 0 !important;
-    padding: 3px;
+    @media screen and (max-width: 960px) {
+      padding: 10px 3px;
+    }
   }
 }
 
@@ -67,4 +109,8 @@
 
 .avatarTemplate {
   @extend %avatarTemplate;
+  &:hover {
+    opacity: 0.8;
+    transform: scale(1.05);
+  }
 }
