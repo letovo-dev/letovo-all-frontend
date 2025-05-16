@@ -13,6 +13,7 @@ import { useFooterContext } from '@/shared/ui/context/FooterContext';
 import style from './Articles.module.scss';
 import Burger from '@/shared/ui/burger-menu/Burger';
 import { SideBarArticles } from '@/features/side-bar-articles';
+import Image from 'next/image';
 
 const Articles: React.FC = () => {
   const { article, normalizedArticles, loading, articlesCategories, getArticlesCategories } =
@@ -23,6 +24,7 @@ const Articles: React.FC = () => {
   const [lsToken, setLsToken] = useState<string | null>(null);
   const [imageCache, setImageCache] = useState<Record<string, string>>({});
   const wrapRef = useRef<HTMLDivElement>(null);
+  const burgerRef = useRef<HTMLDivElement>(null);
   const lastScrollTop = useRef(0);
   const { setFooterHidden } = useFooterContext();
   const [open, setOpen] = useState(false);
@@ -95,7 +97,7 @@ const Articles: React.FC = () => {
             },
             responseType: 'blob',
           });
-
+          console.log(`Изображение загружено: ${url}`);
           const objectUrl = URL.createObjectURL(response.data);
           newImageCache[url] = objectUrl;
         } catch (error) {
@@ -136,7 +138,10 @@ const Articles: React.FC = () => {
 
   return (
     <>
-      <div className={style.burgerArticlesContainer}>
+      <div
+        className={`${style.burgerArticlesContainer} ${open ? style.sidebarOpenBurgerContainer : ''}`}
+        ref={burgerRef}
+      >
         <Burger setOpen={setOpen} />
       </div>
       <SideBarArticles
@@ -144,8 +149,9 @@ const Articles: React.FC = () => {
         setOpen={setOpen}
         normalizedArticles={normalizedArticles}
         articlesCategories={articlesCategories}
+        burgerRef={burgerRef}
       />
-      <div ref={wrapRef} className={`${style.newsContainer}`}>
+      <div ref={wrapRef} className={`${style.newsContainer} ${open ? style.sidebarOpen : ''}`}>
         <div className={style.wrap}>
           <ReactMarkdown
             className={style.mdContent}
@@ -153,7 +159,18 @@ const Articles: React.FC = () => {
             rehypePlugins={[rehypeRaw]}
             components={{
               img: ({ src, alt }) => (
-                <img src={src} alt={alt} style={{ maxWidth: '100%', height: 'auto' }} />
+                <Image
+                  src={src || '/Logo_Mini.png'}
+                  alt={alt || 'Image'}
+                  width={800}
+                  height={450}
+                  sizes="(max-width: 960px) 100vw, (max-width: 1427px) 80vw, 800px"
+                  style={{ width: '100%', height: 'auto' }}
+                  priority={false}
+                  placeholder="blur"
+                  blurDataURL="/Logo_Mini.png"
+                  layout="responsive"
+                />
               ),
             }}
           >

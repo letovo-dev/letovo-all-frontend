@@ -1,6 +1,6 @@
 'use client';
 
-import React, { useEffect, useMemo, useState } from 'react';
+import React, { useEffect, useMemo, useRef, useState } from 'react';
 import style from './SideBarNews.module.scss';
 import { Form } from 'antd';
 import dataStore, { Titles } from '@/shared/stores/data-store';
@@ -24,14 +24,17 @@ const SideBarNews = ({
   open,
   setOpen,
   newsTitles,
+  burgerRef,
 }: {
   open: boolean;
   setOpen: (value: boolean | ((prev: boolean) => boolean)) => void;
   newsTitles: Titles[];
+  burgerRef: React.RefObject<HTMLDivElement>;
 }) => {
   const [form] = Form.useForm();
   const { loading, setCurrentNewsState, fetchNews, currentNewsState } = dataStore(state => state);
   const { searchedNews } = dataStore(state => state.data);
+  const sidebarRef = useRef<HTMLDivElement>(null);
 
   const mainSections: MainSections = useMemo(
     () => ({
@@ -95,9 +98,27 @@ const SideBarNews = ({
     return style.sidebarContainerDesktop;
   };
 
+  useEffect(() => {
+    const handleClickOutside = (event: MouseEvent) => {
+      if (
+        open &&
+        sidebarRef.current &&
+        !sidebarRef.current.contains(event.target as Node) &&
+        (!burgerRef.current || !burgerRef.current.contains(event.target as Node))
+      ) {
+        setOpen(false);
+      }
+    };
+
+    document.addEventListener('mousedown', handleClickOutside);
+    return () => {
+      document.removeEventListener('mousedown', handleClickOutside);
+    };
+  }, [open, setOpen, burgerRef]);
+
   return (
     <div className={windowWidth && windowWidth < 960 && open ? style.modalOverlay : ''}>
-      <div className={getSidebarClass()}>
+      <div ref={sidebarRef} className={getSidebarClass()}>
         <SideBarNewsContent loading={loading} form={form} onFinish={onFinish} />
         {currentNewsState.searched && !searchedNews && (
           <div className={style.noSearchResult}>По запросу ничего не найдено</div>

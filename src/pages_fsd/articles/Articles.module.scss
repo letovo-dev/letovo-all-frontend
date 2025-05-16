@@ -22,16 +22,19 @@ $scrollbar-width: 17px;
   min-height: calc(var(--vh, 1vh) * 100);
   -webkit-overflow-scrolling: touch;
   overscroll-behavior-y: contain;
+  scrollbar-gutter: stable; // Резервируем место под полосу прокрутки
   @media (min-width: 933px) {
-    padding-left: 16px;
+    // padding-left: 16px;
   }
-  &.commentsOpen {
-    overflow-y: hidden;
-    padding-right: $scrollbar-width;
-    height: 100vh;
+  &.sidebarOpen {
+    overflow: hidden; // Скрываем скроллбары при открытом сайдбаре
     @media screen and (max-width: 960px) {
-      padding-right: 0;
-      overflow-y: hidden;
+      overflow: hidden;
+      position: fixed;
+      top: 0;
+      left: 0;
+      width: 100%;
+      height: 100%;
     }
   }
   .wrap {
@@ -44,7 +47,6 @@ $scrollbar-width: 17px;
     flex-direction: column;
     margin: 0 auto;
     box-sizing: border-box;
-    overflow: visible;
     width: calc(100% - 364px);
     height: fit-content;
     min-height: 93%;
@@ -52,15 +54,16 @@ $scrollbar-width: 17px;
       0 4px 8px rgba(0, 0, 0, 0.1),
       0 -4px 8px rgba(0, 0, 0, 0.05);
     @media screen and (max-width: 960px) {
-      top: 48px;
+      top: 46px;
       bottom: 0;
       left: 0%;
       width: 390px;
       height: fit-content;
-      min-height: 93%;
+      min-height: calc(100% - 46px);
     }
     @media screen and (min-width: 961px) and (max-width: 1427px) {
-      width: 100vw;
+      width: 100%;
+      max-width: calc(100% - 2 * 50px); // Учитываем отступы
       display: flex;
       flex-direction: column;
       align-items: center;
@@ -70,7 +73,24 @@ $scrollbar-width: 17px;
   .mdContent {
     line-height: 1.6;
     font-size: 16px;
-
+    width: 100%;
+    max-width: 800px;
+    margin: 0 auto;
+    @media screen and (max-width: 960px) {
+      padding: 15px 35px 50px 35px;
+      max-width: 100%;
+      img {
+        width: 100%;
+        margin: 10px 0;
+      }
+    }
+    @media screen and (min-width: 961px) and (max-width: 1427px) {
+      padding: 10px 50px;
+      max-width: 90%;
+    }
+    @media screen and (min-width: 1428px) {
+      padding: 10px 25px;
+    }
     /* Стили для конкретных элементов Markdown */
     h1 {
       color: #333;
@@ -82,20 +102,19 @@ $scrollbar-width: 17px;
     }
     img {
       border-radius: 8px;
-      margin: 10px 0;
+      margin: 10px auto;
+      display: block;
+      max-width: 100%;
+      height: auto;
+      transition: opacity 0.5s ease-in-out;
+      opacity: 1;
+    }
+    img[data-loading='true'] {
+      opacity: 0.5;
     }
     a {
       color: #007bff;
       text-decoration: underline;
-    }
-    @media screen and (max-width: 960px) {
-      padding: 15px 35px;
-    }
-    @media screen and (min-width: 961px) and (max-width: 1427px) {
-      padding: 10px 115px;
-    }
-    @media screen and (min-width: 1428px) {
-      padding: 10px 25px;
     }
   }
 }
@@ -103,17 +122,29 @@ $scrollbar-width: 17px;
   z-index: 1001;
   position: absolute;
   width: fit-content;
+  height: 45px;
+  display: flex;
+  align-items: center;
   @media screen and (min-width: 1428px) {
     display: none;
   }
   @media screen and (min-width: 961px) and (max-width: 1427px) {
-    top: 95px;
+    top: 101px;
     left: 50px;
   }
   @media screen and (max-width: 960px) {
     position: absolute;
-    top: -28px;
     width: 100vw;
-    background: #fff;
+    background-color: var(--graphics7);
+  }
+  &.sidebarOpenBurgerContainer {
+    @media screen and (max-width: 960px) {
+      position: fixed;
+      top: 0;
+      left: 0;
+      width: 100vw;
+      z-index: 1001;
+      background: #fff;
+    }
   }
 }

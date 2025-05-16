@@ -26,6 +26,7 @@ const NewsPage: React.FC<NewsProps> = ({ children }) => {
   const { setFooterHidden } = useFooterContext();
   const [commentsToRender, setComments] = useState<RealComment[]>([]);
   const wrapRef = useRef<HTMLDivElement>(null);
+  const burgerRef = useRef<HTMLDivElement>(null);
   const lastScrollTop = useRef(0);
   const savedScrollPosition = useRef(0);
   const [open, setOpen] = useState(false);
@@ -117,12 +118,13 @@ const NewsPage: React.FC<NewsProps> = ({ children }) => {
         open={open}
         setOpen={setOpen}
         newsTitles={newsTitles.filter(title => postIds?.includes(title.post_id))}
+        burgerRef={burgerRef}
       />
       <div
         ref={wrapRef}
         className={`${style.newsContainer} ${openComments ? style.commentsOpen : ''}`}
       >
-        <div className={style.containerWrapper}>
+        <div className={style.containerWrapper} ref={burgerRef}>
           <Burger setOpen={setOpen} openComments={openComments} />
         </div>
         <div className={style.wrap}>{children}</div>

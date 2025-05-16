@@ -40,9 +40,11 @@ $scrollbar-width: 17px;
     margin: 0 auto;
     width: 392px;
     box-sizing: border-box;
-    height: 90px;
+    height: 45px;
     z-index: 1001;
     position: fixed;
+    display: flex;
+    align-items: center;
     @media screen and (min-width: 961px) and (max-width: 1427px) {
       display: block;
       background-color: transparent;
@@ -82,7 +84,7 @@ $scrollbar-width: 17px;
       0 -4px 8px rgba(0, 0, 0, 0.05);
     background: var(--background);
     @media screen and (max-width: 960px) {
-      margin-top: 91px;
+      margin-top: 46px;
       padding-bottom: 55px;
       width: 390px;
     }

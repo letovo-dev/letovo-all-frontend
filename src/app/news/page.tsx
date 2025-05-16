@@ -31,7 +31,6 @@ const NewsPage = () => {
   const [newsLength, setNewsLength] = useState(0);
   const [loadedNewsLength, setLoadedNewsLength] = useState(0);
 
-  // Отладка ошибок
   useEffect(() => {
     const handleError = (event: ErrorEvent) => {
       console.error('Uncaught error:', event.error);

@@ -1,6 +1,6 @@
 'use client';
 
-import React, { useEffect, useState } from 'react';
+import React, { useEffect, useRef, useState } from 'react';
 import style from './SideBarArticles.module.scss';
 import articlesStore, { ArticleCategory, OneArticle } from '@/shared/stores/articles-store';
 import type { CollapseProps } from 'antd';
@@ -12,18 +12,39 @@ const SideBarArticles = ({
   setOpen,
   normalizedArticles,
   articlesCategories,
+  burgerRef,
 }: {
   open: boolean;
   setOpen: (value: boolean | ((prev: boolean) => boolean)) => void;
   normalizedArticles: Record<string, OneArticle[]> | null;
   articlesCategories: ArticleCategory[];
+  burgerRef: React.RefObject<HTMLDivElement>;
 }) => {
   const { loading, article, setCurrentArticle, getOneArticle } = articlesStore(state => state);
   const [items, setItems] = useState<{ key: string; label: string; children: React.JSX.Element }[]>(
     [],
   );
-
   const [windowWidth, setWindowWidth] = useState<number | undefined>(undefined);
+  const sidebarRef = useRef<HTMLDivElement>(null);
+
+  useEffect(() => {
+    const handleClickOutside = (event: MouseEvent) => {
+      if (
+        open &&
+        sidebarRef.current &&
+        !sidebarRef.current.contains(event.target as Node) &&
+        (!burgerRef.current || !burgerRef.current.contains(event.target as Node))
+      ) {
+        setOpen(false);
+      }
+    };
+
+    document.addEventListener('mousedown', handleClickOutside);
+    return () => {
+      document.removeEventListener('mousedown', handleClickOutside);
+    };
+  }, [open, setOpen, burgerRef]);
+
   useEffect(() => {
     setWindowWidth(window.innerWidth);
     const handleResize = () => setWindowWidth(window.innerWidth);
@@ -94,7 +115,7 @@ const SideBarArticles = ({
 
   return (
     <div className={windowWidth && windowWidth < 960 && open ? style.modalOverlay : ''}>
-      <div className={getSidebarClass()}>
+      <div ref={sidebarRef} className={getSidebarClass()}>
         <div className={style.sidebarItemsContainer}>
           <Collapse
             items={items}
