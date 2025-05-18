@@ -19,6 +19,7 @@ $scrollbar-width: 17px;
   overflow-x: hidden;
   width: 100%;
   height: calc(var(--vh, 1vh) * 100);
+  scrollbar-gutter: stable;
   -webkit-overflow-scrolling: touch;
   overscroll-behavior-y: contain;
   @media (min-width: 933px) {

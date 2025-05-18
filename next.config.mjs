@@ -29,7 +29,7 @@ const pwaConfig = {
 const configuredWithPWA = withPWA(pwaConfig);
 
 const nextConfig = {
-  reactStrictMode: true,
+  reactStrictMode: false,
   experimental: {
     esmExternals: 'loose',
   },

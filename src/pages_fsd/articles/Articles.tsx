@@ -97,7 +97,6 @@ const Articles: React.FC = () => {
             },
             responseType: 'blob',
           });
-          console.log(`Изображение загружено: ${url}`);
           const objectUrl = URL.createObjectURL(response.data);
           newImageCache[url] = objectUrl;
         } catch (error) {
@@ -160,7 +159,7 @@ const Articles: React.FC = () => {
             components={{
               img: ({ src, alt }) => (
                 <Image
-                  src={src || '/Logo_Mini.png'}
+                  src={src || '/logo_mini_blur.png'}
                   alt={alt || 'Image'}
                   width={800}
                   height={450}
@@ -168,7 +167,7 @@ const Articles: React.FC = () => {
                   style={{ width: '100%', height: 'auto' }}
                   priority={false}
                   placeholder="blur"
-                  blurDataURL="/Logo_Mini.png"
+                  blurDataURL="/logo_mini_blur.png"
                   layout="responsive"
                 />
               ),
