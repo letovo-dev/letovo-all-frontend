@@ -63,7 +63,7 @@ $scrollbar-width: 17px;
     }
     @media screen and (min-width: 961px) and (max-width: 1427px) {
       width: 100%;
-      max-width: calc(100% - 2 * 50px); // Учитываем отступы
+      max-width: calc(100% - 2 * 50px);
       display: flex;
       flex-direction: column;
       align-items: center;
@@ -76,8 +76,9 @@ $scrollbar-width: 17px;
     width: 100%;
     max-width: 800px;
     margin: 0 auto;
+    // margin-bottom: 30px;
     @media screen and (max-width: 960px) {
-      padding: 15px 35px 50px 35px;
+      padding: 15px 35px 20px 35px;
       max-width: 100%;
       img {
         width: 100%;

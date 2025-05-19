@@ -25,9 +25,15 @@ const Articles: React.FC = () => {
   const [imageCache, setImageCache] = useState<Record<string, string>>({});
   const wrapRef = useRef<HTMLDivElement>(null);
   const burgerRef = useRef<HTMLDivElement>(null);
-  const lastScrollTop = useRef(0);
   const { setFooterHidden } = useFooterContext();
   const [open, setOpen] = useState(false);
+  const imageCacheRef = useRef<Record<string, string>>({});
+  const lastScrollTopRef = useRef(0);
+
+  const isVideoUrl = (url: string): boolean => {
+    const result = /\.(mp4|webm|ogg|mkv|avi)(\?.*)?$/i.test(url);
+    return result;
+  };
 
   useEffect(() => {
     if (typeof window !== 'undefined') {
@@ -46,29 +52,49 @@ const Articles: React.FC = () => {
     const handleScroll = () => {
       if (wrapRef.current) {
         const currentScrollTop = wrapRef.current.scrollTop;
-        const scrollHeight = wrapRef.current.scrollHeight;
-        const clientHeight = wrapRef.current.clientHeight;
-        const isAtBottom = currentScrollTop + clientHeight >= scrollHeight - 1;
+        const lastScrollTop = lastScrollTopRef.current;
 
-        if (currentScrollTop > lastScrollTop.current && currentScrollTop > 50) {
+        // if (currentScrollTop > lastScrollTop && currentScrollTop > 50) {
+        //   // Scrolling down and past threshold
+        //   setFooterHidden(true);
+        // } else if (currentScrollTop < lastScrollTop) {
+        //   // Scrolling up
+        //   setFooterHidden(false);
+        // }
+
+        if (currentScrollTop > 50) {
           setFooterHidden(true);
-        } else if (currentScrollTop < lastScrollTop.current || isAtBottom) {
+        } else {
           setFooterHidden(false);
         }
 
-        lastScrollTop.current = currentScrollTop;
+        lastScrollTopRef.current = currentScrollTop;
       }
     };
 
-    const wrapElement = wrapRef.current;
-    if (wrapElement) {
-      wrapElement.addEventListener('scroll', handleScroll, { passive: true });
-    }
+    let cleanup = () => {};
+    const attachListener = () => {
+      const element = wrapRef.current;
+      if (element) {
+        element.addEventListener('scroll', handleScroll, { passive: true });
+        return () => {
+          element.removeEventListener('scroll', handleScroll);
+        };
+      }
+      return () => {};
+    };
+
+    cleanup = attachListener();
+    const interval = setInterval(() => {
+      if (wrapRef.current && !wrapRef.current.onscroll) {
+        cleanup();
+        cleanup = attachListener();
+      }
+    }, 1000);
 
     return () => {
-      if (wrapElement) {
-        wrapElement.removeEventListener('scroll', handleScroll);
-      }
+      cleanup();
+      clearInterval(interval);
     };
   }, [setFooterHidden]);
 
@@ -81,9 +107,8 @@ const Articles: React.FC = () => {
       }
 
       const markdownText = article.text;
-      const imageUrls = extractImageUrls(markdownText);
-
-      const newImageCache = { ...imageCache };
+      const imageUrls = extractImageUrls(markdownText).filter(url => !isVideoUrl(url));
+      const newImageCache = { ...imageCacheRef.current };
 
       for (const url of imageUrls) {
         if (newImageCache[url]) {
@@ -92,9 +117,7 @@ const Articles: React.FC = () => {
 
         try {
           const response = await axios.get(url, {
-            headers: {
-              Authorization: `Bearer ${lsToken}`,
-            },
+            headers: { Authorization: `Bearer ${lsToken}` },
             responseType: 'blob',
           });
           const objectUrl = URL.createObjectURL(response.data);
@@ -104,7 +127,12 @@ const Articles: React.FC = () => {
         }
       }
 
+      imageCacheRef.current = newImageCache;
+
       const updatedText = markdownText.replace(/!\[.*?\]\((.*?)\)/g, (match, url) => {
+        if (isVideoUrl(url)) {
+          return match;
+        }
         const localUrl = newImageCache[url];
         return localUrl ? match.replace(url, localUrl) : match;
       });
@@ -123,8 +151,31 @@ const Articles: React.FC = () => {
   }, [article?.text, lsToken]);
 
   useEffect(() => {
+    const checkVideo = async () => {
+      if (!article?.text || !lsToken) return;
+
+      const videoUrls = extractImageUrls(article.text).filter(isVideoUrl);
+      for (const url of videoUrls) {
+        try {
+          const response = await axios.head(
+            `${url}${url.includes('?') ? '&' : '?'}token=${lsToken}`,
+            {
+              headers: { Authorization: `Bearer ${lsToken}` },
+            },
+          );
+        } catch (error) {
+          console.error('Video check failed:', { url, error });
+        }
+      }
+    };
+
+    checkVideo();
+  }, [article?.text, lsToken]);
+
+  useEffect(() => {
     return () => {
       Object.values(imageCache).forEach(url => URL.revokeObjectURL(url));
+      imageCacheRef.current = {};
       setImageCache({});
     };
   }, []);
@@ -157,20 +208,68 @@ const Articles: React.FC = () => {
             remarkPlugins={[remarkGfm]}
             rehypePlugins={[rehypeRaw]}
             components={{
-              img: ({ src, alt }) => (
-                <Image
-                  src={src || '/logo_mini_blur.png'}
-                  alt={alt || 'Image'}
-                  width={800}
-                  height={450}
-                  sizes="(max-width: 960px) 100vw, (max-width: 1427px) 80vw, 800px"
-                  style={{ width: '100%', height: 'auto' }}
-                  priority={false}
-                  placeholder="blur"
-                  blurDataURL="/logo_mini_blur.png"
-                  layout="responsive"
-                />
-              ),
+              img: ({ src, alt }) => {
+                if (src && isVideoUrl(src)) {
+                  const videoSrc =
+                    lsToken && !src.startsWith('blob:')
+                      ? `${src}${src.includes('?') ? '&' : '?'}token=${lsToken}`
+                      : src;
+                  return (
+                    <video
+                      controls
+                      playsInline
+                      width="100%"
+                      style={{ maxWidth: '800px', height: 'auto' }}
+                      src={videoSrc}
+                      aria-label={alt || 'Video'}
+                      onError={e => console.error('Video error:', { src: videoSrc, error: e })}
+                    >
+                      <source
+                        src={videoSrc}
+                        type={`video/${src.split('.').pop()?.toLowerCase()}`}
+                      />
+                      <track kind="captions" />
+                      Your browser does not support the video tag.
+                    </video>
+                  );
+                }
+                return (
+                  <Image
+                    src={src || '/logo_mini_blur.png'}
+                    alt={alt || 'Image'}
+                    width={800}
+                    height={450}
+                    sizes="(max-width: 960px) 100vw, (max-width: 1427px) 80vw, 800px"
+                    style={{ width: '100%', height: 'auto' }}
+                    priority={false}
+                    placeholder="blur"
+                    blurDataURL="/logo_mini_blur.png"
+                    layout="responsive"
+                  />
+                );
+              },
+              video: ({ src, ...props }) => {
+                const videoSrc =
+                  lsToken && src && !src.startsWith('blob:')
+                    ? `${src}${src.includes('?') ? '&' : '?'}token=${lsToken}`
+                    : src;
+                return (
+                  <video
+                    controls
+                    playsInline
+                    width="100%"
+                    style={{ maxWidth: '800px', height: 'auto' }}
+                    src={videoSrc || ''}
+                    aria-label={props['aria-label'] || 'Video'}
+                    onError={e => console.error('Video error:', { src: videoSrc, error: e })}
+                    {...props}
+                  >
+                    <source src={videoSrc} type={`video/${src?.split('.').pop()?.toLowerCase()}`} />
+                    <track kind="captions" />
+                    Your browser does not support the video tag.
+                  </video>
+                );
+              },
             }}
           >
             {memoizedProcessedText}

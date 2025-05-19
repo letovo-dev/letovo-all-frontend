@@ -44,10 +44,10 @@ const initialState = {
   article: undefined,
   loading: false,
   error: null,
-  lastFetched: Date.now(),
+  lastFetched: null,
 };
 
-const CACHE_DURATION = 1000 * 60 * 5; // 5 minutes
+const CACHE_DURATION = 1000 * 60 * 0.5; // 0,5 minutes
 
 const articlesStore = create<TArticlesStoreState>()(
   persist(
@@ -72,6 +72,7 @@ const articlesStore = create<TArticlesStoreState>()(
             code: number;
             data: { result: ArticleCategory[] };
           };
+
           if (response.code === 200 && response.data?.result) {
             const categories = response.data.result;
             set((draft: TArticlesStoreState) => {
@@ -110,10 +111,10 @@ const articlesStore = create<TArticlesStoreState>()(
       loadAllArticlesByCategory: async (id: string): Promise<void> => {
         try {
           const { articlesCategories, normalizedArticles } = get();
-          if (normalizedArticles?.[id]) {
-            console.info(`Articles for category ${id} already loaded`);
-            return;
-          }
+          // if (normalizedArticles?.[id]) {
+          //   console.info(`Articles for category ${id} already loaded`);
+          //   return;
+          // }
 
           if (!articlesCategories?.length) {
             console.warn('No categories available to load articles');
@@ -122,7 +123,11 @@ const articlesStore = create<TArticlesStoreState>()(
           }
 
           const response = await SERVICES_DATA.Data.getArticlesByCategoryId(Number(id));
-          if (response.code === 200 && (response.data as { result: OneArticle[] }).result) {
+
+          if (
+            response.code === 200 ||
+            (response.code === 203 && (response.data as { result: OneArticle[] }).result)
+          ) {
             const articles = (response.data as { result: OneArticle[] }).result;
             const articlePromises = articles.map(async articleData => {
               try {
@@ -167,7 +172,7 @@ const articlesStore = create<TArticlesStoreState>()(
         set({ loading: true });
         try {
           const response = await SERVICES_DATA.Data.getArticleMd(fileName);
-          if (response && response.code === 200) {
+          if ((response && response.code === 200) || response.code === 203) {
             let markdown: string;
             if (typeof response.data === 'string') {
               markdown = response.data;
@@ -216,6 +221,7 @@ const articlesStore = create<TArticlesStoreState>()(
         normalizedArticles: state.normalizedArticles,
         articlesCategories: state.articlesCategories,
         article: state.article,
+        lastFetched: state.lastFetched,
       }),
     },
   ),

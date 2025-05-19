@@ -110,7 +110,7 @@ const SideBarArticles = ({
   }, [articlesCategories, normalizedArticles, article?.post_id]);
 
   const onChange = (key: string | string[]) => {
-    console.log(key);
+    // console.log(key);
   };
 
   return (
