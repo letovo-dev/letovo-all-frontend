@@ -110,11 +110,7 @@ const articlesStore = create<TArticlesStoreState>()(
       },
       loadAllArticlesByCategory: async (id: string): Promise<void> => {
         try {
-          const { articlesCategories, normalizedArticles } = get();
-          // if (normalizedArticles?.[id]) {
-          //   console.info(`Articles for category ${id} already loaded`);
-          //   return;
-          // }
+          const { articlesCategories } = get();
 
           if (!articlesCategories?.length) {
             console.warn('No categories available to load articles');
@@ -169,7 +165,7 @@ const articlesStore = create<TArticlesStoreState>()(
       },
 
       getArticleMd: async (fileName: string): Promise<{ markdown: string }> => {
-        set({ loading: true });
+        // set({ loading: true });
         try {
           const response = await SERVICES_DATA.Data.getArticleMd(fileName);
           if ((response && response.code === 200) || response.code === 203) {
@@ -196,7 +192,7 @@ const articlesStore = create<TArticlesStoreState>()(
           set({ error: 'Failed to fetch the article file' });
           return { markdown: '# Ошибка\nНе удалось загрузить изображение' };
         } finally {
-          set({ loading: false });
+          // set({ loading: false });
         }
       },
       getOneArticle: (id: string, categoryId: string) => {

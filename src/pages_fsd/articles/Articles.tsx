@@ -2,10 +2,7 @@
 
 import articlesStore from '@/shared/stores/articles-store';
 import SpinModule from '@/shared/ui/spiner';
-import React, { useEffect, useRef, useState, useMemo } from 'react';
-import ReactMarkdown from 'react-markdown';
-import remarkGfm from 'remark-gfm';
-import rehypeRaw from 'rehype-raw';
+import React, { useEffect, useRef, useState, useMemo, useCallback } from 'react';
 import axios from 'axios';
 import { extractImageUrls } from '@/shared/utils/utils';
 import { useRouter } from 'next/navigation';
@@ -13,7 +10,8 @@ import { useFooterContext } from '@/shared/ui/context/FooterContext';
 import style from './Articles.module.scss';
 import Burger from '@/shared/ui/burger-menu/Burger';
 import { SideBarArticles } from '@/features/side-bar-articles';
-import Image from 'next/image';
+import debounce from 'lodash/debounce';
+import MarkdownContent from './ReactMd';
 
 const Articles: React.FC = () => {
   const { article, normalizedArticles, loading, articlesCategories, getArticlesCategories } =
@@ -47,56 +45,82 @@ const Articles: React.FC = () => {
       }
     }
   }, [router, getArticlesCategories]);
+  //вариант футер скрывается - ререндер страницы
+  // useEffect(() => {
+  //   const handleScroll = () => {
+  //     console.log('Scrolling:', wrapRef.current?.scrollTop);
+  //     if (wrapRef.current) {
+  //       const currentScrollTop = wrapRef.current.scrollTop;
+  //       const lastScrollTop = lastScrollTopRef.current;
+  //       //Показывать футер при скролле вверх
+  //       // if (currentScrollTop > lastScrollTop && currentScrollTop > 50) {
+  //       //   // Scrolling down and past threshold
+  //       //   setFooterHidden(true);
+  //       // } else if (currentScrollTop < lastScrollTop) {
+  //       //   // Scrolling up
+  //       //   setFooterHidden(false);
+  //       // }
 
-  useEffect(() => {
-    const handleScroll = () => {
+  //       if (currentScrollTop > 50) {
+  //         setFooterHidden(true);
+  //       } else {
+  //         setFooterHidden(false);
+  //       }
+
+  //       lastScrollTopRef.current = currentScrollTop;
+  //     }
+  //   };
+
+  //   let cleanup = () => {};
+  //   const attachListener = () => {
+  //     const element = wrapRef.current;
+  //     if (element) {
+  //       console.log('oki');
+
+  //       element.addEventListener('scroll', handleScroll, { passive: true });
+  //       return () => {
+  //         element.removeEventListener('scroll', handleScroll);
+  //       };
+  //     }
+  //     return () => {};
+  //   };
+
+  //   cleanup = attachListener();
+  //   const interval = setInterval(() => {
+  //     if (wrapRef.current && !wrapRef.current.onscroll) {
+  //       cleanup();
+  //       cleanup = attachListener();
+  //     }
+  //   }, 1000);
+
+  //   return () => {
+  //     cleanup();
+  //     clearInterval(interval);
+  //   };
+  // }, [setFooterHidden]);
+  const handleScroll = useCallback(
+    debounce(() => {
+      console.log('Scrolling:', wrapRef.current?.scrollTop);
       if (wrapRef.current) {
         const currentScrollTop = wrapRef.current.scrollTop;
-        const lastScrollTop = lastScrollTopRef.current;
-
-        // if (currentScrollTop > lastScrollTop && currentScrollTop > 50) {
-        //   // Scrolling down and past threshold
-        //   setFooterHidden(true);
-        // } else if (currentScrollTop < lastScrollTop) {
-        //   // Scrolling up
-        //   setFooterHidden(false);
-        // }
-
         if (currentScrollTop > 50) {
           setFooterHidden(true);
         } else {
           setFooterHidden(false);
         }
-
         lastScrollTopRef.current = currentScrollTop;
       }
-    };
+    }, 50),
+    [setFooterHidden],
+  );
 
-    let cleanup = () => {};
-    const attachListener = () => {
-      const element = wrapRef.current;
-      if (element) {
-        element.addEventListener('scroll', handleScroll, { passive: true });
-        return () => {
-          element.removeEventListener('scroll', handleScroll);
-        };
-      }
-      return () => {};
-    };
-
-    cleanup = attachListener();
-    const interval = setInterval(() => {
-      if (wrapRef.current && !wrapRef.current.onscroll) {
-        cleanup();
-        cleanup = attachListener();
-      }
-    }, 1000);
-
-    return () => {
-      cleanup();
-      clearInterval(interval);
-    };
-  }, [setFooterHidden]);
+  useEffect(() => {
+    const element = wrapRef.current;
+    if (element) {
+      element.addEventListener('scroll', handleScroll, { passive: true });
+      return () => element.removeEventListener('scroll', handleScroll);
+    }
+  }, [handleScroll]);
 
   useEffect(() => {
     let isMounted = true;
@@ -203,77 +227,7 @@ const Articles: React.FC = () => {
       />
       <div ref={wrapRef} className={`${style.newsContainer} ${open ? style.sidebarOpen : ''}`}>
         <div className={style.wrap}>
-          <ReactMarkdown
-            className={style.mdContent}
-            remarkPlugins={[remarkGfm]}
-            rehypePlugins={[rehypeRaw]}
-            components={{
-              img: ({ src, alt }) => {
-                if (src && isVideoUrl(src)) {
-                  const videoSrc =
-                    lsToken && !src.startsWith('blob:')
-                      ? `${src}${src.includes('?') ? '&' : '?'}token=${lsToken}`
-                      : src;
-                  return (
-                    <video
-                      controls
-                      playsInline
-                      width="100%"
-                      style={{ maxWidth: '800px', height: 'auto' }}
-                      src={videoSrc}
-                      aria-label={alt || 'Video'}
-                      onError={e => console.error('Video error:', { src: videoSrc, error: e })}
-                    >
-                      <source
-                        src={videoSrc}
-                        type={`video/${src.split('.').pop()?.toLowerCase()}`}
-                      />
-                      <track kind="captions" />
-                      Your browser does not support the video tag.
-                    </video>
-                  );
-                }
-                return (
-                  <Image
-                    src={src || '/logo_mini_blur.png'}
-                    alt={alt || 'Image'}
-                    width={800}
-                    height={450}
-                    sizes="(max-width: 960px) 100vw, (max-width: 1427px) 80vw, 800px"
-                    style={{ width: '100%', height: 'auto' }}
-                    priority={false}
-                    placeholder="blur"
-                    blurDataURL="/logo_mini_blur.png"
-                    layout="responsive"
-                  />
-                );
-              },
-              video: ({ src, ...props }) => {
-                const videoSrc =
-                  lsToken && src && !src.startsWith('blob:')
-                    ? `${src}${src.includes('?') ? '&' : '?'}token=${lsToken}`
-                    : src;
-                return (
-                  <video
-                    controls
-                    playsInline
-                    width="100%"
-                    style={{ maxWidth: '800px', height: 'auto' }}
-                    src={videoSrc || ''}
-                    aria-label={props['aria-label'] || 'Video'}
-                    onError={e => console.error('Video error:', { src: videoSrc, error: e })}
-                    {...props}
-                  >
-                    <source src={videoSrc} type={`video/${src?.split('.').pop()?.toLowerCase()}`} />
-                    <track kind="captions" />
-                    Your browser does not support the video tag.
-                  </video>
-                );
-              },
-            }}
-          >
-            {memoizedProcessedText}
-          </ReactMarkdown>
+          <MarkdownContent content={memoizedProcessedText} />
         </div>
       </div>
     </>
