@@ -403,6 +403,4 @@ const UserPage = () => {
   );
 };
 
-export const getServerSideProps = () => ({ props: {} });
-
 export default UserPage;
