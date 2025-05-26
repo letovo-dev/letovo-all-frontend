@@ -29,7 +29,6 @@ const OneComment: React.FC<OneCommentProps> = ({
   showInput,
   saveComment,
   avatar,
-  comments,
   comment,
   setCommentText,
   commentText,
@@ -37,10 +36,12 @@ const OneComment: React.FC<OneCommentProps> = ({
 }) => {
   const [likeComment, selLikeComment] = useState(false);
   const [commentState, setCommentState] = useState<RealComment | undefined>(undefined);
-  const { setOpenComments } = commentsStore(state => state);
+  const { setOpenComments, normalizedComments } = commentsStore(state => state);
   const [text, setText] = useState('');
   const usageCommentText = setCommentText ?? setText;
   const usageCommentTextValue = commentText ?? text;
+
+  const comments = normalizedComments?.[newsId];
 
   useEffect(() => {
     if (comments) {

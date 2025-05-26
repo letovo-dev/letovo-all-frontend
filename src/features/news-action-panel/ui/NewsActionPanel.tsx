@@ -17,6 +17,10 @@ const NewsActionPanel = ({
   likeNewsOrComment: (post_id: string, action: string) => Promise<void>;
   dislikeNews: (post_id: string, action: string) => Promise<void>;
 }) => {
+  const { normalizedComments } = commentsStore(state => state);
+
+  const currentNewsComments = normalizedComments ? normalizedComments[newsItem.post_id] : [];
+
   const [actionsState, setActionsState] = useState({
     liked: Boolean(newsItem?.is_liked === 't'),
     disliked: Boolean(newsItem?.is_disliked === 't'),
@@ -144,7 +148,7 @@ const NewsActionPanel = ({
           onClick={() => handleComment(String(newsItem.post_id))}
         >
           <Image src={'/Icon_Comment.png'} alt="comment" width={22} height={22} />
-          <p className={style.dislikesCount}>{commentsCount}</p>
+          <p className={style.dislikesCount}>{currentNewsComments.length}</p>
         </div>
       </div>
       <div

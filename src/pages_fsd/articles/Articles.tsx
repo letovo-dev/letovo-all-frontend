@@ -48,7 +48,6 @@ const Articles: React.FC = () => {
   //вариант футер скрывается - ререндер страницы
   // useEffect(() => {
   //   const handleScroll = () => {
-  //     console.log('Scrolling:', wrapRef.current?.scrollTop);
   //     if (wrapRef.current) {
   //       const currentScrollTop = wrapRef.current.scrollTop;
   //       const lastScrollTop = lastScrollTopRef.current;
@@ -75,8 +74,6 @@ const Articles: React.FC = () => {
   //   const attachListener = () => {
   //     const element = wrapRef.current;
   //     if (element) {
-  //       console.log('oki');
-
   //       element.addEventListener('scroll', handleScroll, { passive: true });
   //       return () => {
   //         element.removeEventListener('scroll', handleScroll);
@@ -100,7 +97,6 @@ const Articles: React.FC = () => {
   // }, [setFooterHidden]);
   const handleScroll = useCallback(
     debounce(() => {
-      console.log('Scrolling:', wrapRef.current?.scrollTop);
       if (wrapRef.current) {
         const currentScrollTop = wrapRef.current.scrollTop;
         if (currentScrollTop > 50) {
