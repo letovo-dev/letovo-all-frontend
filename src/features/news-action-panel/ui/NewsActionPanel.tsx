@@ -148,7 +148,7 @@ const NewsActionPanel = ({
           onClick={() => handleComment(String(newsItem.post_id))}
         >
           <Image src={'/Icon_Comment.png'} alt="comment" width={22} height={22} />
-          <p className={style.dislikesCount}>{currentNewsComments.length}</p>
+          <p className={style.dislikesCount}>{currentNewsComments?.length}</p>
         </div>
       </div>
       <div

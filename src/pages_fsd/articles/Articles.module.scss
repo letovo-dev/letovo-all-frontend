@@ -22,12 +22,12 @@ $scrollbar-width: 17px;
   min-height: 100vh;
   -webkit-overflow-scrolling: touch;
   overscroll-behavior-y: contain;
-  scrollbar-gutter: stable; // Резервируем место под полосу прокрутки
+  scrollbar-gutter: stable;
   @media (min-width: 933px) {
     // padding-left: 16px;
   }
   &.sidebarOpen {
-    overflow: hidden; // Скрываем скроллбары при открытом сайдбаре
+    overflow: hidden;
     @media screen and (max-width: 960px) {
       overflow: hidden;
       position: fixed;
@@ -78,10 +78,12 @@ $scrollbar-width: 17px;
     max-width: 800px;
     margin: 0 auto;
     margin-bottom: 100px;
+    pointer-events: auto;
     @media screen and (max-width: 960px) {
       padding: 15px 35px 20px 35px;
       max-width: 100%;
-      img {
+      img,
+      video {
         width: 100%;
         margin: 10px 0;
       }
@@ -102,7 +104,8 @@ $scrollbar-width: 17px;
       margin: 10px 0;
       color: #555;
     }
-    img {
+    img,
+    video {
       border-radius: 8px;
       margin: 10px auto;
       display: block;
@@ -110,6 +113,8 @@ $scrollbar-width: 17px;
       height: auto;
       transition: opacity 0.5s ease-in-out;
       opacity: 1;
+      pointer-events: auto;
+      z-index: 2;
     }
     img[data-loading='true'] {
       opacity: 0.5;
@@ -117,9 +122,11 @@ $scrollbar-width: 17px;
     a {
       color: #007bff;
       text-decoration: underline;
+      pointer-events: auto;
     }
   }
 }
+
 .burgerArticlesContainer {
   z-index: 1001;
   position: absolute;

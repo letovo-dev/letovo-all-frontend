@@ -1,3 +1,5 @@
+'use client';
+
 import React from 'react';
 import ReactMarkdown from 'react-markdown';
 import remarkGfm from 'remark-gfm';
@@ -8,8 +10,7 @@ import style from './Articles.module.scss';
 const MarkdownContent: React.FC<{ content: string }> = React.memo(
   ({ content }) => {
     const isVideoUrl = (url: string): boolean => {
-      const result = /\.(mp4|webm|ogg|mkv|avi)(\?.*)?$/i.test(url);
-      return result;
+      return /\.(mp4|webm|ogg|mkv|avi)(\?.*)?$/i.test(url);
     };
 
     return (
@@ -20,22 +21,20 @@ const MarkdownContent: React.FC<{ content: string }> = React.memo(
         components={{
           img: ({ src, alt }) => {
             if (src && isVideoUrl(src)) {
-              const videoSrc = !src.startsWith('blob:')
-                ? `${src}${src.includes('?') ? '&' : '?'}token=${localStorage.getItem('token') || ''}`
-                : src;
+              const extension = src.split('.').pop()?.toLowerCase();
               return (
                 <video
                   controls
                   playsInline
-                  muted
                   width="100%"
-                  style={{ maxWidth: '800px', height: 'auto' }}
-                  src={videoSrc}
+                  style={{ maxWidth: '800px', height: 'auto', zIndex: 1 }}
+                  src={src}
                   aria-label={alt || 'Video'}
-                  onError={e => console.error('Video error:', { src: videoSrc, error: e })}
+                  onError={e => console.error('Video error:', { src, error: e })}
+                  onCanPlay={() => console.log('Video can play:', src)}
+                  onPlay={() => console.log('Video playing:', src)}
                 >
-                  <source src={videoSrc} type={`video/${src.split('.').pop()?.toLowerCase()}`} />
-                  <track kind="captions" />
+                  <source src={src} type={`video/${extension}`} />
                   Your browser does not support the video tag.
                 </video>
               );
@@ -56,23 +55,20 @@ const MarkdownContent: React.FC<{ content: string }> = React.memo(
             );
           },
           video: ({ src, ...props }) => {
-            const videoSrc = !src?.startsWith('blob:')
-              ? `${src}${src?.includes('?') ? '&' : '?'}token=${localStorage.getItem('token') || ''}`
-              : src;
+            const extension = src?.split('.').pop()?.toLowerCase();
             return (
               <video
                 controls
                 playsInline
-                muted
                 width="100%"
-                style={{ maxWidth: '800px', height: 'auto' }}
-                src={videoSrc || ''}
+                style={{ maxWidth: '800px', height: 'auto', zIndex: 1 }}
+                src={src || ''}
                 aria-label={props['aria-label'] || 'Video'}
-                onError={e => console.error('Video error:', { src: videoSrc, error: e })}
-                {...props}
+                onError={e => console.error('Video error:', { src, error: e })}
+                onCanPlay={() => console.log('Video can play:', src)}
+                onPlay={() => console.log('Video playing:', src)}
               >
-                <source src={videoSrc} type={`video/${src?.split('.').pop()?.toLowerCase()}`} />
-                <track kind="captions" />
+                <source src={src || ''} type={`video/${extension}`} />
                 Your browser does not support the video tag.
               </video>
             );

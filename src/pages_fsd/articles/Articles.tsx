@@ -16,21 +16,19 @@ import MarkdownContent from './ReactMd';
 const Articles: React.FC = () => {
   const { article, normalizedArticles, loading, articlesCategories, getArticlesCategories } =
     articlesStore(state => state);
-
   const router = useRouter();
   const [processedText, setProcessedText] = useState('');
   const [lsToken, setLsToken] = useState<string | null>(null);
-  const [imageCache, setImageCache] = useState<Record<string, string>>({});
+  const [mediaCache, setMediaCache] = useState<Record<string, string>>({});
   const wrapRef = useRef<HTMLDivElement>(null);
   const burgerRef = useRef<HTMLDivElement>(null);
   const { setFooterHidden } = useFooterContext();
   const [open, setOpen] = useState(false);
-  const imageCacheRef = useRef<Record<string, string>>({});
+  const mediaCacheRef = useRef<Record<string, string>>({});
   const lastScrollTopRef = useRef(0);
 
   const isVideoUrl = (url: string): boolean => {
-    const result = /\.(mp4|webm|ogg|mkv|avi)(\?.*)?$/i.test(url);
-    return result;
+    return /\.(mp4|webm|ogg|mkv|avi)(\?.*)?$/i.test(url);
   };
 
   useEffect(() => {
@@ -45,56 +43,7 @@ const Articles: React.FC = () => {
       }
     }
   }, [router, getArticlesCategories]);
-  //вариант футер скрывается - ререндер страницы
-  // useEffect(() => {
-  //   const handleScroll = () => {
-  //     if (wrapRef.current) {
-  //       const currentScrollTop = wrapRef.current.scrollTop;
-  //       const lastScrollTop = lastScrollTopRef.current;
-  //       //Показывать футер при скролле вверх
-  //       // if (currentScrollTop > lastScrollTop && currentScrollTop > 50) {
-  //       //   // Scrolling down and past threshold
-  //       //   setFooterHidden(true);
-  //       // } else if (currentScrollTop < lastScrollTop) {
-  //       //   // Scrolling up
-  //       //   setFooterHidden(false);
-  //       // }
 
-  //       if (currentScrollTop > 50) {
-  //         setFooterHidden(true);
-  //       } else {
-  //         setFooterHidden(false);
-  //       }
-
-  //       lastScrollTopRef.current = currentScrollTop;
-  //     }
-  //   };
-
-  //   let cleanup = () => {};
-  //   const attachListener = () => {
-  //     const element = wrapRef.current;
-  //     if (element) {
-  //       element.addEventListener('scroll', handleScroll, { passive: true });
-  //       return () => {
-  //         element.removeEventListener('scroll', handleScroll);
-  //       };
-  //     }
-  //     return () => {};
-  //   };
-
-  //   cleanup = attachListener();
-  //   const interval = setInterval(() => {
-  //     if (wrapRef.current && !wrapRef.current.onscroll) {
-  //       cleanup();
-  //       cleanup = attachListener();
-  //     }
-  //   }, 1000);
-
-  //   return () => {
-  //     cleanup();
-  //     clearInterval(interval);
-  //   };
-  // }, [setFooterHidden]);
   const handleScroll = useCallback(
     debounce(() => {
       if (wrapRef.current) {
@@ -121,49 +70,55 @@ const Articles: React.FC = () => {
   useEffect(() => {
     let isMounted = true;
 
-    const fetchImages = async () => {
+    const fetchMedia = async () => {
       if (!isMounted || !article?.text || !lsToken) {
         return;
       }
 
       const markdownText = article.text;
-      const imageUrls = extractImageUrls(markdownText).filter(url => !isVideoUrl(url));
-      const newImageCache = { ...imageCacheRef.current };
+      const mediaUrls = extractImageUrls(markdownText);
+      const newMediaCache = { ...mediaCacheRef.current };
 
-      for (const url of imageUrls) {
-        if (newImageCache[url]) {
-          continue;
-        }
-
+      const fetchPromises = mediaUrls.map(async url => {
+        if (newMediaCache[url]) return;
         try {
           const response = await axios.get(url, {
             headers: { Authorization: `Bearer ${lsToken}` },
             responseType: 'blob',
           });
-          const objectUrl = URL.createObjectURL(response.data);
-          newImageCache[url] = objectUrl;
+          const mimeType =
+            response.headers['content-type'] ||
+            (isVideoUrl(url) ? `video/${url.split('.').pop()?.toLowerCase()}` : 'image/jpeg');
+          const objectUrl = URL.createObjectURL(new Blob([response.data], { type: mimeType }));
+          newMediaCache[url] = objectUrl;
+          console.log(`Loaded media: ${url} -> ${objectUrl}, MIME: ${mimeType}`);
         } catch (error) {
-          console.error(`Ошибка загрузки изображения ${url}:`, error);
+          console.error(`Ошибка загрузки медиа ${url}:`, error);
         }
-      }
+      });
 
-      imageCacheRef.current = newImageCache;
+      await Promise.all(fetchPromises);
 
       const updatedText = markdownText.replace(/!\[.*?\]\((.*?)\)/g, (match, url) => {
-        if (isVideoUrl(url)) {
+        const localUrl = newMediaCache[url];
+        if (!localUrl) {
+          console.warn(`No local URL for ${url}`);
           return match;
         }
-        const localUrl = newImageCache[url];
-        return localUrl ? match.replace(url, localUrl) : match;
+        if (isVideoUrl(url)) {
+          const extension = url.split('.').pop()?.toLowerCase();
+          return `<video controls playsinline src="${localUrl}" type="video/${extension}" style="max-width: 100%; height: auto; z-index: 1;"></video>`;
+        }
+        return match.replace(url, localUrl);
       });
 
       if (isMounted) {
-        setImageCache(newImageCache);
+        setMediaCache(newMediaCache);
         setProcessedText(updatedText);
       }
     };
 
-    fetchImages();
+    fetchMedia();
 
     return () => {
       isMounted = false;
@@ -171,32 +126,10 @@ const Articles: React.FC = () => {
   }, [article?.text, lsToken]);
 
   useEffect(() => {
-    const checkVideo = async () => {
-      if (!article?.text || !lsToken) return;
-
-      const videoUrls = extractImageUrls(article.text).filter(isVideoUrl);
-      for (const url of videoUrls) {
-        try {
-          const response = await axios.head(
-            `${url}${url.includes('?') ? '&' : '?'}token=${lsToken}`,
-            {
-              headers: { Authorization: `Bearer ${lsToken}` },
-            },
-          );
-        } catch (error) {
-          console.error('Video check failed:', { url, error });
-        }
-      }
-    };
-
-    checkVideo();
-  }, [article?.text, lsToken]);
-
-  useEffect(() => {
     return () => {
-      Object.values(imageCache).forEach(url => URL.revokeObjectURL(url));
-      imageCacheRef.current = {};
-      setImageCache({});
+      Object.values(mediaCache).forEach(url => URL.revokeObjectURL(url));
+      mediaCacheRef.current = {};
+      setMediaCache({});
     };
   }, []);
 
