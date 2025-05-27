@@ -31,8 +31,6 @@ const MarkdownContent: React.FC<{ content: string }> = React.memo(
                   src={src}
                   aria-label={alt || 'Video'}
                   onError={e => console.error('Video error:', { src, error: e })}
-                  onCanPlay={() => console.log('Video can play:', src)}
-                  onPlay={() => console.log('Video playing:', src)}
                 >
                   <source src={src} type={`video/${extension}`} />
                   Your browser does not support the video tag.
@@ -65,8 +63,6 @@ const MarkdownContent: React.FC<{ content: string }> = React.memo(
                 src={src || ''}
                 aria-label={props['aria-label'] || 'Video'}
                 onError={e => console.error('Video error:', { src, error: e })}
-                onCanPlay={() => console.log('Video can play:', src)}
-                onPlay={() => console.log('Video playing:', src)}
               >
                 <source src={src || ''} type={`video/${extension}`} />
                 Your browser does not support the video tag.

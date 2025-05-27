@@ -91,7 +91,6 @@ const Articles: React.FC = () => {
             (isVideoUrl(url) ? `video/${url.split('.').pop()?.toLowerCase()}` : 'image/jpeg');
           const objectUrl = URL.createObjectURL(new Blob([response.data], { type: mimeType }));
           newMediaCache[url] = objectUrl;
-          console.log(`Loaded media: ${url} -> ${objectUrl}, MIME: ${mimeType}`);
         } catch (error) {
           console.error(`Ошибка загрузки медиа ${url}:`, error);
         }
