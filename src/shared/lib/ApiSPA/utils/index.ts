@@ -65,7 +65,7 @@ export const codeTranslator = (code: number | string) => {
       message = 'Ошибка сети';
       break;
     default:
-      message = 'Не удалось определить ошибку';
+      message = 'Упс, что-то пошло не так :с';
       break;
   }
 

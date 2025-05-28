@@ -87,7 +87,7 @@ const NewsPage = () => {
   }, [getRenderNews]);
 
   const loadMore = useCallback(async () => {
-    if (loading || isFetching.current || openComments) {
+    if (!currentNewsState.default || loading || isFetching.current || openComments) {
       return;
     }
 
@@ -116,12 +116,20 @@ const NewsPage = () => {
     } finally {
       isFetching.current = false;
     }
-  }, [fetchNews, startNewsItem, loading, newsLength, openComments]);
+  }, [fetchNews, startNewsItem, loading, newsLength, openComments, currentNewsState.default]);
 
   useEffect(() => {
     if (!currentNewsState.default) {
+      if (observerRef.current) {
+        observerRef.current.disconnect();
+      }
       return;
     }
+
+    // Процент от высоты экрана, при достижении которого срабатывает дозагрузка
+    const triggerPercentage = 10;
+    const screenHeight = window.innerHeight;
+    const rootMarginValue = `${Math.round(screenHeight * (triggerPercentage / 100))}px`;
 
     const observer = new IntersectionObserver(
       entries => {
@@ -130,12 +138,17 @@ const NewsPage = () => {
           !loading &&
           !isFetching.current &&
           !openComments &&
-          startNewsItem < newsLength
+          startNewsItem < newsLength &&
+          !currentNewsState.saved &&
+          !currentNewsState.selected
         ) {
           loadMore();
         }
       },
-      { threshold: 0.1, rootMargin: '300px' },
+      {
+        threshold: 0.1, // Процент пересечения элемента (10% видимости)
+        rootMargin: `0px 0px ${rootMarginValue} 0px`, // Триггер на 10% высоты экрана от нижней границы
+      },
     );
     observerRef.current = observer;
 
@@ -148,10 +161,10 @@ const NewsPage = () => {
         observerRef.current.disconnect();
       }
     };
-  }, [loadMore, currentNewsState.default, openComments]);
+  }, [loadMore, currentNewsState.default, openComments, startNewsItem, newsLength]);
 
   useEffect(() => {
-    if (observerRef.current && lastElementRef.current) {
+    if (observerRef.current && lastElementRef.current && currentNewsState.default) {
       observerRef.current.observe(lastElementRef.current);
     }
 
@@ -159,13 +172,13 @@ const NewsPage = () => {
     if (newsId && containerRef.current && !openComments) {
       const lastVisibleElement = containerRef.current.querySelector(`[data-news-id="${newsId}"]`);
       if (lastVisibleElement) {
-        containerRef.current.scrollTop = (lastVisibleElement as HTMLElement).offsetTop - 120; // Компенсация margin-top
+        containerRef.current.scrollTop = (lastVisibleElement as HTMLElement).offsetTop - 120;
       } else {
         containerRef.current.scrollTop = offsetTop - 120;
       }
       lastVisiblePosition.current = { newsId: null, offsetTop: 0 };
     }
-  }, [renderNews, openComments]);
+  }, [renderNews, openComments, currentNewsState.default]);
 
   if (loading && startNewsItem === 0) {
     return <SpinModule />;

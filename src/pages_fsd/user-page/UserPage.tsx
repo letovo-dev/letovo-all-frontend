@@ -5,12 +5,6 @@ import style from './UserPage.module.scss';
 import userStore, { IUserAchData, IUserStore } from '@/shared/stores/user-store';
 import { ConfigProvider, Form, Spin } from 'antd';
 import { useRouter } from 'next/navigation';
-
-// import CustomSelect from '@/shared/ui/select/CustomSelect';
-// import QRScanner from '@/features/qr-scanner/QrScanner';
-// import TableElement from '@/features/qr-scanner/Table';
-// import { QrReader } from '@/features/qr-scanner/QrReader';
-// import Registration from '@/features/registration';
 import authStore from '@/shared/stores/auth-store';
 import { setDataToLocaleStorage } from '@/shared/lib/ApiSPA/axios/helpers';
 import dataStore from '@/shared/stores/data-store';
@@ -21,13 +15,15 @@ import { TransferModal } from '@/features/moneyTranfer/ui';
 import OnBoard from './ui/OnBoard';
 import Money from './ui/Money';
 import UserData from './ui/UserData';
-const AchieveBlock = dynamic(() => import('./ui/AchieveBlock'), { ssr: false });
-
 import AchieveBlockMobile from './ui/AchieveBlockMobile';
 import { useFooterContext } from '@/shared/ui/context/FooterContext';
 import { ImgWithBackground } from '@/shared/ui/image-background';
 import { generateKey } from '@/shared/api/utils';
-import dynamic from 'next/dynamic';
+import AchieveBlock from './ui/AchieveBlock';
+
+// import QRScanner from '@/features/qr-scanner/QrScanner';
+// import TableElement from '@/features/qr-scanner/Table';
+// import { QrReader } from '@/features/qr-scanner/QrReader';
 
 const UserPage = () => {
   const router = useRouter();

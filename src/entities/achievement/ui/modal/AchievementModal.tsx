@@ -35,7 +35,11 @@ const AchievementModal: React.FC<ModalProps> = ({
     const currentIndex = currentItem ? allPossibleUserAchievements?.indexOf(currentItem) : -1;
     const nextIndex = ((currentIndex ?? -1) + 1) % (allPossibleUserAchievements?.length || 1);
     if (allPossibleUserAchievements) {
-      setCurrentItem(allPossibleUserAchievements[nextIndex]);
+      const doneItem =
+        allPossibleUserAchievements[nextIndex].stages ===
+        allPossibleUserAchievements[nextIndex].level;
+
+      setCurrentItem({ ...allPossibleUserAchievements[nextIndex], done: doneItem });
     }
   };
 
@@ -45,12 +49,18 @@ const AchievementModal: React.FC<ModalProps> = ({
       ((currentIndex ?? -1) - 1 + (allPossibleUserAchievements?.length || 1)) %
       (allPossibleUserAchievements?.length || 1);
     if (allPossibleUserAchievements) {
-      setCurrentItem(allPossibleUserAchievements[prevIndex]);
+      const doneItem =
+        allPossibleUserAchievements[prevIndex].stages ===
+        allPossibleUserAchievements[prevIndex].level;
+
+      setCurrentItem({ ...allPossibleUserAchievements[prevIndex], done: doneItem });
     }
   };
 
   const stage = currentItem?.stages === '' ? '0' : currentItem?.stages;
   const level = currentItem?.level === '' ? '0' : currentItem?.level;
+
+  console.log(currentItem);
 
   return (
     <div className={style.modalOverlay} onClick={onClose}>
