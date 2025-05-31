@@ -6,6 +6,7 @@ import { Form } from 'antd';
 import dataStore, { Titles } from '@/shared/stores/data-store';
 import Image from 'next/image';
 import SideBarNewsContent from './SideBarNewsContent';
+import { message } from 'antd';
 
 interface FormValues {
   search_query: string;
@@ -33,8 +34,18 @@ const SideBarNews = ({
 }) => {
   const [form] = Form.useForm();
   const { loading, setCurrentNewsState, fetchNews, currentNewsState } = dataStore(state => state);
-  const { searchedNews } = dataStore(state => state.data);
+  const { searchedNews, savedNews } = dataStore(state => state.data);
   const sidebarRef = useRef<HTMLDivElement>(null);
+  const savedNewsLength = Object.keys(savedNews).length;
+  console.log(Object.keys(savedNews).length);
+  const [messageApi, contextHolder] = message.useMessage();
+
+  const info = () => {
+    messageApi.open({
+      type: 'warning',
+      content: 'У вас нет сохраненных новостей',
+    });
+  };
 
   const mainSections: MainSections = useMemo(
     () => ({
@@ -54,14 +65,19 @@ const SideBarNews = ({
       saved: {
         title: 'Сохраненные',
         method: () => {
-          setCurrentNewsState({
-            default: false,
-            saved: true,
-            selectedNews: undefined,
-            searched: false,
-          });
-          setOpen(prev => !prev);
-          form.resetFields();
+          if (savedNewsLength === 0) {
+            console.log('Нет сохраненных новостей');
+            info();
+          } else {
+            setCurrentNewsState({
+              default: false,
+              saved: true,
+              selectedNews: undefined,
+              searched: false,
+            });
+            setOpen(prev => !prev);
+            form.resetFields();
+          }
         },
       },
     }),
@@ -118,6 +134,7 @@ const SideBarNews = ({
 
   return (
     <div className={windowWidth && windowWidth < 960 && open ? style.modalOverlay : ''}>
+      {contextHolder}
       <div ref={sidebarRef} className={getSidebarClass()}>
         <SideBarNewsContent loading={loading} form={form} onFinish={onFinish} />
         {currentNewsState.searched && !searchedNews && (

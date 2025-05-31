@@ -5,6 +5,7 @@ import userStore, { IUserStore } from '@/shared/stores/user-store';
 import authStore from '@/shared/stores/auth-store';
 import { ConfigProvider, Spin, Button } from 'antd';
 import style from './page.module.scss';
+import '@ant-design/v5-patch-for-react-19';
 
 export const dynamic = 'force-dynamic';
 
