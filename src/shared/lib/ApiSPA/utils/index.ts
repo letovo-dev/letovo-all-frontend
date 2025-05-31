@@ -49,14 +49,17 @@ export const codeTranslator = (code: number | string) => {
     case 400:
       message = 'Некорректный запрос';
       break;
-    case 404:
-      message = 'Страница не найдена';
-      break;
     case 401:
       message = 'Неверный логин или пароль';
       break;
     case 403:
       message = 'Доступ запрещен';
+      break;
+    case 404:
+      message = 'Пользователь не найден';
+      break;
+    case 409:
+      message = 'Недостаточно денег';
       break;
     case 500:
       message = 'Ошибка сервера';

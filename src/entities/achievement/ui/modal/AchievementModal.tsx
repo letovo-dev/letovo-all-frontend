@@ -60,8 +60,6 @@ const AchievementModal: React.FC<ModalProps> = ({
   const stage = currentItem?.stages === '' ? '0' : currentItem?.stages;
   const level = currentItem?.level === '' ? '0' : currentItem?.level;
 
-  console.log(currentItem);
-
   return (
     <div className={style.modalOverlay} onClick={onClose}>
       <div

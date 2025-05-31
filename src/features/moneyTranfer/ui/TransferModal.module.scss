@@ -136,7 +136,7 @@ $overlay-color: rgba(0, 0, 0, 0.5);
         }
         .inputFormError {
           @extend %input;
-          margin-bottom: 0px;
+          margin-bottom: 5px;
           background-image: url('/base_registration_input_error.png');
         }
 
@@ -178,6 +178,7 @@ $overlay-color: rgba(0, 0, 0, 0.5);
         display: flex;
         height: 30px;
         padding-left: 115px;
+        min-height: 30px;
       }
     }
   }

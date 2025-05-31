@@ -27,10 +27,11 @@ const TransferModal: React.FC<ModalProps> = ({
   const [form] = Form.useForm();
   const { Text } = Typography;
   const [nick, setNick] = useState<string | undefined>('');
-  const [sum, setSum] = useState<number>(0);
+  const [sum, setSum] = useState<number | undefined>(undefined);
   const { isRequireUserInDatabase, transferMoney } = userStore((state: IUserStore) => state);
   const [finished, setFinished] = useState<boolean>(false);
   const [avatar, setAvatar] = useState<string | undefined>(undefined);
+  const [isButtonDisable, setIsButtonDisable] = useState<boolean>(true);
 
   useEffect(() => {
     if (nick !== receiver) {
@@ -38,38 +39,78 @@ const TransferModal: React.FC<ModalProps> = ({
     }
   }, [receiver, nick]);
 
+  // useEffect(() => {
+  //   if (!sum && nick && nick?.length > 4 && receiver) {
+  //     setIsButtonDisable(true);
+  //   }
+  //   if (!sum && nick && nick?.length > 4 && !receiver) {
+  //     setIsButtonDisable(false);
+  //   }
+  //   if (!sum && nick && nick?.length <= 4 && !receiver) {
+  //     setIsButtonDisable(true);
+  //   }
+  //   if (receiver && sum && sum < selfMoney) {
+  //     setIsButtonDisable(false);
+  //   }
+  //   if (sum && sum > selfMoney) {
+  //     setIsButtonDisable(true);
+  //     const timeOutId = setTimeout(() => {
+  //       userStore.setState({ error: 'Недостаточно средств' });
+  //     }, 500);
+  //     return () => clearTimeout(timeOutId);
+  //   } else {
+  //     const timeOutId = setTimeout(() => {
+  //       userStore.setState({ error: undefined });
+  //     }, 500);
+  //     return () => clearTimeout(timeOutId);
+  //   }
+  // }, [sum, selfMoney, nick, receiver]);
+
   useEffect(() => {
-    if (sum > selfMoney) {
-      const timeOutId = setTimeout(() => {
-        userStore.setState({ error: 'Недостаточно средств' });
-      }, 500);
-      return () => clearTimeout(timeOutId);
-    } else {
-      const timeOutId = setTimeout(() => {
-        userStore.setState({ error: undefined });
-      }, 500);
-      return () => clearTimeout(timeOutId);
-    }
-  }, [sum, selfMoney]);
+    const getIsButtonDisabled = () => {
+      if (!nick || nick.length <= 4) {
+        return true;
+      }
+      if (receiver && (!sum || sum <= 0)) {
+        return true;
+      }
+      if (sum && sum > selfMoney) {
+        return true;
+      }
+      return false;
+    };
+
+    const isDisabled = getIsButtonDisabled();
+    setIsButtonDisable(isDisabled);
+
+    const timeOutId = setTimeout(() => {
+      userStore.setState({
+        error: sum && sum > selfMoney ? 'Недостаточно средств' : undefined,
+      });
+    }, 500);
+
+    return () => clearTimeout(timeOutId);
+  }, [sum, selfMoney, nick, receiver]);
 
   if (!openTransferModal) return null;
   const onClose = () => {
     setOpenTransferModal(false);
+    setIsButtonDisable(false);
     userStore.setState({ error: undefined });
   };
 
   const onValuesChange = (changedValues: any, allValues: any) => {
-    if (changedValues.nick) {
-      setNick(changedValues.nick);
+    if ('nick' in changedValues) {
+      setNick(changedValues.nick || undefined);
     }
-    if (changedValues.sum) {
-      setSum(changedValues.sum);
+    if ('sum' in changedValues) {
+      setSum(changedValues.sum || undefined);
     }
   };
-
   const onFinish = async (values: FormValues) => {
     if (values.nick && !values.sum) {
       const user = await isRequireUserInDatabase(values?.nick);
+      setIsButtonDisable(false);
       setReceiver(user ? values.nick : undefined);
       setAvatar(user?.avatar);
       form.resetFields();
@@ -167,6 +208,7 @@ const TransferModal: React.FC<ModalProps> = ({
                         name="nick"
                         initialValue={nick}
                         className={!receiver && error ? style.inputFormError : style.inputForm}
+                        normalize={value => (value === '' ? undefined : value)}
                       >
                         <input
                           type="text"
@@ -185,6 +227,7 @@ const TransferModal: React.FC<ModalProps> = ({
                         <Form.Item
                           name="sum"
                           className={!error ? style.inputForm : style.inputFormError}
+                          normalize={value => (value === '' ? undefined : value)}
                         >
                           <input
                             type="number"
@@ -247,7 +290,7 @@ const TransferModal: React.FC<ModalProps> = ({
                         <Button
                           variant="solid"
                           htmlType="submit"
-                          disabled={!nick || nick.length < 4}
+                          disabled={isButtonDisable}
                           className={style.submitButton}
                         >
                           {receiver ? `${'Перевести'}` : `${'Найти'}`}
