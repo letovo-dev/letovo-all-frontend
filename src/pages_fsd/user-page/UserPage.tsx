@@ -162,12 +162,10 @@ const UserPage = () => {
         {activeIcon ? (
           <>
             <ImgWithBackground imgPath={imgPath} size={60} imgType={'avatar'} opacity={opacity} />
-            <p className={style.achTextActive}>{item.achivement_name}</p>
           </>
         ) : (
           <>
-            <Image src="/Achievement_Closed.png" alt="" height={106} width={106} />
-            <p className={style.achTextActive}>{item.achivement_name}</p>
+            <Image src="/Achievement_Closed.png" alt="" height={106} width={106} />{' '}
           </>
         )}
       </div>,

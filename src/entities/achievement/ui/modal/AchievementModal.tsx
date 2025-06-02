@@ -31,8 +31,17 @@ const AchievementModal: React.FC<ModalProps> = ({
     setCurrentItem(null);
   };
 
+  console.log(allPossibleUserAchievements);
+  console.log(currentItem);
+
   const showNextItem = () => {
-    const currentIndex = currentItem ? allPossibleUserAchievements?.indexOf(currentItem) : -1;
+    const currentIndex = currentItem
+      ? (allPossibleUserAchievements?.findIndex(
+          item => item.achivement_id === currentItem.achivement_id,
+        ) ?? -1)
+      : -1;
+    console.log(currentIndex);
+
     const nextIndex = ((currentIndex ?? -1) + 1) % (allPossibleUserAchievements?.length || 1);
     if (allPossibleUserAchievements) {
       const doneItem =
@@ -44,7 +53,13 @@ const AchievementModal: React.FC<ModalProps> = ({
   };
 
   const showPrevItem = () => {
-    const currentIndex = currentItem ? allPossibleUserAchievements?.indexOf(currentItem) : -1;
+    const currentIndex = currentItem
+      ? (allPossibleUserAchievements?.findIndex(
+          item => item.achivement_id === currentItem.achivement_id,
+        ) ?? -1)
+      : -1;
+    console.log(currentIndex);
+
     const prevIndex =
       ((currentIndex ?? -1) - 1 + (allPossibleUserAchievements?.length || 1)) %
       (allPossibleUserAchievements?.length || 1);
@@ -99,7 +114,9 @@ const AchievementModal: React.FC<ModalProps> = ({
             </div>
           </div>
           <p className={style.textCondition}>Условия получения</p>
-          <p className={style.textDescription}>{currentItem?.achivement_decsription}</p>
+          <div className={style.textDescriptionContainer}>
+            <p className={style.textDescription}>{currentItem?.achivement_decsription}</p>
+          </div>
         </div>
         <Image
           className={style.letovoCorp}

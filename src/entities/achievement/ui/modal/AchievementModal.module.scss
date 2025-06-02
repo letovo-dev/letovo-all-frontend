@@ -1,6 +1,6 @@
 @use '../../../../app/_mixins.scss';
 
-$overlay-color: rgba(0, 0, 0, 0.5);
+$overlay-color: rgba(0, 0, 0, 0.3);
 
 .modalOverlay {
   position: fixed;
@@ -48,7 +48,7 @@ $overlay-color: rgba(0, 0, 0, 0.5);
   }
   .modalContainerItem {
     position: absolute;
-    top: 16%;
+    top: 11%;
     width: 100%;
     display: flex;
     flex-direction: column;
@@ -56,9 +56,10 @@ $overlay-color: rgba(0, 0, 0, 0.5);
     justify-content: center;
     align-items: center;
     .text {
-      color: var(--graphics11);
+      color: var(--graphics10);
       font-weight: 600;
-      padding-bottom: 30px;
+      padding-bottom: 40px;
+      font-size: 18px;
     }
     .slider {
       display: flex;
@@ -74,7 +75,7 @@ $overlay-color: rgba(0, 0, 0, 0.5);
       background-repeat: no-repeat;
       background-image: url('/Achievement_Base.png');
       height: 219px;
-      width: 179px;
+      width: 184px;
       // position: relative;
       display: flex;
       flex-direction: column;
@@ -103,54 +104,63 @@ $overlay-color: rgba(0, 0, 0, 0.5);
       color: var(--orange);
       font-weight: 600;
       font-size: 12px;
-      margin-top: 2px;
+      margin-top: 3px;
     }
     .resultBlockText {
+      height: 100%;
       color: var(--orange);
-      font-weight: 400;
-      font-size: 10px;
-      margin-top: 162px;
+      font-weight: 600;
+      font-size: 12px;
+      margin-top: 160px;
     }
     .resultBlockRes {
       color: var(--graphics10);
       font-weight: 400;
       font-size: 10px;
-      margin-top: 162px;
+      margin-top: 163px;
     }
     .textConditionRes {
       @extend .textCondition;
       font-size: 14px;
+      position: absolute;
+      top: 176px;
     }
+  }
+  .textDescriptionContainer {
+    height: 150px;
+    width: 76%;
+    display: flex;
+    align-items: center;
+    overflow: auto;
     .textDescription {
       margin-top: 10px;
       color: var(--graphics10);
       font-weight: 400;
       font-size: 11px;
-      overflow: auto;
       text-overflow: ellipsis;
       display: -webkit-box;
       -webkit-line-clamp: 10;
       -webkit-box-orient: vertical;
-      width: 85%;
     }
   }
-  .letovoCorp {
-    position: absolute;
-    left: 50%;
-    transform: translate(-50%, -50%);
-    bottom: 1%;
-  }
-  .imageWrapper {
-    position: absolute;
-    left: 50%;
-    transform: translate(-50%, -50%);
-    top: 39%;
-  }
+}
+.letovoCorp {
+  position: absolute;
+  left: 50%;
+  transform: translate(-50%, -50%);
+  bottom: 1%;
+}
+.imageWrapper {
+  position: absolute;
+  left: 50%;
+  transform: translate(-51%, -50%);
+  top: 36%;
 }
 
 .modalContainerDone {
   @extend .modalContainer;
-  background-image: url('/Base_Achievement_Open.png');
+  background-image: url('/Base_Achievement_Open_PC.png');
+  height: 561px;
 }
 
 .modalContainerClosed {

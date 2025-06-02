@@ -56,6 +56,9 @@ export const codeTranslator = (code: number | string) => {
       message = 'Доступ запрещен';
       break;
     case 404:
+      message = 'Страница не найдена';
+      break;
+    case 406:
       message = 'Пользователь не найден';
       break;
     case 409:
