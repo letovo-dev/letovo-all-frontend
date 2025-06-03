@@ -94,6 +94,7 @@ const nextConfig = {
     return config;
   },
   images: {
+    formats: ['image/avif', 'image/webp'],
     remotePatterns: [
       {
         protocol: 'http',

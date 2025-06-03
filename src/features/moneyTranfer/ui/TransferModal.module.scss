@@ -17,7 +17,7 @@ $overlay-color: rgba(0, 0, 0, 0.3);
 
 .modalContainer {
   @extend %transparentContainer;
-  background-image: url('/base_transfer.png');
+  background-image: url('/images/base_transfer.webp');
   width: 391px;
   height: 291px;
   background-size: contain;
@@ -27,7 +27,7 @@ $overlay-color: rgba(0, 0, 0, 0.3);
   overflow: visible;
   .backgroundDiv {
     @extend %transparentContainer;
-    background-image: url('/Mask group.png');
+    background-image: url('/images/Mask group.webp');
     width: 391px;
     height: 291px;
     background-size: contain;
@@ -46,7 +46,7 @@ $overlay-color: rgba(0, 0, 0, 0.3);
     @extend %transparentContainer;
     background-size: contain;
     background-repeat: no-repeat;
-    background-image: url('/button_forget.png');
+    background-image: url('/images/button_forget.webp');
     width: 47px;
     z-index: 1001;
     height: 30px;
@@ -132,12 +132,12 @@ $overlay-color: rgba(0, 0, 0, 0.3);
         .inputForm {
           @extend %input;
           margin-bottom: 5px;
-          background-image: url('/base_registration_input.png');
+          background-image: url('/images/base_registration_input.webp');
         }
         .inputFormError {
           @extend %input;
           margin-bottom: 5px;
-          background-image: url('/base_registration_input_error.png');
+          background-image: url('/images/base_registration_input_error.webp');
         }
 
         .customInput {
@@ -219,7 +219,7 @@ $overlay-color: rgba(0, 0, 0, 0.3);
 }
 .modalContainerTransfer {
   @extend .modalContainer;
-  background-image: url('/Base_Transfer2.png');
+  background-image: url('/images/Base_Transfer2.webp');
   width: 391px;
   height: 376px;
   .modalContainerHeaderTransfer {

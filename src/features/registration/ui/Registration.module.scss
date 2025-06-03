@@ -2,12 +2,12 @@
 
 .formWrapper {
   @extend %entryCover;
-  background-image: url('/background_mobile_logo.png');
+  background-image: url('/images/background_mobile_logo.webp');
 
   padding-top: 12vh;
   .form {
     @extend %transparentContainer;
-    background-image: url('/base_login.png');
+    background-image: url('/images/base_login.webp');
     background-size: 90% 90%;
     width: 387px;
     justify-content: space-evenly;
@@ -20,7 +20,7 @@
 
     .selectPhoto {
       @extend %transparentContainer;
-      background-image: url('/SelectPhoto.png');
+      background-image: url('/images/SelectPhoto.webp');
       background-size: contain;
       justify-content: center;
       align-items: center;
@@ -45,7 +45,7 @@
 
 .titleBorder {
   @extend %transparentContainer;
-  background-image: url('/title_login_empty.png');
+  background-image: url('/images/title_login_empty.webp');
   width: 280px;
   justify-content: center;
   align-items: center;
@@ -65,12 +65,12 @@
 .inputForm {
   @extend %input;
   margin-bottom: 0px;
-  background-image: url('/base_registration_input.png');
+  background-image: url('/images/base_registration_input.webp');
 }
 .inputFormError {
   @extend %input;
   margin-bottom: 0px;
-  background-image: url('/base_registration_input_error.png');
+  background-image: url('/images/base_registration_input_error.webp');
 }
 
 .customInput {
@@ -98,7 +98,7 @@
 }
 
 .infoPanel {
-  background-image: url('/messages_reg_form.png');
+  background-image: url('/images/messages_reg_form.webp');
   background-size: contain;
   background-color: rgba(255, 255, 255, 0);
   background-size: 90% 90%;

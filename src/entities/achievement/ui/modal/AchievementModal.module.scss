@@ -28,7 +28,7 @@ $overlay-color: rgba(0, 0, 0, 0.3);
     @extend %transparentContainer;
     background-size: contain;
     background-repeat: no-repeat;
-    background-image: url('/button_forget.png');
+    background-image: url('/images/button_forget.webp');
     width: 47px;
     z-index: 1001;
     height: 30px;
@@ -73,7 +73,7 @@ $overlay-color: rgba(0, 0, 0, 0.3);
       @extend %transparentContainer;
       background-size: contain;
       background-repeat: no-repeat;
-      background-image: url('/Achievement_Base.png');
+      background-image: url('/images/Achievement_Base.webp');
       height: 219px;
       width: 184px;
       // position: relative;
@@ -159,11 +159,11 @@ $overlay-color: rgba(0, 0, 0, 0.3);
 
 .modalContainerDone {
   @extend .modalContainer;
-  background-image: url('/Base_Achievement_Open_PC.png');
+  background-image: url('/images/Base_Achievement_Open_PC.webp');
   height: 561px;
 }
 
 .modalContainerClosed {
   @extend .modalContainer;
-  background-image: url('/Base_Achievement_Closed_PC.png');
+  background-image: url('/images/Base_Achievement_Closed_PC.webp');
 }

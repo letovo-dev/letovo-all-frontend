@@ -2,10 +2,12 @@
   "name": "letovo-proj",
   "version": "0.1.0",
   "private": true,
+  "type": "module",
   "scripts": {
     "dev": "next dev",
-    "build": "next build",
+    "build": "npm run optimize-images && next build",
     "start": "next start",
+    "optimize-images": "node optimize-images.js",
     "prepare": "husky",
     "clean": "rm -rf dist"
   },
@@ -27,6 +29,7 @@
     "rehype-raw": "^6.1.1",
     "remark-gfm": "^3.0.1",
     "sass": "^1.83.4",
+    "sharp": "^0.34.2",
     "zustand": "^5.0.3"
   },
   "devDependencies": {

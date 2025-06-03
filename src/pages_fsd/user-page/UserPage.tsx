@@ -1,6 +1,6 @@
 'use client';
 
-import React, { useEffect, useRef, useState } from 'react';
+import React, { useCallback, useEffect, useRef, useState } from 'react';
 import style from './UserPage.module.scss';
 import userStore, { IUserAchData, IUserStore } from '@/shared/stores/user-store';
 import { ConfigProvider, Form, Spin } from 'antd';
@@ -152,7 +152,28 @@ const UserPage = () => {
 
   const userOnBoard = userData?.active === 't' ? 'Работает' : 'В отпуске';
 
-  const openModal = (item: IUserAchData, opacity: number, activeIcon: boolean) => {
+  // const openModal = (item: IUserAchData, opacity: number, activeIcon: boolean) => {
+  //   const doneItem = item.stages === item.level;
+  //   const imgPath = `${process.env.NEXT_PUBLIC_BASE_URL_MEDIA}/${item.achivement_pic}`;
+
+  //   setCurrentItem({ ...item, done: doneItem });
+  //   setCurrentImageElement(
+  //     <div key={generateKey()} className={style.item}>
+  //       {activeIcon ? (
+  //         <>
+  //           <ImgWithBackground imgPath={imgPath} size={60} imgType={'avatar'} opacity={opacity} />
+  //         </>
+  //       ) : (
+  //         <>
+  //           <Image src="/Achievement_Closed.png" alt="" height={106} width={106} />{' '}
+  //         </>
+  //       )}
+  //     </div>,
+  //   );
+  //   setOpen(true);
+  // };
+
+  const openModal = useCallback((item: IUserAchData, opacity: number, activeIcon: boolean) => {
     const doneItem = item.stages === item.level;
     const imgPath = `${process.env.NEXT_PUBLIC_BASE_URL_MEDIA}/${item.achivement_pic}`;
 
@@ -171,7 +192,7 @@ const UserPage = () => {
       </div>,
     );
     setOpen(true);
-  };
+  }, []);
 
   useEffect(() => {
     const handleScroll = () => {

@@ -1,6 +1,6 @@
 'use client';
 import { IUserAchData } from '@/shared/stores/user-store';
-import React, { useEffect, useState } from 'react';
+import React, { memo, useEffect, useState } from 'react';
 import styles from './AchieveBlockMobile.module.scss';
 import { calculateOpacity } from '@/shared/utils';
 import { generateKey } from '@/shared/api/utils';
@@ -78,4 +78,4 @@ const AchieveBlockMobile: React.FC<AchieveBlockMobileProps> = ({ achievements, o
   );
 };
 
-export default AchieveBlockMobile;
+export default memo(AchieveBlockMobile);

@@ -27,11 +27,11 @@
     .likesContainer {
       @extend %transparentContainer;
       @extend .actionContainer;
-      background-image: url('/Frame_Like_1.png');
+      background-image: url('/images/Frame_Like_1.webp');
     }
     .likesContainerLiked {
       @extend .likesContainer;
-      background-image: url('/Frame_Like_2.png');
+      background-image: url('/images/Frame_Like_2.webp');
     }
     .likesCount {
       font-size: 14px;
@@ -42,11 +42,11 @@
     .dislikesContainer {
       @extend %transparentContainer;
       @extend .actionContainer;
-      background-image: url('/Frame_Dislike_1.png');
+      background-image: url('/images/Frame_Dislike_1.webp');
     }
     .dislikesContainerDisLiked {
       @extend .dislikesContainer;
-      background-image: url('/Frame_Dislike_2.png');
+      background-image: url('/images/Frame_Dislike_2.webp');
     }
     .dislikesCount {
       font-size: 14px;
@@ -57,7 +57,7 @@
     .commentsContainer {
       @extend %transparentContainer;
       @extend .actionContainer;
-      background-image: url('/Frame_CommentAndFavourite.png');
+      background-image: url('/images/Frame_CommentAndFavourite.webp');
     }
     .dislikesCount {
       font-size: 14px;
@@ -67,10 +67,10 @@
   }
   .saveContainer {
     @extend .actionContainer;
-    background-image: url('/Frame_Dislike_1.png');
+    background-image: url('/images/Frame_Dislike_1.webp');
   }
   .saveContainerSaved {
     @extend .actionContainer;
-    background-image: url('/Frame_Favourite2.png');
+    background-image: url('/images/Frame_Favourite2.webp');
   }
 }

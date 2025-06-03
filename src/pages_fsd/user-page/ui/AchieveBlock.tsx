@@ -1,6 +1,6 @@
 'use client';
 import { IUserAchData } from '@/shared/stores/user-store';
-import React from 'react';
+import React, { memo } from 'react';
 import styles from './AchieveBlock.module.scss';
 import Image from 'next/image';
 import { calculateOpacity } from '@/shared/utils';
@@ -47,4 +47,4 @@ const AchieveBlock: React.FC<AchieveBlockProps> = ({ achievements, openModal }) 
   );
 };
 
-export default AchieveBlock;
+export default memo(AchieveBlock);

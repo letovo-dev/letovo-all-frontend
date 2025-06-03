@@ -4,7 +4,7 @@
   @extend %entryCover;
   padding-top: 14vh;
   @media screen and (max-width: 960px) {
-    background-image: url('/background_mobile.png');
+    background-image: url('/images/background_mobile.webp');
   }
 }
 
@@ -15,7 +15,7 @@
 
 .card {
   @extend %transparentContainer;
-  background-image: url('/base_login.png');
+  background-image: url('/images/base_login.webp');
   width: 332px;
   display: flex;
   justify-content: center;
@@ -42,16 +42,16 @@
 
 .inputForm {
   @extend %input;
-  background-image: url('/base_login_input.png');
+  background-image: url('/images/base_login_input.webp');
 }
 .inputFormError {
   @extend %input;
-  background-image: url('/base_login_input_error.png');
+  background-image: url('/images/base_login_input_error.webp');
 }
 
 .titleBorder {
   @extend %transparentContainer;
-  background-image: url('/title_login_empty.png');
+  background-image: url('/images/title_login_empty.webp');
   width: 95px;
   justify-content: center;
   align-items: center;

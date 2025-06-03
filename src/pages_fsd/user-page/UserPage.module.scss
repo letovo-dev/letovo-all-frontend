@@ -10,7 +10,7 @@
 
 .wrap {
   @extend %entryCover;
-  background-image: url('/Background_Account_WithElements_PC_2.png');
+  background-image: url('/images/Background_Account_WithElements_PC_2.webp');
   position: relative;
   width: 100vw;
   background-size: auto;
@@ -24,7 +24,7 @@
   // overscroll-behavior-y: contain;
   // -webkit-overflow-scrolling: touch;
   @media screen and (max-width: 960px) {
-    background-image: url('/background_account.png');
+    background-image: url('/images/background_account.webp');
     overflow-y: auto;
     padding-bottom: 60px;
   }
@@ -47,7 +47,7 @@
     position: absolute;
     z-index: 1;
     top: 6%;
-    background-image: url('/Background_Account_Base.png');
+    background-image: url('/images/Background_Account_Base.webp');
     width: 390px;
     background-size: 390px;
     height: 233px;
@@ -104,7 +104,7 @@
 .logOutButtonDesktop {
   @extend %transparentContainer;
   background-size: contain;
-  background-image: url('/button_LogOut.png');
+  background-image: url('/images/button_LogOut.webp');
   cursor: pointer;
   width: 60px;
   z-index: 5;
@@ -244,7 +244,7 @@
 
 .spacer {
   @extend %transparentContainer;
-  background-image: url('/Button_ScanQR.png');
+  background-image: url('/images/Button_ScanQR.webp');
   width: 95px;
   height: 55px;
   cursor: pointer;
