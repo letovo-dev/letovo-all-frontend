@@ -39,33 +39,6 @@ const TransferModal: React.FC<ModalProps> = ({
     }
   }, [receiver, nick]);
 
-  // useEffect(() => {
-  //   if (!sum && nick && nick?.length > 4 && receiver) {
-  //     setIsButtonDisable(true);
-  //   }
-  //   if (!sum && nick && nick?.length > 4 && !receiver) {
-  //     setIsButtonDisable(false);
-  //   }
-  //   if (!sum && nick && nick?.length <= 4 && !receiver) {
-  //     setIsButtonDisable(true);
-  //   }
-  //   if (receiver && sum && sum < selfMoney) {
-  //     setIsButtonDisable(false);
-  //   }
-  //   if (sum && sum > selfMoney) {
-  //     setIsButtonDisable(true);
-  //     const timeOutId = setTimeout(() => {
-  //       userStore.setState({ error: 'Недостаточно средств' });
-  //     }, 500);
-  //     return () => clearTimeout(timeOutId);
-  //   } else {
-  //     const timeOutId = setTimeout(() => {
-  //       userStore.setState({ error: undefined });
-  //     }, 500);
-  //     return () => clearTimeout(timeOutId);
-  //   }
-  // }, [sum, selfMoney, nick, receiver]);
-
   useEffect(() => {
     const getIsButtonDisabled = () => {
       if (!nick || nick.length <= 4) {

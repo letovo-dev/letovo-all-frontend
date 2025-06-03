@@ -113,6 +113,13 @@ body {
   cursor: pointer;
 }
 
+.ant-btn-disabled,
+.ant-btn[disabled] {
+  background-color: var(--graphics11) !important; /* Замените на нужный цвет, например, #d3d3d3 */
+  border-color: var(--graphics11) !important; /* Опционально: измените цвет границы */
+  color: var(--background) !important; /* Опционально: измените цвет текста */
+}
+
 [class^='ant-'],
 [class*=' ant-'] {
   font-family: 'Caleo', sans-serif !important;

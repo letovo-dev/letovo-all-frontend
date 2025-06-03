@@ -84,22 +84,22 @@
   background: transparent;
   border: none;
   outline: none; /* Убирает обводку при фокусе */
-  color: #000; /* Цвет текста */
-  font-size: 14px; /* Размер шрифта */
+  color: #000;
+  font-size: 14px;
   font-weight: 400;
-  width: 100%; /* Занимает всю ширину родительского контейнера */
-  padding: 8px 4px 8px 16px; /* Внутренние отступы для удобства */
-  cursor: text; /* Курсор при наведении */
+  width: 100%;
+  padding: 8px 4px 8px 16px;
+  cursor: text;
 }
 
 .customInput::placeholder {
-  color: #aaa; /* Цвет плейсхолдера */
+  color: #aaa;
 }
 
 .customInput:hover,
 .customInput:focus {
-  border: none; /* Убирает рамки даже при наведении и фокусе */
-  outline: none; /* Убирает обводку при фокусе */
+  border: none;
+  outline: none;
 }
 
 .formItemPass {

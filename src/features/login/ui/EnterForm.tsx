@@ -87,7 +87,7 @@ function EnterForm() {
               <input
                 type="text"
                 className={style.customInput}
-                placeholder="Nickname"
+                placeholder=""
                 autoComplete="username"
                 onChange={handleNameInput}
                 value={formData.login || ''}
@@ -107,7 +107,7 @@ function EnterForm() {
                 id="form_password"
                 onChange={handlePassInput}
                 autoComplete="current-password"
-                placeholder="Password"
+                placeholder=""
                 value={formData.password || ''}
               />
             </Form.Item>
@@ -135,6 +135,7 @@ function EnterForm() {
                     defaultActiveColor: '#ffffff',
                     defaultActiveBorderColor: '#ffffff',
                     defaultActiveBg: '#FB4724',
+                    borderColorDisabled: '#b2b2b2',
                   },
                 },
               }}
