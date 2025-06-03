@@ -4,6 +4,7 @@ import { ConfigProvider, Tabs } from 'antd';
 import style from './Menu.module.scss';
 import { usePathname, useRouter } from 'next/navigation';
 import userStore from '@/shared/stores/user-store';
+import articlesStore from '@/shared/stores/articles-store';
 const Menu: React.FC = () => {
   const router = useRouter();
   const pathname = usePathname();
@@ -49,8 +50,10 @@ const Menu: React.FC = () => {
 
   const handleTabClick = (key: string) => {
     if (key === 'user') {
+      userStore.getState().loading = true;
       router.push(`/user/${username}`);
     } else {
+      articlesStore.getState().loading = true;
       router.push('/' + key);
     }
   };

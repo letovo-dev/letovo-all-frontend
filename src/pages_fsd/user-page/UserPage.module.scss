@@ -85,9 +85,15 @@
     justify-content: center;
     margin-top: 35px;
     .textAchieveHeaderDesktop {
-      font-size: 16px;
+      font-size: 21.72px;
       font-weight: 400;
       color: var(--foreground);
+      padding: 0 5px;
+    }
+    .textAchieveHeaderDesktopCommon {
+      font-size: 16px;
+      font-weight: 400;
+      color: var(--orange);
       padding: 0 5px;
     }
   }
@@ -99,6 +105,29 @@
   justify-content: center;
   overflow: auto;
   margin-top: 300px;
+  /* Set scrollbar width for Firefox */
+  scrollbar-width: thin; /* Options: auto, thin, none */
+
+  /* Set scrollbar width for Webkit browsers (Chrome, Safari, Edge) */
+  &::-webkit-scrollbar {
+    width: 4px; /* Adjust this value to set the scrollbar width */
+  }
+
+  /* Optional: Style the scrollbar track and thumb */
+  &::-webkit-scrollbar-track {
+    background: #f1f1f1; /* Light gray track */
+    border-radius: 3px;
+  }
+
+  &::-webkit-scrollbar-thumb {
+    background: #888; /* Gray thumb */
+    border-radius: 3px;
+  }
+
+  /* Optional: Hover effect for thumb */
+  &::-webkit-scrollbar-thumb:hover {
+    background: #555; /* Darker gray on hover */
+  }
 }
 
 .logOutButtonDesktop {
@@ -226,6 +255,9 @@
   overscroll-behavior-y: contain;
   @media screen and (max-width: 960px) {
     position: absolute;
+  }
+  &::-webkit-scrollbar {
+    height: 3px;
   }
 }
 .column {

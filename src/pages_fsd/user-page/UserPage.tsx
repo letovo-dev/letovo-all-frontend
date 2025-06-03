@@ -304,6 +304,8 @@ const UserPage = () => {
             />
           </div>
           <section className={style.achieveHeaderDesktop}>
+            <p className={style.textAchieveHeaderDesktopCommon}>Общие</p>
+            <Image src="/Achievement_Element.png" alt="line" height={2} width={40} />
             <Image
               src="/Achievement_AllBased_Active.png"
               alt="achievement"
@@ -360,7 +362,7 @@ const UserPage = () => {
         <section className={style.achieveHeader}>
           <Image src="/Achievement_AllBased_Active.png" alt="achievement" height={50} width={50} />
           <Image src="/Achievement_Element.png" alt="line" height={2} width={40} />
-          <p className={style.time}>Достижения</p>
+          {/* <p className={style.time}>Достижения</p> */}
           <Image src="/Achievement_Element.png" alt="line" height={2} width={40} />
           <Image src="/Achievement_Управление_Active.png" alt="sign" height={50} width={50} />
         </section>
