@@ -5,6 +5,7 @@ import { immer } from 'zustand/middleware/immer';
 import { Modal } from 'antd';
 import { SERVICES_USERS } from '@/shared/api/user';
 import authStore, { TAuthStoreState } from '../auth-store';
+import { SERVICES_ACHIEVEMENTS } from '@/shared/api/achievements';
 
 export interface IUserAchData {
   id: string;
@@ -40,10 +41,12 @@ export interface IUserStore {
     userData: IUserData;
     userAchievements: IUserAchData | undefined;
     allPossibleUserAchievements: IUserAchData[] | undefined;
+    departmentAchievements: IUserAchData[] | undefined;
   };
   localeName: string;
   endPreload: boolean;
   getAllUserAchievements: (value: string) => void;
+  getAchievementsDepartment: () => void;
   isRequireUserInDatabase: (value: string) => { userName: string; avatar: string };
   transferMoney: (data: { receiver: string; amount: number }) => Promise<any>;
   setEndPreload: (value: boolean) => Promise<void>;
@@ -71,6 +74,7 @@ const initialState = {
   },
   userAchievements: undefined,
   allPossibleUserAchievements: undefined,
+  departmentAchievements: undefined,
   error: undefined,
 };
 
@@ -91,11 +95,32 @@ const userStore = create<IUserStore>()(
           },
           getAllUserAchievements: async (login: string) => {
             try {
-              const response = await SERVICES_USERS.UsersData.getAllUserAchievements(login);
+              const response = await SERVICES_ACHIEVEMENTS.AchievementsData.list();
               if (response?.success && response.code !== undefined && response.code === 200) {
                 const { result } = response?.data as { result: IUserAchData[] };
                 set((draft: IUserStore) => {
                   draft.store.allPossibleUserAchievements = result;
+                });
+              } else {
+                get().setError('Ошибка загрузки данных с сервера');
+                Modal.error({
+                  title: 'Ошибка загрузки данных с сервера',
+                  content: `${get().error}`,
+                });
+              }
+            } catch (error: any) {
+              produce(get(), (draft: IUserStore) => {
+                draft.error = error instanceof Error ? error.message : String(error);
+              });
+            }
+          },
+          getAchievementsDepartment: async () => {
+            try {
+              const response = await SERVICES_ACHIEVEMENTS.AchievementsData.department();
+              if (response?.success && response.code !== undefined && response.code === 200) {
+                const { result } = response?.data as { result: IUserAchData[] };
+                set((draft: IUserStore) => {
+                  draft.store.departmentAchievements = result;
                 });
               } else {
                 get().setError('Ошибка загрузки данных с сервера');

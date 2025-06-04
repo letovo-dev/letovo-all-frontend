@@ -1,6 +1,6 @@
 'use client';
 
-import React, { useCallback, useEffect, useRef, useState } from 'react';
+import React, { useCallback, useEffect, useMemo, useRef, useState } from 'react';
 import style from './UserPage.module.scss';
 import userStore, { IUserAchData, IUserStore } from '@/shared/stores/user-store';
 import { ConfigProvider, Form, Spin } from 'antd';
@@ -28,7 +28,9 @@ import AchieveBlock from './ui/AchieveBlock';
 const UserPage = () => {
   const router = useRouter();
   const { allPossibleUserAchievements } = userStore.getState().store;
-  const getAllUserAchievements = userStore((state: IUserStore) => state.getAllUserAchievements);
+  const { getAllUserAchievements, getAchievementsDepartment } = userStore(
+    (state: IUserStore) => state,
+  );
   const [form] = Form.useForm();
   const changeAvatar = userStore((state: IUserStore) => state.setAvatar);
   const getAvatars = dataStore(state => state.getAvatars);
@@ -38,6 +40,7 @@ const UserPage = () => {
   const [open, setOpen] = useState(false);
   const [currentItem, setCurrentItem] = useState<IUserAchData | null>(null);
   const achievements = userStore.getState().store.allPossibleUserAchievements;
+  const { departmentAchievements } = userStore.getState().store;
 
   const [currentImageElement, setCurrentImageElement] = useState<JSX.Element | null>(null);
   const [userData, setUserData] = useState(userStore.getState().store.userData);
@@ -52,6 +55,11 @@ const UserPage = () => {
   const [windowWidth, setWindowWidth] = useState<number>(
     typeof window !== 'undefined' ? window.innerWidth : 0,
   );
+  const [currentAchievements, setCurrentAchievements] = useState<string>('all');
+
+  const achievementsToDisplay = useMemo(() => {
+    return currentAchievements === 'all' ? achievements : departmentAchievements;
+  }, [currentAchievements, achievements, departmentAchievements]);
 
   useEffect(() => {
     const handleResize = () => setWindowWidth(window.innerWidth);
@@ -71,18 +79,18 @@ const UserPage = () => {
       if (!userStatus?.logged || !userStatus?.token || !userStatus?.registered) {
         router.push(`/login`);
       }
-
       setUserData(initialData);
       setAvatar(initialData.avatar_pic);
 
       if (initialData?.username) {
         setIsLoading(true);
-        await getAllUserAchievements(initialData.username);
+        getAllUserAchievements(initialData.username);
         if (!avatars || avatars.length === 0) {
           await getAvatars();
         }
 
         setIsLoading(false);
+        getAchievementsDepartment();
       }
     };
 
@@ -311,11 +319,20 @@ const UserPage = () => {
               alt="achievement"
               height={50}
               width={50}
+              className={style.ach}
+              onClick={() => setCurrentAchievements('all')}
             />
             <Image src="/Achievement_Element.png" alt="line" height={2} width={40} />
             <p className={style.textAchieveHeaderDesktop}>Достижения</p>
             <Image src="/Achievement_Element.png" alt="line" height={2} width={40} />
-            <Image src="/Achievement_Управление_Active.png" alt="sign" height={50} width={50} />
+            <Image
+              src="/Achievement_Управление_Active.png"
+              alt="sign"
+              height={50}
+              width={50}
+              className={style.ach}
+              onClick={() => setCurrentAchievements('dep')}
+            />
           </section>
         </div>
       </div>
@@ -360,21 +377,35 @@ const UserPage = () => {
         )}
 
         <section className={style.achieveHeader}>
-          <Image src="/Achievement_AllBased_Active.png" alt="achievement" height={50} width={50} />
+          <Image
+            src="/Achievement_AllBased_Active.png"
+            alt="achievement"
+            height={50}
+            width={50}
+            className={style.ach}
+            onClick={() => setCurrentAchievements('all')}
+          />
           <Image src="/Achievement_Element.png" alt="line" height={2} width={40} />
-          {/* <p className={style.time}>Достижения</p> */}
+          <p className={style.time}>Достижения</p>
           <Image src="/Achievement_Element.png" alt="line" height={2} width={40} />
-          <Image src="/Achievement_Управление_Active.png" alt="sign" height={50} width={50} />
+          <Image
+            src="/Achievement_Управление_Active.png"
+            alt="sign"
+            height={50}
+            width={50}
+            className={style.ach}
+            onClick={() => setCurrentAchievements('dep')}
+          />
         </section>
       </div>
 
-      {achievements &&
-        achievements.length > 0 &&
+      {achievementsToDisplay &&
+        achievementsToDisplay.length > 0 &&
         (windowWidth <= 960 ? (
-          <AchieveBlockMobile achievements={achievements ?? []} openModal={openModal} />
+          <AchieveBlockMobile achievements={achievementsToDisplay ?? []} openModal={openModal} />
         ) : (
           <div className={style.achieveBlockContainer}>
-            <AchieveBlock achievements={achievements ?? []} openModal={openModal} />
+            <AchieveBlock achievements={achievementsToDisplay ?? []} openModal={openModal} />
           </div>
         ))}
       {open && (
@@ -384,7 +415,7 @@ const UserPage = () => {
           title="Ачивка"
           currentItem={currentItem}
           setCurrentItem={setCurrentItem}
-          allPossibleUserAchievements={allPossibleUserAchievements}
+          allPossibleUserAchievements={achievementsToDisplay}
           currentImageElement={currentImageElement}
         />
       )}

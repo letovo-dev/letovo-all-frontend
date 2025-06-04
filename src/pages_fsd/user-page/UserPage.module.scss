@@ -76,6 +76,9 @@
   .moneyContainer {
     @extend .topContainer;
   }
+  .ach {
+    cursor: pointer;
+  }
   .achieveHeaderDesktop {
     width: 100%;
     z-index: 3;
