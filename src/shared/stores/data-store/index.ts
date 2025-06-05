@@ -140,7 +140,6 @@ const dataState = {
   avatars: [],
   news: [],
   newsTitles: [],
-  realNews: [],
   savedNews: [],
 };
 
@@ -226,18 +225,43 @@ const dataStore = create<TDataStoreState>()(
         const response = await SERVICES_DATA.Data.saveNews(id, action);
         if (response.code === 200) {
           set((state: TDataStoreState) => {
-            const news = get().data.realNews.find((n: any) => String(n.news.post_id) === id);
+            const currentSavedNews = state.data.normalizedNews[id];
+            const { news } = currentSavedNews;
             let updatedSavedNews;
+            let updatedNormalizedNews;
+
             if (action === 'save') {
-              updatedSavedNews = { [id]: news, ...get().data.savedNews };
+              const updatedNewsEntry = {
+                [id]: {
+                  ...currentSavedNews,
+                  news: { ...news, saved: 't', saved_count: String(Number(news.saved_count) + 1) },
+                },
+              };
+              updatedSavedNews = {
+                ...state.data.savedNews,
+                ...updatedNewsEntry,
+              };
+              updatedNormalizedNews = {
+                ...state.data.normalizedNews,
+                ...updatedNewsEntry,
+              };
             } else {
-              updatedSavedNews = { ...get().data.savedNews };
+              updatedSavedNews = { ...state.data.savedNews };
               delete updatedSavedNews[id];
+              updatedNormalizedNews = {
+                ...state.data.normalizedNews,
+                [id]: {
+                  ...currentSavedNews,
+                  news: { ...news, saved: 'f', saved_count: String(Number(news.saved_count) - 1) },
+                },
+              };
             }
+
             return {
               data: {
                 ...state.data,
                 savedNews: updatedSavedNews,
+                normalizedNews: updatedNormalizedNews,
               },
               error: undefined,
             };

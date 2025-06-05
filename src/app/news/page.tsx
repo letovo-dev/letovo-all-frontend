@@ -1,6 +1,6 @@
 'use client';
 
-import { memo, useCallback, useEffect, useRef, useState } from 'react';
+import { useCallback, useEffect, useRef, useState } from 'react';
 import dataStore from '@/shared/stores/data-store';
 import { OneNews } from '@/entities/post/ui';
 import commentsStore from '@/shared/stores/comments-store';
@@ -13,7 +13,7 @@ const NewsPage = () => {
   const { getTitles, likeNewsOrComment, dislikeNews, fetchNews } = dataStore(state => state);
   const { saveComment } = commentsStore(state => state);
   const normalizedNews = dataStore(state => state.data.normalizedNews);
-  const { currentNewsState, loading } = dataStore(state => state);
+  const { currentNewsState, setCurrentNewsState, loading } = dataStore(state => state);
   const savedNews = dataStore(state => state.data.savedNews);
   const searchedNews = dataStore(state => state.data.searchedNews);
   const newsTitles = dataStore(state => state.data.newsTitles);
@@ -81,10 +81,17 @@ const NewsPage = () => {
     const news = getRenderNews();
     if (news && Object.keys(news).length > 0) {
       setRenderNews(news);
+    } else if (currentNewsState.saved && news && Object.keys(news).length === 0) {
+      setCurrentNewsState({
+        default: true,
+        saved: false,
+        selectedNews: undefined,
+        searched: false,
+      });
     } else {
       setRenderNews({});
     }
-  }, [getRenderNews]);
+  }, [getRenderNews, currentNewsState]);
 
   const loadMore = useCallback(async () => {
     if (!currentNewsState.default || loading || isFetching.current || openComments) {

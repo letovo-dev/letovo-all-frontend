@@ -31,16 +31,12 @@ const AchievementModal: React.FC<ModalProps> = ({
     setCurrentItem(null);
   };
 
-  console.log(allPossibleUserAchievements);
-  console.log(currentItem);
-
   const showNextItem = () => {
     const currentIndex = currentItem
       ? (allPossibleUserAchievements?.findIndex(
           item => item.achivement_id === currentItem.achivement_id,
         ) ?? -1)
       : -1;
-    console.log(currentIndex);
 
     const nextIndex = ((currentIndex ?? -1) + 1) % (allPossibleUserAchievements?.length || 1);
     if (allPossibleUserAchievements) {
@@ -58,7 +54,6 @@ const AchievementModal: React.FC<ModalProps> = ({
           item => item.achivement_id === currentItem.achivement_id,
         ) ?? -1)
       : -1;
-    console.log(currentIndex);
 
     const prevIndex =
       ((currentIndex ?? -1) - 1 + (allPossibleUserAchievements?.length || 1)) %

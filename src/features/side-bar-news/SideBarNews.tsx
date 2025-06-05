@@ -36,8 +36,9 @@ const SideBarNews = ({
   const { loading, setCurrentNewsState, fetchNews, currentNewsState } = dataStore(state => state);
   const { searchedNews, savedNews } = dataStore(state => state.data);
   const sidebarRef = useRef<HTMLDivElement>(null);
-  const savedNewsLength = Object.keys(savedNews).length;
-  console.log(Object.keys(savedNews).length);
+  const savedNewsLength = useMemo(() => {
+    return Object.keys(savedNews).length;
+  }, [savedNews]);
   const [messageApi, contextHolder] = message.useMessage();
 
   const info = () => {
@@ -66,7 +67,6 @@ const SideBarNews = ({
         title: 'Сохраненные',
         method: () => {
           if (savedNewsLength === 0) {
-            console.log('Нет сохраненных новостей');
             info();
           } else {
             setCurrentNewsState({
@@ -81,7 +81,7 @@ const SideBarNews = ({
         },
       },
     }),
-    [setOpen, setCurrentNewsState, form],
+    [setOpen, setCurrentNewsState, form, savedNewsLength],
   );
 
   const onFinish = async (values: FormValues): Promise<void> => {

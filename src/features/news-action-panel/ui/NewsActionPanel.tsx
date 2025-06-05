@@ -18,7 +18,6 @@ const NewsActionPanel = ({
   dislikeNews: (post_id: string, action: string) => Promise<void>;
 }) => {
   const { normalizedComments } = commentsStore(state => state);
-
   const currentNewsComments = normalizedComments ? normalizedComments[newsItem.post_id] : [];
 
   const [actionsState, setActionsState] = useState({

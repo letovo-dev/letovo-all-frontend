@@ -16,7 +16,6 @@ async function optimizeImages() {
       await sharp(inputPath)
         .webp({ quality: 80 }) // Настройте качество
         .toFile(outputPath);
-      console.log(`Optimized: ${file} -> ${outputPath}`);
     }
   }
 }

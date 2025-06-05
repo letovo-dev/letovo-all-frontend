@@ -27,7 +27,7 @@ export const apiQuery = async <T = any>({
   page,
   limit,
   extraHeaders,
-  debug = true,
+  debug = false,
   transitional,
   noNestedData,
 }: IApiQueryProps): Promise<IApiReturn<T | undefined>> => {

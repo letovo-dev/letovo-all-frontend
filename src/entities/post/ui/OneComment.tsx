@@ -4,7 +4,7 @@ import React, { memo, useEffect, useState } from 'react';
 import style from './Comments.module.scss';
 import { Avatar } from 'antd';
 import Image from 'next/image';
-import dataStore, { RealComment } from '@/shared/stores/data-store';
+import { RealComment } from '@/shared/stores/data-store';
 import InputModule from './InputModule';
 import commentsStore from '@/shared/stores/comments-store';
 
