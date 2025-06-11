@@ -6,11 +6,14 @@ import { OneNews } from '@/entities/post/ui';
 import commentsStore from '@/shared/stores/comments-store';
 import SpinModule from '@/shared/ui/spiner';
 import { News } from '@/pages_fsd/news';
+import authStore from '@/shared/stores/auth-store';
+import { useRouter } from 'next/navigation';
 
 const LOAD_NEWS_SIZE = 10;
 
 const NewsPage = () => {
   const { getTitles, likeNewsOrComment, dislikeNews, fetchNews } = dataStore(state => state);
+  const userStatus = authStore(state => state.userStatus);
   const { saveComment } = commentsStore(state => state);
   const normalizedNews = dataStore(state => state.data.normalizedNews);
   const { currentNewsState, setCurrentNewsState, loading } = dataStore(state => state);

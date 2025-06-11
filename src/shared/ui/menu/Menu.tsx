@@ -5,12 +5,14 @@ import style from './Menu.module.scss';
 import { usePathname, useRouter } from 'next/navigation';
 import userStore from '@/shared/stores/user-store';
 import articlesStore from '@/shared/stores/articles-store';
+
 const Menu: React.FC = () => {
   const router = useRouter();
   const pathname = usePathname();
   const {
     userData: { username },
   } = userStore.getState().store;
+  const { userData } = userStore.getState().store;
 
   const [activeKey, setActiveKey] = useState('user');
   const [isReady, setIsReady] = useState(false);
@@ -22,6 +24,8 @@ const Menu: React.FC = () => {
     }
     setActiveKey(currentKey);
   }, [pathname, username]);
+
+  console.log('pathname', pathname);
 
   useEffect(() => {
     const timer = setTimeout(() => {
@@ -42,18 +46,29 @@ const Menu: React.FC = () => {
       disabled: false,
     },
     {
+      label: 'Редактор статей',
+      key: 'md-editor',
+      disabled: false,
+      destroyOnHidden: true,
+    },
+    {
       label: 'Личный кабинет',
       key: 'user',
       disabled: false,
     },
   ];
 
+  const permittedItems =
+    userData.userrights === 'admin' ? items : items.filter((item: any) => item.key !== 'md-editor');
+
   const handleTabClick = (key: string) => {
+    if (key !== 'md-editor') {
+      articlesStore.setState({ isEditArticle: false });
+    }
     if (key === 'user') {
       userStore.getState().loading = true;
       router.push(`/user/${username}`);
     } else {
-      articlesStore.getState().loading = true;
       router.push('/' + key);
     }
   };
@@ -80,7 +95,7 @@ const Menu: React.FC = () => {
             className={style.menu}
             activeKey={activeKey}
             centered
-            items={items}
+            items={permittedItems}
             onTabClick={handleTabClick}
           />
         ) : (

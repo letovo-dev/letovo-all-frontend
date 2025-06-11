@@ -69,6 +69,26 @@ export const API_DATA_SCHEME: IApiEntityScheme<IEndpoint> = {
     method: 'GET',
     url: `${baseUrl}/media/get`,
   },
+  deleteArticlesCategory: {
+    method: 'DELETE',
+    url: `${baseUrl}/social/bycat`,
+  },
+  renameCategory: {
+    method: 'POST',
+    url: `${baseUrl}/social/bycat`,
+  },
+  deleteArticle: {
+    method: 'DELETE',
+    url: `${baseUrl}/social/bycat`,
+  },
+  renameArticle: {
+    method: 'POST',
+    url: `${baseUrl}/social/bycat`,
+  },
+  saveArticle: {
+    method: 'POST',
+    url: `${baseUrl}/social/bycat`,
+  },
 };
 
 export const API_DATA_ENDPOINTS = [
@@ -88,4 +108,9 @@ export const API_DATA_ENDPOINTS = [
   'getArticleById',
   'getArticleMd',
   'getMdMedia',
+  'deleteArticlesCategory',
+  'renameCategory',
+  'deleteArticle',
+  'renameArticle',
+  'saveArticle',
 ] as const;

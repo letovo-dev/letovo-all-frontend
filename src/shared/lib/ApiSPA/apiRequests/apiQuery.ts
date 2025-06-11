@@ -14,6 +14,7 @@ interface IApiQueryProps {
   transitional?: any;
   noNestedData?: boolean;
   signal?: AbortSignal;
+  headers?: { [key: string]: string };
 }
 
 const libConfig = {

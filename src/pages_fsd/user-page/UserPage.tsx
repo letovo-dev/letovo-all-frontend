@@ -27,7 +27,6 @@ import AchieveBlock from './ui/AchieveBlock';
 
 const UserPage = () => {
   const router = useRouter();
-  const { allPossibleUserAchievements } = userStore.getState().store;
   const { getAllUserAchievements, getAchievementsDepartment } = userStore(
     (state: IUserStore) => state,
   );
@@ -41,10 +40,10 @@ const UserPage = () => {
   const [currentItem, setCurrentItem] = useState<IUserAchData | null>(null);
   const achievements = userStore.getState().store.allPossibleUserAchievements;
   const { departmentAchievements } = userStore.getState().store;
-
   const [currentImageElement, setCurrentImageElement] = useState<JSX.Element | null>(null);
   const [userData, setUserData] = useState(userStore.getState().store.userData);
   const [isLoading, setIsLoading] = useState(true);
+  const { error, loading } = userStore((state: IUserStore) => state);
   const [avatar, setAvatar] = useState<string | undefined>(undefined);
   const avatarRef = useRef<HTMLDivElement>(null);
   const [openTransferModal, setOpenTransferModal] = useState(false);
@@ -76,9 +75,6 @@ const UserPage = () => {
   useEffect(() => {
     const loadData = async () => {
       const initialData = userStore.getState().store.userData;
-      if (!userStatus?.logged || !userStatus?.token || !userStatus?.registered) {
-        router.push(`/login`);
-      }
       setUserData(initialData);
       setAvatar(initialData.avatar_pic);
 
@@ -243,6 +239,10 @@ const UserPage = () => {
       document.removeEventListener('mousedown', handleClickOutside);
     };
   }, [visible]);
+
+  useEffect(() => {
+    userStore.getState().loading = false;
+  }, []);
 
   const uploadPhoto = () => {
     const input = document.createElement('input');
@@ -425,6 +425,7 @@ const UserPage = () => {
           setOpenTransferModal={setOpenTransferModal}
           title="Перевод"
           selfMoney={Number(userData.balance) || 0}
+          userData={userData}
         />
       )}
 

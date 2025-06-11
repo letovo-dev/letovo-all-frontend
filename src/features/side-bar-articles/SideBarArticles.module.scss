@@ -108,3 +108,12 @@ $overlay-color: rgba(0, 0, 0, 0.3);
     color: var(--graphics11);
   }
 }
+
+.articleItemContainer {
+  display: flex;
+  flex-direction: column;
+}
+.articleItem {
+  display: flex;
+  gap: 30px;
+}

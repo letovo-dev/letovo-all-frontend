@@ -28,15 +28,21 @@ export type TArticlesStoreState = {
   normalizedArticles: Record<string, OneArticle[]> | null;
   articlesCategories: ArticleCategory[];
   article: OneArticle | undefined;
+  isEditArticle: boolean;
   loading: boolean;
   error: string | null;
   lastFetched: number | null;
   getArticlesCategories: () => Promise<ArticleCategory[]>;
+  renameArticleCategory: (categoryId: string, newName: string) => Promise<ArticleCategory[]>;
+  deleteArticleCategory: (id: string) => Promise<ArticleCategory[]>;
+  deleteArticle: (id: string, categoryId: string) => void;
+  renameArticle: (categoryId: string, articleId: string, newName: string) => OneArticle;
   getOneArticle: (id: string, categoryId: string) => OneArticle;
   getArticleMd: (fileName: string) => Promise<any>;
   loadAllArticlesByCategory: (id: string) => Promise<void>;
   setCurrentArticle: (article: OneArticle) => void;
   refreshArticles: () => Promise<void>;
+  saveArticle: (categoryId: string, articleId: string, file: File) => void;
 };
 
 const initialState = {
@@ -45,6 +51,7 @@ const initialState = {
   loading: false,
   error: null,
   lastFetched: null,
+  isEditArticle: false,
 };
 
 const CACHE_DURATION = 1000 * 60 * 0.5; // 0,5 minutes
@@ -57,6 +64,180 @@ const articlesStore = create<TArticlesStoreState>()(
         set((draft: TArticlesStoreState) => {
           draft.article = article;
         });
+      },
+      // shared/stores/articles-store.ts
+
+      saveArticle: async (categoryId: string, articleId: string | null, content: string) => {
+        set({
+          loading: true,
+        });
+        try {
+          const response = (await SERVICES_DATA.Data.saveArticle(
+            categoryId,
+            articleId,
+            content,
+          )) as {
+            code: number;
+            data: { result: OneArticle };
+          };
+          if (response.code === 200 && response.data?.result) {
+            const data = response.data.result;
+            const normalizedArticles = get().normalizedArticles;
+            let updatedArticles;
+
+            if (articleId) {
+              // Обновление существующей статьи
+              updatedArticles = normalizedArticles[categoryId].map((el: OneArticle) =>
+                el.post_id === articleId ? { ...data } : el,
+              );
+            } else {
+              // Добавление новой статьи
+              updatedArticles = [...(normalizedArticles[categoryId] || []), data];
+            }
+
+            set((draft: TArticlesStoreState) => {
+              draft.normalizedArticles = {
+                ...normalizedArticles,
+                [categoryId]: updatedArticles,
+              };
+              draft.loading = false;
+              draft.article = data; // Обновляем текущую статью
+            });
+          } else {
+            console.error(`Unexpected response code: ${response.code}`, response);
+            set({
+              error: `Unexpected response code: ${response.code}`,
+              loading: false,
+            });
+          }
+        } catch (error) {
+          console.error('Error saving article:', error);
+          set({
+            error: error instanceof Error ? error.message : 'Failed to save article',
+            loading: false,
+          });
+        }
+      },
+      deleteArticle: async (categoryId: string, articleId: string) => {
+        set({
+          loading: true,
+        });
+        try {
+          const response = await SERVICES_DATA.Data.deleteArticle(articleId);
+          if (response.code === 200) {
+            const normalizedArticles = get().normalizedArticles;
+            const updatedArticles = normalizedArticles[categoryId].filter(
+              (el: OneArticle) => el.post_id !== articleId,
+            );
+            set((draft: TArticlesStoreState) => {
+              draft.normalizedArticles = { ...normalizedArticles, [categoryId]: updatedArticles };
+              draft.loading = false;
+            });
+          } else {
+            console.error(`Unexpected response code: ${response.code}`, response);
+            set({
+              error: `Unexpected response code: ${response.code}`,
+              loading: false,
+            });
+          }
+        } catch (error) {
+          console.error('Error deleting article:', error);
+          set({
+            error: error instanceof Error ? error.message : 'Failed to delete article',
+            loading: false,
+          });
+          return [];
+        }
+      },
+      renameArticle: async (categoryId: string, articleId: string, newName: string) => {
+        set({
+          loading: true,
+        });
+        try {
+          const response = (await SERVICES_DATA.Data.renameArticle(
+            categoryId,
+            articleId,
+            newName,
+          )) as {
+            code: number;
+            data: { result: ArticleCategory[] };
+          };
+          if (response.code === 200 && response.data?.result) {
+            const data = response.data.result;
+            const normalizedArticles = get().normalizedArticles;
+            const updatedArticles = normalizedArticles[categoryId].map((el: OneArticle) =>
+              el.post_id === articleId ? data : el,
+            );
+            set((draft: TArticlesStoreState) => {
+              draft.normalizedArticles = {
+                ...normalizedArticles,
+                [categoryId]: updatedArticles,
+              };
+              draft.loading = false;
+            });
+          } else {
+            console.error(`Unexpected response code: ${response.code}`, response);
+            set({
+              error: `Unexpected response code: ${response.code}`,
+              loading: false,
+            });
+          }
+        } catch (error) {
+          console.error('Error deleting category:', error);
+          set({
+            error: error instanceof Error ? error.message : 'Failed to delete articles category',
+            loading: false,
+          });
+          return [];
+        }
+      },
+      deleteArticleCategory: async (categoryId: string) => {
+        set({
+          loading: true,
+        });
+        try {
+          const response = await SERVICES_DATA.Data.deleteArticlesCategory(categoryId);
+          if (response.code === 200) {
+            await get().getArticlesCategories();
+          } else {
+            console.error(`Unexpected response code: ${response.code}`, response);
+            set({
+              error: `Unexpected response code: ${response.code}`,
+              loading: false,
+            });
+          }
+        } catch (error) {
+          console.error('Error deleting category:', error);
+          set({
+            error: error instanceof Error ? error.message : 'Failed to delete articles category',
+            loading: false,
+          });
+          return [];
+        }
+      },
+      renameArticleCategory: async (categoryId: string, newName: string) => {
+        try {
+          const response = (await SERVICES_DATA.Data.renameCategory(categoryId, newName)) as {
+            code: number;
+            data: { result: ArticleCategory[] };
+          };
+          if (response.code === 200 && response.data?.result) {
+            const data = response.data.result;
+            const updatedCategories = get().articlesCategories.map((el: ArticleCategory) => {
+              return el.category === data[0].category ? data[0] : el;
+            });
+            set((draft: TArticlesStoreState) => {
+              draft.articlesCategories = updatedCategories;
+            });
+          }
+        } catch (error) {
+          console.error('Error deleting category:', error);
+          set({
+            error: error instanceof Error ? error.message : 'Failed to delete articles category',
+            loading: false,
+          });
+          return [];
+        }
       },
       getArticlesCategories: async () => {
         const { lastFetched, articlesCategories } = get();
@@ -218,6 +399,7 @@ const articlesStore = create<TArticlesStoreState>()(
         articlesCategories: state.articlesCategories,
         article: state.article,
         lastFetched: state.lastFetched,
+        isEditArticle: state.isEditArticle,
       }),
     },
   ),

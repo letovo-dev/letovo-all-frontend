@@ -4,13 +4,14 @@ import style from './TransferModal.module.scss';
 import Image from 'next/image';
 import { Avatar, Button, ConfigProvider, Flex, Form, Space, Spin, Typography } from 'antd';
 import { ExclamationCircleOutlined } from '@ant-design/icons';
-import userStore, { IUserStore } from '@/shared/stores/user-store';
+import userStore, { IUserData, IUserStore } from '@/shared/stores/user-store';
 
 interface ModalProps {
   openTransferModal: boolean;
   setOpenTransferModal: (value: boolean) => void;
   title?: string;
   selfMoney: number;
+  userData: IUserData;
 }
 interface FormValues {
   nick: string;
@@ -21,6 +22,7 @@ const TransferModal: React.FC<ModalProps> = ({
   openTransferModal,
   setOpenTransferModal,
   selfMoney = 100,
+  userData,
 }) => {
   const [receiver, setReceiver] = useState<string | undefined>(undefined);
   const { error, loading } = userStore((state: IUserStore) => state);
@@ -40,25 +42,27 @@ const TransferModal: React.FC<ModalProps> = ({
   }, [receiver, nick]);
 
   useEffect(() => {
-    const getIsButtonDisabled = () => {
+    const isButtonDisabled = () => {
       if (!nick || nick.length <= 4) {
         return true;
       }
-      if (receiver && (!sum || sum <= 0)) {
+      if (receiver && (!sum || (sum <= 0 && userData?.userrights !== 'admin'))) {
         return true;
       }
-      if (sum && sum > selfMoney) {
+      if (sum && userData?.userrights !== 'admin' && sum > selfMoney) {
         return true;
       }
       return false;
     };
 
-    const isDisabled = getIsButtonDisabled();
-    setIsButtonDisable(isDisabled);
+    setIsButtonDisable(isButtonDisabled());
 
     const timeOutId = setTimeout(() => {
       userStore.setState({
-        error: sum && sum > selfMoney ? 'Недостаточно средств' : undefined,
+        error:
+          sum && sum > selfMoney && userData?.userrights !== 'admin'
+            ? 'Недостаточно средств'
+            : undefined,
       });
     }, 500);
 
@@ -66,6 +70,7 @@ const TransferModal: React.FC<ModalProps> = ({
   }, [sum, selfMoney, nick, receiver]);
 
   if (!openTransferModal) return null;
+
   const onClose = () => {
     setOpenTransferModal(false);
     setIsButtonDisable(false);
@@ -100,10 +105,10 @@ const TransferModal: React.FC<ModalProps> = ({
             },
           },
         }));
-        form.resetFields();
+        // form.resetFields();
         setFinished(true);
       }
-      form.resetFields();
+      // form.resetFields();
     }
   };
 
@@ -146,17 +151,24 @@ const TransferModal: React.FC<ModalProps> = ({
                     : style.modalContainerItemContentTransfer
                 }
               >
-                <div className={style.walletMoney}>
-                  <Image src="/Icon_Wallet.png" alt="wallet" height={26} width={24} />
-                  <p className={style.text}>{`${selfMoney} мон.`}</p>
-                </div>
+                {userData?.userrights === 'admin' ? (
+                  <div className={style.walletMoney}>
+                    <Image src="/Icon_Wallet.png" alt="wallet" height={26} width={24} />
+                    <span className={style.infinity}>&infin;</span>
+                  </div>
+                ) : (
+                  <div className={style.walletMoney}>
+                    <Image src="/Icon_Wallet.png" alt="wallet" height={26} width={24} />
+                    <p className={style.text}>{`${selfMoney} мон.`}</p>
+                  </div>
+                )}
                 <Image
                   className={style.imageStyle}
                   src="/Transfer_Element_1.png"
                   alt="wallet"
                   height={41}
                   width={180}
-                />{' '}
+                />
                 <Form
                   form={form}
                   onValuesChange={onValuesChange}
@@ -284,10 +296,17 @@ const TransferModal: React.FC<ModalProps> = ({
             <h5 className={style.modalContainerHeaderTransfer}>Перевод</h5>
             <div className={style.modalContainerItemTransfer}>
               <section className={style.modalContainerItemContentFinished}>
-                <div className={style.walletMoney}>
-                  <Image src="/Icon_Wallet.png" alt="wallet" height={26} width={24} />
-                  <p className={style.text}>{`${selfMoney} мон.`}</p>
-                </div>
+                {userData?.userrights === 'admin' ? (
+                  <div className={style.walletMoney}>
+                    <Image src="/Icon_Wallet.png" alt="wallet" height={26} width={24} />
+                    <span className={style.infinity}>&infin;</span>
+                  </div>
+                ) : (
+                  <div className={style.walletMoney}>
+                    <Image src="/Icon_Wallet.png" alt="wallet" height={26} width={24} />
+                    <p className={style.text}>{`${selfMoney} мон.`}</p>
+                  </div>
+                )}
                 <Image
                   className={style.imageStyle}
                   src="/Transfer_Element_1.png"

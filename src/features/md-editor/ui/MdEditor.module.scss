@@ -1,18 +1,46 @@
-.markdown-editor-container {
-  max-width: 800px;
+.markdownEditorContainer {
+  max-width: 1400px;
   margin: 0 auto;
+  margin-top: 80px;
   padding: 20px;
+  display: flex;
+  flex-direction: column;
+  gap: 10px;
 }
-
-button {
+.markdownEditor {
+  height: 70vh !important;
+  margin-bottom: 10px;
+}
+.button {
   padding: 10px 20px;
-  background-color: #007bff;
+  background-color: var(--orange);
   color: white;
   border: none;
   border-radius: 5px;
   cursor: pointer;
+  width: fit-content;
 }
 
-button:hover {
-  background-color: #0056b3;
+.button:hover {
+  box-shadow: 3px 3px 8px rgba(0, 0, 0, 0.2);
+}
+
+.noLinkStyle {
+  text-decoration: none;
+  color: inherit;
+}
+
+.noLinkStyle:hover {
+  text-decoration: none;
+  color: inherit;
+}
+
+.titlesContainer {
+  display: flex;
+  gap: 20px;
+  align-items: flex-end;
+}
+
+.inputTitleInstruction {
+  font-size: 10px;
 }

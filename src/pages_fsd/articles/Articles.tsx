@@ -69,6 +69,7 @@ const Articles: React.FC = () => {
 
   useEffect(() => {
     let isMounted = true;
+    const cancelTokenSource = axios.CancelToken.source(); // Для отмены запросов
 
     const fetchMedia = async () => {
       if (!isMounted || !article?.text || !lsToken) {
@@ -80,11 +81,15 @@ const Articles: React.FC = () => {
       const newMediaCache = { ...mediaCacheRef.current };
 
       const fetchPromises = mediaUrls.map(async url => {
-        if (newMediaCache[url]) return;
+        if (newMediaCache[url]) {
+          console.log(`Using cached media for ${url}`);
+          return;
+        }
         try {
           const response = await axios.get(url, {
             headers: { Authorization: `Bearer ${lsToken}` },
             responseType: 'blob',
+            cancelToken: cancelTokenSource.token, // Поддержка отмены
           });
           const mimeType =
             response.headers['content-type'] ||
@@ -92,28 +97,34 @@ const Articles: React.FC = () => {
           const objectUrl = URL.createObjectURL(new Blob([response.data], { type: mimeType }));
           newMediaCache[url] = objectUrl;
         } catch (error) {
-          console.error(`Ошибка загрузки медиа ${url}:`, error);
+          if (axios.isCancel(error)) {
+            console.log(`Request canceled for ${url}`);
+          } else {
+            console.error(`Ошибка загрузки медиа ${url}:`, error);
+          }
         }
       });
 
       await Promise.all(fetchPromises);
 
-      const updatedText = markdownText.replace(/!\[.*?\]\((.*?)\)/g, (match, url) => {
-        const localUrl = newMediaCache[url];
-        if (!localUrl) {
-          console.warn(`No local URL for ${url}`);
-          return match;
-        }
-        if (isVideoUrl(url)) {
-          const extension = url.split('.').pop()?.toLowerCase();
-          return `<video controls playsinline src="${localUrl}" type="video/${extension}" style="max-width: 100%; height: auto; z-index: 1;"></video>`;
-        }
-        return match.replace(url, localUrl);
-      });
-
       if (isMounted) {
+        const updatedText = markdownText.replace(/!\[.*?\]\((.*?)\)/g, (match, url) => {
+          const localUrl = newMediaCache[url];
+          if (!localUrl) {
+            console.warn(`No local URL for ${url}`);
+            return match;
+          }
+          if (isVideoUrl(url)) {
+            const extension = url.split('.').pop()?.toLowerCase();
+            return `<video controls playsinline src="${localUrl}" type="video/${extension}" style="max-width: 100%; height: auto; z-index: 1;"></video>`;
+          }
+          return match.replace(url, localUrl);
+        });
+
+        mediaCacheRef.current = newMediaCache;
         setMediaCache(newMediaCache);
         setProcessedText(updatedText);
+        console.log('Updated mediaCache:', newMediaCache);
       }
     };
 
@@ -121,12 +132,13 @@ const Articles: React.FC = () => {
 
     return () => {
       isMounted = false;
+      cancelTokenSource.cancel('Component unmounted or article changed'); // Отменить запросы
     };
   }, [article?.text, lsToken]);
 
   useEffect(() => {
     return () => {
-      Object.values(mediaCache).forEach(url => URL.revokeObjectURL(url));
+      Object.values(mediaCacheRef.current).forEach(url => URL.revokeObjectURL(url));
       mediaCacheRef.current = {};
       setMediaCache({});
     };

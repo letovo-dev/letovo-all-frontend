@@ -14,6 +14,11 @@ import { saveNews } from './saveNews';
 import { searchNews } from './searchNews';
 import { setDislike } from './setDislike';
 import { setLike } from './setLike';
+import { renameCategory } from './renameCategory';
+import { deleteArticlesCategory } from './deleteArticleCategory';
+import { deleteArticle } from './deleteArticle';
+import { renameArticle } from './renameArticle';
+import { saveArticle } from './saveArticle';
 
 const apiMethods = {
   getAvatars,
@@ -32,6 +37,11 @@ const apiMethods = {
   getArticlesCategories,
   getArticleMd,
   getMdMedia,
+  renameCategory,
+  deleteArticlesCategory,
+  deleteArticle,
+  renameArticle,
+  saveArticle,
 };
 
 export default apiMethods;

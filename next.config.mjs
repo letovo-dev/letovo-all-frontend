@@ -103,6 +103,11 @@ const nextConfig = {
       },
       {
         protocol: 'http',
+        hostname: '45.140.178.217',
+        pathname: '/api/media/get/images/avatars/**',
+      },
+      {
+        protocol: 'http',
         hostname: '192.168.2.144',
         pathname: '/api/media/get/images/avatars/**',
       },
