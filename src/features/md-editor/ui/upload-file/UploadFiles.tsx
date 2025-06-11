@@ -58,8 +58,6 @@ const UploadFiles: React.FC = () => {
     return true;
   };
 
-  console.log('File list:', fileList);
-
   const props = {
     action: 'https://660d2bd96ddfa2943b33731c.mockapi.io/api/upload',
     onChange: handleChange,

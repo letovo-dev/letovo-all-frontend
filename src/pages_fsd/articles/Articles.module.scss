@@ -157,3 +157,41 @@ $scrollbar-width: 17px;
     }
   }
 }
+
+.secretLink {
+  color: inherit !important;
+  text-decoration: none !important;
+  cursor: default !important;
+
+  &:hover {
+    color: inherit !important;
+    text-decoration: none !important;
+  }
+}
+.downloadLink {
+  color: #1677ff;
+  text-decoration: underline;
+  display: inline-flex;
+  align-items: center;
+  gap: 4px;
+
+  &::before {
+    content: '\1F4E5'; /* Иконка скачивания (📥) */
+    font-size: 0.9em;
+  }
+
+  &:hover {
+    color: #0958d9;
+    text-decoration: underline;
+  }
+}
+
+::global(.mdContent a:not(.secretLink)) {
+  color: #1677ff;
+  text-decoration: underline;
+
+  &:hover {
+    color: #0958d9;
+    text-decoration: underline;
+  }
+}

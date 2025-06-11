@@ -87,8 +87,25 @@ body {
 .ant-carousel .slick-next,
 .ant-carousel .slick-prev:hover,
 .ant-carousel .slick-next:hover,
-.ant-collapse .ant-collapse-item > .ant-collapse-header .ant-collapse-arrow {
-  color: var(--orange);
+.ant-collapse .ant-collapse-item > .ant-collapse-header .ant-collapse-arrow,
+.ant-radio-wrapper .ant-radio-checked .ant-radio-inner {
+  color: var(--orange) !important;
+}
+
+.antRadioWrapper {
+  .antRadioChecked {
+    .antRadioInner {
+      border-color: var(--orange) !important;
+      background-color: var(--orange) !important;
+    }
+  }
+}
+
+::global(.css-dev-only-do-not-override-mc1tut) {
+  .ant-radio-wrapper .ant-radio-checked .ant-radio-inner {
+    border-color: var(--orange) !important;
+    background-color: var(--orange) !important;
+  }
 }
 
 .ant-collapse .ant-collapse-content > .ant-collapse-content-box {

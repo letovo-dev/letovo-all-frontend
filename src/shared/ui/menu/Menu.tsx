@@ -25,8 +25,6 @@ const Menu: React.FC = () => {
     setActiveKey(currentKey);
   }, [pathname, username]);
 
-  console.log('pathname', pathname);
-
   useEffect(() => {
     const timer = setTimeout(() => {
       setIsReady(true);

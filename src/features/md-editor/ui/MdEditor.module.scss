@@ -8,7 +8,7 @@
   gap: 10px;
 }
 .markdownEditor {
-  height: 70vh !important;
+  height: 65vh !important;
   margin-bottom: 10px;
 }
 .button {
@@ -43,4 +43,30 @@
 
 .inputTitleInstruction {
   font-size: 10px;
+}
+
+.secretLink {
+  color: inherit !important;
+  text-decoration: none !important;
+  cursor: default !important;
+
+  &:hover {
+    color: inherit !important;
+    text-decoration: none !important;
+  }
+}
+
+::global(.wmde-markdown a:not(.secretLink)) {
+  // color: @linkColor;
+  text-decoration: underline;
+
+  &:hover {
+    // color: darken(@linkColor, 10%);
+    text-decoration: underline;
+  }
+}
+
+.buttonsContainer {
+  display: flex;
+  gap: 20px;
 }

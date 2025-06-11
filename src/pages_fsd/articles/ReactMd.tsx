@@ -13,6 +13,10 @@ const MarkdownContent: React.FC<{ content: string }> = React.memo(
       return /\.(mp4|webm|ogg|mkv|avi)(\?.*)?$/i.test(url);
     };
 
+    const isDownloadableFile = (url: string): boolean => {
+      return /\.(pdf|docx?|xlsx?|zip|rar|txt|md)(\?.*)?$/i.test(url);
+    };
+
     return (
       <ReactMarkdown
         className={style.mdContent}
@@ -67,6 +71,24 @@ const MarkdownContent: React.FC<{ content: string }> = React.memo(
                 <source src={src || ''} type={`video/${extension}`} />
                 Your browser does not support the video tag.
               </video>
+            );
+          },
+          a: ({ href, children, ...props }) => {
+            const isSecretLink =
+              typeof children === 'string' && children.toLowerCase().includes('secret link');
+            const isDownloadLink = href ? isDownloadableFile(href) : false;
+
+            return (
+              <a
+                href={href}
+                className={
+                  isSecretLink ? style.secretLink : isDownloadLink ? style.downloadLink : undefined
+                }
+                download={isDownloadLink ? true : undefined}
+                {...props}
+              >
+                {children}
+              </a>
             );
           },
         }}

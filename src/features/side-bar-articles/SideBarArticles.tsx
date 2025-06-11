@@ -111,16 +111,6 @@ const SideBarArticles = ({
     (articleId: string, categoryId: string, type: 'category' | 'article'): MenuProps['onClick'] =>
     e => {
       e.domEvent.stopPropagation();
-      // console.log(
-      //   'Menu item clicked, menu key:',
-      //   e.key,
-      //   'Type:',
-      //   type,
-      //   'Article ID:',
-      //   articleId,
-      //   'Category ID:',
-      //   categoryId,
-      // );
       if (e.key === 'renameMenuItem' || e.key === 'renameArticle') {
         const initialValue =
           type === 'category'

@@ -1,14 +1,13 @@
 'use client';
 
 import React, { useState, ChangeEvent, useRef, useEffect } from 'react';
-import MDEditor, { MDEditorProps } from '@uiw/react-md-editor';
+import MDEditor from '@uiw/react-md-editor';
 import style from './MdEditor.module.scss';
 import { mdExample } from '../lib/mdExapmle';
 import UploadFiles from './upload-file/UploadFiles';
 import articlesStore from '@/shared/stores/articles-store';
-import { Button, Input, message, Space } from 'antd';
+import { Button, ConfigProvider, Input, message, Radio, RadioChangeEvent, Space } from 'antd';
 import { SaveOutlined } from '@ant-design/icons';
-import userStore from '@/shared/stores/user-store';
 
 interface VideoComponentProps extends React.VideoHTMLAttributes<HTMLVideoElement> {
   src?: string;
@@ -17,16 +16,20 @@ interface VideoComponentProps extends React.VideoHTMLAttributes<HTMLVideoElement
 const MarkdownEditor: React.FC = () => {
   const [markdown, setMarkdown] = useState<string>(mdExample);
   const [articleTitle, setArticleTitle] = useState<string>('');
-  const { article, isEditArticle, renameArticle } = articlesStore(state => state);
+  const { article, isEditArticle, renameArticle, saveArticle } = articlesStore(state => state);
+  const [isSecretArticle, setIsSecretArticle] = useState(article?.is_secret);
 
   useEffect(() => {
     if (article && isEditArticle) {
       setMarkdown(article.text);
-      setArticleTitle(article.title || ''); // Убедитесь, что title не undefined
+      setArticleTitle(article.title || '');
     }
   }, [isEditArticle, article]);
 
-  // Function to handle MD file upload
+  const onRadioChange = (e: RadioChangeEvent) => {
+    setIsSecretArticle(e.target.value);
+  };
+
   const handleFileUpload = (event: ChangeEvent<HTMLInputElement>): void => {
     const file = event.target.files?.[0];
     if (file) {
@@ -40,7 +43,7 @@ const MarkdownEditor: React.FC = () => {
     }
   };
 
-  const handleSave = (): void => {
+  const handleDownload = (): void => {
     const blob = new Blob([markdown], { type: 'text/markdown' });
     const url = URL.createObjectURL(blob);
     const link = document.createElement('a');
@@ -50,12 +53,13 @@ const MarkdownEditor: React.FC = () => {
     URL.revokeObjectURL(url);
   };
 
+  const handleSave = (): void => {};
+
   const handleTitleChange = (e: ChangeEvent<HTMLInputElement>): void => {
     setArticleTitle(e.target.value);
   };
 
   const videoComponent = ({ src, ...props }: VideoComponentProps) => {
-    console.log('Video Component Rendered:', { src, props });
     return src ? (
       <video controls src={src} style={{ maxWidth: '100%' }} {...props}>
         Your browser does not support the video tag.
@@ -76,8 +80,21 @@ const MarkdownEditor: React.FC = () => {
     }
     if (article) {
       await renameArticle(article?.post_id, article?.category, articleTitle);
-      console.log('Saving title:', articleTitle);
     }
+  };
+
+  const linkComponent = ({
+    href,
+    children,
+    ...props
+  }: React.AnchorHTMLAttributes<HTMLAnchorElement>) => {
+    const isSecretLink =
+      typeof children === 'string' && children.toLowerCase().includes('secret link');
+    return (
+      <a href={href} className={isSecretLink ? style.secretLink : undefined} {...props}>
+        {children}
+      </a>
+    );
   };
 
   return (
@@ -112,6 +129,23 @@ const MarkdownEditor: React.FC = () => {
             </Button>
           </Space.Compact>
         </div>
+        <ConfigProvider
+          theme={{
+            token: {
+              colorPrimary: '#fb4724',
+              colorPrimaryActive: '#fb4724',
+            },
+          }}
+        >
+          <Radio.Group
+            defaultValue={isSecretArticle}
+            options={[
+              { value: 't', label: 'Тайна' },
+              { value: 'f', label: 'Статья' },
+            ]}
+            onChange={onRadioChange}
+          />
+        </ConfigProvider>
       </div>
       {articleTitle && <h3>{articleTitle}</h3>}
       <MDEditor
@@ -123,17 +157,26 @@ const MarkdownEditor: React.FC = () => {
         previewOptions={{
           components: {
             video: videoComponent,
+            a: linkComponent,
           },
           urlTransform: (uri: string) => {
             return uri.endsWith('.mp4') ? uri : uri;
           },
         }}
       />
-      <p>Приложите новые файлы, используемые в статье</p>
+      <p>Добавьте новые файлы, используемые в статье</p>
+      <p className={style.inputTitleInstruction}>
+        Название файла должно быть идентично названию, указанному в статье
+      </p>
       <UploadFiles />
-      <button onClick={handleSave} className={style.button}>
-        Сохранить и опубликовать
-      </button>
+      <div className={style.buttonsContainer}>
+        <button onClick={handleSave} className={style.button}>
+          Сохранить и опубликовать
+        </button>
+        <button onClick={handleDownload} className={style.button}>
+          Скачать
+        </button>
+      </div>
     </div>
   );
 };
