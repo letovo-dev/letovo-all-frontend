@@ -42,7 +42,7 @@ export type TArticlesStoreState = {
   loadAllArticlesByCategory: (id: string) => Promise<void>;
   setCurrentArticle: (article: OneArticle) => void;
   refreshArticles: () => Promise<void>;
-  saveArticle: (categoryId: string, articleId: string, file: File) => void;
+  saveArticle: (categoryId: string, articleId: string | null, file: File) => Promise<void>;
 };
 
 const initialState = {
@@ -67,16 +67,12 @@ const articlesStore = create<TArticlesStoreState>()(
       },
       // shared/stores/articles-store.ts
 
-      saveArticle: async (categoryId: string, articleId: string | null, content: string) => {
+      saveArticle: async (categoryId: string, articleId: string | null, file: File) => {
         set({
           loading: true,
         });
         try {
-          const response = (await SERVICES_DATA.Data.saveArticle(
-            categoryId,
-            articleId,
-            content,
-          )) as {
+          const response = (await SERVICES_DATA.Data.saveArticle(categoryId, articleId, file)) as {
             code: number;
             data: { result: OneArticle };
           };
