@@ -20,6 +20,7 @@ interface OneCommentProps {
   setCommentText?: (text: string) => void;
   commentText?: string;
   likeNewsOrComment: (post_id: string, action: string) => Promise<void>;
+  likesCount?: string;
 }
 
 const OneComment: React.FC<OneCommentProps> = ({
@@ -33,6 +34,7 @@ const OneComment: React.FC<OneCommentProps> = ({
   setCommentText,
   commentText,
   likeNewsOrComment,
+  likesCount,
 }) => {
   const [likeComment, selLikeComment] = useState(false);
   const [commentState, setCommentState] = useState<RealComment | undefined>(undefined);
@@ -40,6 +42,7 @@ const OneComment: React.FC<OneCommentProps> = ({
   const [text, setText] = useState('');
   const usageCommentText = setCommentText ?? setText;
   const usageCommentTextValue = commentText ?? text;
+  const [likesCommentCount, setLikesCommentCount] = useState(likesCount);
 
   const comments = normalizedComments?.[newsId];
 
@@ -74,6 +77,13 @@ const OneComment: React.FC<OneCommentProps> = ({
     selLikeComment(prev => !prev);
     const likeSAction = likeComment ? 'delete' : 'like';
     likeNewsOrComment(String(commentState?.post_id), likeSAction);
+    if (likesCount) {
+      if (likeSAction === 'like') {
+        setLikesCommentCount(prev => String(Number(prev) + 1));
+      } else {
+        setLikesCommentCount(prev => String(Math.max(Number(prev) - 1, 0)));
+      }
+    }
   };
 
   const handleSendComment = () => {
@@ -105,14 +115,17 @@ const OneComment: React.FC<OneCommentProps> = ({
               <div className={style.commentTextReply} onClick={handleReply}>
                 Ответить
               </div>
-              <Image
-                src={likeComment ? '/Icon_Like_2.png' : '/Icon_Like.png'}
-                alt="like"
-                width={15}
-                height={15}
-                className={style.likeHeart}
-                onClick={handleLikeComment}
-              />
+              <div className={style.likesInfo}>
+                <Image
+                  src={likeComment ? '/Icon_Like_2.png' : '/Icon_Like.png'}
+                  alt="like"
+                  width={15}
+                  height={15}
+                  className={style.likeHeart}
+                  onClick={handleLikeComment}
+                />
+                {likesCount && <p className={style.count}>{likesCommentCount}</p>}
+              </div>
             </div>
             {showMore && (
               <p onClick={() => setOpenComments(newsId)} className={style.nextCommentText}>

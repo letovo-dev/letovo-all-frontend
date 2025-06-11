@@ -118,6 +118,8 @@ const News: React.FC<NewsProps> = ({ children, onContainerRef }) => {
     };
   }, [setFooterHidden]);
 
+  console.log('commentsToRender', commentsToRender);
+
   return (
     <>
       <SideBarNews
@@ -171,6 +173,7 @@ const News: React.FC<NewsProps> = ({ children, onContainerRef }) => {
                       setCommentText={setText}
                       commentText={text}
                       likeNewsOrComment={likeNewsOrComment}
+                      likesCount={item.likes}
                     />
                   ))}
                 </div>

@@ -17,6 +17,10 @@ const CarouselElement = ({ imgs }: { imgs: string[] }) => {
     return src.endsWith('.mp4') || src.endsWith('.webm') || src.endsWith('.ogg');
   };
 
+  const isPDF = (src: string) => {
+    return src.toLowerCase().endsWith('.pdf');
+  };
+
   return (
     <ConfigProvider
       theme={{
@@ -45,6 +49,14 @@ const CarouselElement = ({ imgs }: { imgs: string[] }) => {
                   controls
                   muted
                   className={style.video}
+                />
+              ) : isPDF(item) ? (
+                <iframe
+                  src={`${process.env.NEXT_PUBLIC_BASE_URL_MEDIA}${item}`}
+                  className={style.pdf}
+                  title={`PDF-${index}`}
+                  frameBorder="0"
+                  scrolling="no"
                 />
               ) : (
                 <Image

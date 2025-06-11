@@ -9,6 +9,7 @@ import { RealNews } from '@/shared/stores/data-store';
 import userStore, { IUserStore } from '@/shared/stores/user-store';
 import commentsStore from '@/shared/stores/comments-store';
 import { generateKey } from '@/shared/api/utils';
+import style from './NewsPost.module.scss';
 
 interface OnePostProps {
   newsId: string;
@@ -41,7 +42,7 @@ const NewsPost: React.FC<OnePostProps> = ({
   const showMore = comments.length > 1;
 
   return (
-    <div key={generateKey()}>
+    <div key={generateKey()} className={style.postContainer}>
       <PostHeader
         index={index}
         author={{
@@ -51,7 +52,11 @@ const NewsPost: React.FC<OnePostProps> = ({
         }}
         text={el.news.text || ''}
       />
-      <CarouselElement imgs={el.media || []} />
+      {el.media.length > 0 ? (
+        <CarouselElement imgs={el.media} />
+      ) : (
+        <div style={{ margin: '10px 0 20px 0' }}></div>
+      )}
       <NewsActionPanel
         newsItem={el.news}
         savedCount={10}

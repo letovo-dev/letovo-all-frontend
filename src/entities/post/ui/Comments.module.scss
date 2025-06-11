@@ -99,3 +99,13 @@ $overlay-color: rgba(0, 0, 0, 0.3);
   z-index: 1006;
   background-color: $overlay-color;
 }
+.likesInfo {
+  display: flex;
+  gap: 3px;
+  align-items: center;
+  .count {
+    font-size: 10px;
+    color: var(--graphics10);
+    font-weight: 400;
+  }
+}

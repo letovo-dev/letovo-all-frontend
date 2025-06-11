@@ -42,7 +42,7 @@ const InputModule: React.FC<InputModuleProps> = ({
           onClick={handleSendComment}
         />
       </div>
-      <Divider className={isLastNews ? style.inputLastDivider : style.inputDividerBottom} />
+      {/* <Divider className={isLastNews ? style.inputLastDivider : style.inputDividerBottom} /> */}
     </>
   );
 };

@@ -4,6 +4,7 @@ import style from './NewsActionPanel.module.scss';
 import dataStore, { RealNews } from '@/shared/stores/data-store';
 import Image from 'next/image';
 import commentsStore from '@/shared/stores/comments-store';
+import { Divider } from 'antd';
 
 const NewsActionPanel = ({
   newsItem,
@@ -114,55 +115,58 @@ const NewsActionPanel = ({
   };
 
   return (
-    <div className={style.sectionContainer}>
-      <div className={style.firstSection}>
+    <>
+      <div className={style.sectionContainer}>
+        <div className={style.firstSection}>
+          <div
+            className={actionsState.liked ? style.likesContainerLiked : style.likesContainer}
+            onClick={handleLike}
+          >
+            <Image
+              src={actionsState.liked ? '/Icon_Like_2.png' : '/Icon_Like.png'}
+              alt="like"
+              width={22}
+              height={22}
+            />
+            <p className={style.likesCount}>{actionsState.likesCount}</p>
+          </div>
+          <div
+            className={
+              actionsState.disliked ? style.dislikesContainerDisLiked : style.dislikesContainer
+            }
+            onClick={handleDislike}
+          >
+            <Image
+              src={actionsState.disliked ? '/Icon_Dislike_2.png' : '/Icon_Dislike.png'}
+              alt="dislike"
+              width={22}
+              height={22}
+            />
+            <p className={style.dislikesCount}>{actionsState.dislikesCount}</p>
+          </div>
+          <div
+            className={style.commentsContainer}
+            onClick={() => handleComment(String(newsItem.post_id))}
+          >
+            <Image src={'/Icon_Comment.png'} alt="comment" width={22} height={22} />
+            <p className={style.dislikesCount}>{currentNewsComments?.length}</p>
+          </div>
+        </div>
         <div
-          className={actionsState.liked ? style.likesContainerLiked : style.likesContainer}
-          onClick={handleLike}
+          className={actionsState.saved ? style.saveContainerSaved : style.saveContainer}
+          onClick={handleSave}
         >
           <Image
-            src={actionsState.liked ? '/Icon_Like_2.png' : '/Icon_Like.png'}
-            alt="like"
+            src={actionsState.saved ? '/Icon_Favorites.png' : '/Icon_Favorites_.png'}
+            alt="save"
             width={22}
             height={22}
           />
-          <p className={style.likesCount}>{actionsState.likesCount}</p>
-        </div>
-        <div
-          className={
-            actionsState.disliked ? style.dislikesContainerDisLiked : style.dislikesContainer
-          }
-          onClick={handleDislike}
-        >
-          <Image
-            src={actionsState.disliked ? '/Icon_Dislike_2.png' : '/Icon_Dislike.png'}
-            alt="dislike"
-            width={22}
-            height={22}
-          />
-          <p className={style.dislikesCount}>{actionsState.dislikesCount}</p>
-        </div>
-        <div
-          className={style.commentsContainer}
-          onClick={() => handleComment(String(newsItem.post_id))}
-        >
-          <Image src={'/Icon_Comment.png'} alt="comment" width={22} height={22} />
-          <p className={style.dislikesCount}>{currentNewsComments?.length}</p>
+          <p className={style.likesCount}>{actionsState.savedCountState}</p>
         </div>
       </div>
-      <div
-        className={actionsState.saved ? style.saveContainerSaved : style.saveContainer}
-        onClick={handleSave}
-      >
-        <Image
-          src={actionsState.saved ? '/Icon_Favorites.png' : '/Icon_Favorites_.png'}
-          alt="save"
-          width={22}
-          height={22}
-        />
-        <p className={style.likesCount}>{actionsState.savedCountState}</p>
-      </div>
-    </div>
+      {commentsCount > 0 && <Divider className={style.inputDivider} />}
+    </>
   );
 };
 

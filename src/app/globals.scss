@@ -83,6 +83,21 @@ body {
   margin-bottom: 0px !important;
 }
 
+.ant-divider {
+  margin: 12px 0 12px 0 !important;
+  border: none !important;
+  /* Set height for horizontal divider */
+  height: 1px;
+  /* Apply gradient for fade effect */
+  background: linear-gradient(
+    to right,
+    transparent 0%,
+    #b2b2b2 15%,
+    #b2b2b2 85%,
+    transparent 100%
+  ) !important;
+}
+
 .ant-carousel .slick-prev,
 .ant-carousel .slick-next,
 .ant-carousel .slick-prev:hover,
