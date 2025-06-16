@@ -28,7 +28,7 @@ const InputModule: React.FC<InputModuleProps> = ({
         </div>
         <TextareaAutoHeight
           value={text}
-          onChange={e => setText(e.target.value)}
+          onChange={e => setText((e.target as unknown as HTMLTextAreaElement).value)}
           placeholder="Введите текст..."
         />
         <Image

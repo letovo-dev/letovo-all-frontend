@@ -20,6 +20,12 @@
     border-color: transparent;
     box-shadow: var(--secondaryGray);
   }
+
+  & > *:not(.nickName) {
+    color: inherit;
+    background: none;
+    font-weight: normal;
+  }
 }
 .nickName {
   color: var(--orange);
