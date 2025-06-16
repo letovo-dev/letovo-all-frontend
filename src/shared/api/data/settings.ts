@@ -89,6 +89,18 @@ export const API_DATA_SCHEME: IApiEntityScheme<IEndpoint> = {
     method: 'POST',
     url: `${baseUrl}/social/bycat`,
   },
+  createNews: {
+    method: 'POST',
+    url: `${baseUrl}/social/bycat`,
+  },
+  editNews: {
+    method: 'POST',
+    url: `${baseUrl}/social/bycat`,
+  },
+  deleteNews: {
+    method: 'DELETE',
+    url: `${baseUrl}/social/bycat`,
+  },
 };
 
 export const API_DATA_ENDPOINTS = [
@@ -113,4 +125,7 @@ export const API_DATA_ENDPOINTS = [
   'deleteArticle',
   'renameArticle',
   'saveArticle',
+  'createNews',
+  'editNews',
+  'deleteNews',
 ] as const;

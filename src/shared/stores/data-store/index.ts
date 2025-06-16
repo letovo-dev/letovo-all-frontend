@@ -135,6 +135,9 @@ export type TDataStoreState = {
   saveNews: (id: string, action: 'save' | 'delete') => Promise<any>;
   setCurrentNewsState: (state: any) => void;
   fetchNews: (params: FetchNewsParams) => Promise<any>;
+  createNews: (news: Partial<RealNews>) => void;
+  editNews: (news: RealNews) => void;
+  deleteNews: (news_id: string) => void;
 };
 
 const dataState = {
@@ -218,6 +221,100 @@ const dataStore = create<TDataStoreState>()(
           },
           error: error.message,
         }));
+      }
+    },
+    createNews: async (news: Partial<RealNews>): Promise<any> => {
+      set({ loading: true, error: undefined });
+      try {
+        const response = await SERVICES_DATA.Data.createNews(news);
+        if (response.success && response.code === 200) {
+          const savedNews = (response?.data as { result: RealNews[] })?.result;
+          const { result } = await commentsStore
+            .getState()
+            .getCurrentNewsPics(savedNews[0].post_id);
+
+          set((state: TDataStoreState) => {
+            const updatedNormalizedNews = {
+              ...state.data.normalizedNews,
+              [savedNews[0].post_id]: {
+                news: savedNews[0],
+                media: result.map((media: RealMedia) => media.media),
+                comments: [],
+              },
+            };
+            return {
+              data: {
+                ...state.data,
+                normalizedNews: updatedNormalizedNews,
+              },
+              error: undefined,
+            };
+          });
+        } else {
+          set({ loading: false, error: response.codeMessage });
+        }
+      } catch (error) {
+        console.error(error);
+        set({ loading: false, error: 'Network or system error' });
+      }
+    },
+    editNews: async (news: Partial<RealNews>): Promise<any> => {
+      set({ loading: true, error: undefined });
+      try {
+        const response = await SERVICES_DATA.Data.editNews(news);
+        if (response.success && response.code === 200) {
+          const editedNews = (response?.data as { result: RealNews[] })?.result;
+          const { result } = await commentsStore
+            .getState()
+            .getCurrentNewsPics(editedNews[0].post_id);
+
+          set((state: TDataStoreState) => {
+            const updatedNormalizedNews = {
+              ...state.data.normalizedNews,
+              [editedNews[0].post_id]: {
+                news: editedNews[0],
+                media: result.map((media: RealMedia) => media.media),
+                comments: state.data.normalizedNews[editedNews[0].post_id]?.comments || [],
+              },
+            };
+            return {
+              data: {
+                ...state.data,
+                normalizedNews: updatedNormalizedNews,
+              },
+              error: undefined,
+            };
+          });
+        } else {
+          set({ loading: false, error: response.codeMessage });
+        }
+      } catch (error) {
+        console.error(error);
+        set({ loading: false, error: 'Network or system error' });
+      }
+    },
+    deleteNews: async (news_id: string): Promise<any> => {
+      set({ loading: true, error: undefined });
+      try {
+        const response = await SERVICES_DATA.Data.deleteNews(news_id);
+        if (response.success && response.code === 200) {
+          set((state: TDataStoreState) => {
+            const updatedNormalizedNews = { ...state.data.normalizedNews };
+            delete updatedNormalizedNews[news_id];
+            return {
+              data: {
+                ...state.data,
+                normalizedNews: updatedNormalizedNews,
+              },
+              error: undefined,
+            };
+          });
+        } else {
+          set({ loading: false, error: response.codeMessage });
+        }
+      } catch (error) {
+        console.error(error);
+        set({ loading: false, error: 'Network or system error' });
       }
     },
     saveNews: async (id: string, action: 'save' | 'delete'): Promise<any> => {

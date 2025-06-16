@@ -19,6 +19,9 @@ import { deleteArticlesCategory } from './deleteArticleCategory';
 import { deleteArticle } from './deleteArticle';
 import { renameArticle } from './renameArticle';
 import { saveArticle } from './saveArticle';
+import { createNews } from './createNews';
+import { deleteNews } from './deleteNews';
+import { editNews } from './editNews';
 
 const apiMethods = {
   getAvatars,
@@ -42,6 +45,9 @@ const apiMethods = {
   deleteArticle,
   renameArticle,
   saveArticle,
+  createNews,
+  editNews,
+  deleteNews,
 };
 
 export default apiMethods;
