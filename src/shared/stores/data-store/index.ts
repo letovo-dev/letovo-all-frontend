@@ -57,6 +57,7 @@ export interface RealMedia {
   is_pic: string;
   media: string;
   post_id: string;
+  is_secret: string;
 }
 
 export interface CurrentNews {

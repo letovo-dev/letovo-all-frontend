@@ -3,8 +3,14 @@
 .infoContainer {
   display: flex;
   align-items: center;
-  gap: 10px;
+  width: 96%;
   margin-left: 10px;
+  justify-content: space-between;
+  .contentContainer {
+    display: flex;
+    gap: 10px;
+    align-items: center;
+  }
   .avatarTemplate {
     @extend %avatarTemplate;
   }
@@ -21,4 +27,8 @@
 .infoContainerFirst {
   @extend .infoContainer;
   margin-top: 12px;
+}
+.editPost {
+  cursor: pointer;
+  color: var(--orange);
 }

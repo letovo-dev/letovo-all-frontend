@@ -7,6 +7,9 @@ import dataStore, { Titles } from '@/shared/stores/data-store';
 import Image from 'next/image';
 import SideBarNewsContent from './SideBarNewsContent';
 import { message } from 'antd';
+import { PlusOutlined } from '@ant-design/icons';
+import userStore, { IUserStore } from '@/shared/stores/user-store';
+import PostModal from '../post-modal/ui';
 
 interface FormValues {
   search_query: string;
@@ -36,6 +39,10 @@ const SideBarNews = ({
   const { loading, setCurrentNewsState, fetchNews, currentNewsState } = dataStore(state => state);
   const { searchedNews, savedNews } = dataStore(state => state.data);
   const sidebarRef = useRef<HTMLDivElement>(null);
+  const { userrights } = userStore((state: IUserStore) => state.store.userData);
+  const [visible, setVisible] = useState(false); // State for modal visibility
+  const [post, setPost] = useState<any | null>(null); // State for editing post
+
   const savedNewsLength = useMemo(() => {
     return Object.keys(savedNews).length;
   }, [savedNews]);
@@ -132,11 +139,46 @@ const SideBarNews = ({
     };
   }, [open, setOpen, burgerRef]);
 
+  const authors = [
+    { id: '1', name: 'John Doe' },
+    { id: '2', name: 'Jane Smith' },
+  ];
+
+  // Open modal for creating or editing
+  const handleOpen = (editPost?: any) => {
+    setPost(editPost || null); // Set post for editing or null for creating
+    setVisible(true); // Show modal
+  };
+
+  // Handle form submission
+  const handleSubmit = async (values: any) => {
+    try {
+      // Mock API call (replace with your actual API)
+      console.log('Submitted:', values);
+      // Example: await api.savePost(values);
+      setVisible(false); // Close modal on success
+    } catch (error) {
+      console.error('Submit error:', error);
+    }
+  };
+
+  // Handle modal cancel
+  const handleCancel = () => {
+    setVisible(false); // Hide modal
+    setPost(null); // Clear post data
+  };
+
   return (
     <div className={windowWidth && windowWidth < 960 && open ? style.modalOverlay : ''}>
       {contextHolder}
       <div ref={sidebarRef} className={getSidebarClass()}>
         <SideBarNewsContent loading={loading} form={form} onFinish={onFinish} />
+        {userrights === 'admin' && (
+          <div className={style.addArticle}>
+            <span>Добавить пост</span>
+            <PlusOutlined className={style.addArticleIcon} onClick={() => handleOpen()} />
+          </div>
+        )}
         {currentNewsState.searched && !searchedNews && (
           <div className={style.noSearchResult}>По запросу ничего не найдено</div>
         )}
@@ -182,6 +224,15 @@ const SideBarNews = ({
           })}
         </div>
       </div>
+      {userrights === 'admin' && (
+        <PostModal
+          visible={visible}
+          onCancel={handleCancel}
+          onSubmit={handleSubmit}
+          post={post}
+          authors={authors}
+        />
+      )}
     </div>
   );
 };

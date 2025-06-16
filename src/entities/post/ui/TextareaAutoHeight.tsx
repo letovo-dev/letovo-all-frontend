@@ -27,6 +27,9 @@ const TextareaAutoHeight: React.FC<TextareaAutoHeightProps> = ({
     }
   }, [value, maxHeight]);
 
+  const valueName = value.split(' ').find((el: string) => el.startsWith('@'));
+  const editedValue = valueName ? value.replace(valueName, '') : value;
+
   return (
     <textarea
       ref={textareaRef}
@@ -34,7 +37,10 @@ const TextareaAutoHeight: React.FC<TextareaAutoHeightProps> = ({
       onChange={onChange}
       className={style.autoHeightTextarea}
       {...props}
-    />
+    >
+      <span className={style.nickName}>{valueName}</span>
+      {editedValue}
+    </textarea>
   );
 };
 

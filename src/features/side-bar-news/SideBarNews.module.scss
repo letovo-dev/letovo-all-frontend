@@ -136,3 +136,16 @@ $overlay-color: rgba(0, 0, 0, 0.3);
   color: var(--management);
   position: fixed;
 }
+
+.addArticle {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  margin-left: 20px;
+  margin-top: 20px;
+  width: 85%;
+}
+.addArticleIcon {
+  color: var(--orange);
+  cursor: pointer;
+}

@@ -1,16 +1,15 @@
 .autoHeightTextarea {
-  min-height: 20px; // Минимальная высота
-  max-height: 200px; // Максимальная высота
+  min-height: 20px;
   width: 80%;
   padding: 0;
-  resize: none; // Убираем ручное изменение размера
-  overflow: hidden; // Убираем скроллбар
+  resize: none;
+  overflow: hidden;
   box-sizing: border-box;
   border: none;
   font-family: inherit;
   font-size: 12px;
-  transition: height 0.4s ease; // Плавное изменение высоты
-  line-height: 1; // Удобная высота строк
+  transition: height 0.4s ease;
+  line-height: 1;
   -webkit-box-sizing: border-box;
   -moz-box-sizing: border-box;
   background: var(--background);
@@ -21,4 +20,9 @@
     border-color: transparent;
     box-shadow: var(--secondaryGray);
   }
+}
+.nickName {
+  color: var(--orange);
+  font-weight: 600;
+  font-size: 12px;
 }

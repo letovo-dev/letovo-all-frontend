@@ -1,15 +1,16 @@
 'use client';
 
-import { memo, useMemo } from 'react';
+import { memo, useMemo, useState } from 'react';
 import PostHeader from './PostHeader';
 import CarouselElement from './Carousel';
 import NewsActionPanel from '@/features/news-action-panel/ui';
 import OneComment from './OneComment';
-import { RealNews } from '@/shared/stores/data-store';
+import { RealMedia, RealNews } from '@/shared/stores/data-store';
 import userStore, { IUserStore } from '@/shared/stores/user-store';
 import commentsStore from '@/shared/stores/comments-store';
 import { generateKey } from '@/shared/api/utils';
 import style from './NewsPost.module.scss';
+import PostModal, { Post } from '@/features/post-modal/ui/PostModal';
 
 interface OnePostProps {
   newsId: string;
@@ -30,7 +31,7 @@ const NewsPost: React.FC<OnePostProps> = ({
   saveComment,
   newsId,
 }) => {
-  const { avatar_pic } = userStore((state: IUserStore) => state.store.userData);
+  const { avatar_pic, userrights } = userStore((state: IUserStore) => state.store.userData);
   const comments = useMemo(
     () =>
       commentsStore.getState().normalizedComments
@@ -38,8 +39,42 @@ const NewsPost: React.FC<OnePostProps> = ({
         : [],
     [newsId],
   );
-
+  const [visible, setVisible] = useState(false); // State for modal visibility
+  const [post, setPost] = useState<Post | null>({
+    ...el.news,
+    mediaUrl: el.media.length > 0 ? el.media : [],
+  }); // State for editing post
   const showMore = comments.length > 1;
+  console.log('el.media', el.media);
+
+  const authors = [
+    { id: '1', name: 'John Doe' },
+    { id: '2', name: 'Jane Smith' },
+  ];
+
+  // Open modal for creating or editing
+  const handleOpen = (editPost?: Post) => {
+    // setPost(editPost || null); // Set post for editing or null for creating
+    setVisible(true); // Show modal
+  };
+
+  // Handle form submission
+  const handleSubmit = async (values: any) => {
+    try {
+      // Mock API call (replace with your actual API)
+      console.log('Submitted:', values);
+      // Example: await api.savePost(values);
+      setVisible(false); // Close modal on success
+    } catch (error) {
+      console.error('Submit error:', error);
+    }
+  };
+
+  // Handle modal cancel
+  const handleCancel = () => {
+    setVisible(false); // Hide modal
+    // setPost(null); // Clear post data
+  };
 
   return (
     <div key={generateKey()} className={style.postContainer}>
@@ -51,6 +86,8 @@ const NewsPost: React.FC<OnePostProps> = ({
           id: String(el.news.post_id),
         }}
         text={el.news.text || ''}
+        userStatus={userrights}
+        handleOpen={handleOpen}
       />
       {el.media.length > 0 ? (
         <CarouselElement imgs={el.media} />
@@ -74,6 +111,15 @@ const NewsPost: React.FC<OnePostProps> = ({
         comments={comments}
         likeNewsOrComment={likeNewsOrComment}
       />
+      {userrights === 'admin' && (
+        <PostModal
+          visible={visible}
+          onCancel={handleCancel}
+          onSubmit={handleSubmit}
+          post={post}
+          authors={authors}
+        />
+      )}
     </div>
   );
 };
