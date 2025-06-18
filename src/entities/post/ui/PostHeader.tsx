@@ -1,8 +1,8 @@
 import React from 'react';
 import style from './PostHeader.module.scss';
-import { Avatar, Tooltip } from 'antd';
+import { App, Avatar, Tooltip } from 'antd';
 import Image from 'next/image';
-import { EditOutlined } from '@ant-design/icons';
+import { DeleteOutlined, EditOutlined } from '@ant-design/icons';
 
 const PostHeader = ({
   index,
@@ -10,12 +10,16 @@ const PostHeader = ({
   text,
   userStatus,
   handleOpen,
+  handleDelete,
+  currentNewsStateSaved,
 }: {
   index: number;
   author: { username: string; avatar: string; id: string };
   text: string;
   userStatus: string;
   handleOpen: () => void;
+  handleDelete: (id: string) => void;
+  currentNewsStateSaved: boolean;
 }) => {
   const avatarSrc =
     author.avatar && process.env.NEXT_PUBLIC_BASE_URL_MEDIA
@@ -23,7 +27,7 @@ const PostHeader = ({
       : '/img/pic1.png';
 
   return (
-    <>
+    <App>
       <div
         key={`header-${author.id}-${index}`}
         className={index === 0 ? style.infoContainerFirst : style.infoContainer}
@@ -36,14 +40,17 @@ const PostHeader = ({
           <Image src="/Checkmark 3.png" alt="like" height={18} width={18} />
         </div>
 
-        {userStatus === 'admin' && (
-          <Tooltip title="Редактировать">
-            <EditOutlined className={style.editPost} onClick={() => handleOpen()} />
-          </Tooltip>
+        {userStatus === 'admin' && !currentNewsStateSaved && (
+          <div className={style.iconsContainer}>
+            <Tooltip title="Редактировать">
+              <EditOutlined className={style.editPost} onClick={() => handleOpen()} />
+            </Tooltip>
+            <DeleteOutlined className={style.editPost} onClick={() => handleDelete(author.id)} />
+          </div>
         )}
       </div>
       <p className={style.newsText}>{text || ''}</p>
-    </>
+    </App>
   );
 };
 

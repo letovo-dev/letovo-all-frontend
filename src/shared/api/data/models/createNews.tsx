@@ -6,7 +6,7 @@ export const createNews = async (news: Partial<RealNews>): Promise<IApiReturn<un
   const response = await API.apiQuery<any[]>({
     method: API_DATA_SCHEME.createNews.method,
     url: API_DATA_SCHEME.createNews.url,
-    data: { news },
+    data: news,
   });
 
   return { ...response };

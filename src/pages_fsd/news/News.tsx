@@ -1,6 +1,6 @@
 'use client';
 
-import React, { Suspense, useEffect, useRef, useState } from 'react';
+import React, { Suspense, useEffect, useMemo, useRef, useState } from 'react';
 import style from './News.module.scss';
 import SideBarNews from '@/features/side-bar-news';
 import Burger from '@/shared/ui/burger-menu/Burger';
@@ -13,6 +13,8 @@ import { useFooterContext } from '@/shared/ui/context/FooterContext';
 import userStore, { IUserStore } from '@/shared/stores/user-store';
 import commentsStore from '@/shared/stores/comments-store';
 import { useRouter } from 'next/navigation';
+import type { MenuProps } from 'antd';
+import getAuthorsList from '@/entities/post/model/getAuthorsList';
 
 interface NewsProps {
   children: React.ReactNode;
@@ -32,8 +34,14 @@ const News: React.FC<NewsProps> = ({ children, onContainerRef }) => {
   const savedScrollPosition = useRef(0);
   const [open, setOpen] = useState(false);
   const [text, setText] = useState('');
-  const { avatar_pic } = userStore((state: IUserStore) => state.store.userData);
+  const { avatar_pic, userrights } = userStore((state: IUserStore) => state.store.userData);
+  const { allPostsAuthors } = userStore((state: IUserStore) => state.store);
   const openComments = commentsStore(state => state.openComments);
+  const [author, setAuthor] = useState<string | undefined>(undefined);
+
+  const items: MenuProps['items'] = useMemo(() => {
+    return getAuthorsList(allPostsAuthors);
+  }, [allPostsAuthors]);
 
   useEffect(() => {
     if (typeof window !== 'undefined') {
@@ -52,9 +60,14 @@ const News: React.FC<NewsProps> = ({ children, onContainerRef }) => {
 
   const handleSendComment = () => {
     if (text.length > 0) {
-      saveComment(text, openComments);
+      saveComment(text, openComments, author);
       setText('');
+      setAuthor(undefined);
     }
+  };
+
+  const handleMenuClick: MenuProps['onClick'] = ({ key, keyPath, domEvent }) => {
+    setAuthor(key);
   };
 
   useEffect(() => {
@@ -118,8 +131,7 @@ const News: React.FC<NewsProps> = ({ children, onContainerRef }) => {
     };
   }, [setFooterHidden]);
 
-  console.log('commentsToRender', commentsToRender);
-
+  const isAdmin = userrights === 'admin';
   return (
     <>
       <SideBarNews
@@ -174,6 +186,8 @@ const News: React.FC<NewsProps> = ({ children, onContainerRef }) => {
                       commentText={text}
                       likeNewsOrComment={likeNewsOrComment}
                       likesCount={item.likes}
+                      isAdmin={isAdmin}
+                      allPostsAuthors={allPostsAuthors}
                     />
                   ))}
                 </div>
@@ -184,6 +198,9 @@ const News: React.FC<NewsProps> = ({ children, onContainerRef }) => {
                     setText={setText}
                     handleSendComment={handleSendComment}
                     avatarSrc={`${process.env.NEXT_PUBLIC_BASE_URL_MEDIA}/${avatar_pic}`}
+                    isAdmin={isAdmin}
+                    handleMenuClick={handleMenuClick}
+                    items={items}
                   />
                 </div>
               </div>

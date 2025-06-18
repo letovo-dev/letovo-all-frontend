@@ -22,6 +22,7 @@ import { saveArticle } from './saveArticle';
 import { createNews } from './createNews';
 import { deleteNews } from './deleteNews';
 import { editNews } from './editNews';
+import { getAllPostsAuthors } from './getAllPostsAuthors';
 
 const apiMethods = {
   getAvatars,
@@ -48,6 +49,7 @@ const apiMethods = {
   createNews,
   editNews,
   deleteNews,
+  getAllPostsAuthors,
 };
 
 export default apiMethods;

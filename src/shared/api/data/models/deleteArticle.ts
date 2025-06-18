@@ -8,7 +8,7 @@ export const deleteArticle = async (id: string): Promise<IApiReturn<unknown>> =>
 
   const response = await API.apiQuery<any[]>({
     method: API_DATA_SCHEME.deleteArticle.method,
-    url: `${API_DATA_SCHEME.deleteArticle.url}/${id}`,
+    url: `${API_DATA_SCHEME.deleteArticle.url}`,
   });
 
   return { ...response };

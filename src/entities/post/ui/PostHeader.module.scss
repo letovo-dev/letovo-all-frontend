@@ -28,6 +28,10 @@
   @extend .infoContainer;
   margin-top: 12px;
 }
+.iconsContainer {
+  display: flex;
+  gap: 20px;
+}
 .editPost {
   cursor: pointer;
   color: var(--orange);

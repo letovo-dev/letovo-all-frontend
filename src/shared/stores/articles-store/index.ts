@@ -33,16 +33,58 @@ export type TArticlesStoreState = {
   error: string | null;
   lastFetched: number | null;
   getArticlesCategories: () => Promise<ArticleCategory[]>;
-  renameArticleCategory: (categoryId: string, newName: string) => Promise<ArticleCategory[]>;
+  renameArticleCategory: (
+    categoryId: string,
+    newName: string,
+    oldName: string,
+  ) => Promise<ArticleCategory[]>;
+  // '/post/rename_category': {
+  //   function: 'rename_category';
+  //   method: 'put';
+  //   body_fields: {
+  //     old_name: 'String';
+  //     new_name: 'String';
+  //   };
+  //   header_fields: ['Bearer'];
+  // };
   deleteArticleCategory: (id: string) => Promise<ArticleCategory[]>;
   deleteArticle: (id: string, categoryId: string) => void;
+  // '/post/delete': {
+  //   function: 'delete_post';
+  //   method: 'delete';
+  //   body_fields: {
+  //     post_id: 'Int';
+  //   };
+  //   header_fields: ['Bearer'];
+  // };
   renameArticle: (categoryId: string, articleId: string, newName: string) => OneArticle;
+  // '/post/update': {
+  //   method: 'put';
+  //   body_fields: {
+  //     post_id: 'Int';
+  //     is_secret: 'Bool';
+  //     likes: 'Int';
+  //     dislikes: 'Int';
+  //     saved: 'Int';
+  //     title: 'String';
+  //     author: 'String';
+  //     text: 'String';
+  //     category: 'String';
+  //   };
+  //   header_fields: ['Bearer'];
+  // };
   getOneArticle: (id: string, categoryId: string) => OneArticle;
   getArticleMd: (fileName: string) => Promise<any>;
   loadAllArticlesByCategory: (id: string) => Promise<void>;
   setCurrentArticle: (article: OneArticle) => void;
   refreshArticles: () => Promise<void>;
   saveArticle: (categoryId: string, articleId: string | null, file: File) => Promise<void>;
+  //   POST ручка /api/post/add_page, формат боди:
+  // {
+  // 	"post_path": "posts/example_post_3.md",
+  // 	"category": "дефолт",
+  // 	"title": "some"
+  // }
 };
 
 const initialState = {
@@ -211,16 +253,19 @@ const articlesStore = create<TArticlesStoreState>()(
           return [];
         }
       },
-      renameArticleCategory: async (categoryId: string, newName: string) => {
+      renameArticleCategory: async (categoryId: string, newName: string, oldName: string) => {
         try {
-          const response = (await SERVICES_DATA.Data.renameCategory(categoryId, newName)) as {
+          const response = (await SERVICES_DATA.Data.renameCategory(
+            categoryId,
+            newName,
+            oldName,
+          )) as {
             code: number;
             data: { result: ArticleCategory[] };
           };
-          if (response.code === 200 && response.data?.result) {
-            const data = response.data.result;
+          if (response.code === 200) {
             const updatedCategories = get().articlesCategories.map((el: ArticleCategory) => {
-              return el.category === data[0].category ? data[0] : el;
+              return el.category_name === oldName ? { ...el, category_name: newName } : el;
             });
             set((draft: TArticlesStoreState) => {
               draft.articlesCategories = updatedCategories;

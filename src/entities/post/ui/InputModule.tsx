@@ -3,6 +3,8 @@ import React from 'react';
 import style from './InputModule.module.scss';
 import TextareaAutoHeight from './TextareaAutoHeight';
 import Image from 'next/image';
+import PostAuthorsDropdown from './PostAuthorsDropdown';
+import type { MenuProps } from 'antd';
 
 type InputModuleProps = {
   isLastNews: boolean;
@@ -10,6 +12,9 @@ type InputModuleProps = {
   avatarSrc: string;
   handleSendComment: () => void;
   setText: (text: string) => void;
+  isAdmin: boolean;
+  handleMenuClick: MenuProps['onClick'];
+  items: MenuProps['items'];
 };
 
 const InputModule: React.FC<InputModuleProps> = ({
@@ -18,13 +23,24 @@ const InputModule: React.FC<InputModuleProps> = ({
   setText,
   handleSendComment,
   avatarSrc,
+  isAdmin,
+  handleMenuClick,
+  items,
 }) => {
   return (
     <>
       <Divider className={style.inputDivider} />
       <div className={style.commentInputContainer}>
         <div className={style.avatarTemplate}>
-          <Avatar src={avatarSrc ?? '/img/pic3.png'} size={30} className={style.avatar} />
+          {isAdmin ? (
+            <PostAuthorsDropdown
+              avatarSrc={avatarSrc}
+              handleMenuClick={handleMenuClick}
+              items={items}
+            />
+          ) : (
+            <Avatar src={avatarSrc ?? '/img/pic3.png'} size={30} className={style.avatar} />
+          )}
         </div>
         <TextareaAutoHeight
           value={text}

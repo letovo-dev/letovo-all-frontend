@@ -7,13 +7,16 @@ import Image from 'next/image';
 import { RealComment } from '@/shared/stores/data-store';
 import InputModule from './InputModule';
 import commentsStore from '@/shared/stores/comments-store';
+import type { MenuProps } from 'antd';
+import { IUserData } from '@/shared/stores/user-store';
+import getAuthorsList from '../model/getAuthorsList';
 
 interface OneCommentProps {
   showMore: boolean;
   newsId: string;
   lastNews: boolean;
   showInput: boolean;
-  saveComment: (comment: string, post_id: string) => Promise<void>;
+  saveComment: (comment: string, post_id: string, author: string | undefined) => Promise<void>;
   avatar: string;
   comments?: RealComment[];
   comment?: RealComment;
@@ -21,6 +24,8 @@ interface OneCommentProps {
   commentText?: string;
   likeNewsOrComment: (post_id: string, action: string) => Promise<void>;
   likesCount?: string;
+  isAdmin: boolean;
+  allPostsAuthors: IUserData[];
 }
 
 const OneComment: React.FC<OneCommentProps> = ({
@@ -35,6 +40,8 @@ const OneComment: React.FC<OneCommentProps> = ({
   commentText,
   likeNewsOrComment,
   likesCount,
+  isAdmin,
+  allPostsAuthors,
 }) => {
   const [likeComment, selLikeComment] = useState(false);
   const [commentState, setCommentState] = useState<RealComment | undefined>(undefined);
@@ -43,6 +50,7 @@ const OneComment: React.FC<OneCommentProps> = ({
   const usageCommentText = setCommentText ?? setText;
   const usageCommentTextValue = commentText ?? text;
   const [likesCommentCount, setLikesCommentCount] = useState(likesCount);
+  const [author, setAuthor] = useState<string | undefined>(undefined);
 
   const comments = normalizedComments?.[newsId];
 
@@ -88,13 +96,18 @@ const OneComment: React.FC<OneCommentProps> = ({
 
   const handleSendComment = () => {
     if (usageCommentTextValue.length > 0) {
-      saveComment(usageCommentTextValue, newsId);
+      saveComment(usageCommentTextValue, newsId, author);
       usageCommentText('');
+      setAuthor(undefined);
     }
   };
 
   const handleReply = () => {
     usageCommentText(`@${commentState?.author}`);
+  };
+
+  const handleMenuClick: MenuProps['onClick'] = ({ key, keyPath, domEvent }) => {
+    setAuthor(key);
   };
 
   return (
@@ -142,6 +155,9 @@ const OneComment: React.FC<OneCommentProps> = ({
           setText={usageCommentText}
           handleSendComment={handleSendComment}
           avatarSrc={`${process.env.NEXT_PUBLIC_BASE_URL_MEDIA}/${avatar}`}
+          isAdmin={isAdmin}
+          handleMenuClick={handleMenuClick}
+          items={getAuthorsList(allPostsAuthors)}
         />
       )}
     </section>

@@ -6,17 +6,16 @@ import { OneNews } from '@/entities/post/ui';
 import commentsStore from '@/shared/stores/comments-store';
 import SpinModule from '@/shared/ui/spiner';
 import { News } from '@/pages_fsd/news';
-import authStore from '@/shared/stores/auth-store';
-import { useRouter } from 'next/navigation';
+import style from './page.module.scss';
+import { message } from 'antd';
 
 const LOAD_NEWS_SIZE = 10;
 
 const NewsPage = () => {
   const { getTitles, likeNewsOrComment, dislikeNews, fetchNews } = dataStore(state => state);
-  const userStatus = authStore(state => state.userStatus);
   const { saveComment } = commentsStore(state => state);
   const normalizedNews = dataStore(state => state.data.normalizedNews);
-  const { currentNewsState, setCurrentNewsState, loading } = dataStore(state => state);
+  const { currentNewsState, setCurrentNewsState, loading, error } = dataStore(state => state);
   const savedNews = dataStore(state => state.data.savedNews);
   const searchedNews = dataStore(state => state.data.searchedNews);
   const newsTitles = dataStore(state => state.data.newsTitles);
@@ -32,6 +31,21 @@ const NewsPage = () => {
     offsetTop: 0,
   });
   const containerRef = useRef<HTMLDivElement | null>(null);
+
+  const [messageApi, contextHolder] = message.useMessage();
+
+  const info = () => {
+    messageApi.open({
+      type: 'error',
+      content: error,
+    });
+  };
+
+  useEffect(() => {
+    if (error) {
+      info();
+    }
+  }, [error]);
 
   useEffect(() => {
     const handleError = (event: ErrorEvent) => {
@@ -53,7 +67,7 @@ const NewsPage = () => {
     const initializeData = async () => {
       try {
         await Promise.all([
-          fetchNews({ type: 'getLimitNews', start: 0, size: LOAD_NEWS_SIZE }),
+          fetchNews({ type: 'getLimitNews', start: 20, size: LOAD_NEWS_SIZE }),
           fetchNews({ type: 'getSavedNews' }),
           getTitles(),
         ]);
@@ -79,6 +93,8 @@ const NewsPage = () => {
         return normalizedNews;
     }
   }, [currentNewsState, normalizedNews, savedNews, searchedNews]);
+
+  console.log('currentNewsState', currentNewsState);
 
   useEffect(() => {
     const news = getRenderNews();
@@ -194,31 +210,37 @@ const NewsPage = () => {
     return <SpinModule />;
   }
 
-  if (!renderNews || Object.keys(renderNews).length === 0) {
-    return <SpinModule />;
-  }
-
   return (
-    <News onContainerRef={ref => (containerRef.current = ref.current)}>
-      {Object.entries(renderNews).map((el, index) => {
-        const newsArr = Object.entries(renderNews);
-        const isLastElement = index === newsArr.length - 1;
-        return (
-          <div ref={isLastElement ? lastElementRef : null} key={el[0]} data-news-id={el[0]}>
-            <OneNews
-              el={el[1] ?? { media: [], news: {} }}
-              index={index}
-              lastNews={isLastElement ? el[1] : null}
-              newsId={String(el[0])}
-              likeNewsOrComment={likeNewsOrComment}
-              dislikeNews={dislikeNews}
-              saveComment={saveComment}
-            />
-          </div>
-        );
-      })}
-      {loading && startNewsItem > 0 && <SpinModule />}
-    </News>
+    <>
+      {contextHolder}
+      <News onContainerRef={ref => (containerRef.current = ref.current)}>
+        {renderNews &&
+          Object.entries(renderNews)
+            .sort((a, b) => {
+              const dateA = new Date(a[1].news.date);
+              const dateB = new Date(b[1].news.date);
+              return dateB.getTime() - dateA.getTime();
+            })
+            .map((el, index) => {
+              const newsArr = Object.entries(renderNews);
+              const isLastElement = index === newsArr.length - 1;
+              return (
+                <div ref={isLastElement ? lastElementRef : null} key={el[0]} data-news-id={el[0]}>
+                  <OneNews
+                    el={el[1] ?? { media: [], news: {} }}
+                    index={index}
+                    lastNews={isLastElement ? el[1] : null}
+                    newsId={String(el[0])}
+                    likeNewsOrComment={likeNewsOrComment}
+                    dislikeNews={dislikeNews}
+                    saveComment={saveComment}
+                  />
+                </div>
+              );
+            })}
+        {loading && startNewsItem > 0 && <SpinModule />}
+      </News>
+    </>
   );
 };
 

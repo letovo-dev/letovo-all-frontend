@@ -34,7 +34,7 @@ export type TCommentsStoreState = {
   setOpenComments: (id: string) => void;
   setCommentReply: (text: string) => void;
   getLimitNewsComments: (post_id: number, start: number, size: number) => Promise<void>;
-  saveComment: (comment: string, post_id: string) => Promise<any>;
+  saveComment: (comment: string, post_id: string, author: string | undefined) => Promise<any>;
   getCurrentNewsPics: (id: number) => Promise<any>;
 };
 
@@ -84,10 +84,14 @@ const commentsStore = create<TCommentsStoreState>()(
           commentReply: text,
         }));
       },
-      saveComment: async (comment: string, post_id: string): Promise<any> => {
+      saveComment: async (
+        comment: string,
+        post_id: string,
+        author: string | undefined,
+      ): Promise<any> => {
         set({ error: null, loading: true });
         try {
-          const response = await SERVICES_DATA.Data.saveComments(comment, post_id);
+          const response = await SERVICES_DATA.Data.saveComments(comment, post_id, author);
 
           if (response.code === 200) {
             const result = (response?.data as { result: OneComment[] })?.result;

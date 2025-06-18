@@ -5,8 +5,8 @@ import PostHeader from './PostHeader';
 import CarouselElement from './Carousel';
 import NewsActionPanel from '@/features/news-action-panel/ui';
 import OneComment from './OneComment';
-import { RealMedia, RealNews } from '@/shared/stores/data-store';
-import userStore, { IUserStore } from '@/shared/stores/user-store';
+import dataStore, { RealNews } from '@/shared/stores/data-store';
+import userStore, { IUserData, IUserStore } from '@/shared/stores/user-store';
 import commentsStore from '@/shared/stores/comments-store';
 import { generateKey } from '@/shared/api/utils';
 import style from './NewsPost.module.scss';
@@ -19,7 +19,7 @@ interface OnePostProps {
   el: { news: RealNews; media: string[] };
   likeNewsOrComment: (post_id: string, action: string) => Promise<void>;
   dislikeNews: (post_id: string, action: string) => Promise<void>;
-  saveComment: (comment: string, post_id: string) => Promise<void>;
+  saveComment: (comment: string, post_id: string, author: string | undefined) => Promise<void>;
 }
 
 const NewsPost: React.FC<OnePostProps> = ({
@@ -32,6 +32,8 @@ const NewsPost: React.FC<OnePostProps> = ({
   newsId,
 }) => {
   const { avatar_pic, userrights } = userStore((state: IUserStore) => state.store.userData);
+  const { allPostsAuthors } = userStore((state: IUserStore) => state.store);
+  const { editNews, deleteNews, setCurrentNewsState, currentNewsState } = dataStore(state => state);
   const comments = useMemo(
     () =>
       commentsStore.getState().normalizedComments
@@ -39,41 +41,46 @@ const NewsPost: React.FC<OnePostProps> = ({
         : [],
     [newsId],
   );
-  const [visible, setVisible] = useState(false); // State for modal visibility
+  const [visible, setVisible] = useState(false);
   const [post, setPost] = useState<Post | null>({
     ...el.news,
     mediaUrl: el.media.length > 0 ? el.media : [],
-  }); // State for editing post
+  });
   const showMore = comments.length > 1;
-  console.log('el.media', el.media);
 
-  const authors = [
-    { id: '1', name: 'John Doe' },
-    { id: '2', name: 'Jane Smith' },
-  ];
+  const authors = useMemo(() => {
+    return allPostsAuthors?.map((author: IUserData) => {
+      return { id: author.username, name: author.username };
+    });
+  }, [allPostsAuthors]);
 
-  // Open modal for creating or editing
   const handleOpen = (editPost?: Post) => {
-    // setPost(editPost || null); // Set post for editing or null for creating
-    setVisible(true); // Show modal
+    setVisible(true);
   };
 
-  // Handle form submission
+  const handleDelete = (id: string) => {
+    deleteNews(id);
+    setCurrentNewsState({
+      default: true,
+      saved: false,
+      selectedNews: undefined,
+      searched: false,
+    });
+  };
+
   const handleSubmit = async (values: any) => {
     try {
-      // Mock API call (replace with your actual API)
       console.log('Submitted:', values);
-      // Example: await api.savePost(values);
-      setVisible(false); // Close modal on success
+      editNews({ ...post, ...values });
+      setVisible(false);
     } catch (error) {
       console.error('Submit error:', error);
     }
   };
 
-  // Handle modal cancel
   const handleCancel = () => {
-    setVisible(false); // Hide modal
-    // setPost(null); // Clear post data
+    setVisible(false);
+    // setPost(null);
   };
 
   return (
@@ -88,6 +95,8 @@ const NewsPost: React.FC<OnePostProps> = ({
         text={el.news.text || ''}
         userStatus={userrights}
         handleOpen={handleOpen}
+        handleDelete={handleDelete}
+        currentNewsStateSaved={currentNewsState.saved}
       />
       {el.media.length > 0 ? (
         <CarouselElement imgs={el.media} />
@@ -110,6 +119,8 @@ const NewsPost: React.FC<OnePostProps> = ({
         avatar={avatar_pic}
         comments={comments}
         likeNewsOrComment={likeNewsOrComment}
+        isAdmin={userrights === 'admin'}
+        allPostsAuthors={allPostsAuthors}
       />
       {userrights === 'admin' && (
         <PostModal

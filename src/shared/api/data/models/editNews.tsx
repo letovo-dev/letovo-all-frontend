@@ -6,7 +6,7 @@ export const editNews = async (news: Partial<RealNews>): Promise<IApiReturn<unkn
   const response = await API.apiQuery<any[]>({
     method: API_DATA_SCHEME.editNews.method,
     url: API_DATA_SCHEME.editNews.url,
-    data: { news },
+    data: news,
   });
 
   return { ...response };

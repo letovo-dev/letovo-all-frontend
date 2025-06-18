@@ -8,7 +8,7 @@ import Image from 'next/image';
 import SideBarNewsContent from './SideBarNewsContent';
 import { message } from 'antd';
 import { PlusOutlined } from '@ant-design/icons';
-import userStore, { IUserStore } from '@/shared/stores/user-store';
+import userStore, { IUserData, IUserStore } from '@/shared/stores/user-store';
 import PostModal from '../post-modal/ui';
 
 interface FormValues {
@@ -36,12 +36,15 @@ const SideBarNews = ({
   burgerRef: React.RefObject<HTMLDivElement>;
 }) => {
   const [form] = Form.useForm();
-  const { loading, setCurrentNewsState, fetchNews, currentNewsState } = dataStore(state => state);
+  const { loading, setCurrentNewsState, fetchNews, createNews, currentNewsState } = dataStore(
+    state => state,
+  );
   const { searchedNews, savedNews } = dataStore(state => state.data);
   const sidebarRef = useRef<HTMLDivElement>(null);
   const { userrights } = userStore((state: IUserStore) => state.store.userData);
-  const [visible, setVisible] = useState(false); // State for modal visibility
-  const [post, setPost] = useState<any | null>(null); // State for editing post
+  const [visible, setVisible] = useState(false);
+  const [post, setPost] = useState<any | null>(null);
+  const { allPostsAuthors } = userStore((state: IUserStore) => state.store);
 
   const savedNewsLength = useMemo(() => {
     return Object.keys(savedNews).length;
@@ -139,33 +142,29 @@ const SideBarNews = ({
     };
   }, [open, setOpen, burgerRef]);
 
-  const authors = [
-    { id: '1', name: 'John Doe' },
-    { id: '2', name: 'Jane Smith' },
-  ];
+  const authors = useMemo(() => {
+    return allPostsAuthors?.map((author: IUserData) => {
+      return { id: author.username, name: author.username };
+    });
+  }, [allPostsAuthors]);
 
-  // Open modal for creating or editing
   const handleOpen = (editPost?: any) => {
-    setPost(editPost || null); // Set post for editing or null for creating
-    setVisible(true); // Show modal
+    setPost(editPost || null);
+    setVisible(true);
   };
 
-  // Handle form submission
   const handleSubmit = async (values: any) => {
     try {
-      // Mock API call (replace with your actual API)
-      console.log('Submitted:', values);
-      // Example: await api.savePost(values);
-      setVisible(false); // Close modal on success
+      createNews(values);
+      setVisible(false);
     } catch (error) {
       console.error('Submit error:', error);
     }
   };
 
-  // Handle modal cancel
   const handleCancel = () => {
-    setVisible(false); // Hide modal
-    setPost(null); // Clear post data
+    setVisible(false);
+    setPost(null);
   };
 
   return (

@@ -6,6 +6,7 @@ import { Modal } from 'antd';
 import { SERVICES_USERS } from '@/shared/api/user';
 import authStore, { TAuthStoreState } from '../auth-store';
 import { SERVICES_ACHIEVEMENTS } from '@/shared/api/achievements';
+import { SERVICES_DATA } from '@/shared/api/data';
 
 export interface IUserAchData {
   id: string;
@@ -23,17 +24,19 @@ export interface IUserAchData {
 }
 
 export interface IUserData {
+  active: string;
+  avatar_pic: string;
+  balance: string;
+  departmentid: string;
+  departmentname: string;
+  jointime: string;
+  paycheck: string;
+  registered: string;
+  role: string;
+  times_visited: string;
   userid: string;
   username: string;
   userrights: string;
-  jointime: string;
-  avatar_pic: string;
-  active: string;
-  departmentid: string;
-  role: string;
-  registered: string;
-  balance: number | string;
-  times_visited: number | string;
 }
 
 export interface IUserStore {
@@ -42,6 +45,7 @@ export interface IUserStore {
     userAchievements: IUserAchData | undefined;
     allPossibleUserAchievements: IUserAchData[] | undefined;
     departmentAchievements: IUserAchData[] | undefined;
+    allPostsAuthors: IUserData[];
   };
   localeName: string;
   endPreload: boolean;
@@ -56,6 +60,7 @@ export interface IUserStore {
   changeLogin: (login: string) => Promise<void>;
   loading: boolean;
   error?: string | undefined;
+  getAllPostsAuthors: () => Promise<void>;
 }
 
 const initialState = {
@@ -76,6 +81,7 @@ const initialState = {
   allPossibleUserAchievements: undefined,
   departmentAchievements: undefined,
   error: undefined,
+  allPostsAuthors: [],
 };
 
 const userStore = create<IUserStore>()(
@@ -267,6 +273,25 @@ const userStore = create<IUserStore>()(
             } catch (err) {
               console.error(err);
               set({ error: 'Не удалось сменить ник' });
+            } finally {
+              set({ loading: false });
+            }
+          },
+          getAllPostsAuthors: async (): Promise<any> => {
+            set({ error: undefined });
+            try {
+              const response = await SERVICES_DATA.Data.getAllPostsAuthors();
+              if (response.success && response.code === 200) {
+                const { result } = response?.data as { result: IUserData[] };
+                userStore.setState((draft: IUserStore) => {
+                  draft.store.allPostsAuthors = result;
+                });
+              } else {
+                set({ error: response.codeMessage });
+              }
+            } catch (error) {
+              console.error(error);
+              set({ error: 'Network or system error' });
             } finally {
               set({ loading: false });
             }

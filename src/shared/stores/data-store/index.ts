@@ -107,6 +107,12 @@ interface RequestConfig {
   updatePostIds: boolean;
 }
 
+interface NewsItem {
+  media: any[];
+  comments: RealComment[];
+  news: RealNews;
+}
+
 export type TDataStoreState = {
   loading: boolean;
   error: string;
@@ -120,6 +126,8 @@ export type TDataStoreState = {
     searchedNews: Record<string, any>;
     normalizedNews: Record<string, any>;
     postIds: string[];
+    allAuthors: string[];
+    lastValidData: NewsItem[] | null;
   };
   currentNewsState: Record<string, any>;
   selectedNews: RealNews[];
@@ -137,7 +145,28 @@ export type TDataStoreState = {
   fetchNews: (params: FetchNewsParams) => Promise<any>;
   createNews: (news: Partial<RealNews>) => void;
   editNews: (news: RealNews) => void;
+  // "/post/update": {
+  //   "method": "put",
+  //   "body_fields": {
+  //       "post_id": "Int",
+  //       "is_secret": "Bool",
+  //       "likes": "Int",
+  //       "dislikes": "Int",
+  //       "saved": "Int",
+  //       "title": "String",
+  //       "author": "String",
+  //       "text": "String",
+  //       "category": "String"
+  //   },
   deleteNews: (news_id: string) => void;
+  // '/post/delete': {
+  //   function: 'delete_post';
+  //   method: 'delete';
+  //   body_fields: {
+  //     post_id: 'Int';
+  //   };
+  //   header_fields: ['Bearer'];
+  // };
 };
 
 const dataState = {
@@ -201,7 +230,6 @@ const dataStore = create<TDataStoreState>()(
               ...s.data,
               newsTitles: result,
             },
-            error: undefined,
           }));
         } else {
           set((s: TDataStoreState) => ({
@@ -209,7 +237,6 @@ const dataStore = create<TDataStoreState>()(
               ...s.data,
               newsTitles: [],
             },
-            error: undefined,
           }));
         }
       } catch (error: any) {
@@ -229,25 +256,31 @@ const dataStore = create<TDataStoreState>()(
         const response = await SERVICES_DATA.Data.createNews(news);
         if (response.success && response.code === 200) {
           const savedNews = (response?.data as { result: RealNews[] })?.result;
-          const { result } = await commentsStore
-            .getState()
-            .getCurrentNewsPics(savedNews[0].post_id);
-
+          const { result } =
+            (await commentsStore.getState().getCurrentNewsPics(savedNews[0].post_id)) ?? [];
+          const updatedNormalizedNews = {
+            [savedNews[0].post_id]: {
+              news: savedNews[0],
+              media: (result && result?.map((media: RealMedia) => media.media)) ?? [],
+              comments: [],
+            },
+            ...get().data.normalizedNews,
+          };
+          const updatedPostIds = [...get().data.postIds, savedNews[0].post_id.toString()];
+          const updatedNewsTitles = [
+            { post_id: savedNews[0].post_id.toString(), title: savedNews[0].title },
+            ...get().data.newsTitles,
+          ];
           set((state: TDataStoreState) => {
-            const updatedNormalizedNews = {
-              ...state.data.normalizedNews,
-              [savedNews[0].post_id]: {
-                news: savedNews[0],
-                media: result.map((media: RealMedia) => media.media),
-                comments: [],
-              },
-            };
             return {
               data: {
                 ...state.data,
                 normalizedNews: updatedNormalizedNews,
+                postIds: updatedPostIds,
+                newsTitles: updatedNewsTitles,
               },
               error: undefined,
+              loading: false,
             };
           });
         } else {
@@ -262,12 +295,16 @@ const dataStore = create<TDataStoreState>()(
       set({ loading: true, error: undefined });
       try {
         const response = await SERVICES_DATA.Data.editNews(news);
+        console.log(response);
+
         if (response.success && response.code === 200) {
           const editedNews = (response?.data as { result: RealNews[] })?.result;
           const { result } = await commentsStore
             .getState()
             .getCurrentNewsPics(editedNews[0].post_id);
-
+          const updatedTitles = get().data.newsTitles.map((title: Titles) =>
+            String(title.post_id) === String(editedNews[0].post_id) ? editedNews[0].title : title,
+          );
           set((state: TDataStoreState) => {
             const updatedNormalizedNews = {
               ...state.data.normalizedNews,
@@ -281,8 +318,10 @@ const dataStore = create<TDataStoreState>()(
               data: {
                 ...state.data,
                 normalizedNews: updatedNormalizedNews,
+                newsTitles: updatedTitles,
               },
               error: undefined,
+              loading: false,
             };
           });
         } else {
@@ -297,14 +336,35 @@ const dataStore = create<TDataStoreState>()(
       set({ loading: true, error: undefined });
       try {
         const response = await SERVICES_DATA.Data.deleteNews(news_id);
+        console.log(
+          'response.success && response.code === 200',
+          response.success && response.code === 200,
+        );
+
+        console.log('get().state.data,', get().data);
+
         if (response.success && response.code === 200) {
+          console.log('get().state.data.newsTitles', get().data.newsTitles);
+
+          const updatedTitles = get().data.newsTitles.filter(
+            (title: Titles) => title.post_id !== news_id,
+          );
+          console.log('updatedTitles', updatedTitles);
+
+          const updatedIds = get().data.postIds.filter((id: string) => id !== news_id);
+          console.log('updatedIds', updatedIds);
+
           set((state: TDataStoreState) => {
             const updatedNormalizedNews = { ...state.data.normalizedNews };
             delete updatedNormalizedNews[news_id];
+            console.log('updatedNormalizedNews', updatedNormalizedNews);
+
             return {
               data: {
                 ...state.data,
                 normalizedNews: updatedNormalizedNews,
+                newsTitles: updatedTitles,
+                postIds: updatedIds,
               },
               error: undefined,
             };
@@ -315,6 +375,8 @@ const dataStore = create<TDataStoreState>()(
       } catch (error) {
         console.error(error);
         set({ loading: false, error: 'Network or system error' });
+      } finally {
+        set({ loading: false });
       }
     },
     saveNews: async (id: string, action: 'save' | 'delete'): Promise<any> => {
@@ -463,7 +525,7 @@ const dataStore = create<TDataStoreState>()(
         } catch (error) {
           console.error('Error in Promise.all:', error);
           set({
-            error: 'Failed to load media or comments',
+            error: 'Не удалось загрузить новости',
             loading: false,
           });
           return response;
@@ -524,7 +586,6 @@ const dataStore = create<TDataStoreState>()(
             ...get().data,
             ...updatedData,
           },
-          error: undefined,
           loading: false,
         });
 

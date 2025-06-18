@@ -97,12 +97,13 @@ const SideBarArticles = ({
     categoryId: string,
     type: 'category' | 'article',
     newValue: string,
+    oldName: string = '',
   ) => {
-    // console.log(`Submitted ${type} rename:`, { key, newValue });
+    console.log(type, categoryId, articleId, newValue);
     if (type === 'category') {
-      renameArticleCategory(categoryId, newValue);
+      renameArticleCategory(categoryId, newValue, oldName);
     } else {
-      renameArticle(categoryId, (articleId = '0'), newValue);
+      renameArticle(categoryId, articleId ?? '0', newValue);
     }
     setEditingEntity(null);
   };
@@ -134,7 +135,7 @@ const SideBarArticles = ({
 
   const menuItems: MenuProps['items'] = [
     { key: 'renameMenuItem', label: 'Переименовать' },
-    { key: 'delete', label: 'Удалить' },
+    // { key: 'delete', label: 'Удалить' },
   ];
 
   const articleItems: MenuProps['items'] = [
@@ -206,6 +207,7 @@ const SideBarArticles = ({
                         value.category,
                         'category',
                         editingEntity?.value || '',
+                        value.category_name,
                       )
                     }
                   >
@@ -254,14 +256,14 @@ const SideBarArticles = ({
                         <Button
                           type="primary"
                           style={{ backgroundColor: '#fb4724' }}
-                          onClick={() =>
+                          onClick={() => {
                             handleRenameSubmit(
-                              value.category,
                               articleItem.post_id,
+                              value.category,
                               'article',
                               editingEntity?.value || '',
-                            )
-                          }
+                            );
+                          }}
                         >
                           <SaveOutlined />
                         </Button>

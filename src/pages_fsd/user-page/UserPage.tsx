@@ -48,6 +48,7 @@ const UserPage = () => {
   const avatarRef = useRef<HTMLDivElement>(null);
   const [openTransferModal, setOpenTransferModal] = useState(false);
   const { setFooterHidden } = useFooterContext();
+  const { getAllPostsAuthors } = userStore.getState();
 
   const wrapRef = useRef<HTMLDivElement>(null);
   const lastScrollTop = useRef(0);
@@ -87,6 +88,9 @@ const UserPage = () => {
 
         setIsLoading(false);
         getAchievementsDepartment();
+      }
+      if (initialData?.userrights === 'admin') {
+        getAllPostsAuthors();
       }
     };
 

@@ -74,32 +74,36 @@ export const API_DATA_SCHEME: IApiEntityScheme<IEndpoint> = {
     url: `${baseUrl}/social/bycat`,
   },
   renameCategory: {
-    method: 'POST',
-    url: `${baseUrl}/social/bycat`,
+    method: 'PUT',
+    url: `${baseUrl}/post/rename_category`,
   },
   deleteArticle: {
     method: 'DELETE',
-    url: `${baseUrl}/social/bycat`,
+    url: `${baseUrl}/post/delete`,
   },
   renameArticle: {
-    method: 'POST',
-    url: `${baseUrl}/social/bycat`,
+    method: 'PUT',
+    url: `${baseUrl}/post/update`,
   },
   saveArticle: {
     method: 'POST',
-    url: `${baseUrl}/social/bycat`,
+    url: `${baseUrl}/post/add_page`,
   },
   createNews: {
     method: 'POST',
-    url: `${baseUrl}/social/bycat`,
+    url: `${baseUrl}/post/add_page`,
   },
   editNews: {
-    method: 'POST',
-    url: `${baseUrl}/social/bycat`,
+    method: 'PUT',
+    url: `${baseUrl}/post/update`,
   },
   deleteNews: {
     method: 'DELETE',
-    url: `${baseUrl}/social/bycat`,
+    url: `${baseUrl}/post/delete`,
+  },
+  getAllPostsAuthors: {
+    method: 'GET',
+    url: `${baseUrl}/authors_list`,
   },
 };
 
@@ -128,4 +132,5 @@ export const API_DATA_ENDPOINTS = [
   'createNews',
   'editNews',
   'deleteNews',
+  'getAllPostsAuthors',
 ] as const;
