@@ -201,7 +201,7 @@ const articlesStore = create<TArticlesStoreState>()(
             data: { result: ArticleCategory[] };
           };
           if (response.code === 200 && response.data?.result) {
-            const data = response.data.result;
+            const data = response.data.result[0];
             const normalizedArticles = get().normalizedArticles;
             const updatedArticles = normalizedArticles[categoryId].map((el: OneArticle) =>
               el.post_id === articleId ? data : el,

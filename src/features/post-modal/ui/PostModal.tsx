@@ -69,7 +69,6 @@ const PostModal: React.FC<PostModalProps> = ({ visible, onCancel, onSubmit, post
           setFileList([]);
         }
       } else {
-        // Create mode: reset form
         form.resetFields();
         setFileList([]);
       }
@@ -91,51 +90,166 @@ const PostModal: React.FC<PostModalProps> = ({ visible, onCancel, onSubmit, post
     }
   };
 
+  console.log('fileList', fileList);
+
+  // const uploadProps: UploadProps = {
+  //   name: 'file',
+  //   accept: 'image/*,video/*',
+  //   fileList,
+  //   action: process.env.NEXT_PUBLIC_UPLOAD_URL,
+  //   headers: {
+  //     Authorization: `Bearer ${localStorage.getItem('token') || ''}`,
+  //   },
+  //   onChange: async ({ file, fileList: newFileList }) => {
+  //     console.log('Upload file:', {
+  //       name: file.name,
+  //       status: file.status,
+  //       response: file.response,
+  //       error: file.error,
+  //       action: process.env.NEXT_PUBLIC_UPLOAD_URL,
+  //       token: localStorage.getItem('token') || 'No token',
+  //     });
+  //     if (file.status === 'removed' && file.url) {
+  //       try {
+  //         const response = await fetch('/api/delete-file', {
+  //           method: 'DELETE',
+  //           headers: {
+  //             'Content-Type': 'application/json',
+  //             Authorization: `Bearer ${localStorage.getItem('token') || ''}`,
+  //           },
+  //           body: JSON.stringify({ url: file.url }),
+  //         });
+  //         if (!response.ok) {
+  //           const errorData = await response.json().catch(() => ({}));
+  //           throw new Error(errorData.message || `Не удалось удалить файл: ${response.status}`);
+  //         }
+  //         message.info(`${file.name} удалён`);
+  //         setFileList(newFileList);
+  //       } catch (error) {
+  //         const errorMsg = error instanceof Error ? error.message : String(error);
+  //         message.error(`Не удалось удалить файл: ${errorMsg}`);
+  //         console.error('Delete error:', error);
+  //       }
+  //     } else {
+  //       setFileList(newFileList);
+  //       if (file.status === 'done') {
+  //         const filePath = file.response?.url;
+  //         if (filePath) {
+  //           console.log('File saved at:', filePath);
+  //           message.success(`${file.name} загружен успешно по пути: ${filePath}`);
+  //         } else {
+  //           message.error('Неверный ответ сервера: путь не возвращён');
+  //           console.error('No URL in response:', file.response);
+  //         }
+  //       } else if (file.status === 'error') {
+  //         const errorMessage =
+  //           file.response?.message ||
+  //           file.error?.message ||
+  //           `Ошибка загрузки ${file.name}: Неизвестная ошибка`;
+  //         message.error(errorMessage);
+  //         console.error('Upload error details:', {
+  //           file: {
+  //             name: file.name,
+  //             status: file.status,
+  //             response: file.response,
+  //             error: file.error,
+  //           },
+  //           action: process.env.NEXT_PUBLIC_UPLOAD_URL,
+  //           token: localStorage.getItem('token') || 'No token',
+  //         });
+  //       }
+  //     }
+  //   },
+  //   beforeUpload: file => {
+  //     console.log('Before upload:', { name: file.name, size: file.size, type: file.type });
+  //     const isValid = file.type.startsWith('image/') || file.type.startsWith('video/');
+  //     if (!isValid) {
+  //       message.error('Можно загружать только изображения или видео!');
+  //       return Upload.LIST_IGNORE;
+  //     }
+  //     const isLt10M = file.size / 1024 / 1024 < 10;
+  //     if (!isLt10M) {
+  //       message.error('Файл должен быть меньше 10 МБ!');
+  //       return Upload.LIST_IGNORE;
+  //     }
+  //     const token = localStorage.getItem('token');
+  //     if (!token) {
+  //       message.error('Токен авторизации отсутствует. Пожалуйста, войдите в систему.');
+  //       return Upload.LIST_IGNORE;
+  //     }
+  //     return true;
+  //   },
+  // };
   const uploadProps: UploadProps = {
     name: 'file',
     accept: 'image/*,video/*',
     fileList,
-    action: process.env.NEXT_PUBLIC_UPLOAD_URL || '/api/upload',
+    action: process.env.NEXT_PUBLIC_UPLOAD_URL || 'http://127.0.0.1:8880/upload',
     headers: {
       Authorization: `Bearer ${localStorage.getItem('token') || ''}`,
     },
     onChange: async ({ file, fileList: newFileList }) => {
-      console.log('Upload file:', file);
+      console.log('Upload file:', {
+        name: file.name,
+        status: file.status,
+        response: file.response,
+        error: file.error,
+        action: process.env.NEXT_PUBLIC_UPLOAD_URL || 'http://127.0.0.1:8880/upload',
+        token: localStorage.getItem('token') || 'No token',
+      });
       if (file.status === 'removed' && file.url) {
         try {
           const response = await fetch('/api/delete-file', {
             method: 'DELETE',
             headers: {
               'Content-Type': 'application/json',
-              Authorization: `Bearer ${localStorage.getItem('token') || ''}`, // Добавляем токен
+              Authorization: `Bearer ${localStorage.getItem('token') || ''}`,
             },
             body: JSON.stringify({ url: file.url }),
           });
-          if (!response.ok) throw new Error('Failed to delete file');
+          if (!response.ok) {
+            const errorData = await response.json().catch(() => ({}));
+            throw new Error(errorData.message || `Не удалось удалить файл: ${response.status}`);
+          }
           message.info(`${file.name} удалён`);
           setFileList(newFileList);
         } catch (error) {
-          message.error('Не удалось удалить файл');
+          const errorMsg = error instanceof Error ? error.message : String(error);
+          message.error(`Не удалось удалить файл: ${errorMsg}`);
           console.error('Delete error:', error);
         }
       } else {
         setFileList(newFileList);
         if (file.status === 'done') {
-          const filePath = file.response?.url; // Извлекаем путь из ответа сервера
+          const filePath = file.response?.url;
           if (filePath) {
-            console.log('File saved at:', filePath); // Логируем путь для отладки
+            console.log('File saved at:', filePath);
             message.success(`${file.name} загружен успешно по пути: ${filePath}`);
           } else {
             message.error('Неверный ответ сервера: путь не возвращён');
             console.error('No URL in response:', file.response);
           }
         } else if (file.status === 'error') {
-          message.error(`Ошибка загрузки: ${file.error?.message || 'Неизвестная ошибка'}`);
-          console.error('Upload error:', file.error);
+          const errorMessage =
+            file.response?.message ||
+            file.error?.message ||
+            `Ошибка загрузки ${file.name}: Неизвестная ошибка`;
+          message.error(errorMessage);
+          console.error('Upload error details:', {
+            file: {
+              name: file.name,
+              status: file.status,
+              response: file.response,
+              error: file.error,
+            },
+            action: process.env.NEXT_PUBLIC_UPLOAD_URL || 'http://127.0.0.1:8880/upload',
+            token: localStorage.getItem('token') || 'No token',
+          });
         }
       }
     },
     beforeUpload: file => {
+      console.log('Before upload:', { name: file.name, size: file.size, type: file.type });
       const isValid = file.type.startsWith('image/') || file.type.startsWith('video/');
       if (!isValid) {
         message.error('Можно загружать только изображения или видео!');
@@ -146,12 +260,14 @@ const PostModal: React.FC<PostModalProps> = ({ visible, onCancel, onSubmit, post
         message.error('Файл должен быть меньше 10 МБ!');
         return Upload.LIST_IGNORE;
       }
+      const token = localStorage.getItem('token');
+      if (!token) {
+        message.error('Токен авторизации отсутствует. Пожалуйста, войдите в систему.');
+        return Upload.LIST_IGNORE;
+      }
       return true;
     },
   };
-
-  // console.log('fileList', fileList);
-
   return (
     <App>
       <Modal
@@ -197,7 +313,6 @@ const PostModal: React.FC<PostModalProps> = ({ visible, onCancel, onSubmit, post
           >
             <Input.TextArea rows={4} placeholder="Введите текст поста" />
           </Form.Item>
-
           <Form.Item label="Медиа (изображения или видео)" name="media">
             <Upload {...uploadProps} listType="picture">
               <Button icon={<UploadOutlined />}>Загрузить</Button>

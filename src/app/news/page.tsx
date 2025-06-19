@@ -67,7 +67,7 @@ const NewsPage = () => {
     const initializeData = async () => {
       try {
         await Promise.all([
-          fetchNews({ type: 'getLimitNews', start: 20, size: LOAD_NEWS_SIZE }),
+          fetchNews({ type: 'getLimitNews', start: 25, size: LOAD_NEWS_SIZE }),
           fetchNews({ type: 'getSavedNews' }),
           getTitles(),
         ]);

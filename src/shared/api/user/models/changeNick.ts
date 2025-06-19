@@ -9,7 +9,7 @@ export const changeNick = async (payload: IPayload): Promise<IApiReturn<any>> =>
   const response = await API.apiQuery<any[]>({
     method: API_USER_SCHEME.changeNick.method,
     // url: API_USER_SCHEME.changeNick.url,
-    url: `http://localhost/api/auth/change_username`,
+    url: `https://localhost/api/auth/change_username`,
     data: payload,
   });
 

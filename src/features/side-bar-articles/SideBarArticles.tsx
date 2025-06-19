@@ -1,15 +1,15 @@
 'use client';
 
-import React, { useEffect, useRef, useState } from 'react';
+import React, { useEffect, useRef, useState, useMemo } from 'react';
 import style from './SideBarArticles.module.scss';
 import articlesStore, { ArticleCategory, OneArticle } from '@/shared/stores/articles-store';
-import type { CollapseProps, MenuProps } from 'antd';
+import type { MenuProps } from 'antd';
 import { Collapse, Dropdown, Input, Button, Space } from 'antd';
 import { generateKey } from '@/shared/api/utils';
 import { MenuUnfoldOutlined, SaveOutlined } from '@ant-design/icons';
 import { useRouter } from 'next/navigation';
 import userStore from '@/shared/stores/user-store';
-
+import ArticleEditInput from './ArticleEditInput';
 const SideBarArticles = ({
   open,
   setOpen,
@@ -47,10 +47,14 @@ const SideBarArticles = ({
   const router = useRouter();
   const [windowWidth, setWindowWidth] = useState<number | undefined>(undefined);
   const sidebarRef = useRef<HTMLDivElement>(null);
-  const [editingEntity, setEditingEntity] = useState<{
-    type: 'category' | 'article';
+
+  const [editingCategory, setEditingCategory] = useState<{
     key: string;
     value?: string;
+  } | null>(null);
+  const [editingArticle, setEditingArticle] = useState<{
+    key: string;
+    categoryId: string;
   } | null>(null);
 
   useEffect(() => {
@@ -99,13 +103,13 @@ const SideBarArticles = ({
     newValue: string,
     oldName: string = '',
   ) => {
-    console.log(type, categoryId, articleId, newValue);
     if (type === 'category') {
       renameArticleCategory(categoryId, newValue, oldName);
+      setEditingCategory(null);
     } else {
       renameArticle(categoryId, articleId ?? '0', newValue);
+      setEditingArticle(null);
     }
-    setEditingEntity(null);
   };
 
   const getMenuOnClick =
@@ -113,18 +117,19 @@ const SideBarArticles = ({
     e => {
       e.domEvent.stopPropagation();
       if (e.key === 'renameMenuItem' || e.key === 'renameArticle') {
-        const initialValue =
-          type === 'category'
-            ? articlesCategories.find(cat => cat.category === categoryId)?.category_name
-            : normalizedArticles?.[categoryId]?.find(art => art.post_id === articleId)?.title;
-        setEditingEntity({ type, key: articleId, value: initialValue || '' });
+        if (type === 'category') {
+          const initialValue = articlesCategories.find(
+            cat => cat.category === categoryId,
+          )?.category_name;
+          setEditingCategory({ key: articleId, value: initialValue || '' });
+        } else {
+          setEditingArticle({ key: articleId, categoryId });
+        }
       } else if (e.key === 'editArticle') {
         handleArticleClick(articleId, categoryId);
         articlesStore.setState({ isEditArticle: true });
         router.push(`/md-editor`);
-        // console.log(`Edit article: Article ID: ${articleId}, Category ID: ${categoryId}`);
       } else if (e.key === 'delete') {
-        console.log(`Delete ${type}: Article ID: ${articleId}, Category ID: ${categoryId}`);
         if (type === 'article') {
           deleteArticle(categoryId, articleId);
         } else {
@@ -168,11 +173,11 @@ const SideBarArticles = ({
     );
   };
 
-  useEffect(() => {
+  const preparedItems = useMemo(() => {
     if (!articlesCategories?.length || !normalizedArticles) {
-      return;
+      return [];
     }
-    const preparedItems: CollapseProps['items'] = articlesCategories?.reduce(
+    return articlesCategories.reduce(
       (
         acc: {
           key: string;
@@ -182,8 +187,7 @@ const SideBarArticles = ({
         }[],
         value,
       ) => {
-        const isEditingCategory =
-          editingEntity?.type === 'category' && editingEntity?.key === value.category;
+        const isEditingCategory = editingCategory?.key === value.category;
         const item = {
           key: value.category,
           label: (
@@ -193,10 +197,13 @@ const SideBarArticles = ({
                 <Space.Compact
                   style={{ width: '100%', marginTop: '8px' }}
                   onClick={e => e.stopPropagation()}
+                  key={`category-${value.category}`}
                 >
                   <Input
-                    defaultValue={editingEntity?.value || value.category_name}
-                    onChange={e => setEditingEntity({ ...editingEntity!, value: e.target.value })}
+                    value={editingCategory?.value || ''}
+                    onChange={(e: React.ChangeEvent<HTMLInputElement>) => {
+                      setEditingCategory(prev => ({ ...prev!, value: e.target.value }));
+                    }}
                   />
                   <Button
                     type="primary"
@@ -206,7 +213,7 @@ const SideBarArticles = ({
                         null,
                         value.category,
                         'category',
-                        editingEntity?.value || '',
+                        editingCategory?.value || '',
                         value.category_name,
                       )
                     }
@@ -221,8 +228,7 @@ const SideBarArticles = ({
             <div>
               {normalizedArticles?.[value.category]?.map((articleItem: OneArticle) => {
                 const articleTitle = articleItem.title ? articleItem.title : 'Статья без названия';
-                const isEditingArticle =
-                  editingEntity?.type === 'article' && editingEntity?.key === articleItem.post_id;
+                const isEditingArticle = editingArticle?.key === articleItem.post_id;
                 return (
                   <div
                     className={style.articleItemContainer}
@@ -243,31 +249,12 @@ const SideBarArticles = ({
                         genExtra(articleItem.post_id, value.category, articleItems, 'article')}
                     </div>
                     {isEditingArticle && (
-                      <Space.Compact
-                        style={{ width: '100%', marginTop: '8px' }}
-                        onClick={e => e.stopPropagation()}
-                      >
-                        <Input
-                          defaultValue={editingEntity?.value || articleTitle}
-                          onChange={e =>
-                            setEditingEntity({ ...editingEntity!, value: e.target.value })
-                          }
-                        />
-                        <Button
-                          type="primary"
-                          style={{ backgroundColor: '#fb4724' }}
-                          onClick={() => {
-                            handleRenameSubmit(
-                              articleItem.post_id,
-                              value.category,
-                              'article',
-                              editingEntity?.value || '',
-                            );
-                          }}
-                        >
-                          <SaveOutlined />
-                        </Button>
-                      </Space.Compact>
+                      <ArticleEditInput
+                        articleId={articleItem.post_id}
+                        categoryId={value.category}
+                        initialValue={articleTitle}
+                        onSubmit={handleRenameSubmit}
+                      />
                     )}
                   </div>
                 );
@@ -286,6 +273,15 @@ const SideBarArticles = ({
       },
       [],
     );
+  }, [
+    articlesCategories,
+    normalizedArticles,
+    article?.post_id,
+    editingCategory,
+    editingArticle?.key,
+  ]);
+
+  useEffect(() => {
     setItems(
       preparedItems as {
         key: string;
@@ -294,11 +290,7 @@ const SideBarArticles = ({
         extra: React.JSX.Element;
       }[],
     );
-  }, [articlesCategories, normalizedArticles, article?.post_id, editingEntity]);
-
-  const onChange = (key: string | string[]) => {
-    // console.log(key);
-  };
+  }, [preparedItems]);
 
   return (
     <div className={windowWidth && windowWidth < 960 && open ? style.modalOverlay : ''}>
@@ -308,8 +300,7 @@ const SideBarArticles = ({
             items={items}
             defaultActiveKey={article && [article?.category]}
             ghost
-            onChange={onChange}
-            expandIconPosition={'end'}
+            // onChange={key => console.log('Collapse onChange:', key)}
           />
         </div>
       </div>

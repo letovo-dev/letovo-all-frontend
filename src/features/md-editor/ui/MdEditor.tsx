@@ -6,7 +6,17 @@ import style from './MdEditor.module.scss';
 import { mdExample } from '../lib/mdExapmle';
 import UploadFiles from './upload-file/UploadFiles';
 import articlesStore from '@/shared/stores/articles-store';
-import { Button, ConfigProvider, Input, message, Radio, RadioChangeEvent, Space } from 'antd';
+import {
+  Button,
+  ConfigProvider,
+  Input,
+  message,
+  Radio,
+  RadioChangeEvent,
+  Space,
+  Select,
+  Form,
+} from 'antd';
 import { SaveOutlined } from '@ant-design/icons';
 
 interface VideoComponentProps extends React.VideoHTMLAttributes<HTMLVideoElement> {
@@ -16,19 +26,24 @@ interface VideoComponentProps extends React.VideoHTMLAttributes<HTMLVideoElement
 const MarkdownEditor: React.FC = () => {
   const [markdown, setMarkdown] = useState<string>(mdExample);
   const [articleTitle, setArticleTitle] = useState<string>('');
-  const { article, isEditArticle, renameArticle, saveArticle } = articlesStore(state => state);
-  const [isSecretArticle, setIsSecretArticle] = useState(article?.is_secret);
+  const { article, isEditArticle, renameArticle, saveArticle, articlesCategories } = articlesStore(
+    state => state,
+  );
+  const [form] = Form.useForm();
 
   useEffect(() => {
     if (article && isEditArticle) {
       setMarkdown(article.text);
       setArticleTitle(article.title || '');
+      // Устанавливаем начальные значения формы
+      form.setFieldsValue({
+        isSecret: article.is_secret || 'f',
+        category: article.category || undefined,
+      });
+    } else {
+      form.resetFields();
     }
-  }, [isEditArticle, article]);
-
-  const onRadioChange = (e: RadioChangeEvent) => {
-    setIsSecretArticle(e.target.value);
-  };
+  }, [isEditArticle, article, form]);
 
   const handleFileUpload = (event: ChangeEvent<HTMLInputElement>): void => {
     const file = event.target.files?.[0];
@@ -53,7 +68,27 @@ const MarkdownEditor: React.FC = () => {
     URL.revokeObjectURL(url);
   };
 
-  const handleSave = (): void => {};
+  const handleSave = async (values: { isSecret: string; category: string }) => {
+    if (!articleTitle.trim()) {
+      message.error('Название статьи не может быть пустым');
+      return;
+    }
+
+    try {
+      // Сохраняем или обновляем статью
+      // await saveArticle({
+      //   post_id: article?.post_id,
+      //   title: articleTitle,
+      //   text: markdown,
+      //   is_secret: values.isSecret,
+      //   category: values.category,
+      // });
+      message.success(isEditArticle ? 'Статья обновлена' : 'Статья сохранена');
+    } catch (error) {
+      console.error('Save article error:', error);
+      message.error('Не удалось сохранить статью');
+    }
+  };
 
   const handleTitleChange = (e: ChangeEvent<HTMLInputElement>): void => {
     setArticleTitle(e.target.value);
@@ -79,7 +114,8 @@ const MarkdownEditor: React.FC = () => {
       return;
     }
     if (article) {
-      await renameArticle(article?.post_id, article?.category, articleTitle);
+      await renameArticle(article.post_id, article.category, articleTitle);
+      message.success('Название статьи обновлено');
     }
   };
 
@@ -113,6 +149,7 @@ const MarkdownEditor: React.FC = () => {
             Выберите md-файл
           </button>
         </div>
+
         <div className={style.titleInputContainer}>
           <p className={style.inputTitleInstruction}>Введите или отредактируйте название статьи</p>
           <Space.Compact
@@ -129,23 +166,52 @@ const MarkdownEditor: React.FC = () => {
             </Button>
           </Space.Compact>
         </div>
-        <ConfigProvider
-          theme={{
-            token: {
-              colorPrimary: '#fb4724',
-              colorPrimaryActive: '#fb4724',
-            },
+        <Form
+          id="markdown-form"
+          form={form}
+          onFinish={handleSave}
+          layout="inline"
+          initialValues={{
+            isSecret: 'f',
+            category: undefined,
           }}
         >
-          <Radio.Group
-            defaultValue={isSecretArticle}
-            options={[
-              { value: 't', label: 'Тайна' },
-              { value: 'f', label: 'Статья' },
-            ]}
-            onChange={onRadioChange}
-          />
-        </ConfigProvider>
+          <Form.Item
+            name="isSecret"
+            label="Тип статьи"
+            rules={[{ required: true, message: 'Выберите тип статьи' }]}
+          >
+            <ConfigProvider
+              theme={{
+                token: {
+                  colorPrimary: '#fb4724',
+                  colorPrimaryActive: '#fb4724',
+                },
+              }}
+            >
+              <Radio.Group
+                options={[
+                  { value: 't', label: 'Тайна' },
+                  { value: 'f', label: 'Статья' },
+                ]}
+              />
+            </ConfigProvider>
+          </Form.Item>
+          <Form.Item
+            name="category"
+            label="Категория"
+            rules={[{ required: true, message: 'Выберите категорию статьи' }]}
+          >
+            <Select
+              placeholder="Категория статьи"
+              style={{ width: '200px' }}
+              options={articlesCategories.map(category => ({
+                value: category.category,
+                label: category.category_name,
+              }))}
+            />
+          </Form.Item>
+        </Form>
       </div>
       {articleTitle && <h3>{articleTitle}</h3>}
       <MDEditor
@@ -170,9 +236,15 @@ const MarkdownEditor: React.FC = () => {
       </p>
       <UploadFiles />
       <div className={style.buttonsContainer}>
-        <button onClick={handleSave} className={style.button}>
+        <Button
+          type="primary"
+          htmlType="submit"
+          className={style.button}
+          style={{ backgroundColor: '#fb4724' }}
+          form="markdown-form"
+        >
           Сохранить и опубликовать
-        </button>
+        </Button>
         <button onClick={handleDownload} className={style.button}>
           Скачать
         </button>
