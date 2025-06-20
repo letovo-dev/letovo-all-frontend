@@ -76,7 +76,7 @@ export type TArticlesStoreState = {
   getOneArticle: (id: string, categoryId: string) => OneArticle;
   getArticleMd: (fileName: string) => Promise<any>;
   loadAllArticlesByCategory: (id: string) => Promise<void>;
-  setCurrentArticle: (article: OneArticle) => void;
+  setCurrentArticle: (article: OneArticle | undefined) => void;
   refreshArticles: () => Promise<void>;
   saveArticle: (categoryId: string, articleId: string | null, file: File) => Promise<void>;
   //   POST ручка /api/post/add_page, формат боди:

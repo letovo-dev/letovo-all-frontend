@@ -167,3 +167,24 @@ $overlay-color: rgba(0, 0, 0, 0.3);
   @extend .modalContainer;
   background-image: url('/images/Base_Achievement_Closed_PC.webp');
 }
+
+.qrStyle {
+  font-size: 42px;
+  right: 41px;
+  top: 85px;
+  position: absolute;
+  color: var(--orange);
+  cursor: pointer !important;
+  pointer-events: auto !important;
+  z-index: 200 !important;
+}
+.qrCode {
+  width: 172px !important;
+  height: 172px !important;
+  background-color: var(--background) !important;
+  position: absolute;
+  top: 37%;
+  left: 50%;
+  transform: translate(-50%, -50%);
+  z-index: 100;
+}

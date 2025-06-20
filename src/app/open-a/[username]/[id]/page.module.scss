@@ -1,0 +1,24 @@
+@use '../../../../app/_mixins.scss';
+
+.pageContainer {
+  height: 80vh;
+  width: 100%;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  flex-direction: column;
+  gap: 20px;
+  .textContainer {
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    flex-direction: column;
+    gap: 10px;
+  }
+  .button {
+    @extend %primaryButton;
+  }
+  .warnP {
+    font-size: 10px;
+  }
+}

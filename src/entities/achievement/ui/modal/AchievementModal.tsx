@@ -2,7 +2,9 @@
 import React from 'react';
 import style from './AchievementModal.module.scss';
 import Image from 'next/image';
-import { IUserAchData } from '@/shared/stores/user-store';
+import userStore, { IUserAchData } from '@/shared/stores/user-store';
+import { QrcodeOutlined } from '@ant-design/icons';
+import { QRCode } from 'antd';
 
 interface ModalProps {
   open: boolean;
@@ -15,6 +17,8 @@ interface ModalProps {
   currentImageElement: JSX.Element | null;
 }
 
+const BASE_URL = 'https://letovo.ru';
+
 const AchievementModal: React.FC<ModalProps> = ({
   currentItem,
   setCurrentItem,
@@ -25,10 +29,20 @@ const AchievementModal: React.FC<ModalProps> = ({
   currentImageElement,
   children,
 }) => {
+  const [qrUrl, setQrUrl] = React.useState<string | null>(null);
+  const {
+    store: {
+      userData: { username },
+    },
+  } = userStore(state => state);
+
+  const qrData = `${process.env.NEXT_PUBLIC_BASE_URL_CLEAR}/${username}/${currentItem?.achivement_id}`;
+
   if (!open) return null;
   const onClose = () => {
     setOpen(false);
     setCurrentItem(null);
+    setQrUrl(null);
   };
 
   const showNextItem = () => {
@@ -70,6 +84,13 @@ const AchievementModal: React.FC<ModalProps> = ({
   const stage = currentItem?.stages === '' ? '0' : currentItem?.stages;
   const level = currentItem?.level === '' ? '0' : currentItem?.level;
 
+  const handleOpenQr = () => {
+    setQrUrl(qrData);
+    setTimeout(() => {
+      setQrUrl(null);
+    }, 15000);
+  };
+
   return (
     <div className={style.modalOverlay} onClick={onClose}>
       <div
@@ -78,6 +99,14 @@ const AchievementModal: React.FC<ModalProps> = ({
       >
         <button onClick={onClose} className={style.closeButton} type="button" />
         <h5 className={style.modalContainerHeader}>{title}</h5>
+        {qrUrl && <QRCode type="svg" value={qrUrl ?? BASE_URL} className={style.qrCode} />}
+        <QrcodeOutlined
+          className={style.qrStyle}
+          onClick={e => {
+            e.stopPropagation();
+            handleOpenQr();
+          }}
+        />
         <div className={style.modalContainerItem}>
           <h5 className={style.text}>{currentItem?.achivement_name}</h5>
           <div className={style.slider}>

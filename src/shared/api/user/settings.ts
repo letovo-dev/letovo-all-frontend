@@ -53,6 +53,10 @@ export const API_USER_SCHEME: IApiEntityScheme<IEndpoint> = {
     method: 'POST',
     url: `${baseUrl}/transactions/send`,
   },
+  addAch: {
+    method: 'POST',
+    url: `${baseUrl}/achivements/add`,
+  },
 };
 
 export const API_USER_ENDPOINTS = [
@@ -68,4 +72,5 @@ export const API_USER_ENDPOINTS = [
   'getAuthor',
   'transactionsPrepare',
   'transactionsSend',
+  'addAch',
 ] as const;

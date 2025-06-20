@@ -30,9 +30,9 @@ const configuredWithPWA = withPWA(pwaConfig);
 
 const nextConfig = {
   reactStrictMode: false,
-  experimental: {
-    esmExternals: 'loose',
-  },
+  // experimental: {
+  //   esmExternals: 'loose',
+  // },
   transpilePackages: [
     'antd',
     '@ant-design/icons',
@@ -97,6 +97,27 @@ const nextConfig = {
     formats: ['image/avif', 'image/webp'],
     remotePatterns: [
       {
+        protocol: 'https',
+        hostname: 'localhost',
+        pathname: '/api/media/getimages/avatars/**',
+      },
+      {
+        protocol: 'https',
+        hostname: 'localhost',
+        pathname: '/api/media/get/images/avatars/**',
+      },
+      {
+        protocol: 'https',
+        hostname: 'localhost',
+        pathname: '/api/media/get/pages/images/achivements/**',
+      },
+      {
+        protocol: 'https',
+        hostname: 'localhost',
+        pathname: '/api/achivements/qr_code/**',
+      },
+
+      {
         protocol: 'http',
         hostname: '192.168.2.144',
         pathname: '/api/media/getimages/avatars/**',
@@ -125,6 +146,16 @@ const nextConfig = {
         protocol: 'http',
         hostname: 'localhost',
         pathname: '/api/media/get/pages/images/achivements/**',
+      },
+      {
+        protocol: 'http',
+        hostname: 'localhost',
+        pathname: '/api/media/get/pages/images/achivements/**',
+      },
+      {
+        protocol: 'http',
+        hostname: 'localhost',
+        pathname: '/api/achivements/qr_code/**',
       },
     ],
   },

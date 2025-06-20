@@ -2,6 +2,7 @@ import { create } from 'zustand';
 import { immer } from 'zustand/middleware/immer';
 import { SERVICES_DATA } from '@/shared/api/data';
 import commentsStore from '../comments-store';
+import { SERVICES_USERS } from '@/shared/api/user';
 
 interface Author {
   id: string;
@@ -167,6 +168,7 @@ export type TDataStoreState = {
   //   };
   //   header_fields: ['Bearer'];
   // };
+  addAch: (ach_id: string, username: string) => Promise<void>;
 };
 
 const dataState = {
@@ -174,6 +176,7 @@ const dataState = {
   news: [],
   newsTitles: [],
   savedNews: [],
+  qrData: null,
 };
 
 const initialState = {
@@ -188,6 +191,25 @@ const controllers: { [key: string]: AbortController } = {};
 const dataStore = create<TDataStoreState>()(
   immer((set: (partial: Partial<any>) => void, get: () => any) => ({
     ...initialState,
+    addAch: async (ach_id: string, username: string): Promise<void> => {
+      set({ loading: true, error: undefined });
+      try {
+        const response = await SERVICES_USERS.UsersData.addAch(ach_id, username);
+        if (response.success && response.code === 200) {
+          set((s: TDataStoreState) => ({
+            loading: false,
+            error: undefined,
+          }));
+        } else {
+          set({ error: response.codeMessage });
+        }
+      } catch (error) {
+        console.error(error);
+        set({ error: 'Network or system error' });
+      } finally {
+        set({ loading: false });
+      }
+    },
     getAvatars: async (): Promise<any> => {
       set({ error: undefined, loading: true });
       try {
@@ -205,11 +227,11 @@ const dataStore = create<TDataStoreState>()(
             error: undefined,
           }));
         } else {
-          set({ ...initialState, error: response.codeMessage });
+          set({ error: response.codeMessage });
         }
       } catch (error) {
         console.error(error);
-        set({ ...initialState, error: 'Network or system error' });
+        set({ error: 'Network or system error' });
       } finally {
         set({ loading: false });
       }

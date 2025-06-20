@@ -115,5 +115,6 @@ $overlay-color: rgba(0, 0, 0, 0.3);
 }
 .articleItem {
   display: flex;
-  gap: 30px;
+  margin-bottom: 16px;
+  justify-content: space-between;
 }

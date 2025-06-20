@@ -1,3 +1,4 @@
+import { addAch } from './addAch';
 import { addRole } from './addRole';
 import { changeNick } from './changeNick';
 import { changePass } from './changePass';
@@ -19,4 +20,5 @@ export default {
   changePass,
   transferPrepare,
   transferSend,
+  addAch,
 };
