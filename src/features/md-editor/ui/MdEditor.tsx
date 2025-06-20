@@ -260,7 +260,7 @@ const MarkdownEditor: React.FC = () => {
             <Select
               placeholder="Категория статьи"
               style={{ width: '200px' }}
-              options={articlesCategories.map(category => ({
+              options={articlesCategories?.map(category => ({
                 value: category.category,
                 label: category.category_name,
               }))}
