@@ -36,7 +36,7 @@ const AchievementModal: React.FC<ModalProps> = ({
     },
   } = userStore(state => state);
 
-  const qrData = `${process.env.NEXT_PUBLIC_BASE_URL_CLEAR}/${username}/${currentItem?.achivement_id}`;
+  const qrData = `${process.env.NEXT_PUBLIC_BASE_URL_CLEAR}/open-a/${username}/${currentItem?.achivement_id}`;
 
   if (!open) return null;
   const onClose = () => {
@@ -88,7 +88,7 @@ const AchievementModal: React.FC<ModalProps> = ({
     setQrUrl(qrData);
     setTimeout(() => {
       setQrUrl(null);
-    }, 15000);
+    }, 1500000);
   };
 
   return (

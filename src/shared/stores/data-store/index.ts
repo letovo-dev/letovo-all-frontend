@@ -201,11 +201,11 @@ const dataStore = create<TDataStoreState>()(
             error: undefined,
           }));
         } else {
-          set({ error: response.codeMessage });
+          set({ error: response.codeMessage, loading: false });
         }
       } catch (error) {
         console.error(error);
-        set({ error: 'Network or system error' });
+        set({ error: 'Network or system error', loading: false });
       } finally {
         set({ loading: false });
       }

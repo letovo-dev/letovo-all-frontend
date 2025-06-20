@@ -7,18 +7,19 @@
   justify-content: center;
   align-items: center;
   flex-direction: column;
-  gap: 20px;
   .textContainer {
     display: flex;
     justify-content: center;
     align-items: center;
     flex-direction: column;
-    gap: 10px;
+    gap: 15px;
   }
   .button {
     @extend %primaryButton;
   }
   .warnP {
     font-size: 10px;
+    text-align: center;
+    width: 80%;
   }
 }
