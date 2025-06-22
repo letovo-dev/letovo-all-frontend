@@ -69,7 +69,7 @@ const Articles: React.FC = () => {
 
   useEffect(() => {
     let isMounted = true;
-    const cancelTokenSource = axios.CancelToken.source(); // Для отмены запросов
+    const cancelTokenSource = axios.CancelToken.source();
 
     const fetchMedia = async () => {
       if (!isMounted || !article?.text || !lsToken) {
@@ -82,14 +82,13 @@ const Articles: React.FC = () => {
 
       const fetchPromises = mediaUrls.map(async url => {
         if (newMediaCache[url]) {
-          console.log(`Using cached media for ${url}`);
           return;
         }
         try {
           const response = await axios.get(url, {
             headers: { Authorization: `Bearer ${lsToken}` },
             responseType: 'blob',
-            cancelToken: cancelTokenSource.token, // Поддержка отмены
+            cancelToken: cancelTokenSource.token,
           });
           const mimeType =
             response.headers['content-type'] ||
@@ -98,7 +97,7 @@ const Articles: React.FC = () => {
           newMediaCache[url] = objectUrl;
         } catch (error) {
           if (axios.isCancel(error)) {
-            console.log(`Request canceled for ${url}`);
+            console.warn(`Request canceled for ${url}`);
           } else {
             console.error(`Ошибка загрузки медиа ${url}:`, error);
           }

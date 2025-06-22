@@ -26,7 +26,6 @@ function ClientAchievementPage({ id, username }: ClientAchievementPageProps) {
           store: { userData },
         },
       } = getDataFromLocaleStorage('userStore');
-      console.log('User data from localStorage:', userData);
       setUser(userData);
     } catch (e) {
       console.error('Failed to get user data:', e);
@@ -36,7 +35,6 @@ function ClientAchievementPage({ id, username }: ClientAchievementPageProps) {
 
   useEffect(() => {
     if (user && user.userrights === 'admin') {
-      console.log('Admin user:', user);
       setTrueUser(true);
     }
     const timeoutId = setTimeout(() => {

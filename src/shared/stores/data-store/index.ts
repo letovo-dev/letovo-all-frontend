@@ -317,22 +317,22 @@ const dataStore = create<TDataStoreState>()(
       set({ loading: true, error: undefined });
       try {
         const response = await SERVICES_DATA.Data.editNews(news);
-        console.log(response);
-
         if (response.success && response.code === 200) {
           const editedNews = (response?.data as { result: RealNews[] })?.result;
           const { result } = await commentsStore
             .getState()
             .getCurrentNewsPics(editedNews[0].post_id);
-          const updatedTitles = get().data.newsTitles.map((title: Titles) =>
-            String(title.post_id) === String(editedNews[0].post_id) ? editedNews[0].title : title,
+          const updatedTitles = get().data.newsTitles.map((el: Titles) =>
+            String(el.post_id) === String(editedNews[0].post_id)
+              ? { ...el, title: editedNews[0].title }
+              : el,
           );
           set((state: TDataStoreState) => {
             const updatedNormalizedNews = {
               ...state.data.normalizedNews,
               [editedNews[0].post_id]: {
                 news: editedNews[0],
-                media: result.map((media: RealMedia) => media.media),
+                media: result?.map((media: RealMedia) => media.media) ?? [],
                 comments: state.data.normalizedNews[editedNews[0].post_id]?.comments || [],
               },
             };
@@ -358,29 +358,15 @@ const dataStore = create<TDataStoreState>()(
       set({ loading: true, error: undefined });
       try {
         const response = await SERVICES_DATA.Data.deleteNews(news_id);
-        console.log(
-          'response.success && response.code === 200',
-          response.success && response.code === 200,
-        );
-
-        console.log('get().state.data,', get().data);
-
         if (response.success && response.code === 200) {
-          console.log('get().state.data.newsTitles', get().data.newsTitles);
-
           const updatedTitles = get().data.newsTitles.filter(
             (title: Titles) => title.post_id !== news_id,
           );
-          console.log('updatedTitles', updatedTitles);
 
           const updatedIds = get().data.postIds.filter((id: string) => id !== news_id);
-          console.log('updatedIds', updatedIds);
-
           set((state: TDataStoreState) => {
             const updatedNormalizedNews = { ...state.data.normalizedNews };
             delete updatedNormalizedNews[news_id];
-            console.log('updatedNormalizedNews', updatedNormalizedNews);
-
             return {
               data: {
                 ...state.data,

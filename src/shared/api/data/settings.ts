@@ -81,7 +81,7 @@ export const API_DATA_SCHEME: IApiEntityScheme<IEndpoint> = {
     method: 'DELETE',
     url: `${baseUrl}/post/delete`,
   },
-  renameArticle: {
+  updateArticle: {
     method: 'PUT',
     url: `${baseUrl}/post/update`,
   },
@@ -127,7 +127,7 @@ export const API_DATA_ENDPOINTS = [
   'deleteArticlesCategory',
   'renameCategory',
   'deleteArticle',
-  'renameArticle',
+  'updateArticle',
   'saveArticle',
   'createNews',
   'editNews',

@@ -2,6 +2,7 @@ import { create } from 'zustand';
 import { immer } from 'zustand/middleware/immer';
 import { persist, createJSONStorage } from 'zustand/middleware';
 import { SERVICES_DATA } from '@/shared/api/data';
+import { jsonrepair } from 'jsonrepair';
 
 export interface OneArticle {
   post_id: string;
@@ -17,6 +18,14 @@ export interface OneArticle {
   saved_count: string;
   category: string;
   category_name: string;
+}
+interface ApiResponse {
+  success: boolean;
+  data: string; // Ожидаем строку, содержащую JSON
+  code: number;
+  codeMessage: string;
+  statusText: string;
+  meta?: any;
 }
 
 export interface ArticleCategory {
@@ -78,13 +87,23 @@ export type TArticlesStoreState = {
   loadAllArticlesByCategory: (id: string) => Promise<void>;
   setCurrentArticle: (article: OneArticle | undefined) => void;
   refreshArticles: () => Promise<void>;
-  saveArticle: (categoryId: string, articleId: string | null, file: File) => Promise<void>;
-  //   POST ручка /api/post/add_page, формат боди:
-  // {
-  // 	"post_path": "posts/example_post_3.md",
-  // 	"category": "дефолт",
-  // 	"title": "some"
-  // }
+  createOrUpdateArticle: (article: Partial<OneArticle>, isNew: boolean) => Promise<void>;
+
+  // '/post/update': {
+  //   method: 'put';
+  //   body_fields: {
+  //     post_id: 'Int';
+  //     is_secret: 'Bool';
+  //     likes: 'Int';
+  //     dislikes: 'Int';
+  //     saved: 'Int';
+  //     title: 'String';
+  //     author: 'String';
+  //     text: 'String';
+  //     category: 'String';
+  //   };
+  //   header_fields: ['Bearer'];
+  // };
 };
 
 const initialState = {
@@ -108,38 +127,39 @@ const articlesStore = create<TArticlesStoreState>()(
         });
       },
       // shared/stores/articles-store.ts
-
-      saveArticle: async (categoryId: string, articleId: string | null, file: File) => {
+      createOrUpdateArticle: async (article: OneArticle, isNew: boolean) => {
         set({
           loading: true,
         });
+
+        const method = isNew ? SERVICES_DATA.Data.createNews : SERVICES_DATA.Data.updateArticle;
+
         try {
-          const response = (await SERVICES_DATA.Data.saveArticle(categoryId, articleId, file)) as {
+          const response = (await method(article)) as {
             code: number;
-            data: { result: OneArticle };
+            data: { result: [OneArticle] };
           };
           if (response.code === 200 && response.data?.result) {
             const data = response.data.result;
             const normalizedArticles = get().normalizedArticles;
             let updatedArticles;
-
-            if (articleId) {
+            if (!isNew) {
               // Обновление существующей статьи
-              updatedArticles = normalizedArticles[categoryId].map((el: OneArticle) =>
-                el.post_id === articleId ? { ...data } : el,
+              updatedArticles = normalizedArticles[article.category].map((el: OneArticle) =>
+                el.post_id === data[0].post_id ? { ...data } : el,
               );
             } else {
               // Добавление новой статьи
-              updatedArticles = [...(normalizedArticles[categoryId] || []), data];
+              updatedArticles = [...(normalizedArticles[article.category] || []), data[0]];
             }
 
             set((draft: TArticlesStoreState) => {
               draft.normalizedArticles = {
                 ...normalizedArticles,
-                [categoryId]: updatedArticles,
+                [article.category]: updatedArticles,
               };
               draft.loading = false;
-              draft.article = data; // Обновляем текущую статью
+              draft.article = data[0];
             });
           } else {
             console.error(`Unexpected response code: ${response.code}`, response);
@@ -192,11 +212,11 @@ const articlesStore = create<TArticlesStoreState>()(
           loading: true,
         });
         try {
-          const response = (await SERVICES_DATA.Data.renameArticle(
-            categoryId,
-            articleId,
-            newName,
-          )) as {
+          const response = (await SERVICES_DATA.Data.updateArticle({
+            category: categoryId,
+            post_id: articleId,
+            title: newName,
+          })) as {
             code: number;
             data: { result: ArticleCategory[] };
           };
@@ -304,6 +324,7 @@ const articlesStore = create<TArticlesStoreState>()(
 
             if (categories.length > 0) {
               await get().loadAllArticlesByCategory(categories[0].category);
+              set({ loading: false });
               categories.slice(1).forEach(category => {
                 get()
                   .loadAllArticlesByCategory(category.category)
@@ -315,8 +336,6 @@ const articlesStore = create<TArticlesStoreState>()(
                   });
               });
             }
-
-            set({ loading: false });
             return categories;
           } else {
             throw new Error(`Failed to fetch categories, code: ${response?.code}`);
@@ -342,12 +361,27 @@ const articlesStore = create<TArticlesStoreState>()(
 
           const response = await SERVICES_DATA.Data.getArticlesByCategoryId(Number(id));
 
+          let parsedData: OneArticle[];
+          try {
+            const repairedJson = jsonrepair(response.data as any);
+            const parsedDataRepared = JSON.parse(repairedJson);
+            parsedData = parsedDataRepared.result.filter(
+              (item: OneArticle) =>
+                typeof item === 'object' && item !== null && !Array.isArray(item),
+            );
+          } catch (e) {
+            console.error('Failed to parse JSON:', e, response.data);
+            set({ error: 'Invalid JSON data' });
+            return;
+          }
+
           if (
             response.code === 200 ||
             (response.code === 203 && (response.data as { result: OneArticle[] }).result)
           ) {
-            const articles = (response.data as { result: OneArticle[] }).result;
-            const articlePromises = articles.map(async articleData => {
+            // const articles = (response.data as { result: OneArticle[] }).result;
+            const articles = parsedData;
+            const articlePromises = articles?.map(async articleData => {
               try {
                 const { markdown } = await get().getArticleMd(articleData.post_path);
                 return { ...articleData, text: markdown };

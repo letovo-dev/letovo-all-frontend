@@ -96,26 +96,26 @@ const nextConfig = {
   images: {
     formats: ['image/avif', 'image/webp'],
     remotePatterns: [
-      {
-        protocol: 'https',
-        hostname: 'localhost',
-        pathname: '/api/media/getimages/avatars/**',
-      },
-      {
-        protocol: 'https',
-        hostname: 'localhost',
-        pathname: '/api/media/get/images/avatars/**',
-      },
-      {
-        protocol: 'https',
-        hostname: 'localhost',
-        pathname: '/api/media/get/pages/images/achivements/**',
-      },
-      {
-        protocol: 'https',
-        hostname: 'localhost',
-        pathname: '/api/achivements/qr_code/**',
-      },
+      // {
+      //   protocol: 'https',
+      //   hostname: 'localhost',
+      //   pathname: '/api/media/getimages/avatars/**',
+      // },
+      // {
+      //   protocol: 'https',
+      //   hostname: 'localhost',
+      //   pathname: '/api/media/get/images/avatars/**',
+      // },
+      // {
+      //   protocol: 'https',
+      //   hostname: 'localhost',
+      //   pathname: '/api/media/get/pages/images/achivements/**',
+      // },
+      // {
+      //   protocol: 'https',
+      //   hostname: 'localhost',
+      //   pathname: '/api/achivements/qr_code/**',
+      // },
 
       {
         protocol: 'http',

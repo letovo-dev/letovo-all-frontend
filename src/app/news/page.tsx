@@ -94,8 +94,6 @@ const NewsPage = () => {
     }
   }, [currentNewsState, normalizedNews, savedNews, searchedNews]);
 
-  console.log('currentNewsState', currentNewsState);
-
   useEffect(() => {
     const news = getRenderNews();
     if (news && Object.keys(news).length > 0) {

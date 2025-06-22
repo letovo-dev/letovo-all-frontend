@@ -9,6 +9,8 @@ import articlesStore from '@/shared/stores/articles-store';
 import { Button, ConfigProvider, Input, message, Radio, Space, Select, Form } from 'antd';
 import { SaveOutlined } from '@ant-design/icons';
 import { usePathname } from 'next/navigation';
+import type { UploadFile } from 'antd';
+import authStore from '@/shared/stores/auth-store';
 
 interface VideoComponentProps extends React.VideoHTMLAttributes<HTMLVideoElement> {
   src?: string;
@@ -21,17 +23,20 @@ const MarkdownEditor: React.FC = () => {
   const pathname = usePathname();
   const [markdown, setMarkdown] = useState<string>(mdExample);
   const [articleTitle, setArticleTitle] = useState<string>('');
+  const [fileList, setFileList] = useState<UploadFile[] | undefined>(undefined);
+
   const {
     article,
     isEditArticle,
     renameArticle,
-    saveArticle,
+    createOrUpdateArticle,
     articlesCategories,
     setCurrentArticle,
   } = articlesStore(state => state);
   const [form] = Form.useForm();
   const [messageApi, contextHolder] = message.useMessage();
   const inputTitleHeader = isEditArticle ? EDIT_ARTICLE_TITLE : INPUT_ARTICLE_TITLE;
+  const { userStatus } = authStore(state => state);
 
   useEffect(() => {
     return () => {
@@ -69,7 +74,6 @@ const MarkdownEditor: React.FC = () => {
         category: article.category || undefined,
         articleTitle: article.title || undefined,
       });
-      console.log('Form values set:', form.getFieldsValue());
     } else {
       setMarkdown(mdExample);
       setArticleTitle('');
@@ -100,24 +104,60 @@ const MarkdownEditor: React.FC = () => {
     URL.revokeObjectURL(url);
   };
 
-  const handleSave = async (values: { isSecret: string; category: string }) => {
+  const handleSave = async (values: {
+    isSecret: string;
+    category: string;
+    articleTitle?: string;
+  }) => {
     if (!articleTitle.trim()) {
       error('Название статьи не может быть пустым');
       return;
     }
 
-    console.log('markdown', markdown);
-
     try {
-      // Сохраняем или обновляем статью
-      // await saveArticle({
-      //   post_id: article?.post_id,
-      //   title: articleTitle,
-      //   text: markdown,
-      //   is_secret: values.isSecret,
-      //   category: values.category,
-      // });
-      success(isEditArticle ? 'Статья обновлена' : 'Статья сохранена');
+      const blob = new Blob([markdown], { type: 'text/markdown' });
+      const file = new File([blob], `${articleTitle}.md`, { type: 'text/markdown' });
+      const formData = new FormData();
+      formData.append('file', file);
+      const uploadResponse = await fetch(`${process.env.NEXT_PUBLIC_BASE_URL_UPLOAD}`, {
+        method: 'POST',
+        headers: {
+          Authorization: `Bearer ${userStatus.token || ''}`,
+        },
+        body: formData,
+      });
+
+      if (!uploadResponse.ok) {
+        throw new Error('Ошибка загрузки файла');
+      }
+
+      const uploadResult = await uploadResponse.json();
+      const fileUrl = uploadResult.url;
+      console.log('File uploaded successfully:', fileUrl);
+
+      const data = isEditArticle
+        ? {
+            ...article,
+            text: markdown,
+            is_secret: values.isSecret,
+            category: values.category,
+          }
+        : {
+            title: values.articleTitle ?? '',
+            text: markdown ?? '',
+            is_secret: values.isSecret,
+            category: values.category,
+            //TODO: поправить post_path после восстановления сервера работы с файлами
+            post_path: fileUrl,
+          };
+
+      if (isEditArticle) {
+        // await createOrUpdateArticle(data, false);
+        success('Статья обновлена');
+      } else {
+        // await createOrUpdateArticle(data, true);
+        success('Статья сохранена');
+      }
     } catch (err) {
       console.error('Save article error:', err);
       error('Не удалось сохранить статью');
@@ -285,11 +325,24 @@ const MarkdownEditor: React.FC = () => {
           },
         }}
       />
-      <p>Добавьте новые файлы, используемые в статье</p>
+      <p className={style.inputTitleInstruction}>
+        Для того, чтобы ваше изображение или видео появились в статье, их нужно предварительно
+        загрузить в базу данных. После загрузки файла появиться сообщение с адресом для доступа к
+        файлу, который нужно скопировать и в точности указать в статье. Например:
+        ![image](https://example.com/image.png)
+      </p>
+      <div className={style.uploadContainer}>
+        <UploadFiles
+          setFileList={setFileList}
+          fileList={fileList}
+          token={userStatus?.token ?? ''}
+        />
+        {fileList && <p>{fileList[0]?.response}</p>}
+      </div>
+
       <p className={style.inputTitleInstruction}>
         Название файла должно быть идентично названию, указанному в статье
       </p>
-      <UploadFiles />
       <div className={style.buttonsContainer}>
         <Button
           type="primary"

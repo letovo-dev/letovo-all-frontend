@@ -42,10 +42,14 @@ const NewsPost: React.FC<OnePostProps> = ({
     [newsId],
   );
   const [visible, setVisible] = useState(false);
-  const [post, setPost] = useState<Post | null>({
-    ...el.news,
-    mediaUrl: el.media.length > 0 ? el.media : [],
-  });
+
+  const post = useMemo(() => {
+    return {
+      ...el.news,
+      mediaUrl: el.media.length > 0 ? el.media : [],
+    };
+  }, [el]);
+
   const showMore = comments.length > 1;
 
   const authors = useMemo(() => {
@@ -70,7 +74,6 @@ const NewsPost: React.FC<OnePostProps> = ({
 
   const handleSubmit = async (values: any) => {
     try {
-      console.log('Submitted:', values);
       editNews({ ...post, ...values });
       setVisible(false);
     } catch (error) {
