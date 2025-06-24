@@ -144,18 +144,19 @@ const MarkdownEditor: React.FC = () => {
           }
         : {
             title: values.articleTitle ?? '',
-            text: markdown ?? '',
+            // text: markdown ?? '',
+            text: '',
             is_secret: values.isSecret,
             category: values.category,
             //TODO: поправить post_path после восстановления сервера работы с файлами
-            post_path: fileUrl,
+            post_path: fileUrl ?? '',
           };
 
       if (isEditArticle) {
-        // await createOrUpdateArticle(data, false);
+        await createOrUpdateArticle(data, false);
         success('Статья обновлена');
       } else {
-        // await createOrUpdateArticle(data, true);
+        await createOrUpdateArticle(data, true);
         success('Статья сохранена');
       }
     } catch (err) {
