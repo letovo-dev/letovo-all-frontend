@@ -95,69 +95,28 @@ const nextConfig = {
   },
   images: {
     formats: ['image/avif', 'image/webp'],
-    remotePatterns: [
-      // {
-      //   protocol: 'https',
-      //   hostname: 'localhost',
-      //   pathname: '/api/media/getimages/avatars/**',
-      // },
-      // {
-      //   protocol: 'https',
-      //   hostname: 'localhost',
-      //   pathname: '/api/media/get/images/avatars/**',
-      // },
-      // {
-      //   protocol: 'https',
-      //   hostname: 'localhost',
-      //   pathname: '/api/media/get/pages/images/achivements/**',
-      // },
-      // {
-      //   protocol: 'https',
-      //   hostname: 'localhost',
-      //   pathname: '/api/achivements/qr_code/**',
-      // },
-
-      {
-        protocol: 'http',
-        hostname: '192.168.2.144',
-        pathname: '/api/media/getimages/avatars/**',
-      },
-      {
-        protocol: 'http',
-        hostname: '45.140.178.217',
-        pathname: '/api/media/get/images/avatars/**',
-      },
-      {
-        protocol: 'http',
-        hostname: '192.168.2.144',
-        pathname: '/api/media/get/images/avatars/**',
-      },
-      {
-        protocol: 'http',
-        hostname: 'localhost',
-        pathname: '/api/media/getimages/avatars/**',
-      },
-      {
-        protocol: 'http',
-        hostname: 'localhost',
-        pathname: '/api/media/get/images/avatars/**',
-      },
-      {
-        protocol: 'http',
-        hostname: 'localhost',
-        pathname: '/api/media/get/pages/images/achivements/**',
-      },
-      {
-        protocol: 'http',
-        hostname: 'localhost',
-        pathname: '/api/media/get/pages/images/achivements/**',
-      },
-      {
-        protocol: 'http',
-        hostname: 'localhost',
-        pathname: '/api/achivements/qr_code/**',
-      },
-    ],
+      remotePatterns: [
+        {
+          protocol: 'https',
+          hostname: 'letovocorp.ru',
+          pathname: '/api/media/getimages/avatars/**',
+        },
+        {
+          protocol: 'https',
+          hostname: 'letovocorp.ru',
+          pathname: '/api/media/get/images/avatars/**',
+        },
+        {
+          protocol: 'https',
+          hostname: 'letovocorp.ru',
+          pathname: '/api/media/get/pages/images/achivements/**',
+        },
+        {
+          protocol: 'https',
+          hostname: 'letovocorp.ru',
+          pathname: '/api/achivements/qr_code/**',
+        },
+      ],
   },
 };
 
