@@ -57,37 +57,6 @@ const Menu = ({ isFooter }: { isFooter?: boolean }) => {
     return () => clearTimeout(timer);
   }, []);
 
-  // const items = [
-  //   {
-  //     label: 'База знаний',
-  //     key: 'articles',
-  //     disabled: false,
-  //   },
-  //   {
-  //     label: 'Новости',
-  //     key: 'news',
-  //     disabled: false,
-  //   },
-  //   {
-  //     label: 'Редактор статей',
-  //     key: 'md-editor',
-  //     disabled: false,
-  //     destroyOnHidden: true,
-  //   },
-  //   {
-  //     label: 'Личный кабинет',
-  //     key: 'user',
-  //     disabled: false,
-  //   },
-  // ];
-
-  // const renderItems = isFooter ? items.filter((item: MenuItem) => item.key !== 'md-editor') : items;
-
-  // const permittedItems =
-  //   userData.userrights === 'admin'
-  //     ? renderItems
-  //     : renderItems.filter((item: MenuItem) => item.key !== 'md-editor');
-
   const permittedItems = useMemo(
     () => getFilteredItems(items, isFooter, userData.userrights),
     [isFooter, userData.userrights],
@@ -108,8 +77,6 @@ const Menu = ({ isFooter }: { isFooter?: boolean }) => {
   if (pathname === '/login') {
     return null;
   }
-
-  console.log('isFooter', isFooter);
 
   return (
     <div className={`${style.footerContainer} ${isReady ? style.ready : ''}`}>
