@@ -9,7 +9,9 @@ RUN npm ci
 
 COPY . .
 
-RUN source front-env.env && npm run build
+COPY ./front-env.env ./.env
+
+RUN npm run build
 
 FROM node:18-alpine
 
