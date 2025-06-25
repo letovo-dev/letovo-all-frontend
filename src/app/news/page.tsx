@@ -6,7 +6,6 @@ import { OneNews } from '@/entities/post/ui';
 import commentsStore from '@/shared/stores/comments-store';
 import SpinModule from '@/shared/ui/spiner';
 import { News } from '@/pages_fsd/news';
-import style from './page.module.scss';
 import { message } from 'antd';
 
 const LOAD_NEWS_SIZE = 10;
@@ -67,7 +66,7 @@ const NewsPage = () => {
     const initializeData = async () => {
       try {
         await Promise.all([
-          fetchNews({ type: 'getLimitNews', start: 25, size: LOAD_NEWS_SIZE }),
+          fetchNews({ type: 'getLimitNews', start: 0, size: LOAD_NEWS_SIZE }),
           fetchNews({ type: 'getSavedNews' }),
           getTitles(),
         ]);

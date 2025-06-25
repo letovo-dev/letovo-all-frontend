@@ -132,9 +132,7 @@ const MarkdownEditor: React.FC = () => {
       }
 
       const uploadResult = await uploadResponse.json();
-      const fileUrl = uploadResult.url;
-      console.log('File uploaded successfully:', fileUrl);
-
+      const fileUrl = uploadResult.file;
       const data = isEditArticle
         ? {
             ...article,
@@ -338,9 +336,13 @@ const MarkdownEditor: React.FC = () => {
           fileList={fileList}
           token={userStatus?.token ?? ''}
         />
-        {fileList && <p>{fileList[0]?.response}</p>}
+        {fileList && fileList[0]?.response && typeof fileList[0].response === 'string' && (
+          <p>
+            {`${process.env.NEXT_PUBLIC_BASE_URL_MEDIA}`}
+            {fileList[0].response}
+          </p>
+        )}
       </div>
-
       <p className={style.inputTitleInstruction}>
         Название файла должно быть идентично названию, указанному в статье
       </p>

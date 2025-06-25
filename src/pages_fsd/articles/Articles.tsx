@@ -123,7 +123,6 @@ const Articles: React.FC = () => {
         mediaCacheRef.current = newMediaCache;
         setMediaCache(newMediaCache);
         setProcessedText(updatedText);
-        console.log('Updated mediaCache:', newMediaCache);
       }
     };
 

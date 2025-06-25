@@ -6,7 +6,7 @@ import Menu from '../menu/Menu';
 const Footer: React.FC = () => {
   return (
     <div className={style.footerContainer}>
-      <Menu />
+      <Menu isFooter={true} />
     </div>
   );
 };

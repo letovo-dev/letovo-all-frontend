@@ -7,6 +7,10 @@ import style from '../MdEditor.module.scss';
 
 type FileType = Parameters<GetProp<UploadProps, 'beforeUpload'>>[0];
 
+interface CustomUploadFile extends UploadFile {
+  response?: string | { file: string };
+}
+
 const getBase64 = (file: FileType): Promise<string> =>
   new Promise((resolve, reject) => {
     const reader = new FileReader();
@@ -20,16 +24,31 @@ const UploadFiles = ({
   fileList,
   token,
 }: {
-  setFileList: React.Dispatch<React.SetStateAction<UploadFile[] | undefined>>;
-  fileList: UploadFile[] | undefined;
+  setFileList: React.Dispatch<React.SetStateAction<CustomUploadFile[] | undefined>>;
+  fileList: CustomUploadFile[] | undefined;
   token: string;
 }) => {
   const handleChange: UploadProps['onChange'] = ({ file, fileList: newFileList }) => {
-    setFileList(newFileList);
+    const transformedFileList = newFileList.map(item => {
+      if (item.response && typeof item.response === 'object' && 'file' in item.response) {
+        return {
+          ...item,
+          response: item.response.file,
+        };
+      }
+      return item;
+    });
+
+    setFileList(transformedFileList);
+
     if (file.status === 'error') {
       console.error('Upload failed:', file.error);
+      message.error(`Не удалось загрузить ${file.name}`);
+    } else if (file.status === 'done') {
+      message.success(`Файл ${file.name} успешно загружен`);
     }
   };
+
   const uploadButton = (
     <button style={{ border: 0, background: 'none' }} type="button">
       <PlusOutlined />
@@ -37,7 +56,7 @@ const UploadFiles = ({
     </button>
   );
 
-  const handleRemove = async (file: UploadFile) => {
+  const handleRemove = async (file: CustomUploadFile) => {
     if (file.url) {
       try {
         const response = await fetch(`YOUR_SERVER_URL/delete/${file.uid}`, {
@@ -51,9 +70,9 @@ const UploadFiles = ({
           throw new Error('Failed to delete file on server');
         }
 
-        message.success(`File ${file.name} deleted successfully`);
+        message.success(`Файл ${file.name} успешно удалён`);
       } catch (error: any) {
-        message.error(`Failed to delete ${file.name}: ${error.message}`);
+        message.error(`Не удалось удалить ${file.name}: ${error.message}`);
         return false;
       }
     }
@@ -61,7 +80,7 @@ const UploadFiles = ({
     return true;
   };
 
-  const props = {
+  const props: UploadProps = {
     name: 'file',
     accept: 'image/*,video/*,pdf/*',
     fileList,

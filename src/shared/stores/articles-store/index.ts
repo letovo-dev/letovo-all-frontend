@@ -47,63 +47,15 @@ export type TArticlesStoreState = {
     newName: string,
     oldName: string,
   ) => Promise<ArticleCategory[]>;
-  // '/post/rename_category': {
-  //   function: 'rename_category';
-  //   method: 'put';
-  //   body_fields: {
-  //     old_name: 'String';
-  //     new_name: 'String';
-  //   };
-  //   header_fields: ['Bearer'];
-  // };
   deleteArticleCategory: (id: string) => Promise<ArticleCategory[]>;
   deleteArticle: (id: string, categoryId: string) => void;
-  // '/post/delete': {
-  //   function: 'delete_post';
-  //   method: 'delete';
-  //   body_fields: {
-  //     post_id: 'Int';
-  //   };
-  //   header_fields: ['Bearer'];
-  // };
   renameArticle: (categoryId: string, articleId: string, newName: string) => OneArticle;
-  // '/post/update': {
-  //   method: 'put';
-  //   body_fields: {
-  //     post_id: 'Int';
-  //     is_secret: 'Bool';
-  //     likes: 'Int';
-  //     dislikes: 'Int';
-  //     saved: 'Int';
-  //     title: 'String';
-  //     author: 'String';
-  //     text: 'String';
-  //     category: 'String';
-  //   };
-  //   header_fields: ['Bearer'];
-  // };
   getOneArticle: (id: string, categoryId: string) => OneArticle;
   getArticleMd: (fileName: string) => Promise<any>;
   loadAllArticlesByCategory: (id: string) => Promise<void>;
   setCurrentArticle: (article: OneArticle | undefined) => void;
   refreshArticles: () => Promise<void>;
   createOrUpdateArticle: (article: Partial<OneArticle>, isNew: boolean) => Promise<void>;
-
-  // '/post/update': {
-  //   method: 'put';
-  //   body_fields: {
-  //     post_id: 'Int';
-  //     is_secret: 'Bool';
-  //     likes: 'Int';
-  //     dislikes: 'Int';
-  //     saved: 'Int';
-  //     title: 'String';
-  //     author: 'String';
-  //     text: 'String';
-  //     category: 'String';
-  //   };
-  //   header_fields: ['Bearer'];
-  // };
 };
 
 const initialState = {
@@ -126,7 +78,6 @@ const articlesStore = create<TArticlesStoreState>()(
           draft.article = article;
         });
       },
-      // shared/stores/articles-store.ts
       createOrUpdateArticle: async (article: OneArticle, isNew: boolean) => {
         set({
           loading: true,
@@ -144,7 +95,6 @@ const articlesStore = create<TArticlesStoreState>()(
             const normalizedArticles = get().normalizedArticles;
             let updatedArticles;
             if (!isNew) {
-              // Обновление существующей статьи
               updatedArticles = normalizedArticles[article.category].map((el: OneArticle) =>
                 el.post_id === data[0].post_id ? { ...data } : el,
               );

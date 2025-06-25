@@ -146,28 +146,7 @@ export type TDataStoreState = {
   fetchNews: (params: FetchNewsParams) => Promise<any>;
   createNews: (news: Partial<RealNews>) => void;
   editNews: (news: RealNews) => void;
-  // "/post/update": {
-  //   "method": "put",
-  //   "body_fields": {
-  //       "post_id": "Int",
-  //       "is_secret": "Bool",
-  //       "likes": "Int",
-  //       "dislikes": "Int",
-  //       "saved": "Int",
-  //       "title": "String",
-  //       "author": "String",
-  //       "text": "String",
-  //       "category": "String"
-  //   },
   deleteNews: (news_id: string) => void;
-  // '/post/delete': {
-  //   function: 'delete_post';
-  //   method: 'delete';
-  //   body_fields: {
-  //     post_id: 'Int';
-  //   };
-  //   header_fields: ['Bearer'];
-  // };
   addAch: (ach_id: string, username: string) => Promise<void>;
 };
 
@@ -522,7 +501,7 @@ const dataStore = create<TDataStoreState>()(
 
         let data;
         try {
-          const promises = newsData.map(async news => {
+          const promises = newsData?.map(async news => {
             const media = await commentsStore.getState().getCurrentNewsPics(news.post_id);
             const comments = await commentsStore
               .getState()

@@ -1,12 +1,37 @@
 'use client';
-import React, { useState, useEffect } from 'react';
+import React, { useState, useEffect, useMemo } from 'react';
 import { ConfigProvider, Tabs } from 'antd';
 import style from './Menu.module.scss';
 import { usePathname, useRouter } from 'next/navigation';
 import userStore from '@/shared/stores/user-store';
 import articlesStore from '@/shared/stores/articles-store';
 
-const Menu: React.FC = () => {
+interface MenuItem {
+  label: string;
+  key: string;
+  disabled: boolean;
+  destroyOnHidden?: boolean;
+}
+
+const items: MenuItem[] = [
+  { label: 'База знаний', key: 'articles', disabled: false },
+  { label: 'Новости', key: 'news', disabled: false },
+  { label: 'Редактор статей', key: 'md-editor', disabled: false, destroyOnHidden: true },
+  { label: 'Личный кабинет', key: 'user', disabled: false },
+];
+
+const getFilteredItems = (
+  items: MenuItem[],
+  isFooter: boolean | undefined,
+  userrights: string | undefined,
+): MenuItem[] => {
+  if (isFooter || userrights !== 'admin') {
+    return items.filter(item => item.key !== 'md-editor');
+  }
+  return items;
+};
+
+const Menu = ({ isFooter }: { isFooter?: boolean }) => {
   const router = useRouter();
   const pathname = usePathname();
   const {
@@ -32,32 +57,41 @@ const Menu: React.FC = () => {
     return () => clearTimeout(timer);
   }, []);
 
-  const items = [
-    {
-      label: 'База знаний',
-      key: 'articles',
-      disabled: false,
-    },
-    {
-      label: 'Новости',
-      key: 'news',
-      disabled: false,
-    },
-    {
-      label: 'Редактор статей',
-      key: 'md-editor',
-      disabled: false,
-      destroyOnHidden: true,
-    },
-    {
-      label: 'Личный кабинет',
-      key: 'user',
-      disabled: false,
-    },
-  ];
+  // const items = [
+  //   {
+  //     label: 'База знаний',
+  //     key: 'articles',
+  //     disabled: false,
+  //   },
+  //   {
+  //     label: 'Новости',
+  //     key: 'news',
+  //     disabled: false,
+  //   },
+  //   {
+  //     label: 'Редактор статей',
+  //     key: 'md-editor',
+  //     disabled: false,
+  //     destroyOnHidden: true,
+  //   },
+  //   {
+  //     label: 'Личный кабинет',
+  //     key: 'user',
+  //     disabled: false,
+  //   },
+  // ];
 
-  const permittedItems =
-    userData.userrights === 'admin' ? items : items.filter((item: any) => item.key !== 'md-editor');
+  // const renderItems = isFooter ? items.filter((item: MenuItem) => item.key !== 'md-editor') : items;
+
+  // const permittedItems =
+  //   userData.userrights === 'admin'
+  //     ? renderItems
+  //     : renderItems.filter((item: MenuItem) => item.key !== 'md-editor');
+
+  const permittedItems = useMemo(
+    () => getFilteredItems(items, isFooter, userData.userrights),
+    [isFooter, userData.userrights],
+  );
 
   const handleTabClick = (key: string) => {
     if (key !== 'md-editor') {
@@ -74,6 +108,9 @@ const Menu: React.FC = () => {
   if (pathname === '/login') {
     return null;
   }
+
+  console.log('isFooter', isFooter);
+
   return (
     <div className={`${style.footerContainer} ${isReady ? style.ready : ''}`}>
       <ConfigProvider
