@@ -1,31 +1,32 @@
 'use client';
 
-import articlesStore from '@/shared/stores/articles-store';
-import SpinModule from '@/shared/ui/spiner';
 import React, { useEffect, useRef, useState, useMemo, useCallback } from 'react';
 import axios from 'axios';
-import { extractImageUrls } from '@/shared/utils/utils';
 import { useRouter } from 'next/navigation';
 import { useFooterContext } from '@/shared/ui/context/FooterContext';
+import articlesStore from '@/shared/stores/articles-store';
+import SpinModule from '@/shared/ui/spiner';
+import { extractImageUrls } from '@/shared/utils/utils';
+import debounce from 'lodash/debounce';
 import style from './Articles.module.scss';
 import Burger from '@/shared/ui/burger-menu/Burger';
 import { SideBarArticles } from '@/features/side-bar-articles';
-import debounce from 'lodash/debounce';
 import MarkdownContent from './ReactMd';
 
 const Articles: React.FC = () => {
   const { article, normalizedArticles, loading, articlesCategories, getArticlesCategories } =
-    articlesStore(state => state);
+    articlesStore();
   const router = useRouter();
+  const { setFooterHidden } = useFooterContext();
   const [processedText, setProcessedText] = useState('');
   const [lsToken, setLsToken] = useState<string | null>(null);
   const [mediaCache, setMediaCache] = useState<Record<string, string>>({});
+  const [error, setError] = useState<string | null>(null);
   const wrapRef = useRef<HTMLDivElement>(null);
   const burgerRef = useRef<HTMLDivElement>(null);
-  const { setFooterHidden } = useFooterContext();
-  const [open, setOpen] = useState(false);
   const mediaCacheRef = useRef<Record<string, string>>({});
   const lastScrollTopRef = useRef(0);
+  const [open, setOpen] = useState(false);
 
   const isVideoUrl = (url: string): boolean => {
     return /\.(mp4|webm|ogg|mkv|avi)(\?.*)?$/i.test(url);
@@ -35,7 +36,6 @@ const Articles: React.FC = () => {
     if (typeof window !== 'undefined') {
       const token = localStorage.getItem('token');
       setLsToken(token);
-
       if (!token) {
         router.push('/login');
       } else {
@@ -48,11 +48,7 @@ const Articles: React.FC = () => {
     debounce(() => {
       if (wrapRef.current) {
         const currentScrollTop = wrapRef.current.scrollTop;
-        if (currentScrollTop > 50) {
-          setFooterHidden(true);
-        } else {
-          setFooterHidden(false);
-        }
+        setFooterHidden(currentScrollTop > 50);
         lastScrollTopRef.current = currentScrollTop;
       }
     }, 50),
@@ -97,20 +93,21 @@ const Articles: React.FC = () => {
           newMediaCache[url] = objectUrl;
         } catch (error) {
           if (axios.isCancel(error)) {
-            console.warn(`Request canceled for ${url}`);
+            console.warn(`Запрос отменён для ${url}`);
           } else {
             console.error(`Ошибка загрузки медиа ${url}:`, error);
+            setError(`Не удалось загрузить медиа: ${url}`);
           }
         }
       });
 
-      await Promise.all(fetchPromises);
+      await Promise.allSettled(fetchPromises);
 
       if (isMounted) {
         const updatedText = markdownText.replace(/!\[.*?\]\((.*?)\)/g, (match, url) => {
           const localUrl = newMediaCache[url];
           if (!localUrl) {
-            console.warn(`No local URL for ${url}`);
+            console.warn(`Локальный URL не найден для ${url}`);
             return match;
           }
           if (isVideoUrl(url)) {
@@ -130,7 +127,7 @@ const Articles: React.FC = () => {
 
     return () => {
       isMounted = false;
-      cancelTokenSource.cancel('Component unmounted or article changed'); // Отменить запросы
+      cancelTokenSource.cancel('Компонент размонтирован или статья изменена');
     };
   }, [article?.text, lsToken]);
 
@@ -150,6 +147,7 @@ const Articles: React.FC = () => {
 
   return (
     <>
+      {error && <div className={style.error}>{error}</div>}
       <div
         className={`${style.burgerArticlesContainer} ${open ? style.sidebarOpenBurgerContainer : ''}`}
         ref={burgerRef}

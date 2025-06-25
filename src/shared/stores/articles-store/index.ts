@@ -311,26 +311,26 @@ const articlesStore = create<TArticlesStoreState>()(
 
           const response = await SERVICES_DATA.Data.getArticlesByCategoryId(Number(id));
 
-          let parsedData: OneArticle[];
-          try {
-            const repairedJson = jsonrepair(response.data as any);
-            const parsedDataRepared = JSON.parse(repairedJson);
-            parsedData = parsedDataRepared.result.filter(
-              (item: OneArticle) =>
-                typeof item === 'object' && item !== null && !Array.isArray(item),
-            );
-          } catch (e) {
-            console.error('Failed to parse JSON:', e, response.data);
-            set({ error: 'Invalid JSON data' });
-            return;
-          }
+          // let parsedData: OneArticle[];
+          // try {
+          //   const repairedJson = jsonrepair(response.data as any);
+          //   const parsedDataRepared = JSON.parse(repairedJson);
+          //   parsedData = parsedDataRepared.result.filter(
+          //     (item: OneArticle) =>
+          //       typeof item === 'object' && item !== null && !Array.isArray(item),
+          //   );
+          // } catch (e) {
+          //   console.error('Failed to parse JSON:', e, response.data);
+          //   set({ error: 'Invalid JSON data' });
+          //   return;
+          // }
 
           if (
             response.code === 200 ||
             (response.code === 203 && (response.data as { result: OneArticle[] }).result)
           ) {
-            // const articles = (response.data as { result: OneArticle[] }).result;
-            const articles = parsedData;
+            const articles = (response.data as { result: OneArticle[] }).result;
+            // const articles = parsedData;
             const articlePromises = articles?.map(async articleData => {
               try {
                 const { markdown } = await get().getArticleMd(articleData.post_path);

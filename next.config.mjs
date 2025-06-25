@@ -95,28 +95,41 @@ const nextConfig = {
   },
   images: {
     formats: ['image/avif', 'image/webp'],
-      remotePatterns: [
-        {
-          protocol: 'https',
-          hostname: 'letovocorp.ru',
-          pathname: '/api/media/getimages/avatars/**',
-        },
-        {
-          protocol: 'https',
-          hostname: 'letovocorp.ru',
-          pathname: '/api/media/get/images/avatars/**',
-        },
-        {
-          protocol: 'https',
-          hostname: 'letovocorp.ru',
-          pathname: '/api/media/get/pages/images/achivements/**',
-        },
-        {
-          protocol: 'https',
-          hostname: 'letovocorp.ru',
-          pathname: '/api/achivements/qr_code/**',
-        },
-      ],
+    remotePatterns: [
+      {
+        protocol: 'https',
+        hostname: 'letovocorp.ru',
+        pathname: '/api/media/getimages/avatars/**',
+      },
+      {
+        protocol: 'https',
+        hostname: 'letovocorp.ru',
+        pathname: '/api/media/get/images/avatars/**',
+      },
+      {
+        protocol: 'https',
+        hostname: 'letovocorp.ru',
+        pathname: '/api/media/get/pages/images/achivements/**',
+      },
+      {
+        protocol: 'https',
+        hostname: 'letovocorp.ru',
+        pathname: '/api/achivements/qr_code/**',
+      },
+      {
+        protocol: 'https',
+        hostname: 'letovocorp.ru',
+        pathname: '/api/media/get/**',
+      },
+    ],
+  },
+  async rewrites() {
+    return [
+      {
+        source: '/api/media/get/:path*',
+        destination: 'https://letovocorp.ru/api/media/get/:path*',
+      },
+    ];
   },
 };
 
