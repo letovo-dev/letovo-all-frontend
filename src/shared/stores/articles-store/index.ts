@@ -55,7 +55,7 @@ export type TArticlesStoreState = {
   loadAllArticlesByCategory: (id: string) => Promise<void>;
   setCurrentArticle: (article: OneArticle | undefined) => void;
   refreshArticles: () => Promise<void>;
-  createOrUpdateArticle: (article: Partial<OneArticle>, isNew: boolean) => Promise<void>;
+  createOrUpdateArticle: (article: Partial<OneArticle>, isNew: boolean) => Promise<string>;
 };
 
 const initialState = {
@@ -111,12 +111,14 @@ const articlesStore = create<TArticlesStoreState>()(
               draft.loading = false;
               draft.article = data[0];
             });
+            return 'success';
           } else {
             console.error(`Unexpected response code: ${response.code}`, response);
             set({
               error: `Unexpected response code: ${response.code}`,
               loading: false,
             });
+            return 'error';
           }
         } catch (error) {
           console.error('Error saving article:', error);

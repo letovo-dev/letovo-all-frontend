@@ -48,11 +48,11 @@ const MarkdownContent: React.FC<{ content: string }> = React.memo(
                 width={800}
                 height={450}
                 sizes="(max-width: 960px) 100vw, (max-width: 1427px) 80vw, 800px"
-                style={{ width: '100%', height: 'auto' }}
+                style={{ width: 'auto', height: 'auto' }}
                 priority={false}
                 placeholder="blur"
                 blurDataURL="/logo_mini_blur.png"
-                layout="responsive"
+                // layout="responsive"
               />
             );
           },

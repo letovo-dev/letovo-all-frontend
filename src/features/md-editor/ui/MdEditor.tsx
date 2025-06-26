@@ -11,6 +11,8 @@ import { SaveOutlined } from '@ant-design/icons';
 import { usePathname } from 'next/navigation';
 import type { UploadFile } from 'antd';
 import authStore from '@/shared/stores/auth-store';
+import { uniqueId } from 'lodash';
+import { useRouter } from 'next/navigation';
 
 interface VideoComponentProps extends React.VideoHTMLAttributes<HTMLVideoElement> {
   src?: string;
@@ -20,6 +22,7 @@ const EDIT_ARTICLE_TITLE = 'Отредактируйте название ста
 const INPUT_ARTICLE_TITLE = 'Введите название статьи';
 
 const MarkdownEditor: React.FC = () => {
+  const router = useRouter();
   const pathname = usePathname();
   const [markdown, setMarkdown] = useState<string>(mdExample);
   const [articleTitle, setArticleTitle] = useState<string>('');
@@ -113,10 +116,12 @@ const MarkdownEditor: React.FC = () => {
       error('Название статьи не может быть пустым');
       return;
     }
-
+    const articleName = isEditArticle
+      ? article?.post_path.split('/')[length - 1]
+      : `${uniqueId('article_')}.md`;
     try {
       const blob = new Blob([markdown], { type: 'text/markdown' });
-      const file = new File([blob], `${articleTitle}.md`, { type: 'text/markdown' });
+      const file = new File([blob], `${articleName}`, { type: 'text/markdown' });
       const formData = new FormData();
       formData.append('file', file);
       const uploadResponse = await fetch(`${process.env.NEXT_PUBLIC_BASE_URL_UPLOAD}`, {
@@ -142,21 +147,28 @@ const MarkdownEditor: React.FC = () => {
           }
         : {
             title: values.articleTitle ?? '',
-            // text: markdown ?? '',
-            text: '',
+            text: markdown ?? '',
             is_secret: values.isSecret,
             category: values.category,
-            //TODO: поправить post_path после восстановления сервера работы с файлами
             post_path: fileUrl ?? '',
           };
 
       if (isEditArticle) {
-        await createOrUpdateArticle(data, false);
-        success('Статья обновлена');
+        const res = await createOrUpdateArticle(data, false);
+        if (res === 'success') {
+          success('Статья обновлена');
+        } else {
+          error('Не удалось обновить статью');
+        }
       } else {
-        await createOrUpdateArticle(data, true);
-        success('Статья сохранена');
+        const res = await createOrUpdateArticle(data, true);
+        if (res === 'success') {
+          success('Статья сохранена');
+        } else {
+          error('Не удалось сохранить статью');
+        }
       }
+      router.push('/articles');
     } catch (err) {
       console.error('Save article error:', err);
       error('Не удалось сохранить статью');
