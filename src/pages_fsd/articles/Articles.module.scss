@@ -19,7 +19,7 @@ $scrollbar-width: 17px;
   overflow-x: hidden;
   width: 100%;
   height: calc(var(--vh, 1vh) * 97);
-  min-height: 100vh;
+  min-height: auto;
   -webkit-overflow-scrolling: touch;
   overscroll-behavior-y: contain;
   scrollbar-gutter: stable;
@@ -107,7 +107,7 @@ $scrollbar-width: 17px;
     img,
     video {
       border-radius: 8px;
-      margin: 10px auto;
+      margin: 10px;
       display: block;
       max-width: 100%;
       height: auto;

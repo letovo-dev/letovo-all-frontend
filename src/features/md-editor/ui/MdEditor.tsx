@@ -41,6 +41,10 @@ const MarkdownEditor: React.FC = () => {
   const inputTitleHeader = isEditArticle ? EDIT_ARTICLE_TITLE : INPUT_ARTICLE_TITLE;
   const { userStatus } = authStore(state => state);
 
+  const articleName = isEditArticle
+    ? article?.post_path.split('/')[length - 1]
+    : `${uniqueId('article_')}.md`;
+
   useEffect(() => {
     return () => {
       setCurrentArticle(undefined);
@@ -116,9 +120,11 @@ const MarkdownEditor: React.FC = () => {
       error('Название статьи не может быть пустым');
       return;
     }
+
     const articleName = isEditArticle
-      ? article?.post_path.split('/')[length - 1]
+      ? article?.post_path.split('/').at(-1)
       : `${uniqueId('article_')}.md`;
+
     try {
       const blob = new Blob([markdown], { type: 'text/markdown' });
       const file = new File([blob], `${articleName}`, { type: 'text/markdown' });
