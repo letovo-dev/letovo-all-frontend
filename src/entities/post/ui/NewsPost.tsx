@@ -46,11 +46,11 @@ const NewsPost: React.FC<OnePostProps> = ({
   const post = useMemo(() => {
     return {
       ...el.news,
-      mediaUrl: el.media.length > 0 ? el.media : [],
+      mediaUrl: el.media?.length > 0 ? el.media : [],
     };
   }, [el]);
 
-  const showMore = comments.length > 1;
+  const showMore = comments?.length > 1;
 
   const authors = useMemo(() => {
     return allPostsAuthors?.map((author: IUserData) => {
@@ -101,15 +101,15 @@ const NewsPost: React.FC<OnePostProps> = ({
         handleDelete={handleDelete}
         currentNewsStateSaved={currentNewsState.saved}
       />
-      {el.media.length > 0 ? (
+      {el.media?.length > 0 ? (
         <CarouselElement imgs={el.media} />
       ) : (
         <div style={{ margin: '10px 0 20px 0' }}></div>
       )}
       <NewsActionPanel
-        newsItem={el.news}
+        postId={el.news.post_id}
         savedCount={10}
-        commentsCount={comments.length}
+        commentsCount={comments?.length}
         likeNewsOrComment={likeNewsOrComment}
         dislikeNews={dislikeNews}
       />

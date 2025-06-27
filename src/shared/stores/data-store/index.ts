@@ -523,7 +523,7 @@ const dataStore = create<TDataStoreState>()(
             (post.comments ?? []).filter(
               (comment: RealComment) => comment.parent_id === String(post.news.post_id),
             ) ?? [];
-          const newsMedia = post.media.map((media: RealMedia) => media.media);
+          const newsMedia = post?.media?.map((media: RealMedia) => media.media);
           return { ...post, comments: newsComments, media: newsMedia };
         });
 
@@ -592,27 +592,105 @@ const dataStore = create<TDataStoreState>()(
       if (controllers[post_id]) {
         controllers[post_id].abort();
       }
-
       const controller = new AbortController();
       controllers[post_id] = controller;
       try {
-        await SERVICES_DATA.Data.setLike(post_id, action, { signal: controller.signal });
+        const res = await SERVICES_DATA.Data.setLike(post_id, action, {
+          signal: controller.signal,
+        });
+
+        if (res.code === 200 || res.success) {
+          const normalizedNews = get().data.normalizedNews;
+          const { news } = normalizedNews[post_id] || {};
+
+          if (!news) {
+            console.error(`News with post_id ${post_id} not found in normalizedNews`);
+            return;
+          }
+          const updatedNewsState = {
+            ...news,
+            is_liked: action === 'delete' ? 'f' : 't',
+            likes: String(Number(news.likes) + (action === 'delete' ? -1 : 1)),
+            ...(news.is_disliked === 't' &&
+              action !== 'delete' && {
+                is_disliked: 'f',
+                dislikes: String(Number(news.dislikes) - 1),
+              }),
+          };
+
+          const updatedNews = { ...normalizedNews[post_id], news: updatedNewsState };
+          const updatedData = {
+            ...normalizedNews,
+            [post_id]: updatedNews,
+          };
+
+          set({
+            data: {
+              ...get().data,
+              normalizedNews: updatedData,
+            },
+            loading: false,
+          });
+        } else {
+          console.error('setLike failed:', res);
+          set({ error: `Failed to ${action} like for post ${post_id}` });
+        }
       } catch (error) {
-        console.error(error);
+        console.error('setLike error:', error);
+        set({ error: error instanceof Error ? error.message : 'Unknown error' });
       } finally {
         if (controllers[post_id] === controller) {
           delete controllers[post_id];
         }
       }
     },
-    dislikeNews: async (post_id: string, action: string): Promise<any> => {
+    dislikeNews: async (post_id: string, action: string): Promise<void> => {
       set({ error: undefined });
       try {
-        await SERVICES_DATA.Data.setDislike(post_id, action);
+        const res = await SERVICES_DATA.Data.setDislike(post_id, action);
+        if (res.code === 200 || res.success) {
+          const normalizedNews = get().data.normalizedNews;
+          const { news } = normalizedNews[post_id] || {};
+
+          if (!news) {
+            console.error(`News with post_id ${post_id} not found in normalizedNews`);
+            return;
+          }
+
+          const updatedNewsState = {
+            ...news,
+            is_disliked: action === 'delete' ? 'f' : 't',
+            dislikes: String(Number(news.dislikes) + (action === 'delete' ? -1 : 1)),
+            ...(news.is_liked === 't' &&
+              action !== 'delete' && {
+                is_liked: 'f',
+                likes: String(Number(news.likes) - 1),
+              }),
+          };
+
+          const updatedNews = { ...normalizedNews[post_id], news: updatedNewsState };
+          const updatedData = {
+            ...normalizedNews,
+            [post_id]: updatedNews,
+          };
+
+          set({
+            data: {
+              ...get().data,
+              normalizedNews: updatedData,
+            },
+            loading: false,
+          });
+        } else {
+          console.error('setDislike failed:', res);
+          set({ error: `Failed to ${action} dislike for post ${post_id}` });
+        }
       } catch (error) {
-        console.error(error);
+        console.error('setDislike error:', error);
+        set({ error: error instanceof Error ? error.message : 'Unknown error' });
       }
     },
+
     resetState: () => {
       set(() => ({
         ...initialState,

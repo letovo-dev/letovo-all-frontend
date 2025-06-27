@@ -59,6 +59,7 @@ const AchievementModal: React.FC<ModalProps> = ({
         allPossibleUserAchievements[nextIndex].level;
 
       setCurrentItem({ ...allPossibleUserAchievements[nextIndex], done: doneItem });
+      setQrUrl(null);
     }
   };
 
@@ -78,6 +79,7 @@ const AchievementModal: React.FC<ModalProps> = ({
         allPossibleUserAchievements[prevIndex].level;
 
       setCurrentItem({ ...allPossibleUserAchievements[prevIndex], done: doneItem });
+      setQrUrl(null);
     }
   };
 
