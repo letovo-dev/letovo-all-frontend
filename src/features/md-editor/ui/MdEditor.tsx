@@ -41,10 +41,6 @@ const MarkdownEditor: React.FC = () => {
   const inputTitleHeader = isEditArticle ? EDIT_ARTICLE_TITLE : INPUT_ARTICLE_TITLE;
   const { userStatus } = authStore(state => state);
 
-  const articleName = isEditArticle
-    ? article?.post_path.split('/')[length - 1]
-    : `${uniqueId('article_')}.md`;
-
   useEffect(() => {
     return () => {
       setCurrentArticle(undefined);
@@ -147,13 +143,13 @@ const MarkdownEditor: React.FC = () => {
       const data = isEditArticle
         ? {
             ...article,
-            text: markdown,
+            text: '',
             is_secret: values.isSecret,
             category: values.category,
           }
         : {
             title: values.articleTitle ?? '',
-            text: markdown ?? '',
+            text: '',
             is_secret: values.isSecret,
             category: values.category,
             post_path: fileUrl ?? '',
