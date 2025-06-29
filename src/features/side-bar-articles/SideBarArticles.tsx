@@ -1,15 +1,35 @@
 'use client';
 
 import React, { useEffect, useRef, useState, useMemo } from 'react';
+import bcrypt from 'bcryptjs';
 import style from './SideBarArticles.module.scss';
 import articlesStore, { ArticleCategory, OneArticle } from '@/shared/stores/articles-store';
 import type { MenuProps } from 'antd';
-import { Collapse, Dropdown, Input, Button, Space } from 'antd';
+import { Collapse, Dropdown, Input, Button, Space, QRCode } from 'antd';
 import { generateKey } from '@/shared/api/utils';
-import { MenuUnfoldOutlined, SaveOutlined } from '@ant-design/icons';
+import {
+  DeleteOutlined,
+  EditOutlined,
+  EyeInvisibleOutlined,
+  EyeOutlined,
+  MenuUnfoldOutlined,
+  QrcodeOutlined,
+  SaveOutlined,
+  SignatureOutlined,
+} from '@ant-design/icons';
 import { useRouter } from 'next/navigation';
 import userStore from '@/shared/stores/user-store';
 import ArticleEditInput from './ArticleEditInput';
+
+const BASE_URL = 'https://letovo.ru';
+const SECRET_KEY = 'очень-секретный-key';
+const saltRounds = 4;
+
+const generateToken = async (key: string): Promise<string> => {
+  const hashedPassword = await bcrypt.hash(key, saltRounds);
+  return hashedPassword;
+};
+
 const SideBarArticles = ({
   open,
   setOpen,
@@ -32,6 +52,7 @@ const SideBarArticles = ({
     deleteArticleCategory,
     deleteArticle,
     renameArticle,
+    createOrUpdateArticle,
   } = articlesStore(state => state);
   const {
     userData: { userrights },
@@ -47,6 +68,10 @@ const SideBarArticles = ({
   const router = useRouter();
   const [windowWidth, setWindowWidth] = useState<number | undefined>(undefined);
   const sidebarRef = useRef<HTMLDivElement>(null);
+  const {
+    store: { userData },
+  } = userStore(state => state);
+  const [qrUrl, setQrUrl] = React.useState<string | null>(null);
 
   const [editingCategory, setEditingCategory] = useState<{
     key: string;
@@ -96,6 +121,15 @@ const SideBarArticles = ({
     setOpen(false);
   };
 
+  const qrOpen = async () => {
+    const token = await generateToken(SECRET_KEY + article?.post_id);
+    const qr_url = `${process.env.NEXT_PUBLIC_BASE_URL_CLEAR}/open-article/${article?.post_id}?token=${token}`;
+    setQrUrl(qr_url);
+    setTimeout(() => {
+      setQrUrl(null);
+    }, 10000);
+  };
+
   const handleRenameSubmit = (
     articleId: string | null,
     categoryId: string,
@@ -113,7 +147,12 @@ const SideBarArticles = ({
   };
 
   const getMenuOnClick =
-    (articleId: string, categoryId: string, type: 'category' | 'article'): MenuProps['onClick'] =>
+    (
+      articleId: string,
+      categoryId: string,
+      type: 'category' | 'article',
+      isSecret: boolean,
+    ): MenuProps['onClick'] =>
     e => {
       e.domEvent.stopPropagation();
       if (e.key === 'renameMenuItem' || e.key === 'renameArticle') {
@@ -135,29 +174,102 @@ const SideBarArticles = ({
         } else {
           deleteArticleCategory(categoryId);
         }
+      } else if (e.key === 'visibility') {
+        if (!normalizedArticles) {
+          return;
+        }
+        const selectedArticle = normalizedArticles[categoryId].find(
+          article => article.post_id === articleId,
+        );
+        if (type === 'article') {
+          const articleEdited = { ...selectedArticle, is_secret: isSecret ? 'f' : 't' };
+          createOrUpdateArticle(articleEdited, false);
+        } else {
+          return;
+        }
       }
     };
 
   const menuItems: MenuProps['items'] = [
-    { key: 'renameMenuItem', label: 'Переименовать' },
+    {
+      key: 'renameMenuItem',
+      label: (
+        <div className={style.menuItem}>
+          <span className={style.menuTitle}>Переименовать</span>
+          <SignatureOutlined />
+        </div>
+      ),
+    },
     // { key: 'delete', label: 'Удалить' },
   ];
 
   const articleItems: MenuProps['items'] = [
-    { key: 'renameArticle', label: 'Переименовать' },
-    { key: 'editArticle', label: 'Редактировать' },
-    { key: 'delete', label: 'Удалить' },
+    {
+      key: 'renameArticle',
+      label: (
+        <div className={style.menuItem}>
+          <span className={style.menuTitle}>Переименовать</span>
+          <SignatureOutlined />
+        </div>
+      ),
+    },
+    {
+      key: 'editArticle',
+      label: (
+        <div className={style.menuItem}>
+          <span className={style.menuTitle}>Редактировать</span>
+          <EditOutlined />
+        </div>
+      ),
+    },
+    {
+      key: 'delete',
+      label: (
+        <div className={style.menuItem}>
+          <span className={style.menuTitle}>Удалить</span>
+          <DeleteOutlined />
+        </div>
+      ),
+    },
+    {
+      key: 'visibility',
+      label: 'Статус',
+    },
   ];
+
+  const getItems = (menuItems: MenuProps['items'] = [], isSecret: boolean) => {
+    return menuItems
+      .map(item =>
+        item && item.key !== 'visibility'
+          ? item
+          : item
+            ? {
+                ...item,
+                label: (
+                  <div className={style.menuItem}>
+                    {isSecret ? <span>Открыть</span> : <span>Скрыть</span>}
+                    {isSecret ? <EyeInvisibleOutlined /> : <EyeOutlined />}
+                  </div>
+                ),
+              }
+            : null,
+      )
+      .filter(Boolean) as MenuProps['items'];
+  };
 
   const genExtra = (
     articleId: string,
     categoryId: string,
     items: MenuProps['items'],
     type: 'category' | 'article',
+    isSecret: boolean,
   ) => {
     return (
       <Dropdown
-        menu={{ items, onClick: getMenuOnClick(articleId, categoryId, type) }}
+        menu={{
+          items,
+          onClick: getMenuOnClick(articleId, categoryId, type, isSecret),
+        }}
         trigger={['click']}
       >
         <a
@@ -231,7 +343,11 @@ const SideBarArticles = ({
                 const isEditingArticle = editingArticle?.key === articleItem.post_id;
                 return (
                   <div
-                    className={style.articleItemContainer}
+                    className={
+                      userData.userrights === 'admin'
+                        ? `${style.articleItemContainer}`
+                        : `${style.articleItemContainer} ${style.articleItemContainerHide}`
+                    }
                     key={generateKey()}
                     onClick={() => handleArticleClick(articleItem.post_id, value.category)}
                   >
@@ -245,8 +361,20 @@ const SideBarArticles = ({
                       >
                         {articleTitle}
                       </p>
-                      {userrights === 'admin' &&
-                        genExtra(articleItem.post_id, value.category, articleItems, 'article')}
+
+                      <div className={style.menuIcons}>
+                        {userrights === 'admin' &&
+                          genExtra(
+                            articleItem.post_id,
+                            value.category,
+                            getItems(articleItems, Boolean(articleItem?.is_secret === 't')),
+                            'article',
+                            Boolean(articleItem?.is_secret === 't'),
+                          )}
+                        {userrights === 'admin' && (
+                          <QrcodeOutlined onClick={qrOpen} className={style.qrIcon} />
+                        )}
+                      </div>
                     </div>
                     {isEditingArticle && (
                       <ArticleEditInput
@@ -263,7 +391,7 @@ const SideBarArticles = ({
           ),
           extra:
             userrights === 'admin' ? (
-              genExtra(value.category, value.category, menuItems, 'category')
+              genExtra(value.category, value.category, menuItems, 'category', false)
             ) : (
               <></>
             ),
@@ -304,6 +432,7 @@ const SideBarArticles = ({
           />
         </div>
       </div>
+      {qrUrl && <QRCode type="svg" value={qrUrl ?? BASE_URL} className={style.qrCode} />}
     </div>
   );
 };

@@ -90,7 +90,7 @@ const AchievementModal: React.FC<ModalProps> = ({
     setQrUrl(qrData);
     setTimeout(() => {
       setQrUrl(null);
-    }, 1500000);
+    }, 10000);
   };
 
   return (

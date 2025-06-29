@@ -29,7 +29,7 @@ const initialState: Pick<TAuthStoreState, 'loading' | 'error' | 'userStatus'> = 
     logged: false,
     authed: false,
     registered: false,
-    token: undefined,
+    token: '',
   },
 };
 

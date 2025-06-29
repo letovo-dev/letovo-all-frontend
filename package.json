@@ -19,6 +19,7 @@
     "@zxing/browser": "^0.1.5",
     "antd": "^5.25.4",
     "axios": "^1.7.9",
+    "bcryptjs": "^3.0.2",
     "css-loader": "^7.1.2",
     "immer": "^10.1.1",
     "jsonrepair": "^3.12.0",

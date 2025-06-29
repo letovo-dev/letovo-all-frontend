@@ -129,7 +129,7 @@ const MarkdownEditor: React.FC = () => {
       const uploadResponse = await fetch(`${process.env.NEXT_PUBLIC_BASE_URL_UPLOAD}`, {
         method: 'POST',
         headers: {
-          Authorization: `Bearer ${userStatus.token || ''}`,
+          Bearer: `${userStatus.token || ''}`,
         },
         body: formData,
       });

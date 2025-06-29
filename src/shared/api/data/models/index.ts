@@ -22,6 +22,7 @@ import { deleteNews } from './deleteNews';
 import { editNews } from './editNews';
 import { getAllPostsAuthors } from './getAllPostsAuthors';
 import { updateArticle } from './updateArticle';
+import { revealSecretArticle } from './revealSecretArticle';
 
 const apiMethods = {
   getAvatars,
@@ -48,6 +49,7 @@ const apiMethods = {
   deleteNews,
   getAllPostsAuthors,
   updateArticle,
+  revealSecretArticle,
 };
 
 export default apiMethods;

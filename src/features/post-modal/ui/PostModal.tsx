@@ -15,6 +15,7 @@ import {
 } from 'antd';
 import { UploadOutlined } from '@ant-design/icons';
 import type { UploadProps } from 'antd';
+import authStore from '@/shared/stores/auth-store';
 
 export interface Post {
   id?: string;
@@ -50,6 +51,9 @@ const PostModal: React.FC<PostModalProps> = ({ visible, onCancel, onSubmit, post
   const [form] = Form.useForm();
   const [fileList, setFileList] = React.useState<any[]>([]);
   const [messageApi, contextHolder] = message.useMessage();
+  const {
+    userStatus: { token },
+  } = authStore(state => state);
 
   useEffect(() => {
     if (visible) {
@@ -104,7 +108,7 @@ const PostModal: React.FC<PostModalProps> = ({ visible, onCancel, onSubmit, post
     fileList,
     action: `${process.env.NEXT_PUBLIC_BASE_URL_UPLOAD}`,
     headers: {
-      Authorization: `Bearer ${localStorage.getItem('token') || ''}`,
+      Bearer: token || '',
     },
     onChange: async ({ file, fileList: newFileList }) => {
       // console.log('Upload file:', {
@@ -113,7 +117,6 @@ const PostModal: React.FC<PostModalProps> = ({ visible, onCancel, onSubmit, post
       //   response: file.response,
       //   error: file.error,
       //   action: `${process.env.NEXT_PUBLIC_BASE_URL_UPLOAD}`,
-      //   token: localStorage.getItem('token') || 'No token',
       // });
       if (file.status === 'removed' && file.url) {
         try {
@@ -121,7 +124,7 @@ const PostModal: React.FC<PostModalProps> = ({ visible, onCancel, onSubmit, post
             method: 'DELETE',
             headers: {
               'Content-Type': 'application/json',
-              Authorization: `Bearer ${localStorage.getItem('token') || ''}`,
+              Bearer: token || '',
             },
             body: JSON.stringify({ url: file.url }),
           });
@@ -160,7 +163,7 @@ const PostModal: React.FC<PostModalProps> = ({ visible, onCancel, onSubmit, post
               error: file.error,
             },
             action: `${process.env.NEXT_PUBLIC_BASE_URL_UPLOAD}`,
-            token: localStorage.getItem('token'),
+            token,
           });
         }
       }
@@ -176,7 +179,6 @@ const PostModal: React.FC<PostModalProps> = ({ visible, onCancel, onSubmit, post
         message.error('Файл должен быть меньше 10 МБ!');
         return Upload.LIST_IGNORE;
       }
-      const token = localStorage.getItem('token');
       if (!token) {
         message.error('Токен авторизации отсутствует. Пожалуйста, войдите в систему.');
         return Upload.LIST_IGNORE;

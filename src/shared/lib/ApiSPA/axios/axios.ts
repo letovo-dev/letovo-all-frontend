@@ -17,18 +17,11 @@ instance.interceptors.request.use(
   },
 );
 
-// const logoutErrors = [401, 403];
-
 instance.interceptors.response.use(
   function (dataResponse) {
     return dataResponse;
   },
   function (error) {
-    // console.log('error?.response?.status', error?.response?.status);
-    // console.log('axios error', error);
-    // if (logoutErrors.includes(error?.response?.status) && window.location.href !== '/login') {
-    // window.location.href = '/login';
-    // }
     return Promise.reject(error);
   },
 );

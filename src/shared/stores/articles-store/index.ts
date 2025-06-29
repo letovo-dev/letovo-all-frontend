@@ -56,6 +56,7 @@ export type TArticlesStoreState = {
   setCurrentArticle: (article: OneArticle | undefined) => void;
   refreshArticles: () => Promise<void>;
   createOrUpdateArticle: (article: Partial<OneArticle>, isNew: boolean) => Promise<string>;
+  revealSecretArticle: (articleId: string) => Promise<void>;
 };
 
 const initialState = {
@@ -78,6 +79,13 @@ const articlesStore = create<TArticlesStoreState>()(
           draft.article = article;
         });
       },
+      revealSecretArticle: async (articleId: string) => {
+        try {
+          await SERVICES_DATA.Data.revealSecretArticle(articleId);
+        } catch (error) {
+          console.error('Error saving article:', error);
+        }
+      },
       createOrUpdateArticle: async (article: OneArticle, isNew: boolean) => {
         set({
           loading: true,
@@ -96,10 +104,9 @@ const articlesStore = create<TArticlesStoreState>()(
             let updatedArticles;
             if (!isNew) {
               updatedArticles = normalizedArticles[article.category].map((el: OneArticle) =>
-                el.post_id === data[0].post_id ? { ...data } : el,
+                el.post_id === data[0].post_id ? { ...data[0] } : el,
               );
             } else {
-              // Добавление новой статьи
               updatedArticles = [...(normalizedArticles[article.category] || []), data[0]];
             }
 

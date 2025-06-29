@@ -247,8 +247,6 @@ const userStore = create<IUserStore>()(
               } = await SERVICES_USERS.UsersData.changeNick({ new_username });
               if (response?.success && response.code === 200) {
                 const token = response.authorization;
-                // setDataToLocaleStorage('token', token);
-                // token && localStorage.setItem('token', token);
                 authStore.setState((draft: TAuthStoreState) => {
                   draft.userStatus = { ...draft.userStatus, token: token };
                 });

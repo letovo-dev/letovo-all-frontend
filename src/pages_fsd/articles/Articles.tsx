@@ -12,6 +12,7 @@ import style from './Articles.module.scss';
 import Burger from '@/shared/ui/burger-menu/Burger';
 import { SideBarArticles } from '@/features/side-bar-articles';
 import MarkdownContent from './ReactMd';
+import authStore from '@/shared/stores/auth-store';
 
 const Articles: React.FC = () => {
   const { article, normalizedArticles, loading, articlesCategories, getArticlesCategories } =
@@ -19,7 +20,7 @@ const Articles: React.FC = () => {
   const router = useRouter();
   const { setFooterHidden } = useFooterContext();
   const [processedText, setProcessedText] = useState('');
-  const [lsToken, setLsToken] = useState<string | null>(null);
+  const [lsToken, setLsToken] = useState<string | undefined>(undefined);
   const [mediaCache, setMediaCache] = useState<Record<string, string>>({});
   const [error, setError] = useState<string | null>(null);
   const wrapRef = useRef<HTMLDivElement>(null);
@@ -27,6 +28,9 @@ const Articles: React.FC = () => {
   const mediaCacheRef = useRef<Record<string, string>>({});
   const lastScrollTopRef = useRef(0);
   const [open, setOpen] = useState(false);
+  const {
+    userStatus: { token },
+  } = authStore(state => state);
 
   const isVideoUrl = (url: string): boolean => {
     return /\.(mp4|webm|ogg|mkv|avi)(\?.*)?$/i.test(url);
@@ -34,7 +38,6 @@ const Articles: React.FC = () => {
 
   useEffect(() => {
     if (typeof window !== 'undefined') {
-      const token = localStorage.getItem('token');
       setLsToken(token);
       if (!token) {
         router.push('/login');

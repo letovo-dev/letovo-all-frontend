@@ -15,6 +15,7 @@ import commentsStore from '@/shared/stores/comments-store';
 import { useRouter } from 'next/navigation';
 import type { MenuProps } from 'antd';
 import getAuthorsList from '@/entities/post/model/getAuthorsList';
+import authStore from '@/shared/stores/auth-store';
 
 interface NewsProps {
   children: React.ReactNode;
@@ -38,6 +39,9 @@ const News: React.FC<NewsProps> = ({ children, onContainerRef }) => {
   const { allPostsAuthors } = userStore((state: IUserStore) => state.store);
   const openComments = commentsStore(state => state.openComments);
   const [author, setAuthor] = useState<string | undefined>(undefined);
+  const {
+    userStatus: { token },
+  } = authStore(state => state);
 
   const items: MenuProps['items'] = useMemo(() => {
     return getAuthorsList(allPostsAuthors);
@@ -45,7 +49,6 @@ const News: React.FC<NewsProps> = ({ children, onContainerRef }) => {
 
   useEffect(() => {
     if (typeof window !== 'undefined') {
-      const token = localStorage.getItem('token');
       if (!token) {
         router.push('/login');
       }

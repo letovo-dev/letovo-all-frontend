@@ -75,6 +75,11 @@ $overlay-color: rgba(0, 0, 0, 0.3);
     margin-top: 30px;
   }
 }
+
+.articleItemContainerHide {
+  @extend .sidebarItemsContainer;
+  display: 'none';
+}
 .sidebarItemNewsContainer {
   width: 100%;
   max-height: 60vh;
@@ -117,4 +122,36 @@ $overlay-color: rgba(0, 0, 0, 0.3);
   display: flex;
   margin-bottom: 16px;
   justify-content: space-between;
+}
+
+.menuItem {
+  display: flex;
+  justify-content: space-between;
+}
+
+.menuTitle {
+  margin-right: 20px;
+}
+
+.qrCode {
+  width: 172px !important;
+  height: 172px !important;
+  background-color: var(--background) !important;
+  position: absolute;
+  top: 37%;
+  left: 50%;
+  transform: translate(-50%, -50%);
+  z-index: 100;
+}
+
+.menuIcons {
+  display: flex;
+  gap: 15px;
+}
+
+.qrIcon {
+  padding-bottom: 2px;
+  &:hover {
+    color: var(--orange);
+  }
 }
