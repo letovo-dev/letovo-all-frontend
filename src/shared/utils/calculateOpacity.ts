@@ -2,7 +2,7 @@ const calculateOpacity = (level: string, stages: string): number => {
   const levelNum = Number(level);
   const stagesNum = Number(stages);
 
-  const minOpacity = 0.1;
+  const minOpacity = 0.4;
   const maxOpacity = 1.0;
 
   if (isNaN(levelNum) || isNaN(stagesNum) || levelNum < 0 || stagesNum <= 0) {
