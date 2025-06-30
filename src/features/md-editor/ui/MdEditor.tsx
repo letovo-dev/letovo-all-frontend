@@ -6,13 +6,14 @@ import style from './MdEditor.module.scss';
 import { mdExample } from '../lib/mdExapmle';
 import UploadFiles from './upload-file/UploadFiles';
 import articlesStore from '@/shared/stores/articles-store';
-import { Button, ConfigProvider, Input, message, Radio, Space, Select, Form } from 'antd';
-import { SaveOutlined } from '@ant-design/icons';
+import { Button, ConfigProvider, Input, message, Radio, Space, Select, Form, Divider } from 'antd';
+import { PlusOutlined, SaveOutlined } from '@ant-design/icons';
 import { usePathname } from 'next/navigation';
 import type { UploadFile } from 'antd';
 import authStore from '@/shared/stores/auth-store';
 import { uniqueId } from 'lodash';
 import { useRouter } from 'next/navigation';
+import type { InputRef } from 'antd';
 
 interface VideoComponentProps extends React.VideoHTMLAttributes<HTMLVideoElement> {
   src?: string;
@@ -40,12 +41,26 @@ const MarkdownEditor: React.FC = () => {
   const [messageApi, contextHolder] = message.useMessage();
   const inputTitleHeader = isEditArticle ? EDIT_ARTICLE_TITLE : INPUT_ARTICLE_TITLE;
   const { userStatus } = authStore(state => state);
+  const [selectCategoryItems, setSelectCategoryItems] = useState<
+    { value: string; label: string }[]
+  >([]);
+  const [categoryName, setCategoryName] = useState('');
+  const inputCategoryRef = useRef<InputRef>(null);
 
   useEffect(() => {
     return () => {
       setCurrentArticle(undefined);
     };
   }, [pathname]);
+
+  useEffect(() => {
+    setSelectCategoryItems(
+      articlesCategories?.map(category => ({
+        value: category.category,
+        label: category.category_name,
+      })),
+    );
+  }, [articlesCategories]);
 
   const success = (text: string) => {
     messageApi.open({
@@ -220,6 +235,19 @@ const MarkdownEditor: React.FC = () => {
     );
   };
 
+  const onNameChange = (event: React.ChangeEvent<HTMLInputElement>) => {
+    setCategoryName(event.target.value);
+  };
+
+  const addItem = (e: React.MouseEvent<HTMLButtonElement | HTMLAnchorElement>) => {
+    e.preventDefault();
+    setSelectCategoryItems([...selectCategoryItems, { label: categoryName, value: categoryName }]);
+    setCategoryName('');
+    setTimeout(() => {
+      inputCategoryRef.current?.focus();
+    }, 0);
+  };
+
   return (
     <div className={style.markdownEditorContainer}>
       {contextHolder}
@@ -308,15 +336,30 @@ const MarkdownEditor: React.FC = () => {
           <Form.Item
             name="category"
             label="Категория"
-            rules={[{ required: true, message: 'Выберите категорию статьи' }]}
+            rules={[{ required: true, message: 'Выберите или создайте категорию статьи' }]}
           >
             <Select
               placeholder="Категория статьи"
-              style={{ width: '200px' }}
-              options={articlesCategories?.map(category => ({
-                value: category.category,
-                label: category.category_name,
-              }))}
+              style={{ width: '300px' }}
+              popupRender={menu => (
+                <>
+                  {menu}
+                  <Divider style={{ margin: '8px 0' }} />
+                  <Space style={{ padding: '0 8px 4px' }}>
+                    <Input
+                      placeholder="Название категории"
+                      ref={inputCategoryRef}
+                      value={categoryName}
+                      onChange={onNameChange}
+                      onKeyDown={e => e.stopPropagation()}
+                    />
+                    <Button type="text" icon={<PlusOutlined />} onClick={addItem}>
+                      Добавить
+                    </Button>
+                  </Space>
+                </>
+              )}
+              options={selectCategoryItems}
             />
           </Form.Item>
         </Form>

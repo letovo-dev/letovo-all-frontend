@@ -5,6 +5,9 @@ import Image from 'next/image';
 import userStore, { IUserAchData } from '@/shared/stores/user-store';
 import { QrcodeOutlined } from '@ant-design/icons';
 import { QRCode } from 'antd';
+import { generateKey } from '@/shared/api/utils';
+import { ImgWithBackground } from '@/shared/ui/image-background';
+import { calculateOpacity } from '@/shared/utils';
 
 interface ModalProps {
   open: boolean;
@@ -15,9 +18,11 @@ interface ModalProps {
   allPossibleUserAchievements: IUserAchData[] | undefined;
   setCurrentItem: (value: IUserAchData | null) => void;
   currentImageElement: JSX.Element | null;
+  setCurrentImageElement: any;
 }
 
 const BASE_URL = 'https://letovo.ru';
+const DONE_ACH = '/images/aceehimnstv/loched.png';
 
 const AchievementModal: React.FC<ModalProps> = ({
   currentItem,
@@ -28,6 +33,7 @@ const AchievementModal: React.FC<ModalProps> = ({
   allPossibleUserAchievements = [],
   currentImageElement,
   children,
+  setCurrentImageElement,
 }) => {
   const [qrUrl, setQrUrl] = React.useState<string | null>(null);
   const {
@@ -57,9 +63,30 @@ const AchievementModal: React.FC<ModalProps> = ({
       const doneItem =
         allPossibleUserAchievements[nextIndex].stages ===
         allPossibleUserAchievements[nextIndex].level;
-
+      const currentAch = { ...allPossibleUserAchievements[nextIndex], done: doneItem };
       setCurrentItem({ ...allPossibleUserAchievements[nextIndex], done: doneItem });
+      const opacity = calculateOpacity(currentAch.level, currentAch.stages);
+
       setQrUrl(null);
+      const imgPath = `${process.env.NEXT_PUBLIC_BASE_URL_MEDIA}${allPossibleUserAchievements[nextIndex].achivement_pic}`;
+      setCurrentImageElement(
+        <div key={generateKey()} className={style.item}>
+          {currentAch.done ? (
+            <>
+              <Image
+                src={`${process.env.NEXT_PUBLIC_BASE_URL_MEDIA}${DONE_ACH}`}
+                alt=""
+                height={75}
+                width={75}
+              />
+            </>
+          ) : (
+            <>
+              <ImgWithBackground imgPath={imgPath} size={60} imgType={'avatar'} opacity={opacity} />
+            </>
+          )}
+        </div>,
+      );
     }
   };
 
@@ -78,8 +105,29 @@ const AchievementModal: React.FC<ModalProps> = ({
         allPossibleUserAchievements[prevIndex].stages ===
         allPossibleUserAchievements[prevIndex].level;
 
+      const currentAch = { ...allPossibleUserAchievements[prevIndex], done: doneItem };
       setCurrentItem({ ...allPossibleUserAchievements[prevIndex], done: doneItem });
+      const opacity = calculateOpacity(currentAch.level, currentAch.stages);
       setQrUrl(null);
+      const imgPath = `${process.env.NEXT_PUBLIC_BASE_URL_MEDIA}${currentAch.achivement_pic}`;
+      setCurrentImageElement(
+        <div key={generateKey()} className={style.item}>
+          {currentAch.done ? (
+            <>
+              <Image
+                src={`${process.env.NEXT_PUBLIC_BASE_URL_MEDIA}${DONE_ACH}`}
+                alt=""
+                height={75}
+                width={75}
+              />
+            </>
+          ) : (
+            <>
+              <ImgWithBackground imgPath={imgPath} size={60} imgType={'avatar'} opacity={opacity} />
+            </>
+          )}
+        </div>,
+      );
     }
   };
 

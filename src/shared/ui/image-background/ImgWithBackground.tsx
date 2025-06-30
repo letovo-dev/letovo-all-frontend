@@ -6,8 +6,8 @@ const ImgWithBackground = ({
   imgPath = '/img5.png',
   size,
   imgType,
-  height = 90,
-  width = 90,
+  height = 75,
+  width = 75,
   opacity,
 }: {
   imgPath: string;
@@ -21,7 +21,8 @@ const ImgWithBackground = ({
   return (
     <div className={style.imgContainer}>
       {imgType === 'avatar' ? (
-        <Avatar src={imgPath} size={size} className={style.avatar} style={{ opacity: opacity }} />
+        // <Avatar src={imgPath} size={size} className={style.avatar} style={{ opacity: opacity }} />
+        <Image src={imgPath} height={height} width={width} alt="" style={{ opacity: opacity }} />
       ) : (
         <Image src={imgPath} height={height} width={width} alt="" style={{ opacity: opacity }} />
       )}

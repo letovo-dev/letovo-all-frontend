@@ -121,6 +121,11 @@ const nextConfig = {
         hostname: 'letovocorp.ru',
         pathname: '/api/media/get/**',
       },
+      {
+        protocol: 'http',
+        hostname: 'localhost',
+        pathname: '/api/media/get/**',
+      },
     ],
   },
   async rewrites() {
