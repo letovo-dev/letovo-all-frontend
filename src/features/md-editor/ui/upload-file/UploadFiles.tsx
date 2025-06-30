@@ -62,7 +62,7 @@ const UploadFiles = ({
         const response = await fetch(`YOUR_SERVER_URL/delete/${file.uid}`, {
           method: 'DELETE',
           headers: {
-            Authorization: `Bearer ${token || ''}`,
+            Bearer: `${token || ''}`,
           },
         });
 
@@ -89,7 +89,7 @@ const UploadFiles = ({
     onRemove: handleRemove,
     multiple: false,
     headers: {
-      Authorization: `Bearer ${token || ''}`,
+      Bearer: `${token || ''}`,
     },
   };
 

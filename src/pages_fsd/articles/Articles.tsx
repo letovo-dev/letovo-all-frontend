@@ -85,7 +85,7 @@ const Articles: React.FC = () => {
         }
         try {
           const response = await axios.get(url, {
-            headers: { Authorization: `Bearer ${lsToken}` },
+            headers: { Bearer: `${lsToken}` },
             responseType: 'blob',
             cancelToken: cancelTokenSource.token,
           });
