@@ -121,6 +121,11 @@ const nextConfig = {
         hostname: 'letovocorp.ru',
         pathname: '/api/media/get/**',
       },
+      {
+        protocol: 'https',
+        hostname: 'letovocorp.ru',
+        pathname: '/api/media/get/images/achivements/**',
+      },
       // {
       //   protocol: 'http',
       //   hostname: 'localhost',
