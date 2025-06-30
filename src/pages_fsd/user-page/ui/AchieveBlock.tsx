@@ -21,7 +21,7 @@ const AchieveBlock: React.FC<AchieveBlockProps> = ({ achievements, openModal }) 
       {achievements.map(item => {
         const opacity = calculateOpacity(item.level, item.stages);
         const activeIcon = Boolean(item.stages);
-        const imgPath = `${process.env.NEXT_PUBLIC_BASE_URL_MEDIA || 'https://localhost/api/media/get'}${item.achivement_pic}`;
+        const imgPath = `${process.env.NEXT_PUBLIC_BASE_URL_MEDIA}${item.achivement_pic}`;
 
         return (
           <div
@@ -36,7 +36,7 @@ const AchieveBlock: React.FC<AchieveBlockProps> = ({ achievements, openModal }) 
               </>
             ) : (
               <>
-                <Image src="/Achievement_Closed.png" alt="" height={106} width={106} />
+                <Image src="/images/Achievement_Closed.webp" alt="" height={106} width={106} />
                 <p className={styles.achTextInactive}>{item.achivement_name}</p>
               </>
             )}

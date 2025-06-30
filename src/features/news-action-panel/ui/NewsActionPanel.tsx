@@ -111,7 +111,7 @@ const NewsActionPanel = ({
             onClick={handleLike}
           >
             <Image
-              src={actionsState.liked ? '/Icon_Like_2.png' : '/Icon_Like.png'}
+              src={actionsState.liked ? '/images/Icon_Like_2.webp' : '/images/Icon_Like.webp'}
               alt="like"
               width={22}
               height={22}
@@ -125,7 +125,9 @@ const NewsActionPanel = ({
             onClick={handleDislike}
           >
             <Image
-              src={actionsState.disliked ? '/Icon_Dislike_2.png' : '/Icon_Dislike.png'}
+              src={
+                actionsState.disliked ? '/images/Icon_Dislike_2.webp' : '/images/Icon_Dislike.webp'
+              }
               alt="dislike"
               width={22}
               height={22}
@@ -133,7 +135,7 @@ const NewsActionPanel = ({
             <p className={style.dislikesCount}>{actionsState.dislikesCount}</p>
           </div>
           <div className={style.commentsContainer} onClick={() => handleComment(String(postId))}>
-            <Image src={'/Icon_Comment.png'} alt="comment" width={22} height={22} />
+            <Image src={'/images/Icon_Comment.webp'} alt="comment" width={22} height={22} />
             <p className={style.dislikesCount}>{currentNewsComments?.length}</p>
           </div>
         </div>
@@ -142,7 +144,9 @@ const NewsActionPanel = ({
           onClick={handleSave}
         >
           <Image
-            src={actionsState.saved ? '/Icon_Favorites.png' : '/Icon_Favorites_.png'}
+            src={
+              actionsState.saved ? '/images/Icon_Favorites.webp' : '/images/Icon_Favorites_.webp'
+            }
             alt="save"
             width={22}
             height={22}

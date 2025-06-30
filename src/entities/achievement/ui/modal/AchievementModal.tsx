@@ -162,7 +162,7 @@ const AchievementModal: React.FC<ModalProps> = ({
           <div className={style.slider}>
             <div className={style.directionDiv} onClick={showPrevItem}>
               <Image
-                src="/Vector_left.png"
+                src="/images/Vector_left.webp"
                 alt="achievement"
                 height={12}
                 width={8}
@@ -179,7 +179,7 @@ const AchievementModal: React.FC<ModalProps> = ({
             </div>
             <div className={style.directionDiv} onClick={showNextItem}>
               <Image
-                src="/Vector_right.png"
+                src="/images/Vector_right.webp"
                 alt="achievement"
                 height={12}
                 width={8}
@@ -194,7 +194,7 @@ const AchievementModal: React.FC<ModalProps> = ({
         </div>
         <Image
           className={style.letovoCorp}
-          src="/Logo_Mini.png"
+          src="/images/Logo_Mini.webp"
           alt="Letovo.corp"
           height={14}
           width={163}

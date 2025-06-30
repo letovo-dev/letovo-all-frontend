@@ -216,7 +216,7 @@ const SideBarNews = ({
                 className={style.sidebarItemSaved}
                 onClick={mainSections[section].method}
               >
-                <Image src="/Icon_Favorites.png" alt="saved" width={24} height={26} />
+                <Image src="/images/Icon_Favorites.webp" alt="saved" width={24} height={26} />
                 <span>{mainSections[section].title}</span>
               </div>
             );

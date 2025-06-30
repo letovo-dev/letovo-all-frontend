@@ -3,7 +3,7 @@ import style from './ImgWithBackground.module.scss';
 import Image from 'next/image';
 
 const ImgWithBackground = ({
-  imgPath = '/img5.png',
+  imgPath = '/images/img5.webp',
   size,
   imgType,
   height = 75,

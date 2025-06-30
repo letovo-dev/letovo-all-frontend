@@ -153,18 +153,18 @@ const TransferModal: React.FC<ModalProps> = ({
               >
                 {userData?.userrights === 'admin' ? (
                   <div className={style.walletMoney}>
-                    <Image src="/Icon_Wallet.png" alt="wallet" height={26} width={24} />
+                    <Image src="/images/Icon_Wallet.webp" alt="wallet" height={26} width={24} />
                     <span className={style.infinity}>&infin;</span>
                   </div>
                 ) : (
                   <div className={style.walletMoney}>
-                    <Image src="/Icon_Wallet.png" alt="wallet" height={26} width={24} />
+                    <Image src="/images/Icon_Wallet.webp" alt="wallet" height={26} width={24} />
                     <p className={style.text}>{`${selfMoney} мон.`}</p>
                   </div>
                 )}
                 <Image
                   className={style.imageStyle}
-                  src="/Transfer_Element_1.png"
+                  src="/images/Transfer_Element_1.webp"
                   alt="wallet"
                   height={41}
                   width={180}
@@ -177,7 +177,12 @@ const TransferModal: React.FC<ModalProps> = ({
                 >
                   <div className={style.receiverContainer}>
                     {!receiver ? (
-                      <Image src="/Icon_Transfer_Account.png" alt="user" height={78} width={78} />
+                      <Image
+                        src="/images/Icon_Transfer_Account.webp"
+                        alt="user"
+                        height={78}
+                        width={78}
+                      />
                     ) : (
                       <div className={style.avatarTemplate}>
                         <Avatar
@@ -206,7 +211,12 @@ const TransferModal: React.FC<ModalProps> = ({
                   </div>
                   {receiver && (
                     <div className={style.receiverContainerAdditional}>
-                      <Image src="/Icon_Transfer_Wallet.png" alt="user" height={78} width={78} />
+                      <Image
+                        src="/images/Icon_Transfer_Wallet.webp"
+                        alt="user"
+                        height={78}
+                        width={78}
+                      />
                       <div className={style.nickBox}>
                         <Text className={style.nickText}>Сумма перевода</Text>
                         <Form.Item
@@ -298,32 +308,37 @@ const TransferModal: React.FC<ModalProps> = ({
               <section className={style.modalContainerItemContentFinished}>
                 {userData?.userrights === 'admin' ? (
                   <div className={style.walletMoney}>
-                    <Image src="/Icon_Wallet.png" alt="wallet" height={26} width={24} />
+                    <Image src="/images/Icon_Wallet.webp" alt="wallet" height={26} width={24} />
                     <span className={style.infinity}>&infin;</span>
                   </div>
                 ) : (
                   <div className={style.walletMoney}>
-                    <Image src="/Icon_Wallet.png" alt="wallet" height={26} width={24} />
+                    <Image src="/images/Icon_Wallet.webp" alt="wallet" height={26} width={24} />
                     <p className={style.text}>{`${selfMoney} мон.`}</p>
                   </div>
                 )}
                 <Image
                   className={style.imageStyle}
-                  src="/Transfer_Element_1.png"
+                  src="/images/Transfer_Element_1.webp"
                   alt="wallet"
                   height={41}
                   width={180}
                 />
                 <Image
                   className={style.imageEarth}
-                  src="/Transfer_Element_3_2.png"
+                  src="/images/Transfer_Element_3_2.webp"
                   alt="earth"
                   height={220}
                   width={360}
                 />
 
                 <div className={style.success}>
-                  <Image src="/transfer_element_forget.png" alt="wallet" height={48} width={172} />
+                  <Image
+                    src="/images/transfer_element_forget.webp"
+                    alt="wallet"
+                    height={48}
+                    width={172}
+                  />
                   <Text className={style.nickText}>Успешно!</Text>
                 </div>
                 <ConfigProvider

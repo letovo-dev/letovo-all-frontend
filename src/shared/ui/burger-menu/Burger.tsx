@@ -11,7 +11,7 @@ const Burger = ({
 }) => (
   <Image
     className={style.burger}
-    src="/Icon_Sidebar.png"
+    src="/images/Icon_Sidebar.webp"
     alt="logo"
     width={24}
     height={20}

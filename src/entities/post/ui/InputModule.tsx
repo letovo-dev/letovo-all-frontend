@@ -39,7 +39,7 @@ const InputModule: React.FC<InputModuleProps> = ({
               items={items}
             />
           ) : (
-            <Avatar src={avatarSrc ?? '/img/pic3.png'} size={30} className={style.avatar} />
+            <Avatar src={avatarSrc} size={30} className={style.avatar} />
           )}
         </div>
         <TextareaAutoHeight
@@ -49,7 +49,9 @@ const InputModule: React.FC<InputModuleProps> = ({
         />
         <Image
           src={
-            text.length > 0 ? '/Button_SendComment_Active.png' : '/Button_SendComment_Unactive.png'
+            text.length > 0
+              ? '/images/Button_SendComment_Active.webp'
+              : '/images/Button_SendComment_Unactive.webp'
           }
           alt="send"
           width={24}

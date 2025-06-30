@@ -130,7 +130,7 @@ const OneComment: React.FC<OneCommentProps> = ({
               </div>
               <div className={style.likesInfo}>
                 <Image
-                  src={likeComment ? '/Icon_Like_2.png' : '/Icon_Like.png'}
+                  src={likeComment ? '/images/Icon_Like_2.webp' : '/images/Icon_Like.webp'}
                   alt="like"
                   width={15}
                   height={15}

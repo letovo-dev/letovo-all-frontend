@@ -2,6 +2,7 @@ import React from 'react';
 import { Avatar, Menu } from 'antd';
 import style from './CustomSelect.module.scss';
 import './CustomSelect.module.scss';
+import { ImgWithBackground } from '../image-background';
 
 interface CustomSelectProps {
   value?: string;
@@ -27,6 +28,12 @@ const CustomSelect: React.FC<CustomSelectProps> = ({
       icon: (
         <div className={style.avatarTemplate}>
           <Avatar src={`${process.env.NEXT_PUBLIC_BASE_URL_MEDIA}/${avatar}`} size={45} />
+          {/* <ImgWithBackground
+            imgPath={`${process.env.NEXT_PUBLIC_BASE_URL_MEDIA}/${avatar}`}
+            size={60}
+            imgType={'avatar'}
+            opacity={1}
+          /> */}
         </div>
       ),
       label: null,

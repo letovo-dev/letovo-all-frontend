@@ -38,7 +38,7 @@ const PostAuthorsDropdown = ({
     <Dropdown menu={{ items, onClick: handleMenuClick }}>
       <a onClick={e => e.preventDefault()}>
         <Space>
-          <Avatar src={avatarSrc ?? '/img/pic3.png'} size={30} className={style.avatar} />
+          <Avatar src={avatarSrc} size={30} className={style.avatar} />
         </Space>
       </a>
     </Dropdown>

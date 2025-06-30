@@ -2,7 +2,6 @@ import { create } from 'zustand';
 import { immer } from 'zustand/middleware/immer';
 import { persist, createJSONStorage } from 'zustand/middleware';
 import { SERVICES_DATA } from '@/shared/api/data';
-import { jsonrepair } from 'jsonrepair';
 
 export interface OneArticle {
   post_id: string;
@@ -319,20 +318,6 @@ const articlesStore = create<TArticlesStoreState>()(
           }
 
           const response = await SERVICES_DATA.Data.getArticlesByCategoryId(Number(id));
-
-          // let parsedData: OneArticle[];
-          // try {
-          //   const repairedJson = jsonrepair(response.data as any);
-          //   const parsedDataRepared = JSON.parse(repairedJson);
-          //   parsedData = parsedDataRepared.result.filter(
-          //     (item: OneArticle) =>
-          //       typeof item === 'object' && item !== null && !Array.isArray(item),
-          //   );
-          // } catch (e) {
-          //   console.error('Failed to parse JSON:', e, response.data);
-          //   set({ error: 'Invalid JSON data' });
-          //   return;
-          // }
 
           if (
             response.code === 200 ||

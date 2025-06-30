@@ -159,7 +159,7 @@ const News: React.FC<NewsProps> = ({ children, onContainerRef }) => {
                   <div className={style.commentsHeader}>
                     <p className={style.commentsTitle}>Комментарии</p>
                     <Image
-                      src={'/Icon_X_Big.png'}
+                      src={'/images/Icon_X_Big.webp'}
                       alt="X"
                       width={35}
                       height={35}

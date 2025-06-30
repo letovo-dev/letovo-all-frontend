@@ -22,7 +22,7 @@ const OnBoard = ({ userData }: { userData: any }) => {
         {colorClasses[userData?.departmentid]?.name}
       </div>
       <div className={style.timeOnBoard}>
-        <Image src="/Element_New_Achiv.png" alt="*" height={20} width={20} />
+        <Image src="/images/Element_New_Achiv.webp" alt="*" height={20} width={20} />
         <p className={style.time}>{userData.times_visited}</p>
       </div>
     </section>

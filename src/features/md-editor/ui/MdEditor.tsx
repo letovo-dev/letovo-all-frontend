@@ -5,7 +5,7 @@ import MDEditor from '@uiw/react-md-editor';
 import style from './MdEditor.module.scss';
 import { mdExample } from '../lib/mdExapmle';
 import UploadFiles from './upload-file/UploadFiles';
-import articlesStore from '@/shared/stores/articles-store';
+import articlesStore, { OneArticle } from '@/shared/stores/articles-store';
 import { Button, ConfigProvider, Input, message, Radio, Space, Select, Form, Divider } from 'antd';
 import { PlusOutlined, SaveOutlined } from '@ant-design/icons';
 import { usePathname } from 'next/navigation';
@@ -42,7 +42,7 @@ const MarkdownEditor: React.FC = () => {
   const inputTitleHeader = isEditArticle ? EDIT_ARTICLE_TITLE : INPUT_ARTICLE_TITLE;
   const { userStatus } = authStore(state => state);
   const [selectCategoryItems, setSelectCategoryItems] = useState<
-    { value: string; label: string }[]
+    { value: string; label: string; text: string }[]
   >([]);
   const [categoryName, setCategoryName] = useState('');
   const inputCategoryRef = useRef<InputRef>(null);
@@ -58,6 +58,7 @@ const MarkdownEditor: React.FC = () => {
       articlesCategories?.map(category => ({
         value: category.category,
         label: category.category_name,
+        text: '',
       })),
     );
   }, [articlesCategories]);
@@ -152,26 +153,40 @@ const MarkdownEditor: React.FC = () => {
       if (!uploadResponse.ok) {
         throw new Error('Ошибка загрузки файла');
       }
+      const categoryValueItem = selectCategoryItems.find(
+        (category: { value: string; label: string }) => category.value === values.category,
+      );
+
+      const currentCategory = articlesCategories.find(
+        item => item.category_name === values.category,
+      );
 
       const uploadResult = await uploadResponse.json();
       const fileUrl = uploadResult.file;
-      const data = isEditArticle
+      const editedDataCategoryValue =
+        categoryValueItem?.text === 'new' ? 'category_name' : 'category';
+      const data: Partial<OneArticle> = isEditArticle
         ? {
             ...article,
             text: '',
             is_secret: values.isSecret,
-            category: values.category,
+            [editedDataCategoryValue]:
+              categoryValueItem?.text === 'new' ? values.category : currentCategory?.category,
           }
         : {
             title: values.articleTitle ?? '',
             text: '',
             is_secret: values.isSecret,
-            category: values.category,
+            category_name: values.category,
             post_path: fileUrl ?? '',
           };
 
       if (isEditArticle) {
-        const res = await createOrUpdateArticle(data, false);
+        if (categoryValueItem?.text === 'new') {
+          delete data.category;
+          delete data.post_id;
+        }
+        const res = await createOrUpdateArticle(data, categoryValueItem?.text === 'new');
         if (res === 'success') {
           success('Статья обновлена');
         } else {
@@ -241,7 +256,10 @@ const MarkdownEditor: React.FC = () => {
 
   const addItem = (e: React.MouseEvent<HTMLButtonElement | HTMLAnchorElement>) => {
     e.preventDefault();
-    setSelectCategoryItems([...selectCategoryItems, { label: categoryName, value: categoryName }]);
+    setSelectCategoryItems([
+      ...selectCategoryItems,
+      { label: categoryName, value: categoryName, text: 'new' },
+    ]);
     setCategoryName('');
     setTimeout(() => {
       inputCategoryRef.current?.focus();

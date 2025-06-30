@@ -21,10 +21,7 @@ const PostHeader = ({
   handleDelete: (id: string) => void;
   currentNewsStateSaved: boolean;
 }) => {
-  const avatarSrc =
-    author.avatar && process.env.NEXT_PUBLIC_BASE_URL_MEDIA
-      ? `${process.env.NEXT_PUBLIC_BASE_URL_MEDIA}/${author.avatar}`
-      : '/img/pic1.png';
+  const avatarSrc = author.avatar && `${process.env.NEXT_PUBLIC_BASE_URL_MEDIA}/${author.avatar}`;
 
   return (
     <App>
@@ -37,7 +34,7 @@ const PostHeader = ({
             <Avatar src={avatarSrc} size={50} className={style.avatar} />
           </div>
           <p>{author.username || 'Unknown'}</p>
-          <Image src="/Checkmark 3.png" alt="like" height={18} width={18} />
+          <Image src="/images/Checkmark 3.webp" alt="like" height={18} width={18} />
         </div>
 
         {userStatus === 'admin' && !currentNewsStateSaved && (

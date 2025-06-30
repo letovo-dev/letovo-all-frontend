@@ -23,7 +23,7 @@ const CustomModal: React.FC<CustomModalProps> = ({ open, setOpen, title }) => {
         <h5 className={style.modalContainerHeader}>{title}</h5>
         <div className={style.modalContainerText}>
           <div className={style.logo}>
-            <Image src="/transfer_element_forget.png" alt="logo" width={172} height={48} />
+            <Image src="/images/transfer_element_forget.webp" alt="logo" width={172} height={48} />
           </div>
           <h5 className={style.textBox}>{forgetText}</h5>
         </div>

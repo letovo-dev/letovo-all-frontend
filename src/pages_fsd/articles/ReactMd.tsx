@@ -43,7 +43,7 @@ const MarkdownContent: React.FC<{ content: string }> = React.memo(
             }
             return (
               <Image
-                src={src || '/logo_mini_blur.png'}
+                src={src || '/images/logo_mini_blur.webp'}
                 alt={alt || 'Image'}
                 width={800}
                 height={450}
@@ -51,7 +51,7 @@ const MarkdownContent: React.FC<{ content: string }> = React.memo(
                 style={{ width: 'auto', height: 'auto' }}
                 priority={false}
                 placeholder="blur"
-                blurDataURL="/logo_mini_blur.png"
+                blurDataURL="/images/logo_mini_blur.webp"
                 // layout="responsive"
               />
             );

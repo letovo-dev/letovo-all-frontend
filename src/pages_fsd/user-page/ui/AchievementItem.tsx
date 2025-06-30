@@ -30,7 +30,7 @@ const AchievementItem: React.FC<AchievementItemProps> = ({ item, onClick, classN
         </>
       ) : (
         <>
-          <Image src="/Achievement_Closed.png" alt="" height={106} width={106} />
+          <Image src="/images/Achievement_Closed.webp" alt="" height={106} width={106} />
           <p className={styles.achTextInactive}>{item.achivement_name}</p>
         </>
       )}

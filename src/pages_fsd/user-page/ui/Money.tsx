@@ -8,22 +8,22 @@ const Money = ({ userData, setOpenTransferModal, uploadPhoto }: any) => {
       <section className={style.money} onClick={() => setOpenTransferModal(true)}>
         {userData?.userrights === 'admin' ? (
           <>
-            <Image src="/Icon_Wallet.png" alt="wallet" height={26} width={24} />
+            <Image src="/images/Icon_Wallet.webp" alt="wallet" height={26} width={24} />
             <span className={style.infinity}>&infin;</span>
           </>
         ) : (
           <>
-            <Image src="/Icon_Wallet.png" alt="wallet" height={26} width={24} />
+            <Image src="/images/Icon_Wallet.webp" alt="wallet" height={26} width={24} />
             <p className={style.count}>{`${userData?.balance ?? 100} мон.`}</p>
             <p className={style.count}>{`|`} &nbsp;</p>
-            <Image src="/Icon_Time.png" alt="clock" height={24} width={24} />
+            <Image src="/images/Icon_Time.webp" alt="clock" height={24} width={24} />
             <p className={style.text}>{userData.paycheck}</p>
           </>
         )}
       </section>
       {userData?.userrights === 'admin' && (
         <Image
-          src="/UploadPhoto_1.png"
+          src="/images/UploadPhoto_1.webp"
           alt="upload"
           height={30}
           width={30}
