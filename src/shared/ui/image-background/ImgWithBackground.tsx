@@ -22,7 +22,14 @@ const ImgWithBackground = ({
     <div className={style.imgContainer}>
       {imgType === 'avatar' ? (
         // <Avatar src={imgPath} size={size} className={style.avatar} style={{ opacity: opacity }} />
-        <Image src={imgPath} height={height} width={width} alt="" style={{ opacity: opacity }} />
+        <Image
+          src={imgPath}
+          height={height}
+          width={width}
+          alt=""
+          style={{ opacity: opacity }}
+          unoptimized
+        />
       ) : (
         <Image src={imgPath} height={height} width={width} alt="" style={{ opacity: opacity }} />
       )}
