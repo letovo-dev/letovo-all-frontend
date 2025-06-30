@@ -298,20 +298,22 @@ const dataStore = create<TDataStoreState>()(
         const response = await SERVICES_DATA.Data.editNews(news);
         if (response.success && response.code === 200) {
           const editedNews = (response?.data as { result: RealNews[] })?.result;
-          const { result } = await commentsStore
-            .getState()
-            .getCurrentNewsPics(editedNews[0].post_id);
+          const media = await commentsStore.getState().getCurrentNewsPics(editedNews[0].post_id);
           const updatedTitles = get().data.newsTitles.map((el: Titles) =>
             String(el.post_id) === String(editedNews[0].post_id)
               ? { ...el, title: editedNews[0].title }
               : el,
           );
+
+          console.log('result', media);
+          console.log(media?.map((media: RealMedia) => media.media));
+
           set((state: TDataStoreState) => {
             const updatedNormalizedNews = {
               ...state.data.normalizedNews,
               [editedNews[0].post_id]: {
                 news: editedNews[0],
-                media: result?.map((media: RealMedia) => media.media) ?? [],
+                media: media?.map((media: RealMedia) => media.media) || [],
                 comments: state.data.normalizedNews[editedNews[0].post_id]?.comments || [],
               },
             };

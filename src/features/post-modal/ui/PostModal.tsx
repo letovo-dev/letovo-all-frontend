@@ -92,7 +92,7 @@ const PostModal: React.FC<PostModalProps> = ({ visible, onCancel, onSubmit, post
         dislikes: String(values.dislikes),
         likes: String(values.likes),
         saved_count: String(values.saved_count),
-        media: fileList.map(file => file.response),
+        media: fileList.map(file => file.response?.file),
       };
       await onSubmit(formData);
       message.success(post ? 'Пост успешно изменен' : 'Пост успешно сохранен');
