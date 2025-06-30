@@ -304,10 +304,6 @@ const dataStore = create<TDataStoreState>()(
               ? { ...el, title: editedNews[0].title }
               : el,
           );
-
-          console.log('result', media);
-          console.log(media?.map((media: RealMedia) => media.media));
-
           set((state: TDataStoreState) => {
             const updatedNormalizedNews = {
               ...state.data.normalizedNews,
