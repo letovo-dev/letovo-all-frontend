@@ -19,7 +19,7 @@ const OnBoard = ({ userData }: { userData: any }) => {
   return (
     <section className={style.onBoardContainer}>
       <div className={`${style.department} ${getColorClass(userData?.departmentid || '')}`}>
-        {colorClasses[userData?.departmentid]?.name}
+        {userData?.departmentname}
       </div>
       <div className={style.timeOnBoard}>
         <Image src="/images/Element_New_Achiv.webp" alt="*" height={20} width={20} />
