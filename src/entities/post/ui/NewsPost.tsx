@@ -69,6 +69,7 @@ const NewsPost: React.FC<OnePostProps> = ({
       saved: false,
       selectedNews: undefined,
       searched: false,
+      selectedAuthor: false,
     });
   };
 

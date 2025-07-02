@@ -70,44 +70,44 @@ $overlay-color: rgba(0, 0, 0, 0.3);
 .sidebarItemNewsContainer {
   width: 100%;
   max-height: 60vh;
-  overflow-y: hidden;
+  overflow-y: auto;
   overflow-x: hidden;
 
+  scrollbar-width: thin;
   &::-webkit-scrollbar {
-    width: 0;
-    background: transparent;
+    width: 4px;
   }
 
   &::-webkit-scrollbar-track {
-    background: transparent;
+    border-radius: 2px;
   }
 
   &::-webkit-scrollbar-thumb {
-    background: transparent;
+    border-radius: 2px;
   }
 
-  &:hover {
-    overflow-y: auto;
-    scrollbar-width: thin;
+  // &:hover {
+  //   overflow-y: auto;
+  //   scrollbar-width: thin;
 
-    &::-webkit-scrollbar {
-      width: 4px;
-    }
+  //   &::-webkit-scrollbar {
+  //     width: 4px;
+  //   }
 
-    &::-webkit-scrollbar-track {
-      background: #f5f5f5; /* #f5f5f5 или переменная */
-      border-radius: 2px;
-    }
+  //   &::-webkit-scrollbar-track {
+  //     background: #f5f5f5;
+  //     border-radius: 2px;
+  //   }
 
-    &::-webkit-scrollbar-thumb {
-      background: var(--graphics11); /* #888 или переменная */
-      border-radius: 2px;
-    }
+  //   &::-webkit-scrollbar-thumb {
+  //     background: var(--graphics11);
+  //     border-radius: 2px;
+  //   }
 
-    &::-webkit-scrollbar-thumb:hover {
-      background: var(--graphics11); /* #555 или переменная */
-    }
-  }
+  //   &::-webkit-scrollbar-thumb:hover {
+  //     background: var(--graphics11);
+  //   }
+  // }
 }
 .sidebarItem {
   margin: 10px 0px 0px 20px;
@@ -151,4 +151,9 @@ $overlay-color: rgba(0, 0, 0, 0.3);
 .addArticleIcon {
   color: var(--orange);
   cursor: pointer;
+}
+
+.author {
+  margin: 20px 0 0 10px;
+  font-style: italic;
 }

@@ -88,6 +88,8 @@ const NewsPage = () => {
         return searchedNews;
       case !!currentNewsState.selectedNews:
         return { [currentNewsState.selectedNews]: normalizedNews[currentNewsState.selectedNews] };
+      case currentNewsState.selectedAuthor.state:
+        return Object.fromEntries(currentNewsState.selectedAuthor.news);
       default:
         return normalizedNews;
     }
@@ -95,6 +97,7 @@ const NewsPage = () => {
 
   useEffect(() => {
     const news = getRenderNews();
+
     if (news && Object.keys(news).length > 0) {
       setRenderNews(news);
     } else if (currentNewsState.saved && news && Object.keys(news).length === 0) {
@@ -103,6 +106,7 @@ const NewsPage = () => {
         saved: false,
         selectedNews: undefined,
         searched: false,
+        selectedAuthor: false,
       });
     } else {
       setRenderNews({});

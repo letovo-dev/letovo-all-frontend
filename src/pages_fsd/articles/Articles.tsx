@@ -37,15 +37,12 @@ const Articles: React.FC = () => {
   };
 
   useEffect(() => {
-    if (typeof window !== 'undefined') {
-      setLsToken(token);
-      if (!token) {
-        router.push('/login');
-      } else {
-        getArticlesCategories();
-      }
+    if (!token) {
+      router.push('/login');
+    } else {
+      getArticlesCategories();
     }
-  }, [router, getArticlesCategories]);
+  }, [router, getArticlesCategories, token]);
 
   const handleScroll = useCallback(
     debounce(() => {
@@ -150,7 +147,6 @@ const Articles: React.FC = () => {
 
   return (
     <>
-      {/* {error && <div className={style.error}>{error}</div>} */}
       <div
         className={`${style.burgerArticlesContainer} ${open ? style.sidebarOpenBurgerContainer : ''}`}
         ref={burgerRef}

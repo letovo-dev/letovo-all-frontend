@@ -39,12 +39,29 @@ const SideBarNews = ({
   const { loading, setCurrentNewsState, fetchNews, createNews, currentNewsState } = dataStore(
     state => state,
   );
-  const { searchedNews, savedNews } = dataStore(state => state.data);
+  const { searchedNews, savedNews, normalizedNews } = dataStore(state => state.data);
   const sidebarRef = useRef<HTMLDivElement>(null);
   const { userrights } = userStore((state: IUserStore) => state.store.userData);
   const [visible, setVisible] = useState(false);
   const [post, setPost] = useState<any | null>(null);
   const { allPostsAuthors } = userStore((state: IUserStore) => state.store);
+  const [newsDataStructure, setNewsDataStructure] = useState<
+    { author: IUserData; data: [string, any][] }[]
+  >([]);
+
+  useEffect(() => {
+    setNewsDataStructure(
+      allPostsAuthors?.reduce<{ author: IUserData; data: [string, any][] }[]>((acc, author) => {
+        const authorNews =
+          normalizedNews &&
+          Object.entries(normalizedNews).filter(arr => arr[1].news.author === author.username);
+        if (authorNews?.length) {
+          acc.push({ author: author, data: authorNews });
+        }
+        return acc;
+      }, []),
+    );
+  }, [allPostsAuthors, normalizedNews]);
 
   const savedNewsLength = useMemo(() => {
     return Object.keys(savedNews).length;
@@ -69,6 +86,7 @@ const SideBarNews = ({
             saved: false,
             selectedNews: undefined,
             searched: false,
+            selectedAuthor: false,
           });
           form.resetFields();
         },
@@ -84,6 +102,7 @@ const SideBarNews = ({
               saved: true,
               selectedNews: undefined,
               searched: false,
+              selectedAuthor: false,
             });
             setOpen(prev => !prev);
             form.resetFields();
@@ -101,6 +120,7 @@ const SideBarNews = ({
       saved: false,
       selectedNews: undefined,
       searched: true,
+      selectedAuthor: false,
     });
     if (searchedNews && Object.keys(searchedNews).length > 0) {
       setOpen(prev => !prev);
@@ -182,7 +202,7 @@ const SideBarNews = ({
           <div className={style.noSearchResult}>По запросу ничего не найдено</div>
         )}
         <div className={style.sidebarItemsContainer}>
-          {Object.keys(mainSections).map((section, index) => {
+          {/* {Object.keys(mainSections).map((section, index) => {
             return section === 'news' ? (
               <div key={index} className={style.sidebarItem} onClick={mainSections[section].method}>
                 <span>{mainSections[section].title}</span>
@@ -207,6 +227,74 @@ const SideBarNews = ({
                         <span>{item.title}</span>
                       </div>
                     ) : null;
+                  })}
+                </div>
+              </div>
+            ) : (
+              <div
+                key={index}
+                className={style.sidebarItemSaved}
+                onClick={mainSections[section].method}
+              >
+                <Image src="/images/Icon_Favorites.webp" alt="saved" width={24} height={26} />
+                <span>{mainSections[section].title}</span>
+              </div>
+            );
+          })} */}
+          {Object.keys(mainSections).map((section, index) => {
+            return section === 'news' ? (
+              <div key={index} className={style.sidebarItem} onClick={mainSections[section].method}>
+                <span>{mainSections[section].title}</span>
+                <div className={style.sidebarItemNewsContainer}>
+                  {newsDataStructure.map((news, index) => {
+                    return (
+                      <>
+                        <div
+                          key={news.author.username + index}
+                          className={style.author}
+                          onClick={(e: React.MouseEvent<HTMLDivElement>) => {
+                            e.stopPropagation();
+                            setCurrentNewsState({
+                              default: false,
+                              saved: false,
+                              selectedNews: false,
+                              searched: false,
+                              selectedAuthor: {
+                                state: true,
+                                author: news.author.username,
+                                news: news.data,
+                              },
+                            });
+                            setOpen(prev => !prev);
+                            form.resetFields();
+                          }}
+                        >
+                          {news.author.username}
+                        </div>
+                        {news.data.map((item, index) => {
+                          return item[1].news.title !== '' ? (
+                            <div
+                              key={item[1].news.post_id + index}
+                              className={style.sidebarItemNews}
+                              onClick={(e: React.MouseEvent<HTMLDivElement>) => {
+                                e.stopPropagation();
+                                setCurrentNewsState({
+                                  default: false,
+                                  saved: false,
+                                  selectedNews: item[1].news.post_id,
+                                  searched: false,
+                                  selectedAuthor: false,
+                                });
+                                setOpen(prev => !prev);
+                                form.resetFields();
+                              }}
+                            >
+                              <span>{item[1].news.title}</span>
+                            </div>
+                          ) : null;
+                        })}
+                      </>
+                    );
                   })}
                 </div>
               </div>

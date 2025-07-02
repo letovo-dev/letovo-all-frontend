@@ -1,23 +1,71 @@
 'use client';
 import style from './page.module.scss';
-import { useEffect, useRef } from 'react';
+import { useEffect, useRef, useState } from 'react';
 import Footer from '@/shared/ui/footer';
 import Image from 'next/image';
 import Menu from '@/shared/ui/menu';
 import { useFooterContext } from '@/shared/ui/context/FooterContext';
-import { useRouter } from 'next/navigation';
+import { useRouter, usePathname } from 'next/navigation';
 import userStore from '@/shared/stores/user-store';
 import authStore from '@/shared/stores/auth-store';
+import { checkAuthToken } from '@/shared/api/auth/models/checkAuthToken';
+import { ConfigProvider, Spin } from 'antd';
 
 export default function DefaultLayout({ children }: { children: React.ReactNode }) {
   const layoutRef = useRef<HTMLDivElement>(null);
   const { isFooterHidden, setFooterHidden, toggleFooter } = useFooterContext();
   const lastScrollTop = useRef(0);
   const router = useRouter();
+  const pathname = usePathname();
   const {
     userData: { username },
   } = userStore.getState().store;
-  const userStatus = authStore(state => state.userStatus);
+  const [isAuthChecked, setIsAuthChecked] = useState(false);
+  const [isLoading, setIsLoading] = useState(true);
+
+  useEffect(() => {
+    const verifyToken = async () => {
+      try {
+        await authStore.persist.rehydrate();
+        const currentUserStatus = authStore.getState().userStatus;
+        if (currentUserStatus.token) {
+          const authData = await checkAuthToken(currentUserStatus.token);
+          if (
+            authData?.success &&
+            authData.data &&
+            typeof authData.data === 'object' &&
+            'status' in authData.data &&
+            (authData.data as { status?: string }).status === 't'
+          ) {
+            authStore.setState(state => ({
+              ...state,
+              userStatus: {
+                logged: true,
+                authed: true,
+                registered: true,
+                token: currentUserStatus.token,
+              },
+            }));
+          } else {
+            authStore.getState().logout();
+            router.push('/login');
+          }
+        } else {
+          authStore.getState().logout();
+          router.push('/login');
+        }
+      } catch (error) {
+        console.error('Error during auth verification:', error);
+        authStore.getState().logout();
+        router.push('/login');
+      } finally {
+        setIsAuthChecked(true);
+        setIsLoading(false);
+      }
+    };
+
+    verifyToken();
+  }, [router]);
 
   useEffect(() => {
     const updateVh = () => {
@@ -28,13 +76,11 @@ export default function DefaultLayout({ children }: { children: React.ReactNode 
     const handleScroll = () => {
       if (layoutRef.current) {
         const currentScrollTop = layoutRef.current.scrollTop;
-
         if (currentScrollTop > lastScrollTop.current && currentScrollTop > 50) {
           setFooterHidden(true);
         } else if (currentScrollTop < lastScrollTop.current) {
           setFooterHidden(false);
         }
-
         lastScrollTop.current = currentScrollTop;
       }
     };
@@ -55,16 +101,25 @@ export default function DefaultLayout({ children }: { children: React.ReactNode 
     };
   }, [setFooterHidden]);
 
-  useEffect(() => {
-    const timeoutId = setTimeout(() => {
-      if (!userStatus?.logged || !userStatus?.token || !userStatus?.registered) {
-        router.push('/login');
-      }
-    }, 1000);
+  // Удаляем отдельный useEffect для редиректа, так как он уже обрабатывается в verifyToken
 
-    return () => clearTimeout(timeoutId);
-  }, [userStatus, router]);
+  // Если проверка авторизации ещё не завершена или пользователь не авторизован, не рендерим содержимое
+  if (isLoading || !isAuthChecked) {
+    return (
+      <div className={style.emptyPage}>
+        <ConfigProvider theme={{ token: { colorPrimary: '#FB4724' } }}>
+          <Spin size="large" />
+        </ConfigProvider>
+      </div>
+    );
+  }
 
+  const currentUserStatus = authStore.getState().userStatus;
+  if (!currentUserStatus?.logged || !currentUserStatus?.token || !currentUserStatus?.registered) {
+    return null; // Редирект уже выполнен в verifyToken
+  }
+
+  // Рендерим содержимое только для авторизованных пользователей
   return (
     <div ref={layoutRef} className={style.layoutContainer}>
       <header className={style.header}>
@@ -75,7 +130,7 @@ export default function DefaultLayout({ children }: { children: React.ReactNode 
           height={25}
           width={250}
           priority
-          onClick={() => router.push(`/user/${username}`)}
+          onClick={() => username && router.push(`/user/${username}`)}
         />
         <div className={style.headerMenu}>
           <Menu />

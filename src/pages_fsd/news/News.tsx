@@ -12,10 +12,8 @@ import { Divider } from 'antd';
 import { useFooterContext } from '@/shared/ui/context/FooterContext';
 import userStore, { IUserStore } from '@/shared/stores/user-store';
 import commentsStore from '@/shared/stores/comments-store';
-import { useRouter } from 'next/navigation';
 import type { MenuProps } from 'antd';
 import getAuthorsList from '@/entities/post/model/getAuthorsList';
-import authStore from '@/shared/stores/auth-store';
 
 interface NewsProps {
   children: React.ReactNode;
@@ -23,7 +21,6 @@ interface NewsProps {
 }
 
 const News: React.FC<NewsProps> = ({ children, onContainerRef }) => {
-  const router = useRouter();
   const { newsTitles, postIds } = dataStore(state => state.data);
   const { normalizedComments, saveComment } = commentsStore(state => state);
   const { likeNewsOrComment } = dataStore(state => state);
@@ -39,21 +36,10 @@ const News: React.FC<NewsProps> = ({ children, onContainerRef }) => {
   const { allPostsAuthors } = userStore((state: IUserStore) => state.store);
   const openComments = commentsStore(state => state.openComments);
   const [author, setAuthor] = useState<string | undefined>(undefined);
-  const {
-    userStatus: { token },
-  } = authStore(state => state);
 
   const items: MenuProps['items'] = useMemo(() => {
     return getAuthorsList(allPostsAuthors);
   }, [allPostsAuthors]);
-
-  useEffect(() => {
-    if (typeof window !== 'undefined') {
-      if (!token) {
-        router.push('/login');
-      }
-    }
-  }, [router]);
 
   useEffect(() => {
     if (onContainerRef && wrapRef) {
