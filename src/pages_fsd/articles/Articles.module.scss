@@ -23,6 +23,19 @@ $scrollbar-width: 17px;
   -webkit-overflow-scrolling: touch;
   overscroll-behavior-y: contain;
   scrollbar-gutter: stable;
+  scrollbar-width: thin;
+  &::-webkit-scrollbar {
+    width: 4px;
+  }
+
+  &::-webkit-scrollbar-track {
+    border-radius: 2px;
+  }
+
+  &::-webkit-scrollbar-thumb {
+    border-radius: 2px;
+  }
+
   @media (min-width: 933px) {
     // padding-left: 16px;
   }

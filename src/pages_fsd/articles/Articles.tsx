@@ -150,7 +150,7 @@ const Articles: React.FC = () => {
 
   return (
     <>
-      {error && <div className={style.error}>{error}</div>}
+      {/* {error && <div className={style.error}>{error}</div>} */}
       <div
         className={`${style.burgerArticlesContainer} ${open ? style.sidebarOpenBurgerContainer : ''}`}
         ref={burgerRef}

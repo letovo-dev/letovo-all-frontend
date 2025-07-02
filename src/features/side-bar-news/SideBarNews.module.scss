@@ -63,6 +63,9 @@ $overlay-color: rgba(0, 0, 0, 0.3);
 }
 .sidebarItemsContainer {
   margin-top: 22px;
+  // max-height: 89vh;
+  // overflow-y: auto;
+  // overflow-x: hidden;
 }
 .sidebarItemNewsContainer {
   width: 100%;
