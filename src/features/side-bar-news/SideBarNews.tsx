@@ -202,45 +202,6 @@ const SideBarNews = ({
           <div className={style.noSearchResult}>По запросу ничего не найдено</div>
         )}
         <div className={style.sidebarItemsContainer}>
-          {/* {Object.keys(mainSections).map((section, index) => {
-            return section === 'news' ? (
-              <div key={index} className={style.sidebarItem} onClick={mainSections[section].method}>
-                <span>{mainSections[section].title}</span>
-                <div className={style.sidebarItemNewsContainer}>
-                  {newsTitles.map((item, index) => {
-                    return item.title !== '' ? (
-                      <div
-                        key={item.post_id}
-                        className={style.sidebarItemNews}
-                        onClick={(e: React.MouseEvent<HTMLDivElement>) => {
-                          e.stopPropagation();
-                          setCurrentNewsState({
-                            default: false,
-                            saved: false,
-                            selectedNews: item.post_id,
-                            searched: false,
-                          });
-                          setOpen(prev => !prev);
-                          form.resetFields();
-                        }}
-                      >
-                        <span>{item.title}</span>
-                      </div>
-                    ) : null;
-                  })}
-                </div>
-              </div>
-            ) : (
-              <div
-                key={index}
-                className={style.sidebarItemSaved}
-                onClick={mainSections[section].method}
-              >
-                <Image src="/images/Icon_Favorites.webp" alt="saved" width={24} height={26} />
-                <span>{mainSections[section].title}</span>
-              </div>
-            );
-          })} */}
           {Object.keys(mainSections).map((section, index) => {
             return section === 'news' ? (
               <div key={index} className={style.sidebarItem} onClick={mainSections[section].method}>

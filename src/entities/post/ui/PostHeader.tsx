@@ -31,7 +31,7 @@ const PostHeader = ({
       >
         <div className={style.contentContainer}>
           <div className={style.avatarTemplate}>
-            <Avatar src={avatarSrc} size={50} className={style.avatar} />
+            <Avatar src={avatarSrc} size={70} className={style.avatar} />
           </div>
           <p>{author.username || 'Unknown'}</p>
           <Image src="/images/Checkmark 3.webp" alt="like" height={18} width={18} />
