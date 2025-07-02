@@ -174,11 +174,11 @@ const PostModal: React.FC<PostModalProps> = ({ visible, onCancel, onSubmit, post
         message.error('Можно загружать только изображения или видео!');
         return Upload.LIST_IGNORE;
       }
-      const isLt10M = file.size / 1024 / 1024 < 10;
-      if (!isLt10M) {
-        message.error('Файл должен быть меньше 10 МБ!');
-        return Upload.LIST_IGNORE;
-      }
+      // const isLt10M = file.size / 1024 / 1024 < 10;
+      // if (!isLt10M) {
+      //   message.error('Файл должен быть меньше 10 МБ!');
+      //   return Upload.LIST_IGNORE;
+      // }
       if (!token) {
         message.error('Токен авторизации отсутствует. Пожалуйста, войдите в систему.');
         return Upload.LIST_IGNORE;
