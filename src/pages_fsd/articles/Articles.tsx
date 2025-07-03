@@ -68,8 +68,6 @@ const Articles: React.FC = () => {
 
     const fetchMedia = async () => {
       if (!isMounted || !article?.text || !token) {
-        console.log('oki');
-
         return;
       }
 
@@ -105,8 +103,6 @@ const Articles: React.FC = () => {
       await Promise.allSettled(fetchPromises);
 
       if (isMounted) {
-        console.log('markdownText', markdownText);
-
         const updatedText = markdownText.replace(/!\[.*?\]\((.*?)\)/g, (match, url) => {
           const localUrl = newMediaCache[url];
           if (!localUrl) {
@@ -143,8 +139,6 @@ const Articles: React.FC = () => {
   }, []);
 
   const memoizedProcessedText = useMemo(() => processedText, [processedText]);
-
-  console.log('memoizedProcessedText', memoizedProcessedText);
 
   if (loading) {
     return <SpinModule />;
