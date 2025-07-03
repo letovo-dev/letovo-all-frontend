@@ -48,11 +48,13 @@ const PostHeader = ({
           </div>
         )}
       </div>
-      {text.split('\n\n').map((paragraph, index) => (
-        <p key={index} className={style.newsText}>
-          {cleanedParagraphs}
-        </p>
-      ))}
+      <>
+        {cleanedParagraphs.map((paragraph, index) => (
+          <p key={index} className={style.newsText}>
+            {paragraph}
+          </p>
+        ))}
+      </>
     </App>
   );
 };
