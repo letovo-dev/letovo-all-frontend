@@ -283,7 +283,7 @@ const UserPage = () => {
                     avatar={avatar}
                     avatars={avatars}
                     setAvatar={setAvatar}
-                    avatarSize={75}
+                    avatarSize={115}
                     userPageSelectPosition={true}
                   />
                 </div>
@@ -358,7 +358,7 @@ const UserPage = () => {
                 avatar={avatar}
                 avatars={avatars}
                 setAvatar={setAvatar}
-                avatarSize={60}
+                avatarSize={93}
                 userPageSelectPosition={true}
               />
             </div>

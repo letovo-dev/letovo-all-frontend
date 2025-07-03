@@ -1,5 +1,9 @@
 .selectedAvatar {
   position: absolute;
-  left: 7%;
-  bottom: 7%;
+  left: 6%;
+  bottom: 6%;
+  @media screen and (max-width: 960px) {
+    left: 4%;
+    bottom: 7%;
+  }
 }
