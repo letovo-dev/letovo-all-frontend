@@ -24,7 +24,7 @@ const GetAvatars: React.FC<ComponentProps> = ({
   avatars,
   setAvatar,
   userPageSelectPosition,
-  avatarSize = 60,
+  avatarSize,
 }) => {
   return (
     <div>

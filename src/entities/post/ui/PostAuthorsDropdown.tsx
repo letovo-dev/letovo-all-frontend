@@ -1,4 +1,4 @@
-import React, { useMemo } from 'react';
+import React from 'react';
 import type { MenuProps } from 'antd';
 import { Avatar, Dropdown, Space } from 'antd';
 import style from './InputModule.module.scss';
@@ -35,7 +35,7 @@ const PostAuthorsDropdown = ({
   items: MenuProps['items'];
 }) => {
   return (
-    <Dropdown menu={{ items, onClick: handleMenuClick }}>
+    <Dropdown menu={{ items, onClick: handleMenuClick }} overlayClassName={style.dropdown}>
       <a onClick={e => e.preventDefault()}>
         <Space>
           <Avatar src={avatarSrc} size={30} className={style.avatar} />

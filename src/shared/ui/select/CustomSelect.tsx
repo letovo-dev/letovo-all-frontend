@@ -27,7 +27,7 @@ const CustomSelect: React.FC<CustomSelectProps> = ({
       key: avatar,
       icon: (
         <div className={style.avatarTemplate}>
-          <Avatar src={`${process.env.NEXT_PUBLIC_BASE_URL_MEDIA}/${avatar}`} size={45} />
+          <Avatar src={`${process.env.NEXT_PUBLIC_BASE_URL_MEDIA}/${avatar}`} size={72} />
           {/* <ImgWithBackground
             imgPath={`${process.env.NEXT_PUBLIC_BASE_URL_MEDIA}/${avatar}`}
             size={60}

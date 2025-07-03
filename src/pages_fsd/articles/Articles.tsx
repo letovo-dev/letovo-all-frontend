@@ -20,7 +20,6 @@ const Articles: React.FC = () => {
   const router = useRouter();
   const { setFooterHidden } = useFooterContext();
   const [processedText, setProcessedText] = useState('');
-  const [lsToken, setLsToken] = useState<string | undefined>(undefined);
   const [mediaCache, setMediaCache] = useState<Record<string, string>>({});
   const [error, setError] = useState<string | null>(null);
   const wrapRef = useRef<HTMLDivElement>(null);
@@ -68,7 +67,9 @@ const Articles: React.FC = () => {
     const cancelTokenSource = axios.CancelToken.source();
 
     const fetchMedia = async () => {
-      if (!isMounted || !article?.text || !lsToken) {
+      if (!isMounted || !article?.text || !token) {
+        console.log('oki');
+
         return;
       }
 
@@ -82,7 +83,7 @@ const Articles: React.FC = () => {
         }
         try {
           const response = await axios.get(url, {
-            headers: { Bearer: `${lsToken}` },
+            headers: { Bearer: `${token}` },
             responseType: 'blob',
             cancelToken: cancelTokenSource.token,
           });
@@ -104,6 +105,8 @@ const Articles: React.FC = () => {
       await Promise.allSettled(fetchPromises);
 
       if (isMounted) {
+        console.log('markdownText', markdownText);
+
         const updatedText = markdownText.replace(/!\[.*?\]\((.*?)\)/g, (match, url) => {
           const localUrl = newMediaCache[url];
           if (!localUrl) {
@@ -129,7 +132,7 @@ const Articles: React.FC = () => {
       isMounted = false;
       cancelTokenSource.cancel('Компонент размонтирован или статья изменена');
     };
-  }, [article?.text, lsToken]);
+  }, [article?.text, token]);
 
   useEffect(() => {
     return () => {
@@ -140,6 +143,8 @@ const Articles: React.FC = () => {
   }, []);
 
   const memoizedProcessedText = useMemo(() => processedText, [processedText]);
+
+  console.log('memoizedProcessedText', memoizedProcessedText);
 
   if (loading) {
     return <SpinModule />;
