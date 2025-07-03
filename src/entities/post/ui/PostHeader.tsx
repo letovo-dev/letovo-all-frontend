@@ -22,7 +22,9 @@ const PostHeader = ({
   currentNewsStateSaved: boolean;
 }) => {
   const avatarSrc = author.avatar && `${process.env.NEXT_PUBLIC_BASE_URL_MEDIA}/${author.avatar}`;
-
+  const cleanedParagraphs = text
+    .replace(/\n(?!\n)/g, ' ') // убрать одиночные переносы
+    .split(/\n{2,}/);
   return (
     <App>
       <div
@@ -46,7 +48,11 @@ const PostHeader = ({
           </div>
         )}
       </div>
-      <p className={style.newsText}>{text || ''}</p>
+      {text.split('\n\n').map((paragraph, index) => (
+        <p key={index} className={style.newsText}>
+          {cleanedParagraphs}
+        </p>
+      ))}
     </App>
   );
 };

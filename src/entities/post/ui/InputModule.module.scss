@@ -28,3 +28,17 @@
   @extend .inputDivider;
   padding-bottom: 15px;
 }
+.dropdown {
+  // Только обёртка — без прокрутки
+  max-height: none;
+  overflow: visible;
+}
+
+.menu {
+  max-height: 200px;
+  overflow-y: auto;
+  overflow-x: hidden;
+  padding-right: 4px;
+  border-radius: 4px;
+  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.15);
+}

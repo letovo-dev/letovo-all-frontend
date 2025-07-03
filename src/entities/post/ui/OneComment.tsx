@@ -7,9 +7,9 @@ import Image from 'next/image';
 import { RealComment } from '@/shared/stores/data-store';
 import InputModule from './InputModule';
 import commentsStore from '@/shared/stores/comments-store';
-import type { MenuProps } from 'antd';
 import { IUserData } from '@/shared/stores/user-store';
 import getAuthorsList from '../model/getAuthorsList';
+import type { MenuInfo } from 'rc-menu/lib/interface';
 
 interface OneCommentProps {
   showMore: boolean;
@@ -51,6 +51,7 @@ const OneComment: React.FC<OneCommentProps> = ({
   const usageCommentTextValue = commentText ?? text;
   const [likesCommentCount, setLikesCommentCount] = useState(likesCount);
   const [author, setAuthor] = useState<string | undefined>(undefined);
+  const [avatarPic, setAvatarPic] = useState<string | undefined>(undefined);
 
   const comments = normalizedComments?.[newsId];
 
@@ -99,6 +100,7 @@ const OneComment: React.FC<OneCommentProps> = ({
       saveComment(usageCommentTextValue, newsId, author);
       usageCommentText('');
       setAuthor(undefined);
+      setAvatarPic(undefined);
     }
   };
 
@@ -106,8 +108,11 @@ const OneComment: React.FC<OneCommentProps> = ({
     usageCommentText(`@${commentState?.author}`);
   };
 
-  const handleMenuClick: MenuProps['onClick'] = ({ key, keyPath, domEvent }) => {
-    setAuthor(key);
+  const handleMenuClick = (info: MenuInfo) => {
+    const selectedItem = getAuthorsList(allPostsAuthors).find(item => item?.key === info.key);
+    const avatar = selectedItem?.avatarSrc;
+    setAuthor(info.key);
+    setAvatarPic(avatar);
   };
 
   return (
@@ -117,7 +122,7 @@ const OneComment: React.FC<OneCommentProps> = ({
           <div className={style.avatarTemplate}>
             <Avatar
               src={`${process.env.NEXT_PUBLIC_BASE_URL_MEDIA}/${commentState.avatar_pic}`}
-              size={30}
+              size={40}
               className={style.avatar}
             />
           </div>
@@ -158,6 +163,7 @@ const OneComment: React.FC<OneCommentProps> = ({
           isAdmin={isAdmin}
           handleMenuClick={handleMenuClick}
           items={getAuthorsList(allPostsAuthors)}
+          avatarPic={avatarPic}
         />
       )}
     </section>

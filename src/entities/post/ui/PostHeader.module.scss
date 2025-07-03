@@ -20,10 +20,19 @@
   }
 }
 .newsText {
-  padding: 0 15px 0 15px;
+  padding: 0 15px;
   font-size: 12px;
   font-weight: 400;
+  text-align: justify;
+  white-space: pre-wrap;
+
+  hyphens: none;
+  overflow-wrap: break-word;
+  word-break: normal;
+  line-height: 1.6;
+  text-indent: 1.5em;
 }
+
 .infoContainerFirst {
   @extend .infoContainer;
   margin-top: 12px;
@@ -35,7 +44,4 @@
 .editPost {
   cursor: pointer;
   color: var(--orange);
-}
-.dropdown {
-  max-height: 100px;
 }

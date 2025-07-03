@@ -47,8 +47,9 @@ const CarouselElement = ({ imgs }: { imgs: string[] }) => {
                   }}
                   src={`${process.env.NEXT_PUBLIC_BASE_URL_MEDIA}/${item}`}
                   controls
-                  muted
+                  // muted
                   className={style.video}
+                  preload="metadata"
                 />
               ) : isPDF(item) ? (
                 <iframe

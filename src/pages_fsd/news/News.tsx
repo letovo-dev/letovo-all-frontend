@@ -14,6 +14,7 @@ import userStore, { IUserStore } from '@/shared/stores/user-store';
 import commentsStore from '@/shared/stores/comments-store';
 import type { MenuProps } from 'antd';
 import getAuthorsList from '@/entities/post/model/getAuthorsList';
+import type { MenuInfo } from 'rc-menu/lib/interface';
 
 interface NewsProps {
   children: React.ReactNode;
@@ -36,6 +37,7 @@ const News: React.FC<NewsProps> = ({ children, onContainerRef }) => {
   const { allPostsAuthors } = userStore((state: IUserStore) => state.store);
   const openComments = commentsStore(state => state.openComments);
   const [author, setAuthor] = useState<string | undefined>(undefined);
+  const [avatarPic, setAvatarPic] = useState<string | undefined>(undefined);
 
   const items: MenuProps['items'] = useMemo(() => {
     return getAuthorsList(allPostsAuthors);
@@ -52,11 +54,15 @@ const News: React.FC<NewsProps> = ({ children, onContainerRef }) => {
       saveComment(text, openComments, author);
       setText('');
       setAuthor(undefined);
+      setAvatarPic(undefined);
     }
   };
 
-  const handleMenuClick: MenuProps['onClick'] = ({ key, keyPath, domEvent }) => {
-    setAuthor(key);
+  const handleMenuClick = (info: MenuInfo) => {
+    const selectedItem = getAuthorsList(allPostsAuthors).find(item => item?.key === info.key);
+    const avatar = selectedItem?.avatarSrc;
+    setAuthor(info.key);
+    setAvatarPic(avatar);
   };
 
   useEffect(() => {
@@ -147,8 +153,8 @@ const News: React.FC<NewsProps> = ({ children, onContainerRef }) => {
                     <Image
                       src={'/images/Icon_X_Big.webp'}
                       alt="X"
-                      width={35}
-                      height={35}
+                      width={40}
+                      height={40}
                       className={style.closeButton}
                       onClick={() => {
                         commentsStore.setState(state => {
@@ -190,6 +196,7 @@ const News: React.FC<NewsProps> = ({ children, onContainerRef }) => {
                     isAdmin={isAdmin}
                     handleMenuClick={handleMenuClick}
                     items={items}
+                    avatarPic={avatarPic}
                   />
                 </div>
               </div>

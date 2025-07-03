@@ -15,6 +15,7 @@ type InputModuleProps = {
   isAdmin: boolean;
   handleMenuClick: MenuProps['onClick'];
   items: MenuProps['items'];
+  avatarPic: string | undefined;
 };
 
 const InputModule: React.FC<InputModuleProps> = ({
@@ -26,6 +27,7 @@ const InputModule: React.FC<InputModuleProps> = ({
   isAdmin,
   handleMenuClick,
   items,
+  avatarPic,
 }) => {
   return (
     <>
@@ -34,12 +36,12 @@ const InputModule: React.FC<InputModuleProps> = ({
         <div className={style.avatarTemplate}>
           {isAdmin ? (
             <PostAuthorsDropdown
-              avatarSrc={avatarSrc}
+              avatarSrc={avatarPic ? avatarPic : avatarSrc}
               handleMenuClick={handleMenuClick}
               items={items}
             />
           ) : (
-            <Avatar src={avatarSrc} size={30} className={style.avatar} />
+            <Avatar src={avatarSrc} size={40} className={style.avatar} />
           )}
         </div>
         <TextareaAutoHeight
