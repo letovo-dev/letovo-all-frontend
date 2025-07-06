@@ -136,10 +136,10 @@ const OneComment: React.FC<OneCommentProps> = ({
                 Ответить
               </div>
               <div className={style.iconsItem}>
-                <DeleteOutlined
+                {/* <DeleteOutlined
                   className={style.deleteCommentIcon}
                   onClick={() => handleDeleteComment(commentState.post_id, commentState.parent_id)}
-                />
+                /> */}
                 <div className={style.likesInfo}>
                   <Image
                     src={likeComment ? '/images/Icon_Like_2.webp' : '/images/Icon_Like.webp'}
