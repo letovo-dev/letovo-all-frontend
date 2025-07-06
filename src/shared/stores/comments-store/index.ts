@@ -35,6 +35,7 @@ export type TCommentsStoreState = {
   setCommentReply: (text: string) => void;
   getLimitNewsComments: (post_id: number, start: number, size: number) => Promise<void>;
   saveComment: (comment: string, post_id: string, author: string | undefined) => Promise<any>;
+  deleteComment: (id: string, post_id: string) => void;
   getCurrentNewsPics: (id: number) => Promise<any>;
 };
 
@@ -110,6 +111,31 @@ const commentsStore = create<TCommentsStoreState>()(
           console.error('saveComment error:', error);
           set({ error: error instanceof Error ? error.message : 'Failed to save comment' });
           return [];
+        } finally {
+          set({ loading: false });
+        }
+      },
+      deleteComment: async (id: string, post_id: string): Promise<any> => {
+        set({ loading: true, error: undefined });
+        try {
+          const response = await SERVICES_DATA.Data.deleteNews(id);
+          if (response.success && response.code === 200) {
+            set((state: TCommentsStoreState) => ({
+              normalizedComments: {
+                ...state.normalizedComments,
+                [post_id]: [
+                  ...(state.normalizedComments?.[post_id].filter(
+                    comment => comment.post_id !== id,
+                  ) || []),
+                ],
+              },
+            }));
+          } else {
+            set({ loading: false, error: response.codeMessage });
+          }
+        } catch (error) {
+          console.error(error);
+          set({ loading: false, error: 'Network or system error' });
         } finally {
           set({ loading: false });
         }

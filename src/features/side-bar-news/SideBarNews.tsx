@@ -56,7 +56,7 @@ const SideBarNews = ({
           normalizedNews &&
           Object.entries(normalizedNews).filter(arr => arr[1].news.author === author.username);
         if (authorNews?.length) {
-          acc.push({ author: author, data: authorNews });
+          acc.push({ author, data: authorNews });
         }
         return acc;
       }, []),
@@ -203,65 +203,68 @@ const SideBarNews = ({
         )}
         <div className={style.sidebarItemsContainer}>
           {Object.keys(mainSections).map((section, index) => {
+            const sectionKey = `${section}-${index}`;
             return section === 'news' ? (
-              <div key={index} className={style.sidebarItem} onClick={mainSections[section].method}>
+              <div
+                key={sectionKey}
+                className={style.sidebarItem}
+                onClick={mainSections[section].method}
+              >
                 <span>{mainSections[section].title}</span>
                 <div className={style.sidebarItemNewsContainer}>
-                  {newsDataStructure.map((news, index) => {
-                    return (
-                      <>
-                        <div
-                          key={news.author.username + index}
-                          className={style.author}
-                          onClick={(e: React.MouseEvent<HTMLDivElement>) => {
-                            e.stopPropagation();
-                            setCurrentNewsState({
-                              default: false,
-                              saved: false,
-                              selectedNews: false,
-                              searched: false,
-                              selectedAuthor: {
-                                state: true,
-                                author: news.author.username,
-                                news: news.data,
-                              },
-                            });
-                            setOpen(prev => !prev);
-                            form.resetFields();
-                          }}
-                        >
-                          {news.author.username}
-                        </div>
-                        {news.data.map((item, index) => {
-                          return item[1].news.title !== '' ? (
-                            <div
-                              key={item[1].news.post_id + index}
-                              className={style.sidebarItemNews}
-                              onClick={(e: React.MouseEvent<HTMLDivElement>) => {
-                                e.stopPropagation();
-                                setCurrentNewsState({
-                                  default: false,
-                                  saved: false,
-                                  selectedNews: item[1].news.post_id,
-                                  searched: false,
-                                  selectedAuthor: false,
-                                });
-                                setOpen(prev => !prev);
-                                form.resetFields();
-                              }}
-                            >
-                              <span>{item[1].news.title}</span>
-                            </div>
-                          ) : null;
-                        })}
-                      </>
-                    );
-                  })}
+                  {newsDataStructure.map((news, idx) => (
+                    <React.Fragment key={news.author.username + idx}>
+                      <div
+                        key={news.author.username}
+                        className={style.author}
+                        onClick={(e: React.MouseEvent<HTMLDivElement>) => {
+                          e.stopPropagation();
+                          setCurrentNewsState({
+                            default: false,
+                            saved: false,
+                            selectedNews: false,
+                            searched: false,
+                            selectedAuthor: {
+                              state: true,
+                              author: news.author.username,
+                              news: news.data,
+                            },
+                          });
+                          setOpen(prev => !prev);
+                          form.resetFields();
+                        }}
+                      >
+                        {news.author.username}
+                      </div>
+                      {news.data.map((item, itemIdx) =>
+                        item[1].news.title !== '' ? (
+                          <div
+                            key={item[0]}
+                            className={style.sidebarItemNews}
+                            onClick={(e: React.MouseEvent<HTMLDivElement>) => {
+                              e.stopPropagation();
+                              setCurrentNewsState({
+                                default: false,
+                                saved: false,
+                                selectedNews: item[1].news.post_id,
+                                searched: false,
+                                selectedAuthor: false,
+                              });
+                              setOpen(prev => !prev);
+                              form.resetFields();
+                            }}
+                          >
+                            <span>{item[1].news.title}</span>
+                          </div>
+                        ) : null,
+                      )}
+                    </React.Fragment>
+                  ))}
                 </div>
               </div>
             ) : (
               <div
-                key={index}
+                key={sectionKey}
                 className={style.sidebarItemSaved}
                 onClick={mainSections[section].method}
               >

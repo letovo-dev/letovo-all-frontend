@@ -28,10 +28,12 @@
       @extend %transparentContainer;
       @extend .actionContainer;
       background-image: url('/images/Frame_Like_1.webp');
+      gap: 6px;
     }
     .likesContainerLiked {
       @extend .likesContainer;
       background-image: url('/images/Frame_Like_2.webp');
+      gap: 6px;
     }
     .likesCount {
       font-size: 14px;
@@ -43,10 +45,12 @@
       @extend %transparentContainer;
       @extend .actionContainer;
       background-image: url('/images/Frame_Dislike_1.webp');
+      gap: 6px;
     }
     .dislikesContainerDisLiked {
       @extend .dislikesContainer;
       background-image: url('/images/Frame_Dislike_2.webp');
+      gap: 6px;
     }
     .dislikesCount {
       font-size: 14px;

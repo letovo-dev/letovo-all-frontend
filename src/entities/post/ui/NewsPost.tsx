@@ -50,7 +50,9 @@ const NewsPost: React.FC<OnePostProps> = ({
     };
   }, [el]);
 
-  const showMore = comments?.length > 1;
+  const showMore = useMemo(() => {
+    return comments?.length > 1;
+  }, [comments]);
 
   const authors = useMemo(() => {
     return allPostsAuthors?.map((author: IUserData) => {

@@ -6,6 +6,16 @@ import Image from 'next/image';
 import commentsStore from '@/shared/stores/comments-store';
 import { Divider } from 'antd';
 
+function formatCount(num: number): string {
+  if (num < 1000) return num.toString();
+
+  if (num < 100_000) {
+    return `${(num / 1000).toFixed(1).replace('.0', '')}k`;
+  }
+
+  return `${Math.round(num / 1000)}k`;
+}
+
 const NewsActionPanel = ({
   postId,
   commentsCount,
@@ -116,7 +126,7 @@ const NewsActionPanel = ({
               width={22}
               height={22}
             />
-            <p className={style.likesCount}>{actionsState.likesCount}</p>
+            <p className={style.likesCount}>{formatCount(actionsState.likesCount)}</p>
           </div>
           <div
             className={
@@ -132,7 +142,7 @@ const NewsActionPanel = ({
               width={22}
               height={22}
             />
-            <p className={style.dislikesCount}>{actionsState.dislikesCount}</p>
+            <p className={style.dislikesCount}>{formatCount(actionsState.dislikesCount)}</p>
           </div>
           <div className={style.commentsContainer} onClick={() => handleComment(String(postId))}>
             <Image src={'/images/Icon_Comment.webp'} alt="comment" width={22} height={22} />

@@ -10,6 +10,7 @@ import commentsStore from '@/shared/stores/comments-store';
 import { IUserData } from '@/shared/stores/user-store';
 import getAuthorsList from '../model/getAuthorsList';
 import type { MenuInfo } from 'rc-menu/lib/interface';
+import { DeleteOutlined } from '@ant-design/icons';
 
 interface OneCommentProps {
   showMore: boolean;
@@ -45,14 +46,13 @@ const OneComment: React.FC<OneCommentProps> = ({
 }) => {
   const [likeComment, selLikeComment] = useState(false);
   const [commentState, setCommentState] = useState<RealComment | undefined>(undefined);
-  const { setOpenComments, normalizedComments } = commentsStore(state => state);
+  const { setOpenComments, normalizedComments, deleteComment } = commentsStore(state => state);
   const [text, setText] = useState('');
   const usageCommentText = setCommentText ?? setText;
   const usageCommentTextValue = commentText ?? text;
   const [likesCommentCount, setLikesCommentCount] = useState(likesCount);
   const [author, setAuthor] = useState<string | undefined>(undefined);
   const [avatarPic, setAvatarPic] = useState<string | undefined>(undefined);
-
   const comments = normalizedComments?.[newsId];
 
   useEffect(() => {
@@ -115,6 +115,8 @@ const OneComment: React.FC<OneCommentProps> = ({
     setAvatarPic(avatar);
   };
 
+  const handleDeleteComment = (id: string, post_is: string) => deleteComment(id, post_is);
+
   return (
     <section className={style.comment}>
       {commentState ? (
@@ -133,19 +135,25 @@ const OneComment: React.FC<OneCommentProps> = ({
               <div className={style.commentTextReply} onClick={handleReply}>
                 Ответить
               </div>
-              <div className={style.likesInfo}>
-                <Image
-                  src={likeComment ? '/images/Icon_Like_2.webp' : '/images/Icon_Like.webp'}
-                  alt="like"
-                  width={15}
-                  height={15}
-                  className={style.likeHeart}
-                  onClick={handleLikeComment}
+              <div className={style.iconsItem}>
+                <DeleteOutlined
+                  className={style.deleteCommentIcon}
+                  onClick={() => handleDeleteComment(commentState.post_id, commentState.parent_id)}
                 />
-                {likesCount && <p className={style.count}>{likesCommentCount}</p>}
+                <div className={style.likesInfo}>
+                  <Image
+                    src={likeComment ? '/images/Icon_Like_2.webp' : '/images/Icon_Like.webp'}
+                    alt="like"
+                    width={15}
+                    height={15}
+                    className={style.likeHeart}
+                    onClick={handleLikeComment}
+                  />
+                  {likesCount && <p className={style.count}>{likesCommentCount}</p>}
+                </div>
               </div>
             </div>
-            {showMore && (
+            {comments && comments?.length > 1 && (
               <p onClick={() => setOpenComments(newsId)} className={style.nextCommentText}>
                 Показать следующие комментарии...
               </p>

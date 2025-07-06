@@ -1,12 +1,12 @@
 'use client';
 
-import { useCallback, useEffect, useRef, useState } from 'react';
+import { useCallback, useEffect, useMemo, useRef, useState } from 'react';
 import dataStore from '@/shared/stores/data-store';
-import { OneNews } from '@/entities/post/ui';
 import commentsStore from '@/shared/stores/comments-store';
 import SpinModule from '@/shared/ui/spiner';
 import { News } from '@/pages_fsd/news';
 import { message } from 'antd';
+import NewsList from './NewsList';
 
 const LOAD_NEWS_SIZE = 10;
 
@@ -79,19 +79,24 @@ const NewsPage = () => {
   }, []);
 
   const getRenderNews = useCallback(() => {
+    if (!normalizedNews && !savedNews && !searchedNews) return {};
     switch (true) {
       case currentNewsState.default:
-        return normalizedNews;
+        return normalizedNews || {};
       case currentNewsState.saved:
-        return savedNews;
+        return savedNews || {};
       case currentNewsState.searched && searchedNews && Object.keys(searchedNews).length > 0:
         return searchedNews;
       case !!currentNewsState.selectedNews:
-        return { [currentNewsState.selectedNews]: normalizedNews[currentNewsState.selectedNews] };
+        return normalizedNews?.[currentNewsState.selectedNews]
+          ? { [currentNewsState.selectedNews]: normalizedNews[currentNewsState.selectedNews] }
+          : {};
       case currentNewsState.selectedAuthor.state:
-        return Object.fromEntries(currentNewsState.selectedAuthor.news);
+        return currentNewsState.selectedAuthor.news
+          ? Object.fromEntries(currentNewsState.selectedAuthor.news)
+          : {};
       default:
-        return normalizedNews;
+        return normalizedNews || {};
     }
   }, [currentNewsState, normalizedNews, savedNews, searchedNews]);
 
@@ -207,38 +212,28 @@ const NewsPage = () => {
     }
   }, [renderNews, openComments, currentNewsState.default]);
 
-  if (loading && startNewsItem === 0) {
-    return <SpinModule />;
-  }
+  const sortedNews = useMemo(
+    () =>
+      Object.entries(renderNews ?? []).sort((a, b) => {
+        const dateA = new Date(a[1].news.date);
+        const dateB = new Date(b[1].news.date);
+        return dateB.getTime() - dateA.getTime();
+      }),
+    [renderNews],
+  );
 
   return (
     <>
       {contextHolder}
       <News onContainerRef={ref => (containerRef.current = ref.current)}>
-        {renderNews &&
-          Object.entries(renderNews)
-            .sort((a, b) => {
-              const dateA = new Date(a[1].news.date);
-              const dateB = new Date(b[1].news.date);
-              return dateB.getTime() - dateA.getTime();
-            })
-            .map((el, index) => {
-              const newsArr = Object.entries(renderNews);
-              const isLastElement = index === newsArr.length - 1;
-              return (
-                <div ref={isLastElement ? lastElementRef : null} key={el[0]} data-news-id={el[0]}>
-                  <OneNews
-                    el={el[1] ?? { media: [], news: {} }}
-                    index={index}
-                    lastNews={isLastElement ? el[1] : null}
-                    newsId={String(el[0])}
-                    likeNewsOrComment={likeNewsOrComment}
-                    dislikeNews={dislikeNews}
-                    saveComment={saveComment}
-                  />
-                </div>
-              );
-            })}
+        {loading && startNewsItem === 0 && <SpinModule />}
+        <NewsList
+          news={sortedNews}
+          lastElementRef={lastElementRef}
+          likeNewsOrComment={likeNewsOrComment}
+          dislikeNews={dislikeNews}
+          saveComment={saveComment}
+        />
         {loading && startNewsItem > 0 && <SpinModule />}
       </News>
     </>

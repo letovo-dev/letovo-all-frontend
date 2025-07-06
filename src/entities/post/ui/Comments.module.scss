@@ -109,3 +109,12 @@ $overlay-color: rgba(0, 0, 0, 0.3);
     font-weight: 400;
   }
 }
+.iconsItem {
+  display: flex;
+  align-items: flex-end;
+  gap: 10px;
+}
+.deleteCommentIcon {
+  cursor: pointer;
+  color: var(--orange);
+}
