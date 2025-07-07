@@ -7,7 +7,7 @@ import Image from 'next/image';
 import { RealComment } from '@/shared/stores/data-store';
 import InputModule from './InputModule';
 import commentsStore from '@/shared/stores/comments-store';
-import { IUserData } from '@/shared/stores/user-store';
+import userStore, { IUserData, IUserStore } from '@/shared/stores/user-store';
 import getAuthorsList from '../model/getAuthorsList';
 import type { MenuInfo } from 'rc-menu/lib/interface';
 import { DeleteOutlined } from '@ant-design/icons';
@@ -54,6 +54,7 @@ const OneComment: React.FC<OneCommentProps> = ({
   const [author, setAuthor] = useState<string | undefined>(undefined);
   const [avatarPic, setAvatarPic] = useState<string | undefined>(undefined);
   const comments = normalizedComments?.[newsId];
+  const userData = userStore((state: IUserStore) => state.store?.userData);
 
   useEffect(() => {
     if (comments) {
@@ -136,10 +137,14 @@ const OneComment: React.FC<OneCommentProps> = ({
                 Ответить
               </div>
               <div className={style.iconsItem}>
-                {/* <DeleteOutlined
-                  className={style.deleteCommentIcon}
-                  onClick={() => handleDeleteComment(commentState.post_id, commentState.parent_id)}
-                /> */}
+                {userData.userrights === 'admin' && (
+                  <DeleteOutlined
+                    className={style.deleteCommentIcon}
+                    onClick={() =>
+                      handleDeleteComment(commentState.post_id, commentState.parent_id)
+                    }
+                  />
+                )}
                 <div className={style.likesInfo}>
                   <Image
                     src={likeComment ? '/images/Icon_Like_2.webp' : '/images/Icon_Like.webp'}
