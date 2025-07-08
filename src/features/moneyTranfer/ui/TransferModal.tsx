@@ -268,7 +268,7 @@ const TransferModal: React.FC<ModalProps> = ({
                           <Button
                             color="default"
                             variant="solid"
-                            disabled={!nick || nick.length < 4}
+                            disabled={!nick || nick.length < 3}
                             className={style.rejectButton}
                             onClick={() => {
                               setReceiver(undefined);
@@ -359,7 +359,7 @@ const TransferModal: React.FC<ModalProps> = ({
                     <Button
                       variant="solid"
                       htmlType="submit"
-                      disabled={!nick || nick.length < 4}
+                      disabled={!nick || nick.length < 3}
                       className={style.submitButton}
                       onClick={onClose}
                     >
