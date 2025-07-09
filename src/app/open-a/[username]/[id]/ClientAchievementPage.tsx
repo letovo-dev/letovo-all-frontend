@@ -34,11 +34,14 @@ function ClientAchievementPage({ id, username }: ClientAchievementPageProps) {
   }, []);
 
   useEffect(() => {
-    if (user && user.userrights === 'admin') {
+    if ((user && user.userrights === 'admin') || (user && user?.userrights === 'moder')) {
       setTrueUser(true);
     }
     const timeoutId = setTimeout(() => {
-      if (user && user.userrights !== 'admin' && user.username) {
+      if (
+        (user && user.userrights !== 'admin' && user.username) ||
+        (user && user.userrights !== 'moder' && user.username)
+      ) {
         router.push(`/user/${user.username}`);
       }
     }, 1000);

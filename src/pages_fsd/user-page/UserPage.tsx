@@ -3,7 +3,7 @@
 import React, { useCallback, useEffect, useMemo, useRef, useState } from 'react';
 import style from './UserPage.module.scss';
 import userStore, { IUserAchData, IUserStore } from '@/shared/stores/user-store';
-import { ConfigProvider, Form, Spin } from 'antd';
+import { ConfigProvider, Form, Spin, message } from 'antd';
 import { useRouter } from 'next/navigation';
 import authStore from '@/shared/stores/auth-store';
 import { setDataToLocaleStorage } from '@/shared/lib/ApiSPA/axios/helpers';
@@ -50,6 +50,7 @@ const UserPage = () => {
   const [openTransferModal, setOpenTransferModal] = useState(false);
   const { setFooterHidden } = useFooterContext();
   const { getAllPostsAuthors } = userStore.getState();
+  const [messageApi, contextHolder] = message.useMessage();
 
   const wrapRef = useRef<HTMLDivElement>(null);
   const lastScrollTop = useRef(0);
@@ -246,6 +247,25 @@ const UserPage = () => {
     input.click();
   };
 
+  const warning = () => {
+    messageApi.open({
+      type: 'warning',
+      content:
+        'Мы используем файлы cookie для повышения безопасности и предотвращения мошенничества. Оставаясь на сайте, вы соглашаетесь на их использование. Собранные данные о ваших входах и устройстве не передаются третьим лицам.',
+      className: 'custom-class',
+      style: {
+        marginTop: '77vh',
+      },
+      duration: 7,
+    });
+  };
+
+  useEffect(() => {
+    setTimeout(() => {
+      warning();
+    }, 2000);
+  }, []);
+
   if (isLoading) {
     return (
       <div className={style.spinner}>
@@ -263,46 +283,111 @@ const UserPage = () => {
   }
 
   return (
-    <div className={style.wrap} ref={wrapRef}>
-      <div className={style.desktopContent}>
-        <div className={style.accountDivPC}>
-          <div className={style.topContainer}>
-            {windowWidth > 960 && (
-              <Form form={form} onValuesChange={onValuesChange} className={style.formDesktop}>
-                <div
-                  ref={avatarRef}
-                  className={style.avatarTemplate}
-                  onClick={() => {
-                    toggleVisible();
-                  }}
-                >
-                  <GetAvatars
-                    form={form}
-                    setVisible={setVisible}
-                    visible={visible}
-                    avatar={avatar}
-                    avatars={avatars}
-                    setAvatar={setAvatar}
-                    avatarSize={115}
-                    userPageSelectPosition={true}
-                  />
-                </div>
-              </Form>
-            )}
-            <UserData userData={userData} userOnBoard={userOnBoard} />
-            <button onClick={logout} className={style.logOutButtonDesktop} type="button" />
+    <>
+      {contextHolder}
+      <div className={style.wrap} ref={wrapRef}>
+        <div className={style.desktopContent}>
+          <div className={style.accountDivPC}>
+            <div className={style.topContainer}>
+              {windowWidth > 960 && (
+                <Form form={form} onValuesChange={onValuesChange} className={style.formDesktop}>
+                  <div
+                    ref={avatarRef}
+                    className={style.avatarTemplate}
+                    onClick={() => {
+                      toggleVisible();
+                    }}
+                  >
+                    <GetAvatars
+                      form={form}
+                      setVisible={setVisible}
+                      visible={visible}
+                      avatar={avatar}
+                      avatars={avatars}
+                      setAvatar={setAvatar}
+                      avatarSize={115}
+                      userPageSelectPosition={true}
+                    />
+                  </div>
+                </Form>
+              )}
+              <UserData userData={userData} userOnBoard={userOnBoard} />
+              <button onClick={logout} className={style.logOutButtonDesktop} type="button" />
+            </div>
+            <div className={style.moneyContainer}>
+              <OnBoard userData={userData} />
+              <Money
+                userData={userData}
+                setOpenTransferModal={setOpenTransferModal}
+                uploadPhoto={uploadPhoto}
+              />
+            </div>
+            <section className={style.achieveHeaderDesktop}>
+              <p className={style.textAchieveHeaderDesktopCommon}>Общие</p>
+              <Image src="/images/Achievement_Element.webp" alt="line" height={2} width={40} />
+              <Image
+                src="/images/Achievement_AllBased_Active.webp"
+                alt="achievement"
+                height={50}
+                width={50}
+                className={style.ach}
+                onClick={() => setCurrentAchievements('all')}
+              />
+              <Image src="/images/Achievement_Element.webp" alt="line" height={2} width={40} />
+              <p className={style.textAchieveHeaderDesktop}>Достижения</p>
+              <Image src="/images/Achievement_Element.webp" alt="line" height={2} width={40} />
+              <Image
+                src="/images/Achievement_Управление_Active.webp"
+                alt="sign"
+                height={50}
+                width={50}
+                className={style.ach}
+                onClick={() => setCurrentAchievements('dep')}
+              />
+            </section>
           </div>
-          <div className={style.moneyContainer}>
-            <OnBoard userData={userData} />
-            <Money
-              userData={userData}
-              setOpenTransferModal={setOpenTransferModal}
-              uploadPhoto={uploadPhoto}
-            />
-          </div>
-          <section className={style.achieveHeaderDesktop}>
-            <p className={style.textAchieveHeaderDesktopCommon}>Общие</p>
-            <Image src="/images/Achievement_Element.webp" alt="line" height={2} width={40} />
+        </div>
+
+        <button onClick={logout} className={style.logOutButton} type="button" />
+        <div className={style.accountDiv}>
+          <OnBoard userData={userData} />
+          <section className={style.userData}>
+            <h4 className={style.userName}>{userData?.username}</h4>
+            <p className={userData?.active === 't' ? style.userOnBoard : style.userRest}>
+              {userOnBoard}
+            </p>
+            <p className={style.userPosition}>{userData?.role}</p>
+          </section>
+          <Money
+            userData={userData}
+            setOpenTransferModal={setOpenTransferModal}
+            uploadPhoto={uploadPhoto}
+          />
+
+          {windowWidth <= 960 && (
+            <Form form={form} onValuesChange={onValuesChange} className={style.form}>
+              <div
+                ref={avatarRef}
+                className={style.avatarTemplate}
+                onClick={() => {
+                  toggleVisible();
+                }}
+              >
+                <GetAvatars
+                  form={form}
+                  setVisible={setVisible}
+                  visible={visible}
+                  avatar={avatar}
+                  avatars={avatars}
+                  setAvatar={setAvatar}
+                  avatarSize={93}
+                  userPageSelectPosition={true}
+                />
+              </div>
+            </Form>
+          )}
+
+          <section className={style.achieveHeader}>
             <Image
               src="/images/Achievement_AllBased_Active.webp"
               alt="achievement"
@@ -312,7 +397,7 @@ const UserPage = () => {
               onClick={() => setCurrentAchievements('all')}
             />
             <Image src="/images/Achievement_Element.webp" alt="line" height={2} width={40} />
-            <p className={style.textAchieveHeaderDesktop}>Достижения</p>
+            <p className={style.time}>Достижения</p>
             <Image src="/images/Achievement_Element.webp" alt="line" height={2} width={40} />
             <Image
               src="/images/Achievement_Управление_Active.webp"
@@ -324,105 +409,42 @@ const UserPage = () => {
             />
           </section>
         </div>
-      </div>
 
-      <button onClick={logout} className={style.logOutButton} type="button" />
-      <div className={style.accountDiv}>
-        <OnBoard userData={userData} />
-        <section className={style.userData}>
-          <h4 className={style.userName}>{userData?.username}</h4>
-          <p className={userData?.active === 't' ? style.userOnBoard : style.userRest}>
-            {userOnBoard}
-          </p>
-          <p className={style.userPosition}>{userData?.role}</p>
-        </section>
-        <Money
-          userData={userData}
-          setOpenTransferModal={setOpenTransferModal}
-          uploadPhoto={uploadPhoto}
-        />
-
-        {windowWidth <= 960 && (
-          <Form form={form} onValuesChange={onValuesChange} className={style.form}>
-            <div
-              ref={avatarRef}
-              className={style.avatarTemplate}
-              onClick={() => {
-                toggleVisible();
-              }}
-            >
-              <GetAvatars
-                form={form}
-                setVisible={setVisible}
-                visible={visible}
-                avatar={avatar}
-                avatars={avatars}
-                setAvatar={setAvatar}
-                avatarSize={93}
-                userPageSelectPosition={true}
-              />
+        {achievementsToDisplay &&
+          achievementsToDisplay.length > 0 &&
+          (windowWidth <= 960 ? (
+            <AchieveBlockMobile achievements={achievementsToDisplay ?? []} openModal={openModal} />
+          ) : (
+            <div className={style.achieveBlockContainer}>
+              <AchieveBlock achievements={achievementsToDisplay ?? []} openModal={openModal} />
             </div>
-          </Form>
+          ))}
+        {open && (
+          <AchievementModal
+            open={open}
+            setOpen={setOpen}
+            title="Ачивка"
+            currentItem={currentItem}
+            setCurrentItem={setCurrentItem}
+            allPossibleUserAchievements={achievementsToDisplay}
+            currentImageElement={currentImageElement}
+            setCurrentImageElement={setCurrentImageElement}
+          />
+        )}
+        {openTransferModal && (
+          <TransferModal
+            openTransferModal={openTransferModal}
+            setOpenTransferModal={setOpenTransferModal}
+            title="Перевод"
+            selfMoney={Number(userData.balance) || 0}
+            userData={userData}
+          />
         )}
 
-        <section className={style.achieveHeader}>
-          <Image
-            src="/images/Achievement_AllBased_Active.webp"
-            alt="achievement"
-            height={50}
-            width={50}
-            className={style.ach}
-            onClick={() => setCurrentAchievements('all')}
-          />
-          <Image src="/images/Achievement_Element.webp" alt="line" height={2} width={40} />
-          <p className={style.time}>Достижения</p>
-          <Image src="/images/Achievement_Element.webp" alt="line" height={2} width={40} />
-          <Image
-            src="/images/Achievement_Управление_Active.webp"
-            alt="sign"
-            height={50}
-            width={50}
-            className={style.ach}
-            onClick={() => setCurrentAchievements('dep')}
-          />
-        </section>
-      </div>
-
-      {achievementsToDisplay &&
-        achievementsToDisplay.length > 0 &&
-        (windowWidth <= 960 ? (
-          <AchieveBlockMobile achievements={achievementsToDisplay ?? []} openModal={openModal} />
-        ) : (
-          <div className={style.achieveBlockContainer}>
-            <AchieveBlock achievements={achievementsToDisplay ?? []} openModal={openModal} />
-          </div>
-        ))}
-      {open && (
-        <AchievementModal
-          open={open}
-          setOpen={setOpen}
-          title="Ачивка"
-          currentItem={currentItem}
-          setCurrentItem={setCurrentItem}
-          allPossibleUserAchievements={achievementsToDisplay}
-          currentImageElement={currentImageElement}
-          setCurrentImageElement={setCurrentImageElement}
-        />
-      )}
-      {openTransferModal && (
-        <TransferModal
-          openTransferModal={openTransferModal}
-          setOpenTransferModal={setOpenTransferModal}
-          title="Перевод"
-          selfMoney={Number(userData.balance) || 0}
-          userData={userData}
-        />
-      )}
-
-      {/* <Button onClick={changeLogin}> Change login </Button>
+        {/* <Button onClick={changeLogin}> Change login </Button>
       <Button onClick={changePass}> Change pass </Button> */}
 
-      {/* <div style={{ width: '400px', margin: 'auto' }}>
+        {/* <div style={{ width: '400px', margin: 'auto' }}>
         <QrReader
           {...args}
           onResult={(result, error) => {
@@ -438,7 +460,8 @@ const UserPage = () => {
         <p>The value is: {JSON.stringify(dataScanner, null, 2)}</p>
         <p>The error is: {error}</p>
       </div> */}
-    </div>
+      </div>
+    </>
   );
 };
 
