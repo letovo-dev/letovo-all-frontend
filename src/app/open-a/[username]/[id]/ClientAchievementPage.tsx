@@ -3,9 +3,9 @@
 import style from './page.module.scss';
 import { Button, ConfigProvider, Spin } from 'antd';
 import dataStore from '@/shared/stores/data-store';
-import { useEffect, useState } from 'react';
+import { useEffect, useRef, useState } from 'react';
 import { getDataFromLocaleStorage } from '@/shared/lib/ApiSPA/axios/helpers';
-import { IUserData } from '@/shared/stores/user-store';
+import userStore, { IUserData } from '@/shared/stores/user-store';
 import { useRouter } from 'next/navigation';
 
 interface ClientAchievementPageProps {
@@ -15,44 +15,32 @@ interface ClientAchievementPageProps {
 
 function ClientAchievementPage({ id, username }: ClientAchievementPageProps) {
   const { addAch, loading } = dataStore(state => state);
-  const [user, setUser] = useState<IUserData | null>(null);
+  const { userData } = userStore(state => state.store);
   const [trueUser, setTrueUser] = useState<boolean>(false);
   const router = useRouter();
+  console.log('userData', userData);
 
   useEffect(() => {
-    try {
-      const {
-        state: {
-          store: { userData },
-        },
-      } = getDataFromLocaleStorage('userStore');
-      setUser(userData);
-    } catch (e) {
-      console.error('Failed to get user data:', e);
-      setUser(null);
-    }
-  }, []);
+    if (!userData) return;
 
-  useEffect(() => {
-    if (user && user.userrights === 'admin') {
+    if (userData.userrights !== 'admin' && userData.userrights !== 'moder') {
+      const timeoutId = setTimeout(() => {
+        router.push(`/user/${userData?.username || 'unknown'}`);
+      }, 1000);
+      return () => clearTimeout(timeoutId);
+    } else {
       setTrueUser(true);
     }
-    const timeoutId = setTimeout(() => {
-      if (user && user.userrights !== 'admin' && user.username) {
-        router.push(`/user/${user.username}`);
-      }
-    }, 1000);
-    return () => clearTimeout(timeoutId);
-  }, [user, router]);
+  }, [userData]);
 
   const handleButtonClick = async () => {
-    if (!user?.username) {
+    if (!userData?.username) {
       console.error('User or username is undefined');
       return;
     }
     try {
       await addAch(id, username);
-      router.push(`/user/${user.username}`);
+      router.push(`/user/${userData.username}`);
     } catch (e) {
       console.error('Failed to add achievement:', e);
     }
@@ -73,10 +61,11 @@ function ClientAchievementPage({ id, username }: ClientAchievementPageProps) {
         },
       }}
     >
-      <div className={style.pageContainer}>
-        {trueUser ? (
-          <>
-            {loading && <Spin size="large" />}
+      {userData.userrights === '' || loading ? (
+        <Spin size="large" />
+      ) : (
+        <div className={style.pageContainer}>
+          {trueUser ? (
             <div className={style.textContainer}>
               <h5>
                 Для открытия ачивки {id} для {username} нажмите
@@ -88,11 +77,11 @@ function ClientAchievementPage({ id, username }: ClientAchievementPageProps) {
                 Ачивка будет разблокирована при условии предварительного логина в приложении
               </p>
             </div>
-          </>
-        ) : (
-          <h5>Вы не можете открывать ачивки</h5>
-        )}
-      </div>
+          ) : (
+            <h5>Вы не можете открывать ачивки</h5>
+          )}
+        </div>
+      )}
     </ConfigProvider>
   );
 }

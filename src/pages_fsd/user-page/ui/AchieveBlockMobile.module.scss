@@ -30,11 +30,11 @@
 
 .spacer {
   @extend %transparentContainer;
-  background-image: url('/images/Button_ScanQR.webp');
+  background-image: url('/images/Button_ScanQR_Teacher.webp');
   width: 95px;
   height: 55px;
   cursor: pointer;
-  margin-bottom: 5px;
+  margin-top: 4px;
 }
 .item {
   display: flex;

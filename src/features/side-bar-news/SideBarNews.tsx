@@ -187,12 +187,14 @@ const SideBarNews = ({
     setPost(null);
   };
 
+  const permittedUsers = ['admin', 'moder'];
+
   return (
     <div className={windowWidth && windowWidth < 960 && open ? style.modalOverlay : ''}>
       {contextHolder}
       <div ref={sidebarRef} className={getSidebarClass()}>
         <SideBarNewsContent loading={loading} form={form} onFinish={onFinish} />
-        {userrights === 'admin' && (
+        {permittedUsers.includes(userrights) && (
           <div className={style.addArticle}>
             <span>Добавить пост</span>
             <PlusOutlined className={style.addArticleIcon} onClick={() => handleOpen()} />

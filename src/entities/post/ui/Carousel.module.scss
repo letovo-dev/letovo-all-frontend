@@ -1,107 +1,39 @@
-@use '../../../app/_mixins.scss';
-
-.imageBackground {
-  // width: 760px;
+.carouselWrapper {
   width: 100%;
-
   max-width: 760px;
-  max-height: 427px;
-  margin: 10px 0 30px 0;
-  border: none;
+  margin: 10px auto 30px;
   position: relative;
 
-  @media screen and (max-width: 961px) {
-    width: 394px;
-    max-width: 394px;
-    max-height: 221px;
-    margin: 10px 0 30px 0;
+  .swiper-button-prev,
+  .swiper-button-next {
+    background: rgba(0, 0, 0, 0.5);
+    width: 20px !important;
+    height: 20px !important;
+    border-radius: 50%;
+    top: 50%;
+    transform: translateY(-50%);
+    color: var(--orange) !important;
   }
 
-  .slick-prev,
-  .slick-next {
-    width: 40px;
-    height: 40px;
-    z-index: 1;
-    background-color: rgba(0, 0, 0, 0.5);
-    border-radius: 50%;
-    display: flex !important;
-    align-items: center;
-    justify-content: center;
-
-    &::before {
-      font-size: 24px;
-      color: #fff;
+  .swiper-pagination-bullets {
+    bottom: 8px !important;
+    .swiper-pagination-bullet-active {
+      color: var(--orange) !important;
     }
   }
-
-  .slick-prev {
-    left: 10px;
-  }
-
-  .slick-next {
-    right: 10px;
+  .swiper-pagination-bullet-active {
+    color: var(--orange) !important;
   }
 }
 
-.slideContainer {
-  // width: 760px;
-  // height: 427px;
-  width: 100%;
-  aspect-ratio: 760 / 427;
+.slide {
   display: flex;
-  align-items: center;
   justify-content: center;
-  background-color: #000;
-  overflow: hidden;
-
-  @media screen and (max-width: 961px) {
-    width: 394px;
-    height: 221px;
-  }
+  align-items: center;
 }
 
-.image {
-  width: 100% !important;
-  height: 100% !important;
-  // object-fit: cover;
+.media {
+  max-width: 100%;
+  height: auto;
   object-fit: contain;
-  object-position: center;
-}
-
-.video {
-  width: 100%;
-  height: 100%;
-  object-fit: cover;
-  object-position: center;
-  display: block;
-}
-
-.pdf {
-  // width: 100%;
-  // height: 500px;
-  // max-width: 800px;
-  width: 100%;
-  height: 100%;
-  max-height: 100%;
-  border: none;
-  background-color: #fff;
-}
-
-.footer {
-  @extend %transparentContainer;
-  background-image: url('/images/base_bottom.webp');
-  width: 760px;
-  height: 85px;
-  position: absolute;
-  bottom: 0;
-
-  @media screen and (max-width: 961px) {
-    width: 394px;
-  }
-}
-
-::global(html[data-theme='dark']) {
-  .pdf {
-    background-color: #333;
-  }
 }

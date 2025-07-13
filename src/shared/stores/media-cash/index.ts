@@ -1,22 +1,57 @@
 import { create } from 'zustand';
+import { persist } from 'zustand/middleware';
 
-interface MediaCacheState {
-  cache: Map<string, string>;
-  setCache: (url: string, blobUrl: string) => void;
-  getCache: (url: string) => string | null;
+interface VideoCacheState {
+  loadedVideos: string[];
+  markAsLoaded: (src: string) => void;
 }
 
-const useMediaCache = create<MediaCacheState>(set => ({
-  cache: new Map<string, string>(),
-  setCache: (url: string, blobUrl: string) =>
-    set(state => {
-      const newCache = new Map(state.cache);
-      newCache.set(url, blobUrl);
-      return { cache: newCache };
+export const useVideoCacheStore = create<VideoCacheState>()(
+  persist(
+    (set, get) => ({
+      loadedVideos: [],
+      markAsLoaded: (src: string) => {
+        const current = get().loadedVideos;
+        if (!current.includes(src)) {
+          set({ loadedVideos: [...current, src] });
+        }
+      },
     }),
-  getCache: (url: string): string | null => {
-    return useMediaCache.getState().cache.get(url) || null;
-  },
-}));
+    {
+      name: 'video-cache',
+      partialize: state => ({ loadedVideos: state.loadedVideos }), // только список
+    },
+  ),
+);
 
-export default useMediaCache;
+// import { create } from 'zustand';
+// import { persist } from 'zustand/middleware';
+
+// interface VideoCacheState {
+//   loadedVideos: string[];
+//   markAsLoaded: (src: string) => void;
+//   clearCache: () => void;
+// }
+
+// export const useVideoCacheStore = create<VideoCacheState>()(
+//   persist(
+//     (set, get) => ({
+//       loadedVideos: [],
+//       markAsLoaded: (src: string) => {
+//         const current = get().loadedVideos;
+//         console.log('markAsLoaded:', { src, currentLength: current.length });
+//         if (!current.includes(src)) {
+//           set({ loadedVideos: [...current, src] });
+//         }
+//       },
+//       clearCache: () => {
+//         set({ loadedVideos: [] });
+//         console.log('Loaded videos cache cleared');
+//       },
+//     }),
+//     {
+//       name: 'video-cache',
+//       partialize: state => ({ loadedVideos: state.loadedVideos }),
+//     },
+//   ),
+// );

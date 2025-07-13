@@ -262,6 +262,8 @@ const UserPage = () => {
     );
   }
 
+  console.log('currentAchievements', currentAchievements === 'all');
+
   return (
     <div className={style.wrap} ref={wrapRef}>
       <div className={style.desktopContent}>
@@ -304,7 +306,11 @@ const UserPage = () => {
             <p className={style.textAchieveHeaderDesktopCommon}>Общие</p>
             <Image src="/images/Achievement_Element.webp" alt="line" height={2} width={40} />
             <Image
-              src="/images/Achievement_AllBased_Active.webp"
+              src={
+                currentAchievements === 'all'
+                  ? '/images/Achievement_AllBased_A.webp'
+                  : '/images/Achievement_AllBased_Inactive.webp'
+              }
               alt="achievement"
               height={50}
               width={50}
@@ -315,7 +321,11 @@ const UserPage = () => {
             <p className={style.textAchieveHeaderDesktop}>Достижения</p>
             <Image src="/images/Achievement_Element.webp" alt="line" height={2} width={40} />
             <Image
-              src="/images/Achievement_Управление_Active.webp"
+              src={
+                currentAchievements === 'all'
+                  ? '/images/Achievement_Dep_Inactive.webp'
+                  : '/images/Achievement_Dep_Active.webp'
+              }
               alt="sign"
               height={50}
               width={50}
@@ -367,7 +377,11 @@ const UserPage = () => {
 
         <section className={style.achieveHeader}>
           <Image
-            src="/images/Achievement_AllBased_Active.webp"
+            src={
+              currentAchievements === 'all'
+                ? '/Achievement_AllBased_A.png'
+                : '/images/Achievement_AllBased_Inactive.webp'
+            }
             alt="achievement"
             height={50}
             width={50}
@@ -378,7 +392,11 @@ const UserPage = () => {
           <p className={style.time}>Достижения</p>
           <Image src="/images/Achievement_Element.webp" alt="line" height={2} width={40} />
           <Image
-            src="/images/Achievement_Управление_Active.webp"
+            src={
+              currentAchievements === 'all'
+                ? '/images/Achievement_Dep_Inactive.webp'
+                : '/images/Achievement_Dep_Active.webp'
+            }
             alt="sign"
             height={50}
             width={50}
