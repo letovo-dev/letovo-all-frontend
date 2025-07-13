@@ -20,12 +20,14 @@ const items: MenuItem[] = [
   { label: 'Личный кабинет', key: 'user', disabled: false },
 ];
 
+const ALLOWED_ROLES = ['admin', 'moder'];
+
 const getFilteredItems = (
   items: MenuItem[],
   isFooter: boolean | undefined,
   userrights: string | undefined,
 ): MenuItem[] => {
-  if (isFooter || userrights !== 'admin') {
+  if (isFooter || !ALLOWED_ROLES.includes(userrights || '')) {
     return items.filter(item => item.key !== 'md-editor');
   }
   return items;

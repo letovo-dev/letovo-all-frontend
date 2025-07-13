@@ -3,7 +3,7 @@
 import React, { useCallback, useEffect, useMemo, useRef, useState } from 'react';
 import style from './UserPage.module.scss';
 import userStore, { IUserAchData, IUserStore } from '@/shared/stores/user-store';
-import { ConfigProvider, Form, Spin } from 'antd';
+import { ConfigProvider, Form, Spin, message } from 'antd';
 import { useRouter } from 'next/navigation';
 import authStore from '@/shared/stores/auth-store';
 import { setDataToLocaleStorage } from '@/shared/lib/ApiSPA/axios/helpers';
@@ -50,6 +50,7 @@ const UserPage = () => {
   const [openTransferModal, setOpenTransferModal] = useState(false);
   const { setFooterHidden } = useFooterContext();
   const { getAllPostsAuthors } = userStore.getState();
+  const [messageApi, contextHolder] = message.useMessage();
 
   const wrapRef = useRef<HTMLDivElement>(null);
   const lastScrollTop = useRef(0);
@@ -245,6 +246,25 @@ const UserPage = () => {
     };
     input.click();
   };
+
+  const warning = () => {
+    messageApi.open({
+      type: 'warning',
+      content:
+        'Мы используем файлы cookie для повышения безопасности и предотвращения мошенничества. Оставаясь на сайте, вы соглашаетесь на их использование. Собранные данные о ваших входах и устройстве не передаются третьим лицам.',
+      className: 'custom-class',
+      style: {
+        marginTop: '77vh',
+      },
+      duration: 7,
+    });
+  };
+
+  useEffect(() => {
+    setTimeout(() => {
+      warning();
+    }, 2000);
+  }, []);
 
   if (isLoading) {
     return (
