@@ -277,7 +277,7 @@ const SideBarNews = ({
           })}
         </div>
       </div>
-      {userrights === 'admin' && (
+      {(userrights === 'admin' || userrights === 'moder') && (
         <PostModal
           visible={visible}
           onCancel={handleCancel}

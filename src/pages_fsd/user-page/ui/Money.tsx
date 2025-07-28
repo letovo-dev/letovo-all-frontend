@@ -6,7 +6,7 @@ const Money = ({ userData, setOpenTransferModal, uploadPhoto }: any) => {
   return (
     <>
       <section className={style.money} onClick={() => setOpenTransferModal(true)}>
-        {userData?.userrights === 'admin' || userData?.userrights === 'moder' ? (
+        {userData?.userrights === 'admin' ? (
           <>
             <Image src="/images/Icon_Wallet.webp" alt="wallet" height={26} width={24} />
             <span className={style.infinity}>&infin;</span>

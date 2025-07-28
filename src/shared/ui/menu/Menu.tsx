@@ -20,7 +20,7 @@ const items: MenuItem[] = [
   { label: 'Личный кабинет', key: 'user', disabled: false },
 ];
 
-const ALLOWED_ROLES = ['admin', 'moder'];
+const ALLOWED_ROLES = ['admin'];
 
 const getFilteredItems = (
   items: MenuItem[],

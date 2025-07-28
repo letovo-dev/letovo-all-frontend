@@ -151,7 +151,7 @@ const TransferModal: React.FC<ModalProps> = ({
                     : style.modalContainerItemContentTransfer
                 }
               >
-                {userData?.userrights === 'admin' || userData?.userrights === 'moder' ? (
+                {userData?.userrights === 'admin' ? (
                   <div className={style.walletMoney}>
                     <Image src="/images/Icon_Wallet.webp" alt="wallet" height={26} width={24} />
                     <span className={style.infinity}>&infin;</span>
@@ -306,7 +306,7 @@ const TransferModal: React.FC<ModalProps> = ({
             <h5 className={style.modalContainerHeaderTransfer}>Перевод</h5>
             <div className={style.modalContainerItemTransfer}>
               <section className={style.modalContainerItemContentFinished}>
-                {userData?.userrights === 'admin' || userData?.userrights === 'moder' ? (
+                {userData?.userrights === 'admin' ? (
                   <div className={style.walletMoney}>
                     <Image src="/images/Icon_Wallet.webp" alt="wallet" height={26} width={24} />
                     <span className={style.infinity}>&infin;</span>
