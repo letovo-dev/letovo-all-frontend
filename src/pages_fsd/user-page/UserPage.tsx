@@ -91,7 +91,7 @@ const UserPage = () => {
         setIsLoading(false);
         getAchievementsDepartment();
       }
-      if (initialData?.userrights === 'admin') {
+      if (initialData?.userrights === 'admin' || initialData?.userrights === 'moder') {
         getAllPostsAuthors();
       }
     };
