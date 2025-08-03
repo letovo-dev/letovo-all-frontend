@@ -112,7 +112,7 @@ const userStore = create<IUserStore>()(
                 });
               } else {
                 set((draft: IUserStore) => {
-                  draft.store.messageText = 'Российский рынок летит вниз на фоне заявления Трампа';
+                  draft.store.messageText = '';
                 });
               }
             } catch (error: any) {
