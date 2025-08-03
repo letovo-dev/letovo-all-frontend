@@ -21,8 +21,6 @@
   box-sizing: border-box;
   overflow-x: hidden;
   overflow-y: hidden;
-  // overscroll-behavior-y: contain;
-  // -webkit-overflow-scrolling: touch;
   @media screen and (max-width: 960px) {
     background-image: url('/images/background_account.webp');
     overflow-y: auto;

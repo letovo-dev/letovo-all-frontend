@@ -76,7 +76,6 @@ $overlay-color: rgba(0, 0, 0, 0.3);
       background-image: url('/images/Achievement_Base.webp');
       height: 219px;
       width: 184px;
-      // position: relative;
       display: flex;
       flex-direction: column;
       align-items: center;
@@ -97,7 +96,7 @@ $overlay-color: rgba(0, 0, 0, 0.3);
       }
       &:focus {
         outline: none;
-        box-shadow: 0 0 0 2px rgba(0, 123, 255, 0.5); // Добавляем мягкую обводку
+        box-shadow: 0 0 0 2px rgba(0, 123, 255, 0.5);
       }
     }
     .textCondition {

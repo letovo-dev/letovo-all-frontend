@@ -20,7 +20,7 @@ export interface OneArticle {
 }
 interface ApiResponse {
   success: boolean;
-  data: string; // Ожидаем строку, содержащую JSON
+  data: string;
   code: number;
   codeMessage: string;
   statusText: string;
@@ -324,7 +324,6 @@ const articlesStore = create<TArticlesStoreState>()(
             (response.code === 203 && (response.data as { result: OneArticle[] }).result)
           ) {
             const articles = (response.data as { result: OneArticle[] }).result;
-            // const articles = parsedData;
             const articlePromises = articles?.map(async articleData => {
               try {
                 const { markdown } = await get().getArticleMd(articleData.post_path);
@@ -365,7 +364,6 @@ const articlesStore = create<TArticlesStoreState>()(
       },
 
       getArticleMd: async (fileName: string): Promise<{ markdown: string }> => {
-        // set({ loading: true });
         try {
           const response = await SERVICES_DATA.Data.getArticleMd(fileName);
           if ((response && response.code === 200) || response.code === 203) {

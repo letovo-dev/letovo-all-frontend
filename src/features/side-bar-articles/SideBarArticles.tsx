@@ -200,7 +200,6 @@ const SideBarArticles = ({
         </div>
       ),
     },
-    // { key: 'delete', label: 'Удалить' },
   ];
 
   const articleItems: MenuProps['items'] = [
@@ -424,12 +423,7 @@ const SideBarArticles = ({
     <div className={windowWidth && windowWidth < 960 && open ? style.modalOverlay : ''}>
       <div ref={sidebarRef} className={getSidebarClass()}>
         <div className={style.sidebarItemsContainer}>
-          <Collapse
-            items={items}
-            defaultActiveKey={article && [article?.category]}
-            ghost
-            // onChange={key => console.log('Collapse onChange:', key)}
-          />
+          <Collapse items={items} defaultActiveKey={article && [article?.category]} ghost />
         </div>
       </div>
       {qrUrl && <QRCode type="svg" value={qrUrl ?? BASE_URL} className={style.qrCode} />}

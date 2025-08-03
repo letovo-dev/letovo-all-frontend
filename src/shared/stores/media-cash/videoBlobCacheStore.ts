@@ -11,12 +11,12 @@ export const useVideoSessionCache = create<VideoBlobSessionCache>()((set, get) =
   blobMap: new Map<string, Blob>(),
   getCachedVideo: (src: string) => {
     const blob = get().blobMap.get(src);
-    console.log('getCachedVideo:', {
-      src,
-      found: !!blob,
-      blobSize: blob?.size,
-      blobType: blob?.type,
-    });
+    // console.log('getCachedVideo:', {
+    //   src,
+    //   found: !!blob,
+    //   blobSize: blob?.size,
+    //   blobType: blob?.type,
+    // });
     return blob;
   },
   setCachedVideo: (src: string, blob: Blob) => {
@@ -28,10 +28,10 @@ export const useVideoSessionCache = create<VideoBlobSessionCache>()((set, get) =
     set(state => ({
       blobMap: new Map(state.blobMap).set(src, blob),
     }));
-    console.log('setCachedVideo: blob stored for', src, 'size:', blob.size, 'type:', blob.type);
+    // console.log('setCachedVideo: blob stored for', src, 'size:', blob.size, 'type:', blob.type);
   },
   clearCache: () => {
     set({ blobMap: new Map<string, Blob>() });
-    console.log('Video session cache cleared');
+    // console.log('Video session cache cleared');
   },
 }));

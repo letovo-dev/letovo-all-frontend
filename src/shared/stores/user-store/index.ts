@@ -46,6 +46,7 @@ export interface IUserStore {
     allPossibleUserAchievements: IUserAchData[] | undefined;
     departmentAchievements: IUserAchData[] | undefined;
     allPostsAuthors: IUserData[];
+    messageText: string;
   };
   localeName: string;
   endPreload: boolean;
@@ -61,6 +62,7 @@ export interface IUserStore {
   loading: boolean;
   error?: string | undefined;
   getAllPostsAuthors: () => Promise<void>;
+  getMessageText: () => Promise<void>;
 }
 
 const initialState = {
@@ -82,6 +84,7 @@ const initialState = {
   departmentAchievements: undefined,
   error: undefined,
   allPostsAuthors: [],
+  messageText: '',
 };
 
 const userStore = create<IUserStore>()(
@@ -98,6 +101,25 @@ const userStore = create<IUserStore>()(
             set((state: IUserStore) => {
               state.endPreload = value;
             });
+          },
+          getMessageText: async () => {
+            try {
+              const response = await SERVICES_USERS.UsersData.getMessage();
+              if (response?.success && response.code !== undefined && response.code === 200) {
+                const { result } = response?.data as { result: string };
+                set((draft: IUserStore) => {
+                  draft.store.messageText = result;
+                });
+              } else {
+                set((draft: IUserStore) => {
+                  draft.store.messageText = 'Российский рынок летит вниз на фоне заявления Трампа';
+                });
+              }
+            } catch (error: any) {
+              produce(get(), (draft: IUserStore) => {
+                draft.error = error instanceof Error ? error.message : String(error);
+              });
+            }
           },
           getAllUserAchievements: async (login: string) => {
             try {

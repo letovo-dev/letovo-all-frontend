@@ -25,6 +25,8 @@ const PostHeader = ({
   const cleanedParagraphs = text
     .replace(/\n(?!\n)/g, ' ') // убрать одиночные переносы
     .split(/\n{2,}/);
+  const permittedUser = userStatus === 'admin' || userStatus === 'moder';
+
   return (
     <App>
       <div
@@ -39,7 +41,7 @@ const PostHeader = ({
           <Image src="/images/Checkmark 3.webp" alt="like" height={18} width={18} />
         </div>
 
-        {userStatus === 'admin' && !currentNewsStateSaved && (
+        {permittedUser && !currentNewsStateSaved && (
           <div className={style.iconsContainer}>
             <Tooltip title="Редактировать">
               <EditOutlined className={style.editPost} onClick={() => handleOpen()} />

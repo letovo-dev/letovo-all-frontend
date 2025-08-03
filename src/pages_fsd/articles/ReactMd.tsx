@@ -52,7 +52,6 @@ const MarkdownContent: React.FC<{ content: string }> = React.memo(
                 priority={false}
                 placeholder="blur"
                 blurDataURL="/images/logo_mini_blur.webp"
-                // layout="responsive"
               />
             );
           },

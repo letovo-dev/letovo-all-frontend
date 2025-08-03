@@ -18,7 +18,6 @@ function ClientAchievementPage({ id, username }: ClientAchievementPageProps) {
   const { userData } = userStore(state => state.store);
   const [trueUser, setTrueUser] = useState<boolean>(false);
   const router = useRouter();
-  console.log('userData', userData);
 
   useEffect(() => {
     if (!userData) return;

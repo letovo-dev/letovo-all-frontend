@@ -16,28 +16,12 @@ function QRScanner() {
     try {
       setDisplay('block');
       const codeReader = new BrowserQRCodeReader();
-      // const videoInputDevices = await codeReader.listVideoInputDevices();
-      // const selectedDeviceId = videoInputDevices[3].deviceId;
-
-      // console.log(`Started decode from camera with id ${selectedDeviceId}`);
-
       const previewElem = document.querySelector<HTMLVideoElement>(
         '#test-area-qr-code-webcam > video',
       );
       if (!previewElem) {
         throw new Error('No video element found');
       }
-
-      // const controls = await codeReader.decodeFromVideoDevice(
-      //   undefined,
-      //   previewElem,
-      //   (result, error, controls) => {
-      //     // use the result and error values to choose your actions
-      //     // you can also use controls API in this scope like the controls
-      //     // returned from the method.
-      //   }
-      // );
-
       const controls1 = await codeReader.decodeOnceFromVideoDevice(undefined, previewElem);
 
       alert(controls1.getText());

@@ -65,9 +65,7 @@ const UserPage = () => {
 
   useEffect(() => {
     const handleResize = () => setWindowWidth(window.innerWidth);
-
     window.addEventListener('resize', handleResize);
-
     return () => window.removeEventListener('resize', handleResize);
   }, []);
 
@@ -281,8 +279,6 @@ const UserPage = () => {
       </div>
     );
   }
-
-  console.log('currentAchievements', currentAchievements === 'all');
 
   return (
     <div className={style.wrap} ref={wrapRef}>

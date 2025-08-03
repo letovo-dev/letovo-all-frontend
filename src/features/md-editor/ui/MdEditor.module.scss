@@ -57,11 +57,9 @@
 }
 
 ::global(.wmde-markdown a:not(.secretLink)) {
-  // color: @linkColor;
   text-decoration: underline;
 
   &:hover {
-    // color: darken(@linkColor, 10%);
     text-decoration: underline;
   }
 }

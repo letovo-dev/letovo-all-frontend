@@ -86,8 +86,9 @@ const NewsPost: React.FC<OnePostProps> = ({
 
   const handleCancel = () => {
     setVisible(false);
-    // setPost(null);
   };
+
+  const permittedUser = userrights === 'admin' || userrights === 'moder';
 
   return (
     <div key={generateKey()} className={style.postContainer}>
@@ -128,7 +129,7 @@ const NewsPost: React.FC<OnePostProps> = ({
         isAdmin={userrights === 'admin'}
         allPostsAuthors={allPostsAuthors}
       />
-      {userrights === 'admin' && (
+      {permittedUser && (
         <PostModal
           visible={visible}
           onCancel={handleCancel}

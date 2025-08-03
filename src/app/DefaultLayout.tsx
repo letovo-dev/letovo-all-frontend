@@ -5,7 +5,7 @@ import Footer from '@/shared/ui/footer';
 import Image from 'next/image';
 import Menu from '@/shared/ui/menu';
 import { useFooterContext } from '@/shared/ui/context/FooterContext';
-import { useRouter, usePathname } from 'next/navigation';
+import { useRouter } from 'next/navigation';
 import userStore from '@/shared/stores/user-store';
 import authStore from '@/shared/stores/auth-store';
 import { checkAuthToken } from '@/shared/api/auth/models/checkAuthToken';
@@ -16,7 +16,6 @@ export default function DefaultLayout({ children }: { children: React.ReactNode 
   const { isFooterHidden, setFooterHidden, toggleFooter } = useFooterContext();
   const lastScrollTop = useRef(0);
   const router = useRouter();
-  const pathname = usePathname();
   const {
     userData: { username },
   } = userStore.getState().store;
@@ -101,9 +100,6 @@ export default function DefaultLayout({ children }: { children: React.ReactNode 
     };
   }, [setFooterHidden]);
 
-  // Удаляем отдельный useEffect для редиректа, так как он уже обрабатывается в verifyToken
-
-  // Если проверка авторизации ещё не завершена или пользователь не авторизован, не рендерим содержимое
   if (isLoading || !isAuthChecked) {
     return (
       <div className={style.emptyPage}>
@@ -116,10 +112,9 @@ export default function DefaultLayout({ children }: { children: React.ReactNode 
 
   const currentUserStatus = authStore.getState().userStatus;
   if (!currentUserStatus?.logged || !currentUserStatus?.token || !currentUserStatus?.registered) {
-    return null; // Редирект уже выполнен в verifyToken
+    return null;
   }
 
-  // Рендерим содержимое только для авторизованных пользователей
   return (
     <div ref={layoutRef} className={style.layoutContainer}>
       <header className={style.header}>

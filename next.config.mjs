@@ -30,9 +30,6 @@ const configuredWithPWA = withPWA(pwaConfig);
 
 const nextConfig = {
   reactStrictMode: false,
-  // experimental: {
-  //   esmExternals: 'loose',
-  // },
   transpilePackages: [
     'antd',
     '@ant-design/icons',

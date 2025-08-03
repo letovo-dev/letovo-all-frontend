@@ -105,10 +105,8 @@ const TransferModal: React.FC<ModalProps> = ({
             },
           },
         }));
-        // form.resetFields();
         setFinished(true);
       }
-      // form.resetFields();
     }
   };
 

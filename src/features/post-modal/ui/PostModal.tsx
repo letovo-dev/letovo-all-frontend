@@ -111,13 +111,6 @@ const PostModal: React.FC<PostModalProps> = ({ visible, onCancel, onSubmit, post
       Bearer: token || '',
     },
     onChange: async ({ file, fileList: newFileList }) => {
-      // console.log('Upload file:', {
-      //   name: file.name,
-      //   status: file.status,
-      //   response: file.response,
-      //   error: file.error,
-      //   action: `${process.env.NEXT_PUBLIC_BASE_URL_UPLOAD}`,
-      // });
       if (file.status === 'removed' && file.url) {
         try {
           const response = await fetch('/api/delete-file', {
@@ -174,11 +167,6 @@ const PostModal: React.FC<PostModalProps> = ({ visible, onCancel, onSubmit, post
         message.error('Можно загружать только изображения или видео!');
         return Upload.LIST_IGNORE;
       }
-      // const isLt10M = file.size / 1024 / 1024 < 10;
-      // if (!isLt10M) {
-      //   message.error('Файл должен быть меньше 10 МБ!');
-      //   return Upload.LIST_IGNORE;
-      // }
       if (!token) {
         message.error('Токен авторизации отсутствует. Пожалуйста, войдите в систему.');
         return Upload.LIST_IGNORE;
