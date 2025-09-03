@@ -1,19 +1,15 @@
-@import url('https://fonts.googleapis.com/css2?family=Orbitron:wght@500;700&family=Inter:wght@400;600&display=swap');
-
-:root {
-  --bg: #0a0a0a;
-  --pink: #ff4fa3;
-  --pink-2: #ff1e8a;
-  --text: #ffb3d9;
-  --white: #ffffff;
-}
-
 @keyframes flicker {
   0%,19%,21%,23%,25%,54%,56%,100% { text-shadow: 0 0 8px var(--pink), 0 0 16px var(--pink-2), 0 0 24px var(--pink-2) }
   20%,24%,55% { text-shadow: none }
 }
 
 .container {
+  --bg: #0a0a0a;
+  --pink: #ff4fa3;
+  --pink-2: #ff1e8a;
+  --text: #ffb3d9;
+  --white: #ffffff;
+
   position: relative;
   min-height: 100dvh;
   display: grid;
@@ -23,7 +19,6 @@
   color: var(--text);
   overflow: hidden;
   text-align: center;
-  font-family: Inter, system-ui, -apple-system, Segoe UI, Roboto, Ubuntu, Cantarell, 'Helvetica Neue', Arial, sans-serif;
 }
 
 .glowRing {
@@ -36,7 +31,6 @@
 }
 
 .title {
-  font-family: Orbitron, Inter, sans-serif;
   font-size: clamp(64px, 12vw, 120px);
   color: var(--pink);
   letter-spacing: .08em;
@@ -70,15 +64,12 @@
   overflow: hidden;
 }
 
-.image {
-  object-fit: cover;
-}
+.image { object-fit: cover; }
 
 .speech {
   position: absolute;
   top: 10px;
   left: 10px;
-  font-family: Orbitron, Inter, sans-serif;
   font-size: clamp(16px, 3vw, 24px);
   color: var(--pink);
   background: rgba(10,10,10,.6);
@@ -104,6 +95,5 @@
   box-shadow: 0 0 12px var(--pink), 0 0 24px var(--pink-2);
   transition: transform .12s ease, background .12s ease;
 }
-
 .button:hover { background: var(--pink-2); transform: translateY(-1px) }
 .button:active { transform: translateY(0) }
