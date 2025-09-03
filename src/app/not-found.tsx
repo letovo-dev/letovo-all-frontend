@@ -1,27 +1,36 @@
 'use client';
 
 import { useRouter } from 'next/navigation';
+import Image from 'next/image';
 import styles from './not-found.module.scss';
 
-const NotFound: React.FC = () => {
+export default function NotFound() {
   const router = useRouter();
-
-  const handleGoHome = () => {
-    router.push('/');
-  };
 
   return (
     <div className={styles.container}>
+      <div className={styles.glowRing} />
       <h1 className={styles.title}>404</h1>
       <p className={styles.message}>Страница не найдена</p>
       <p className={styles.subMessage}>
-        Похоже, вы пытались открыть страницу, которой не существует, или у вас нет доступа.
+        Даже не знаю, как ты забрел сюда, путник. Либо страницы не существует, либо доступ тебе не светит.
       </p>
-      <button className={styles.button} onClick={handleGoHome}>
+
+      <div className={styles.imageWrap}>
+        <Image
+          src="/mnt/media/404.png"
+          alt="anime girl says no"
+          fill
+          sizes="(max-width: 600px) 80vw, 400px"
+          priority
+          className={styles.image}
+        />
+        <div className={styles.speech}>No</div>
+      </div>
+
+      <button className={styles.button} onClick={() => router.push('/')}>
         На главную
       </button>
     </div>
   );
-};
-
-export default NotFound;
+}
