@@ -55,7 +55,7 @@ const NewsPage = () => {
   }, []);
 
   useEffect(() => {
-    setNewsLength(newsTitles.length);
+    setNewsLength(newsTitles?.length);
   }, [newsTitles]);
 
   useEffect(() => {

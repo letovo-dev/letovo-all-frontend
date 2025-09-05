@@ -132,7 +132,7 @@ const News: React.FC<NewsProps> = ({ children, onContainerRef }) => {
       <SideBarNews
         open={open}
         setOpen={setOpen}
-        newsTitles={newsTitles.filter(title => postIds?.includes(title.post_id))}
+        newsTitles={newsTitles?.filter(title => postIds?.includes(title.post_id))}
         burgerRef={burgerRef}
       />
       <div
