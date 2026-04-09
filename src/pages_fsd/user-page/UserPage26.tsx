@@ -334,6 +334,9 @@ const UserPage26 = () => {
       </div>
     );
   }
+  console.log(userData);
+  console.log(userAchievements);
+  console.log(achievements);
 
   return (
     <>
