@@ -6,6 +6,7 @@ import { info } from './info';
 import { list } from './list';
 import { pictures } from './pictures';
 import { tree } from './tree';
+import { user } from './user';
 
 const achievements = {
   add,
@@ -16,6 +17,7 @@ const achievements = {
   info,
   department,
   list,
+  user,
 };
 
 export default achievements;

@@ -4,9 +4,9 @@ import { useCallback, useEffect, useMemo, useRef, useState } from 'react';
 import dataStore from '@/shared/stores/data-store';
 import commentsStore from '@/shared/stores/comments-store';
 import SpinModule from '@/shared/ui/spiner';
-import { News } from '@/pages_fsd/news';
 import { message } from 'antd';
 import NewsList from './NewsList';
+import { News26 } from '@/pages_fsd/news';
 
 const LOAD_NEWS_SIZE = 10;
 
@@ -225,7 +225,7 @@ const NewsPage = () => {
   return (
     <>
       {contextHolder}
-      <News onContainerRef={ref => (containerRef.current = ref.current)}>
+      <News26 onContainerRef={ref => (containerRef.current = ref.current)}>
         {loading && startNewsItem === 0 && <SpinModule />}
         <NewsList
           news={sortedNews}
@@ -235,7 +235,7 @@ const NewsPage = () => {
           saveComment={saveComment}
         />
         {loading && startNewsItem > 0 && <SpinModule />}
-      </News>
+      </News26>
     </>
   );
 };

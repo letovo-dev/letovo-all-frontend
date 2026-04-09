@@ -1,16 +1,7 @@
-@use '../../../app/_mixins.scss';
-
 .footerContainer {
-  @extend %transparentContainer;
-  background-image: none;
-  width: 390px;
-  height: 85px;
-  bottom: 0px;
+  width: inherit;
+  height: inherit;
   display: flex;
   align-items: center;
-  position: relative;
   justify-content: center;
-  @media screen and (max-width: 960px) {
-    background-image: url('/images/base_bottom.webp');
-  }
 }

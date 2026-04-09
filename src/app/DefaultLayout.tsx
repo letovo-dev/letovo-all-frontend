@@ -13,7 +13,7 @@ import { ConfigProvider, Spin } from 'antd';
 
 export default function DefaultLayout({ children }: { children: React.ReactNode }) {
   const layoutRef = useRef<HTMLDivElement>(null);
-  const { isFooterHidden, setFooterHidden, toggleFooter } = useFooterContext();
+  const { isFooterHidden, setFooterHidden, toggleFooter, scrollContainerRef } = useFooterContext();
   const lastScrollTop = useRef(0);
   const router = useRouter();
   const {
@@ -21,6 +21,11 @@ export default function DefaultLayout({ children }: { children: React.ReactNode 
   } = userStore.getState().store;
   const [isAuthChecked, setIsAuthChecked] = useState(false);
   const [isLoading, setIsLoading] = useState(true);
+  const [mounted, setMounted] = useState(false);
+
+  useEffect(() => {
+    setMounted(true);
+  }, []);
 
   useEffect(() => {
     const verifyToken = async () => {
@@ -72,33 +77,34 @@ export default function DefaultLayout({ children }: { children: React.ReactNode 
       document.documentElement.style.setProperty('--vh', `${vh}px`);
     };
 
-    const handleScroll = () => {
-      if (layoutRef.current) {
-        const currentScrollTop = layoutRef.current.scrollTop;
-        if (currentScrollTop > lastScrollTop.current && currentScrollTop > 50) {
-          setFooterHidden(true);
-        } else if (currentScrollTop < lastScrollTop.current) {
-          setFooterHidden(false);
-        }
-        lastScrollTop.current = currentScrollTop;
+    const handleScroll = (e: Event) => {
+      const target = e.currentTarget as HTMLElement;
+      const currentScrollTop = target.scrollTop;
+      if (currentScrollTop > lastScrollTop.current && currentScrollTop > 50) {
+        setFooterHidden(true);
+      } else if (currentScrollTop < lastScrollTop.current) {
+        setFooterHidden(false);
       }
+      lastScrollTop.current = currentScrollTop;
     };
 
     updateVh();
     window.addEventListener('resize', updateVh);
 
-    const layoutElement = layoutRef.current;
-    if (layoutElement) {
-      layoutElement.addEventListener('scroll', handleScroll);
+    const element = scrollContainerRef.current ?? layoutRef.current;
+    if (element) {
+      element.addEventListener('scroll', handleScroll);
     }
 
     return () => {
       window.removeEventListener('resize', updateVh);
-      if (layoutElement) {
-        layoutElement.removeEventListener('scroll', handleScroll);
+      if (element) {
+        element.removeEventListener('scroll', handleScroll);
       }
     };
-  }, [setFooterHidden]);
+  }, [setFooterHidden, isAuthChecked, scrollContainerRef]);
+
+  if (!mounted) return null;
 
   if (isLoading || !isAuthChecked) {
     return (
@@ -116,7 +122,7 @@ export default function DefaultLayout({ children }: { children: React.ReactNode 
   }
 
   return (
-    <div ref={layoutRef} className={style.layoutContainer}>
+    <div className={style.defaultLayoutContainer}>
       <header className={style.header}>
         <Image
           className={style.letovoCorp}
@@ -131,7 +137,9 @@ export default function DefaultLayout({ children }: { children: React.ReactNode 
           <Menu />
         </div>
       </header>
-      <main className={style.content}>{children}</main>
+      <main ref={layoutRef} className={style.pageContent}>
+        {children}
+      </main>
       <footer
         className={`${style.footer} ${isFooterHidden ? style.footerHidden : ''}`}
         onClick={isFooterHidden ? toggleFooter : undefined}

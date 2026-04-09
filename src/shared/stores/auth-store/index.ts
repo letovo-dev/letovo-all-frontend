@@ -45,12 +45,18 @@ const authStore = create<TAuthStoreState>()(
         set({ error: undefined, loading: true });
         try {
           const response = await SERVICES_AUTH.Auth.login(payload);
+          console.log(response);
+
           if (response.success && response.code === 200) {
             const {
               data: { result },
             } = response;
             userStore.setState((draft: IUserStore) => {
-              draft.store.userData = result[0];
+              draft.store.userData = {
+                ...result[0],
+                last_incoming_payment: response.data.last_incoming_payment,
+                last_outgoing_payment: response.data.last_outgoing_payment,
+              };
             });
             const token = response?.authorization;
             const registered = result[0]?.registered === 'f' ? false : true;

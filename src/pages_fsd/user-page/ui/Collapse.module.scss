@@ -1,0 +1,68 @@
+.collapse {
+  width: 100%;
+  box-sizing: border-box;
+  padding: 0;
+}
+
+.collapseHeader {
+  height: 30px;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  border-radius: 25px;
+  border: var(--collapse-header-border, 1px solid var(--border-grey));
+  padding: 0 10px;
+  background: var(--collapse-header-bg, transparent);
+  position: relative;
+  z-index: 2;
+}
+
+.collapseLeftText {
+  margin: 0;
+  font-size: 14px;
+  color: var(--background);
+}
+
+.collapseRight {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+}
+
+.collapseDot {
+  width: 14px;
+  height: 14px;
+  border-radius: 50%;
+  border: 2px solid var(--collapse-dot-color, var(--background));
+  background: transparent;
+  flex-shrink: 0;
+}
+
+.collapseDotActive {
+  background: var(--collapse-dot-color, var(--background));
+}
+
+.collapseRightText {
+  margin: 0;
+  font-size: 14px;
+  color: var(--background);
+}
+
+.collapseToggle {
+  background: none;
+  border: none;
+  cursor: pointer;
+  padding: 0;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+.collapseBody {
+  width: 100%;
+  box-sizing: border-box;
+  padding: 20px 10px 15px 10px;
+  border-radius: 0 0 25px 25px;
+  border: 1px solid var(--border-grey);
+  border-top: none;
+}

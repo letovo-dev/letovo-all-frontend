@@ -11,14 +11,35 @@
   --graphics10: #494949;
   --graphics11: #b2b2b2;
   --vh: 100vh;
-  --science: #50c787;
-  --enginery: #edc731;
-  --it: #5a88ff;
-  --art: #c061f3;
-  --management: #fd4948;
-  --proj: #a7e265;
+  --science-icon: #50c787;
+  --science-border: #417357;
+  --science-header: #385043;
+  --enginery-icon: #edc731;
+  --enginery-border: #6c6134;
+  --enginery-header: #575032;
+  --it-icon: #5a88ff;
+  --it-border: #46598a;
+  --it-header: #3a435b;
+  --design-icon: #c061f3;
+  --design-border: #684b77;
+  --design-header: #4e3b59;
+  --management-icon: #f9423a;
+  --management-border: #794339;
+  --management-header: #5c3736;
+  --proj-icon: #91d744;
+  --proj-border: #4f6438;
+  --proj-header: #445235;
+  --x-icon: #252525;
+  --x-border: #505050;
+  --x-header: #3d3d3d;
+  --public-relations-icon: #ff672d;
+  --public-relations-border: #714432;
+  --public-relations-header: #5b3d31;
   --scale-factor: 1;
   --swiper-theme-color: #fb4724 !important;
+  --grey: #aaaaaa;
+  --green: #31c14c;
+  --border-grey: #505050;
 }
 
 html,
@@ -27,10 +48,7 @@ body {
 }
 
 body {
-  display: flex;
-  flex-direction: column;
   color: var(--graphics9);
-  background: var(--background);
   -webkit-font-smoothing: antialiased;
   -moz-osx-font-smoothing: grayscale;
   margin: 0;
@@ -48,10 +66,29 @@ body {
   font-family: 'Caleo', sans-serif;
 }
 
-.layout-container {
+.layoutContainer {
+  background-image: url('/images/lk_dt_back.webp');
+  position: relative;
+  background-repeat: no-repeat;
+  background-position: top center;
+  background-size: cover;
+  margin: 0 auto;
   display: flex;
   flex-direction: column;
-  height: 100%;
+  height: 100vh;
+  box-sizing: border-box;
+  overflow-x: hidden;
+  overflow-y: hidden;
+
+  @media screen and (max-width: 480px) {
+    background-image: url('/images/lk_mob_back.webp');
+    overflow-y: auto;
+    max-width: 480px;
+  }
+
+  @media screen and (min-width: 961px) {
+    justify-content: flex-start;
+  }
 }
 
 * {

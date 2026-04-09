@@ -1,7 +1,7 @@
 'use client';
 import React, { useEffect, useState } from 'react';
 import { ExclamationCircleOutlined } from '@ant-design/icons';
-import { Button, Form, Typography, ConfigProvider, Spin, Flex, message } from 'antd';
+import { Button, Form, Typography, ConfigProvider, Spin, Flex, message, Input } from 'antd';
 import authStore from '@/shared/stores/auth-store';
 import { redirect } from 'next/navigation';
 import style from './EnterForm.module.scss';
@@ -81,7 +81,7 @@ function EnterForm() {
       style: {
         marginTop: '77vh',
       },
-      duration: 10,
+      duration: 1,
     });
   };
 
@@ -95,9 +95,9 @@ function EnterForm() {
     <>
       {contextHolder}
       <div className={style.loginFormWrapper}>
-        <div className={style.titleBorder}>
-          <Title level={4}>ВХОД</Title>
-        </div>
+        <Title level={4} className={style.titleBorder}>
+          ВХОД
+        </Title>
         <Form name="form" onFinish={onFinish} form={form}>
           <div className={style.card}>
             {loading && (
@@ -113,7 +113,7 @@ function EnterForm() {
                 </ConfigProvider>
               </div>
             )}
-            <div style={{ width: '90%' }}>
+            <div className={style.inputsContainer}>
               <Text className={style.inputTextHeader} type="secondary">
                 {'Логин'}
               </Text>
@@ -122,7 +122,7 @@ function EnterForm() {
                 initialValue={formData.login}
                 className={!error ? style.inputForm : style.inputFormError}
               >
-                <input
+                <Input
                   type="text"
                   className={style.customInput}
                   placeholder=""
@@ -139,7 +139,7 @@ function EnterForm() {
                 name="password"
                 initialValue={formData.password}
               >
-                <input
+                <Input
                   className={style.customInput}
                   type="password"
                   id="form_password"

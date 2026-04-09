@@ -1,0 +1,27 @@
+.walletAndSum {
+  display: flex;
+  align-items: flex-start;
+  align-items: center;
+  gap: 16px;
+  .sum {
+    display: flex;
+    align-items: center;
+    gap: 12px;
+  }
+  .sign {
+    display: flex;
+    align-items: start;
+    height: 20px;
+  }
+}
+.count {
+  font-size: 26px;
+  font-weight: 600;
+  color: var(--foreground);
+}
+.text {
+  font-size: 34px;
+  line-height: auto;
+  font-weight: 600;
+  color: var(--graphics9);
+}

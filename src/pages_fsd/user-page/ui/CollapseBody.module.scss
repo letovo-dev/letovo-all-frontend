@@ -1,0 +1,150 @@
+.body {
+  display: flex;
+  flex-direction: column;
+  padding: 18px 0 10px 0;
+  color: #fff;
+}
+
+/* ── Department info row ── */
+
+.infoRow {
+  display: flex;
+  align-items: flex-start;
+  gap: 20px;
+  padding: 0 20px 16px 20px;
+}
+
+.deptIconCircle {
+  width: 58px;
+  height: 58px;
+  border-radius: 50%;
+  border: 2px solid;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  flex-shrink: 0;
+  margin-top: 6px;
+  box-sizing: border-box;
+}
+
+.infoTexts {
+  display: flex;
+  flex-direction: column;
+  gap: 1px;
+}
+
+.label {
+  font-size: 12px;
+  color: #888;
+  margin-top: 10px;
+}
+
+.label:first-child {
+  margin-top: 0;
+}
+
+.value {
+  font-size: 18px;
+  color: #fff;
+  font-weight: 500;
+  line-height: 1.25;
+}
+
+/* ── Dotted divider ── */
+
+.divider {
+  width: 100%;
+  border: none;
+  border-bottom: 1px dashed #555;
+  margin: 6px 0;
+  box-sizing: border-box;
+}
+
+/* ── Skills section ── */
+
+.skillsRow {
+  display: flex;
+  align-items: flex-start;
+  gap: 14px;
+  padding: 12px 20px;
+}
+
+.sectionLabel {
+  font-size: 12px;
+  color: #888;
+  white-space: pre-line;
+  line-height: 1.5;
+  min-width: 52px;
+  flex-shrink: 0;
+  padding-top: 6px;
+}
+
+.skillsList {
+  display: flex;
+  flex-direction: column;
+  gap: 14px;
+  flex: 1;
+}
+
+.skillItem {
+  display: flex;
+  align-items: center;
+  gap: 14px;
+}
+
+/* New skill — colored circle with stage number */
+
+.stageCircle {
+  position: relative;
+  width: 44px;
+  height: 44px;
+  min-width: 44px;
+  border-radius: 50%;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  flex-shrink: 0;
+  overflow: visible;
+}
+
+.stageNum {
+  font-size: 16px;
+  font-weight: 700;
+  color: #fff;
+  line-height: 1;
+}
+
+.proBadge {
+  position: absolute;
+  bottom: -7px;
+  left: 50%;
+  transform: translateX(-50%);
+  background: #e8a000;
+  color: #000;
+  font-size: 8px;
+  font-weight: 800;
+  padding: 1px 5px;
+  border-radius: 3px;
+  white-space: nowrap;
+  text-transform: uppercase;
+  letter-spacing: 0.5px;
+}
+
+/* Old skill — plain icon */
+
+.oldIconWrap {
+  width: 36px;
+  height: 36px;
+  min-width: 36px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  flex-shrink: 0;
+}
+
+.skillName {
+  font-size: 14px;
+  color: #d0d0d0;
+  line-height: 1.3;
+}

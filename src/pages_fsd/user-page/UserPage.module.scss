@@ -9,12 +9,13 @@
 }
 
 .wrap {
-  @extend %entryCover;
+  // @extend %entryCover;
   background-image: url('/images/Background_Account_WithElements_PC_2.webp');
   position: relative;
   width: 100vw;
-  background-size: auto;
-  background-position: top center;
+  object-fit: cover;
+  // background-size: auto;
+  // background-position: top center;
   display: flex;
   flex-direction: column;
   height: calc(var(--vh, 1vh) * 100);
@@ -24,7 +25,7 @@
   @media screen and (max-width: 960px) {
     background-image: url('/images/background_account.webp');
     overflow-y: auto;
-    padding-bottom: 60px;
+    // padding-bottom: 60px;
   }
   @media screen and (min-width: 961px) {
     justify-content: flex-start;

@@ -21,9 +21,6 @@ import { ImgWithBackground } from '@/shared/ui/image-background';
 import { generateKey } from '@/shared/api/utils';
 import AchieveBlock from './ui/AchieveBlock';
 
-// import QRScanner from '@/features/qr-scanner/QrScanner';
-// import TableElement from '@/features/qr-scanner/Table';
-// import { QrReader } from '@/features/qr-scanner/QrReader';
 const DONE_ACH = '/images/aceehimnstv/loched.png';
 
 const UserPage = () => {
@@ -54,9 +51,7 @@ const UserPage = () => {
 
   const wrapRef = useRef<HTMLDivElement>(null);
   const lastScrollTop = useRef(0);
-  const [windowWidth, setWindowWidth] = useState<number>(
-    typeof window !== 'undefined' ? window.innerWidth : 0,
-  );
+  const [windowWidth, setWindowWidth] = useState<number>(0);
   const [currentAchievements, setCurrentAchievements] = useState<string>('all');
 
   const achievementsToDisplay = useMemo(() => {
@@ -64,6 +59,7 @@ const UserPage = () => {
   }, [currentAchievements, achievements, departmentAchievements]);
 
   useEffect(() => {
+    setWindowWidth(window.innerWidth);
     const handleResize = () => setWindowWidth(window.innerWidth);
     window.addEventListener('resize', handleResize);
     return () => window.removeEventListener('resize', handleResize);
@@ -282,6 +278,7 @@ const UserPage = () => {
 
   return (
     <div className={style.wrap} ref={wrapRef}>
+      {contextHolder}
       <div className={style.desktopContent}>
         <div className={style.accountDivPC}>
           <div className={style.topContainer}>
