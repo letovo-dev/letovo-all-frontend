@@ -11,10 +11,7 @@ import dataStore from '@/shared/stores/data-store';
 import GetAvatars from '@/features/getAvatars';
 import Image from 'next/image';
 import { AchievementModal } from '@/entities/achievement/ui/modal';
-import { TransferModal } from '@/features/moneyTranfer/ui';
-import OnBoard from './ui/OnBoard';
-import UserData from './ui/UserData';
-import AchieveBlockMobile from './ui/AchieveBlockMobile';
+import { TransferModal26 } from '@/features/moneyTranfer/ui';
 import { ImgWithBackground } from '@/shared/ui/image-background';
 import { generateKey } from '@/shared/api/utils';
 import AchieveBlock from './ui/AchieveBlock';
@@ -154,6 +151,10 @@ const UserPage26 = () => {
   }, []);
 
   useEffect(() => {
+    if (!userStatus?.logged || !userStatus?.token) {
+      return;
+    }
+
     const loadData = async () => {
       const initialData = userStore.getState().store.userData;
       setUserData(initialData);
@@ -169,10 +170,11 @@ const UserPage26 = () => {
         setIsLoading(false);
         getAchievementsDepartment();
         getUserAchievements(initialData.username);
-      }
-      if (initialData?.userrights === 'admin' || initialData?.userrights === 'moder') {
         getAllPostsAuthors();
       }
+      // if (initialData?.userrights === 'admin' || initialData?.userrights === 'moder') {
+      //   getAllPostsAuthors();
+      // }
     };
 
     loadData();
@@ -300,25 +302,6 @@ const UserPage26 = () => {
     input.click();
   };
 
-  const warning = () => {
-    messageApi.open({
-      type: 'warning',
-      content:
-        'Мы используем файлы cookie для повышения безопасности и предотвращения мошенничества. Оставаясь на сайте, вы соглашаетесь на их использование. Собранные данные о ваших входах и устройстве не передаются третьим лицам.',
-      className: 'custom-class',
-      style: {
-        marginTop: '77vh',
-      },
-      duration: 1,
-    });
-  };
-
-  useEffect(() => {
-    setTimeout(() => {
-      warning();
-    }, 2000);
-  }, []);
-
   if (isLoading) {
     return (
       <div className={style.spinner}>
@@ -334,9 +317,6 @@ const UserPage26 = () => {
       </div>
     );
   }
-  console.log(userData);
-  console.log(userAchievements);
-  console.log(achievements);
 
   return (
     <>
@@ -346,7 +326,7 @@ const UserPage26 = () => {
             <Avatar
               src={`${process.env.NEXT_PUBLIC_BASE_URL_MEDIA}/${userData.avatar_pic}`}
               size={80}
-              className={style.avatar}
+              shape="circle"
             />
           </div>
           <Image
@@ -381,7 +361,7 @@ const UserPage26 = () => {
           <p className={style.salarySum}>{`${userData?.paycheck} энк / д.`}</p>
         </div>
         <div className={style.transferBlock}>
-          <Button className={style.transferButton}>
+          <Button className={style.transferButton} onClick={() => setOpenTransferModal(true)}>
             Перевести
             <Image
               className={style.icon}
@@ -525,6 +505,16 @@ const UserPage26 = () => {
               ))}
           </section>
         </div>
+      )}
+
+      {openTransferModal && (
+        <TransferModal26
+          openTransferModal={openTransferModal}
+          setOpenTransferModal={setOpenTransferModal}
+          title="Перевод"
+          selfMoney={Number(userData?.balance) || 0}
+          userData={userData}
+        />
       )}
 
       {contextHolder}

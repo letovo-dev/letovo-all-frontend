@@ -81,14 +81,14 @@ function EnterForm() {
       style: {
         marginTop: '77vh',
       },
-      duration: 1,
+      duration: 15,
     });
   };
 
   useEffect(() => {
     setTimeout(() => {
       warning();
-    }, 500);
+    }, 1000);
   }, []);
 
   return (

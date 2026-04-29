@@ -110,8 +110,7 @@ const News26: React.FC<NewsProps> = ({ children, onContainerRef }) => {
   return (
     <>
       <SideBarNews
-        open={open}
-        setOpen={setOpen}
+        // desktop={false}
         newsTitles={newsTitles?.filter(title => postIds?.includes(title.post_id))}
         burgerRef={burgerRef}
       />
@@ -119,9 +118,6 @@ const News26: React.FC<NewsProps> = ({ children, onContainerRef }) => {
         ref={wrapRef}
         className={`${style.newsContainer} ${openComments ? style.commentsOpen : ''}`}
       >
-        <div className={style.containerWrapper} ref={burgerRef}>
-          <Burger setOpen={setOpen} openComments={openComments} />
-        </div>
         <div className={style.wrap}>{children}</div>
         {openComments && (
           <Suspense fallback={<div>Loading comments...</div>}>

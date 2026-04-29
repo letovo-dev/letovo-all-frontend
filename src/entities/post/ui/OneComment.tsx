@@ -3,7 +3,6 @@
 import React, { memo, useEffect, useState } from 'react';
 import style from './Comments.module.scss';
 import { Avatar } from 'antd';
-import Image from 'next/image';
 import { RealComment } from '@/shared/stores/data-store';
 import InputModule from './InputModule';
 import commentsStore from '@/shared/stores/comments-store';
@@ -11,6 +10,37 @@ import userStore, { IUserData, IUserStore } from '@/shared/stores/user-store';
 import getAuthorsList from '../model/getAuthorsList';
 import type { MenuInfo } from 'rc-menu/lib/interface';
 import { DeleteOutlined } from '@ant-design/icons';
+
+function formatCount(num: number): string {
+  if (num < 1000) return num.toString();
+  if (num < 100_000) {
+    return `${(num / 1000).toFixed(1).replace('.0', '')}k`;
+  }
+  return `${Math.round(num / 1000)}k`;
+}
+
+const RU_MONTHS = [
+  'января',
+  'февраля',
+  'марта',
+  'апреля',
+  'мая',
+  'июня',
+  'июля',
+  'августа',
+  'сентября',
+  'октября',
+  'ноября',
+  'декабря',
+];
+
+const formatCommentDate = (raw: string): { time: string; date: string } => {
+  const match = raw?.match(/^(\d{4})-(\d{2})-(\d{2})[ T](\d{2}):(\d{2})/);
+  if (!match) return { time: '', date: raw ?? '' };
+  const [, year, month, day, hh, mm] = match;
+  const monthName = RU_MONTHS[parseInt(month, 10) - 1] ?? month;
+  return { time: `${hh}:${mm}`, date: `${day} ${monthName} ${year}` };
+};
 
 interface OneCommentProps {
   showMore: boolean;
@@ -39,22 +69,26 @@ const OneComment: React.FC<OneCommentProps> = ({
   comment,
   setCommentText,
   commentText,
-  likeNewsOrComment,
-  likesCount,
   isAdmin,
   allPostsAuthors,
 }) => {
-  const [likeComment, selLikeComment] = useState(false);
   const [commentState, setCommentState] = useState<RealComment | undefined>(undefined);
-  const { setOpenComments, normalizedComments, deleteComment } = commentsStore(state => state);
+  const { setOpenComments, normalizedComments, deleteComment, likeComment, dislikeComment } =
+    commentsStore(state => state);
   const [text, setText] = useState('');
   const usageCommentText = setCommentText ?? setText;
   const usageCommentTextValue = commentText ?? text;
-  const [likesCommentCount, setLikesCommentCount] = useState(likesCount);
   const [author, setAuthor] = useState<string | undefined>(undefined);
   const [avatarPic, setAvatarPic] = useState<string | undefined>(undefined);
   const comments = normalizedComments?.[newsId];
   const userData = userStore((state: IUserStore) => state.store?.userData);
+
+  const [actionsState, setActionsState] = useState({
+    liked: false,
+    disliked: false,
+    likesCount: 0,
+    dislikesCount: 0,
+  });
 
   useEffect(() => {
     if (comments) {
@@ -71,29 +105,37 @@ const OneComment: React.FC<OneCommentProps> = ({
 
       const commentToDisplay =
         comments.length > 0 ? (filteredByLikes ?? filteredByDate) : undefined;
-      selLikeComment(commentToDisplay?.is_liked === 't');
       setCommentState(commentToDisplay);
     }
   }, [comments]);
 
   useEffect(() => {
     if (comment) {
-      selLikeComment(comment?.is_liked === 't');
       setCommentState(comment);
     }
   }, [comment]);
 
-  const handleLikeComment = () => {
-    selLikeComment(prev => !prev);
-    const likeSAction = likeComment ? 'delete' : 'like';
-    likeNewsOrComment(String(commentState?.post_id), likeSAction);
-    if (likesCount) {
-      if (likeSAction === 'like') {
-        setLikesCommentCount(prev => String(Number(prev) + 1));
-      } else {
-        setLikesCommentCount(prev => String(Math.max(Number(prev) - 1, 0)));
-      }
+  useEffect(() => {
+    if (commentState) {
+      setActionsState({
+        liked: commentState.is_liked === 't',
+        disliked: commentState.is_disliked === 't',
+        likesCount: Number(commentState.likes) || 0,
+        dislikesCount: Number(commentState.dislikes) || 0,
+      });
     }
+  }, [commentState]);
+
+  const handleLike = () => {
+    if (!commentState) return;
+    const action = actionsState.liked ? 'delete' : 'like';
+    likeComment(String(commentState.post_id), newsId, action);
+  };
+
+  const handleDislike = () => {
+    if (!commentState) return;
+    const action = actionsState.disliked ? 'delete' : 'like';
+    dislikeComment(String(commentState.post_id), newsId, action);
   };
 
   const handleSendComment = () => {
@@ -117,6 +159,7 @@ const OneComment: React.FC<OneCommentProps> = ({
   };
 
   const handleDeleteComment = (id: string, post_is: string) => deleteComment(id, post_is);
+  console.log(commentState);
 
   return (
     <section className={style.comment}>
@@ -131,7 +174,35 @@ const OneComment: React.FC<OneCommentProps> = ({
           </div>
           <div className={style.commentTextBox}>
             <p className={style.commentAuthor}>{commentState.author}</p>
+            {(() => {
+              const { time, date } = formatCommentDate(commentState.date);
+              return (
+                <p className={style.commentDate}>
+                  {time && <span className={style.commentTime}>{time}</span>}
+                  {time && date ? ' ' : ''}
+                  {date}
+                </p>
+              );
+            })()}
             <p className={style.commentText}>{commentState.text}</p>
+            <div className={style.actions}>
+              <div className={style.actionItem} onClick={handleLike}>
+                <span
+                  className={`${style.likeIcon} ${actionsState.liked ? style.iconActive : ''}`}
+                  aria-label="like"
+                  role="img"
+                />
+                <p className={style.likesCount}>{formatCount(actionsState.likesCount)}</p>
+              </div>
+              <div className={style.actionItem} onClick={handleDislike}>
+                <span
+                  className={`${style.dislikeIcon} ${actionsState.disliked ? style.iconActive : ''}`}
+                  aria-label="dislike"
+                  role="img"
+                />
+                <p className={style.dislikesCount}>{formatCount(actionsState.dislikesCount)}</p>
+              </div>
+            </div>
             <div className={style.footer}>
               <div className={style.commentTextReply} onClick={handleReply}>
                 Ответить
@@ -145,17 +216,6 @@ const OneComment: React.FC<OneCommentProps> = ({
                     }
                   />
                 )}
-                <div className={style.likesInfo}>
-                  <Image
-                    src={likeComment ? '/images/Icon_Like_2.webp' : '/images/Icon_Like.webp'}
-                    alt="like"
-                    width={15}
-                    height={15}
-                    className={style.likeHeart}
-                    onClick={handleLikeComment}
-                  />
-                  {likesCount && <p className={style.count}>{likesCommentCount}</p>}
-                </div>
               </div>
             </div>
             {comments && comments?.length > 1 && (

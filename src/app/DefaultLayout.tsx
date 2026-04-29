@@ -123,7 +123,7 @@ export default function DefaultLayout({ children }: { children: React.ReactNode 
 
   return (
     <div className={style.defaultLayoutContainer}>
-      <header className={style.header}>
+      {/* <header className={style.header}>
         <Image
           className={style.letovoCorp}
           src="/Logo_Mini.svg"
@@ -136,7 +136,7 @@ export default function DefaultLayout({ children }: { children: React.ReactNode 
         <div className={style.headerMenu}>
           <Menu />
         </div>
-      </header>
+      </header> */}
       <main ref={layoutRef} className={style.pageContent}>
         {children}
       </main>

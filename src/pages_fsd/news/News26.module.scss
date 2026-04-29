@@ -1,7 +1,6 @@
 @use '../../app/_mixins.scss';
 
 $overlay-color: rgba(0, 0, 0, 0.5);
-$scrollbar-width: 17px;
 
 .newsContainer {
   // background-image: url('/images/Background_News_PC.webp');
@@ -22,21 +21,13 @@ $scrollbar-width: 17px;
   scrollbar-gutter: stable;
   -webkit-overflow-scrolling: touch;
   overscroll-behavior-y: contain;
-  @media (min-width: 933px) {
-    padding-left: 16px;
-  }
   &.commentsOpen {
     overflow-y: hidden;
-    padding-right: $scrollbar-width;
+    padding-right: 0;
     height: 100vh;
-    @media screen and (max-width: 960px) {
-      padding-right: 0;
-      overflow-y: hidden;
-    }
   }
 
   .containerWrapper {
-    display: block;
     background-color: var(--graphics7);
     margin: 0 auto;
     width: 392px;
@@ -46,27 +37,8 @@ $scrollbar-width: 17px;
     position: fixed;
     display: flex;
     align-items: center;
-    @media screen and (min-width: 961px) and (max-width: 1427px) {
-      display: block;
-      background-color: transparent;
-      margin: 0 auto;
-      width: fit-content;
-      box-sizing: border-box;
-      height: fit-content;
-      z-index: 1001;
-      position: fixed;
-      top: 122px;
-      left: 50%;
-      transform: translateX(-445px);
-    }
-    @media screen and (min-width: 1428px) {
-      display: none;
-    }
     &.commentsOpen {
-      padding-right: $scrollbar-width;
-      @media screen and (max-width: 960px) {
-        padding-right: 0;
-      }
+      padding-right: 0;
     }
   }
   .wrap {
@@ -78,26 +50,14 @@ $scrollbar-width: 17px;
     margin: 0 auto;
     box-sizing: border-box;
     overflow: visible;
-    width: 760px;
-    margin-top: 120px;
     gap: 30px;
-    @media screen and (max-width: 960px) {
-      margin-top: 46px;
-      padding-bottom: 55px;
-      width: 390px;
-    }
+    margin-top: 46px;
+    padding-bottom: 55px;
+    width: 390px;
   }
 
   .newsMenu {
-    position: absolute;
-    top: 0;
-    left: 0%;
-    width: 75%;
-    height: 100%;
-    background-color: var(--secondaryGray);
-    @media screen and (max-width: 960px) {
-      display: none;
-    }
+    display: none;
   }
 
   .commentsOpen {
@@ -118,7 +78,7 @@ $scrollbar-width: 17px;
     overflow: hidden;
     touch-action: none;
     .commentsContainer {
-      width: 760px;
+      width: 390px;
       overflow-y: auto;
       height: fit-content;
       max-height: 700px;
@@ -132,9 +92,6 @@ $scrollbar-width: 17px;
       display: flex;
       flex-direction: column;
       justify-content: flex-end;
-      @media screen and (max-width: 960px) {
-        width: 390px;
-      }
       .headerBox {
         width: 100%;
         display: flex;

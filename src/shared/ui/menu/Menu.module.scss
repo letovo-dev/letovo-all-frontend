@@ -39,7 +39,7 @@
   transition: transform 0.2s ease-in-out;
 
   .icon {
-    filter: brightness(0); // черный цвет для невыбранных
+    filter: brightness(0);
     transition: filter 0.2s ease-in-out;
     flex-shrink: 0;
   }
