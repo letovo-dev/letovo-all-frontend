@@ -58,20 +58,6 @@ const SideBarNews = ({
     active: boolean;
   }>({ top: 0, height: 0, thumbY: 0, active: false });
 
-  console.log(allPostsAuthors);
-  console.log(normalizedNews);
-
-  console.log(newsDataStructure);
-
-  console.log(
-    'authors',
-    allPostsAuthors?.map(a => a.username),
-  );
-  console.log(
-    'news authors',
-    Object.values(normalizedNews ?? {}).map((n: any) => n?.news?.author),
-  );
-
   useEffect(() => {
     if (!normalizedNews) {
       setNewsDataStructure([]);
@@ -295,7 +281,6 @@ const SideBarNews = ({
 
   const permittedUsers = ['admin', 'moder'];
 
-  console.log(newsDataStructure);
   const handleSidebarClick = (e: React.MouseEvent<HTMLElement>) => {
     const target = e.target as HTMLElement;
     if (target.tagName !== 'INPUT' && target.tagName !== 'SELECT' && target.tagName !== 'BUTTON') {
@@ -363,8 +348,13 @@ const SideBarNews = ({
               return section === 'news' ? (
                 <div
                   key={sectionKey}
-                  className={style.sidebarItemSaved}
-                  onClick={mainSections[section].method}
+                  className={`${style.sidebarItemSaved} ${
+                    currentNewsState.saved ? style.active : ''
+                  }`}
+                  onClick={() => {
+                    mainSections.saved.method();
+                    setOpen(prev => !prev);
+                  }}
                 >
                   <Image src="/26_saved.svg" alt="saved" width={30} height={18} />
                   <span>Сохраненное</span>
@@ -377,7 +367,9 @@ const SideBarNews = ({
                 >
                   <div className={style.sidebarItemSavedContainer}>
                     <div
-                      className={style.newsTitle}
+                      className={`${style.newsTitle} ${
+                        currentNewsState.default ? style.active : ''
+                      }`}
                       onClick={(e: React.MouseEvent<HTMLDivElement>) => {
                         e.stopPropagation();
                         setCurrentNewsState({
@@ -410,7 +402,11 @@ const SideBarNews = ({
                             item[1].news.title !== '' ? (
                               <div
                                 key={item[0]}
-                                className={style.sidebarItemNews}
+                                className={`${style.sidebarItemNews} ${
+                                  currentNewsState.selectedNews === item[1].news.post_id
+                                    ? style.active
+                                    : ''
+                                }`}
                                 onClick={(e: React.MouseEvent<HTMLDivElement>) => {
                                   e.stopPropagation();
                                   setCurrentNewsState({

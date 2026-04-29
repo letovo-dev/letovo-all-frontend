@@ -1,27 +1,3 @@
-@use '../../app/mixins.scss';
-
-$overlay-color: rgba(0, 0, 0, 0.3);
-.spinWrapper {
-  height: 100vh;
-  width: 100%;
-  display: flex;
-  justify-content: center;
-  align-items: center;
-}
-
-.modalOverlay {
-  position: fixed;
-  top: 0;
-  left: 90%;
-  transform: translateX(-50%);
-  width: 392px;
-  height: 562px;
-  background-color: $overlay-color;
-  display: flex;
-  justify-content: center;
-  align-items: center;
-  z-index: 100;
-}
 .sidebarContainer {
   z-index: 10;
   position: absolute;
@@ -36,22 +12,32 @@ $overlay-color: rgba(0, 0, 0, 0.3);
   border-bottom-left-radius: 15px;
   overflow: hidden;
   transition: width 0.6s cubic-bezier(0.25, 0.46, 0.45, 0.94);
+
   .content {
-    width: 100%;
-    position: relative;
+    position: absolute;
+    top: 0;
+    right: 25px;
+    width: 315px;
+    height: 100%;
     display: flex;
     flex-direction: column;
-    flex-grow: 1;
+    padding-top: 25px;
+    box-sizing: border-box;
+
     .searchInput {
-      margin-left: 30px;
+      margin-left: 52px;
     }
   }
+
   .openStatusContainer {
+    z-index: 1;
     display: flex;
     flex-direction: column;
     height: 100%;
     width: 25px;
     position: relative;
+    background-color: var(--foreground);
+
     .orangeLine {
       position: absolute;
       background-color: var(--orange);
@@ -62,6 +48,7 @@ $overlay-color: rgba(0, 0, 0, 0.3);
       border-top-right-radius: 15px;
       border-bottom-right-radius: 15px;
     }
+
     .statusActionText {
       position: absolute;
       background-color: transparent;
@@ -73,6 +60,7 @@ $overlay-color: rgba(0, 0, 0, 0.3);
       align-items: center;
       flex-direction: column;
       gap: 15px;
+
       .statusText {
         font-size: 10px;
         transform: rotate(270deg);
@@ -82,24 +70,42 @@ $overlay-color: rgba(0, 0, 0, 0.3);
     }
   }
 }
+
 .sidebarContainer.hidden {
-  // right: max(0px, calc(50% - 195px));
   width: 25px;
-  // @media (min-width: 460px) {
-  //   right: 0;
-  // }
 }
+
+.placeholder {
+  margin: 33px 0 7px 68px;
+  color: var(--secondaryWhite);
+  font-size: 12px;
+  line-height: 1.43;
+
+  p {
+    margin: 0;
+  }
+}
+
 .sidebarItemsContainer {
-  position: absolute;
-  top: 84px;
-  left: 28px;
-  width: 220px;
+  padding: 10px 0 40px 70px;
+  width: 270px;
+  display: flex;
+  flex-direction: column;
 }
-.newsListMaskWrapper {
+
+.contactsHeader {
+  display: flex;
+  align-items: flex-end;
+  gap: 10px;
+  font-size: 15px;
+  margin-bottom: 16px;
+}
+
+.contactsListMaskWrapper {
   width: 100%;
 }
 
-.newsListMaskWrapperFaded {
+.contactsListMaskWrapperFaded {
   $fade-gradient: linear-gradient(
     to bottom,
     #000 0%,
@@ -117,13 +123,16 @@ $overlay-color: rgba(0, 0, 0, 0.3);
   -webkit-mask-size: 100% 100%;
 }
 
-.sidebarItemNewsContainer {
+.contactsListContainer {
   width: 100%;
-  max-height: 60vh;
+  max-height: 50vh;
   overflow-y: auto;
   overflow-x: hidden;
-  padding: 0 0 50px 30px;
+  padding: 0 0 50px 0;
   font-size: 12px;
+  display: flex;
+  flex-direction: column;
+  gap: 10px;
 
   scrollbar-width: none;
   -ms-overflow-style: none;
@@ -134,9 +143,44 @@ $overlay-color: rgba(0, 0, 0, 0.3);
   }
 }
 
+.emptyState {
+  font-size: 12px;
+  color: var(--graphics11);
+  margin-top: 10px;
+}
+
+.contactItem {
+  cursor: pointer;
+  display: flex;
+  flex-direction: column;
+  gap: 2px;
+  max-width: 90%;
+  padding: 4px 0;
+
+  &:hover {
+    color: var(--graphics11);
+  }
+}
+
+.contactItemActive {
+  color: var(--orange);
+}
+
+.contactName {
+  font-weight: 500;
+}
+
+.contactLastMessage {
+  font-size: 10px;
+  color: var(--graphics11);
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+
 .scrollContainer {
   position: absolute;
-  left: 25px;
+  right: 293px;
   width: 22px;
   z-index: 11;
   pointer-events: auto;
@@ -194,68 +238,4 @@ $overlay-color: rgba(0, 0, 0, 0.3);
   .scrollThumb {
     cursor: default;
   }
-}
-.sidebarItem {
-  margin: 20px 0px 0px 0px;
-  max-width: 320px;
-  cursor: pointer;
-  .newsTitle {
-    display: flex;
-    align-items: center;
-  }
-}
-.sidebarItemSavedContainer {
-  display: flex;
-  align-items: center;
-  justify-content: space-between;
-}
-.sidebarItemSaved {
-  @extend .sidebarItem;
-  display: flex;
-  align-items: center;
-  gap: 7px;
-  margin-top: 0px;
-}
-
-.sidebarItemNews {
-  @extend .sidebarItem;
-  margin-top: 10px;
-  display: flex;
-  gap: 2px;
-  max-width: 90%;
-  &:hover {
-    color: var(--graphics11);
-  }
-  &:active {
-    color: var(--graphics11);
-  }
-}
-
-.active {
-  color: var(--orange) !important;
-}
-.noSearchResult {
-  margin: 10px 0px 0px 20px;
-  font-size: 10px;
-  color: var(--management);
-  position: fixed;
-}
-
-.addArticle {
-  position: absolute;
-  top: 48px;
-  left: 28px;
-  width: 220px;
-  display: flex;
-  align-items: center;
-  justify-content: space-between;
-}
-.addArticleIcon {
-  color: var(--orange);
-  cursor: pointer;
-}
-
-.author {
-  margin: 20px 0 0 10px;
-  font-style: italic;
 }

@@ -45,8 +45,6 @@ const authStore = create<TAuthStoreState>()(
         set({ error: undefined, loading: true });
         try {
           const response = await SERVICES_AUTH.Auth.login(payload);
-          console.log(response);
-
           if (response.success && response.code === 200) {
             const {
               data: { result },

@@ -159,7 +159,6 @@ const OneComment: React.FC<OneCommentProps> = ({
   };
 
   const handleDeleteComment = (id: string, post_is: string) => deleteComment(id, post_is);
-  console.log(commentState);
 
   return (
     <section className={style.comment}>
