@@ -1,24 +1,28 @@
 'use client';
 
-import { createContext, useContext, useState, ReactNode } from 'react';
+import { createContext, useContext, useState, useRef, ReactNode } from 'react';
 
 interface FooterContextType {
   isFooterHidden: boolean;
   toggleFooter: () => void;
   setFooterHidden: (hidden: boolean) => void;
+  scrollContainerRef: React.MutableRefObject<HTMLElement | null>;
 }
 
 const FooterContext = createContext<FooterContextType | undefined>(undefined);
 
 export const FooterProvider = ({ children }: { children: ReactNode }) => {
   const [isFooterHidden, setFooterHidden] = useState(false);
+  const scrollContainerRef = useRef<HTMLElement | null>(null);
 
   const toggleFooter = () => {
     setFooterHidden(prev => !prev);
   };
 
   return (
-    <FooterContext.Provider value={{ isFooterHidden, toggleFooter, setFooterHidden }}>
+    <FooterContext.Provider
+      value={{ isFooterHidden, toggleFooter, setFooterHidden, scrollContainerRef }}
+    >
       {children}
     </FooterContext.Provider>
   );

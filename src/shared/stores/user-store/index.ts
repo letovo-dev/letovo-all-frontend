@@ -23,6 +23,42 @@ export interface IUserAchData {
   done?: boolean;
 }
 
+export interface IUserAchNew {
+  username: string;
+  achivements: [
+    {
+      year: number;
+      chapter: string;
+      department_id: number;
+      department: string;
+      role: string;
+      achivements: [
+        {
+          id: number;
+          new: boolean;
+          datetime: string;
+          stage: number;
+          achivement_pic: string;
+          achivement_name: string;
+          achivement_decsription: string;
+          stages: 1;
+          category: null;
+          category_name: string;
+          departmentid: number;
+        },
+      ];
+    },
+  ];
+}
+
+export interface IPayment {
+  transactionid: number;
+  amount: number;
+  sender: string;
+  receiver: string;
+  transactiontime: string;
+}
+
 export interface IUserData {
   active: string;
   avatar_pic: string;
@@ -37,12 +73,17 @@ export interface IUserData {
   userid: string;
   username: string;
   userrights: string;
+  display_name: string;
+  brigade: string;
+  brigadename: string;
+  last_incoming_payment?: IPayment;
+  last_outgoing_payment?: IPayment;
 }
 
 export interface IUserStore {
   store: {
     userData: IUserData;
-    userAchievements: IUserAchData | undefined;
+    userAchievements: IUserAchNew | undefined;
     allPossibleUserAchievements: IUserAchData[] | undefined;
     departmentAchievements: IUserAchData[] | undefined;
     allPostsAuthors: IUserData[];
@@ -52,6 +93,7 @@ export interface IUserStore {
   endPreload: boolean;
   getAllUserAchievements: (value: string) => void;
   getAchievementsDepartment: () => void;
+  getUserAchievements: (name: string) => void;
   isRequireUserInDatabase: (value: string) => { userName: string; avatar: string };
   transferMoney: (data: { receiver: string; amount: number }) => Promise<any>;
   setEndPreload: (value: boolean) => Promise<void>;
@@ -149,6 +191,26 @@ const userStore = create<IUserStore>()(
                 const { result } = response?.data as { result: IUserAchData[] };
                 set((draft: IUserStore) => {
                   draft.store.departmentAchievements = result;
+                });
+              } else {
+                get().setError('Ошибка загрузки данных с сервера');
+                Modal.error({
+                  title: 'Ошибка загрузки данных с сервера',
+                  content: `${get().error}`,
+                });
+              }
+            } catch (error: any) {
+              produce(get(), (draft: IUserStore) => {
+                draft.error = error instanceof Error ? error.message : String(error);
+              });
+            }
+          },
+          getUserAchievements: async (userName: string) => {
+            try {
+              const response = await SERVICES_ACHIEVEMENTS.AchievementsData.user(userName);
+              if (response?.success && response.code !== undefined && response.code === 200) {
+                set((draft: IUserStore) => {
+                  draft.store.userAchievements = response?.data as IUserAchNew;
                 });
               } else {
                 get().setError('Ошибка загрузки данных с сервера');

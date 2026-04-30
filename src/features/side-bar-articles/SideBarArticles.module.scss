@@ -1,6 +1,7 @@
 @use '../../app/mixins.scss';
 
 $overlay-color: rgba(0, 0, 0, 0.3);
+
 .spinWrapper {
   height: 100vh;
   width: 100%;
@@ -12,100 +13,235 @@ $overlay-color: rgba(0, 0, 0, 0.3);
 .modalOverlay {
   position: fixed;
   top: 0;
-  left: 49%;
+  left: 90%;
   transform: translateX(-50%);
-  width: 100vw;
-  height: 100%;
+  width: 392px;
+  height: 562px;
   background-color: $overlay-color;
   display: flex;
   justify-content: center;
   align-items: center;
   z-index: 100;
-  @media screen and (min-width: 961px) and (max-width: 1427px) {
-    height: 450px;
-    position: fixed;
-    top: 0;
-    left: 50%;
-    transform: translateX(-50%);
-  }
-  @media screen and (max-width: 960px) {
-    top: 36px;
-    left: 50%;
-  }
 }
+
 .sidebarContainer {
   z-index: 10;
   position: absolute;
-  display: none;
-  left: 0;
-  @media screen and (max-width: 960px) {
-    display: block;
-    top: 0;
-    left: 0%;
-    width: 75%;
-    max-width: 350px;
+  display: flex;
+  top: 85px;
+  right: 0;
+  width: 340px;
+  height: 645px;
+  background-color: var(--foreground);
+  color: var(--secondaryWhite);
+  border-top-left-radius: 15px;
+  border-bottom-left-radius: 15px;
+  overflow: hidden;
+  transition: width 0.6s cubic-bezier(0.25, 0.46, 0.45, 0.94);
+  .content {
+    width: 100%;
+    position: relative;
+    display: flex;
+    flex-direction: column;
+    flex-grow: 1;
+    .searchInput {
+      margin-left: 30px;
+    }
+  }
+  .openStatusContainer {
+    display: flex;
+    flex-direction: column;
     height: 100%;
-    background-color: var(--secondaryGray);
+    width: 25px;
+    position: relative;
+    .orangeLine {
+      position: absolute;
+      background-color: var(--orange);
+      height: 85px;
+      width: 6px;
+      left: 0;
+      top: 30px;
+      border-top-right-radius: 15px;
+      border-bottom-right-radius: 15px;
+    }
+    .statusActionText {
+      position: absolute;
+      background-color: transparent;
+      height: 85px;
+      width: 21px;
+      left: 0;
+      bottom: -15px;
+      display: flex;
+      align-items: center;
+      flex-direction: column;
+      gap: 15px;
+      .statusText {
+        font-size: 10px;
+        transform: rotate(270deg);
+        width: 100%;
+        white-space: nowrap;
+      }
+    }
   }
 }
-.sidebarContainerDesktop {
-  z-index: 10;
+
+.sidebarContainer.hidden {
+  width: 25px;
+  // @media (max-width: 960px) {
+  //   right: 0;
+  // }
+}
+
+.welcomeLink {
   position: absolute;
-  top: 7%;
-  height: 93vh;
-  left: 0;
-  width: 364px;
-  background-color: var(--secondaryGray);
-  @media screen and (max-width: 1428px) {
+  top: 64px;
+  left: 36px;
+  color: var(--secondaryWhite);
+  text-decoration: none;
+  font-size: 16px;
+  cursor: pointer;
+  transition: color 0.3s ease;
+  &:hover {
+    color: var(--graphics11);
+  }
+}
+
+.sidebarItemsContainer {
+  position: absolute;
+  top: 84px;
+  left: 28px;
+  width: 260px;
+}
+
+.newsListMaskWrapper {
+  width: 100%;
+}
+
+.newsListMaskWrapperFaded {
+  $fade-gradient: linear-gradient(
+    to bottom,
+    #000 0%,
+    #000 55%,
+    rgba(0, 0, 0, 0.85) 68%,
+    rgba(0, 0, 0, 0.55) 80%,
+    rgba(0, 0, 0, 0.25) 92%,
+    rgba(0, 0, 0, 0.05) 100%
+  );
+  mask-image: $fade-gradient;
+  -webkit-mask-image: $fade-gradient;
+  mask-repeat: no-repeat;
+  -webkit-mask-repeat: no-repeat;
+  mask-size: 100% 100%;
+  -webkit-mask-size: 100% 100%;
+}
+
+.sidebarItemNewsContainer {
+  width: 100%;
+  max-height: min(60vh, 590px);
+  overflow-y: auto;
+  overflow-x: hidden;
+  padding: 0 0 50px 0;
+  font-size: 12px;
+
+  scrollbar-width: none;
+  -ms-overflow-style: none;
+  &::-webkit-scrollbar {
+    width: 0;
+    height: 0;
     display: none;
   }
 }
 
-.sidebarContainerTablet {
-  z-index: 10;
-  position: fixed;
-  top: 125px;
-  left: 75px;
-  background-color: var(--secondaryGray);
-  padding-bottom: 30px;
+.scrollContainer {
+  position: absolute;
+  left: 25px;
+  width: 22px;
+  z-index: 11;
+  pointer-events: auto;
+
+  .scrollTrack {
+    position: absolute;
+    left: 10px;
+    top: 11px;
+    width: 2px;
+    height: calc(100% - 22px);
+    background: linear-gradient(
+      180deg,
+      rgba(80, 80, 80, 1) 0%,
+      rgba(80, 80, 80, 1) 80%,
+      rgba(36, 36, 36, 1) 100%
+    );
+    border-radius: 1px;
+    pointer-events: none;
+  }
+
+  .scrollThumb {
+    position: absolute;
+    left: 0;
+    top: 0;
+    width: 22px;
+    height: 22px;
+    border-radius: 50%;
+    background: rgba(255, 255, 255, 0.12);
+    backdrop-filter: blur(83px);
+    -webkit-backdrop-filter: blur(83px);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    cursor: grab;
+    will-change: transform;
+    touch-action: none;
+    user-select: none;
+
+    &:active {
+      cursor: grabbing;
+    }
+  }
+
+  .scrollThumbDot {
+    width: 7.33px;
+    height: 7.33px;
+    border-radius: 50%;
+    background: #ffffff;
+  }
 }
-.sidebarItemsContainer {
-  margin-top: 35px;
-  max-height: 89vh;
-  overflow-y: auto;
-  overflow-x: hidden;
-  scrollbar-width: thin;
 
-  @media screen and (max-width: 960px) {
-    margin-top: 30px;
+.scrollContainerInactive {
+  pointer-events: none;
+  .scrollThumb {
+    cursor: default;
   }
+}
 
-  &::-webkit-scrollbar {
-    width: 4px;
-  }
+.noSearchResult {
+  margin: 10px 0px 0px 20px;
+  font-size: 10px;
+  color: var(--management);
+  position: fixed;
+}
 
-  &::-webkit-scrollbar-track {
-    border-radius: 2px;
-  }
-
-  &::-webkit-scrollbar-thumb {
-    border-radius: 2px;
-  }
+.articleItemContainer {
+  display: flex;
+  flex-direction: column;
 }
 
 .articleItemContainerHide {
-  @extend .sidebarItemsContainer;
-  display: 'none';
+  display: flex;
+  flex-direction: column;
 }
-.sidebarItemNewsContainer {
-  width: 100%;
-  max-height: 60vh;
-  overflow-y: auto;
-  overflow-x: hidden;
+
+.articleItem {
+  display: flex;
+  margin-bottom: 16px;
+  justify-content: space-between;
+  align-items: center;
+  gap: 8px;
 }
 
 .articleTitle {
   padding-top: 0;
+  margin: 0;
+  color: var(--secondaryWhite);
   transition: color 0.3s ease;
   &:hover {
     color: var(--graphics11);
@@ -117,28 +253,8 @@ $overlay-color: rgba(0, 0, 0, 0.3);
 
 .articleTitleSelected {
   @extend .articleTitle;
-  color: var(--foreground);
+  color: var(--orange);
   font-weight: bold;
-}
-
-.articleTitle:nth-child(n + 2) {
-  padding-top: 15px;
-  &:hover {
-    color: var(--graphics11);
-  }
-  &:active {
-    color: var(--graphics11);
-  }
-}
-
-.articleItemContainer {
-  display: flex;
-  flex-direction: column;
-}
-.articleItem {
-  display: flex;
-  margin-bottom: 16px;
-  justify-content: space-between;
 }
 
 .menuItem {
@@ -171,5 +287,30 @@ $overlay-color: rgba(0, 0, 0, 0.3);
   padding-bottom: 2px;
   &:hover {
     color: var(--orange);
+  }
+}
+
+.extraIcon {
+  color: inherit;
+  &:hover {
+    color: var(--orange);
+  }
+}
+
+.sidebarContainer {
+  :global(.ant-collapse > .ant-collapse-item > .ant-collapse-header) {
+    padding: 12px 12px !important;
+  }
+  :global(.ant-collapse .ant-collapse-content > .ant-collapse-content-box) {
+    padding: 12px 0px 12px 35px !important;
+  }
+  :global(.ant-collapse-header-text) {
+    color: var(--secondaryWhite) !important;
+  }
+  :global(.ant-collapse-content) {
+    color: var(--secondaryWhite) !important;
+  }
+  :global(.ant-collapse-arrow) {
+    color: var(--secondaryWhite) !important;
   }
 }

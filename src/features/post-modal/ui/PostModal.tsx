@@ -85,6 +85,17 @@ const PostModal: React.FC<PostModalProps> = ({ visible, onCancel, onSubmit, post
     }
   }, [visible, post, form]);
 
+  useEffect(() => {
+    if (!visible) return;
+    const main = document.querySelector('main');
+    if (!main) return;
+    const previousOverflowY = main.style.overflowY;
+    main.style.overflowY = 'hidden';
+    return () => {
+      main.style.overflowY = previousOverflowY;
+    };
+  }, [visible]);
+
   const handleSubmit = async (values: any) => {
     try {
       const formData = {
@@ -182,6 +193,11 @@ const PostModal: React.FC<PostModalProps> = ({ visible, onCancel, onSubmit, post
         open={visible}
         onCancel={onCancel}
         footer={null}
+        centered
+        styles={{
+          body: { maxHeight: 'calc(100vh - 100px)', overflowY: 'auto' },
+          wrapper: { overflow: 'hidden' },
+        }}
       >
         <Form
           form={form}
@@ -222,7 +238,9 @@ const PostModal: React.FC<PostModalProps> = ({ visible, onCancel, onSubmit, post
           </Form.Item>
           <Form.Item label="Медиа (изображения или видео)" name="media">
             <Upload {...uploadProps} listType="picture">
-              <Button icon={<UploadOutlined />}>Загрузить</Button>
+              <Button style={{ padding: '0px 30px' }}>
+                <UploadOutlined />
+              </Button>
             </Upload>
           </Form.Item>
 

@@ -1,0 +1,345 @@
+@use '../../app/mixins.scss';
+
+.spinner {
+  width: 100vw;
+  height: 100vh;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+.wrap {
+  display: flex;
+  flex-direction: column;
+}
+.userBlock {
+  display: flex;
+  align-items: start;
+  width: 100%;
+  max-width: 415px;
+  box-sizing: border-box;
+  min-height: 145px;
+  // border: 1px solid var(--background);
+  padding: 35px 10px 5px 20px;
+  .icons {
+    border-radius: 25px;
+    border: 1px solid var(--background);
+    background: transparent;
+    display: flex;
+    flex-direction: column;
+    min-width: 80px;
+    min-height: 148px;
+    flex-shrink: 0;
+    .userIcon {
+      width: inherit;
+      height: 80px;
+      background: var(--background);
+      border-radius: 22px;
+      border: 1px solid var(--background);
+      display: flex;
+      align-items: center;
+      justify-content: center;
+    }
+    .depIcon {
+      color: var(--background);
+    }
+  }
+  .userData {
+    flex: 1;
+    display: flex;
+    flex-direction: column;
+    // border: 1px solid var(--background);
+    height: 100%;
+    padding: 10px 10px 10px 15px;
+    .userName {
+      color: var(--background);
+      font-size: inherit;
+      font-weight: inherit;
+      margin: 0;
+      padding: 0;
+      line-height: inherit;
+    }
+    .status {
+      color: var(--orange);
+      display: flex;
+      align-items: center;
+      font-size: 12px;
+      margin: 0;
+    }
+    .status::before {
+      content: '•';
+      font-weight: bold;
+      font-size: 2em;
+      color: var(--orange);
+      margin: 0 8px 0 0;
+      line-height: 1;
+    }
+    .depData {
+      padding: 30px 0 0 0;
+      display: flex;
+      flex-direction: column;
+      .branchName {
+        color: var(--background);
+        font-size: 14px;
+        margin: 0;
+      }
+      .depName {
+        @extend .branchName;
+        font-weight: bold;
+      }
+    }
+  }
+  .menuButtonDiv {
+    width: 30px;
+    flex-shrink: 0;
+    color: var(--background) !important;
+    padding: 11px 3px 3px 3px;
+    background: none;
+    border: none;
+    cursor: pointer;
+    .logout {
+      filter: invert(98%) sepia(4%) saturate(425%) hue-rotate(296deg) brightness(117%) contrast(96%);
+      cursor: pointer;
+    }
+  }
+}
+.moneyBlock {
+  display: flex;
+  flex-direction: column;
+  width: 100%;
+  max-width: 415px;
+  box-sizing: border-box;
+  height: 145px;
+  align-items: flex-start;
+  padding: 22px 32px;
+  margin-top: 10px;
+  border-radius: 30px;
+  background-color: var(--secondaryGray);
+  @media screen and (max-width: 810px) {
+    width: 99%;
+  }
+  .salary {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    .salaryText {
+      font-size: 12px;
+      color: var(--graphics11);
+      margin: 0;
+    }
+    .salarySum {
+      font-size: 16px;
+      font-weight: 600;
+      color: var(--foreground);
+      margin: 0;
+    }
+  }
+  .transferBlock {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    .moneyActions {
+      display: flex;
+      flex-direction: column;
+      margin-top: 6px;
+      .moneyActionLine {
+        display: flex;
+        align-items: center;
+        gap: 10px;
+
+        .moneyText {
+          font-size: 12px;
+          color: var(--grey);
+          margin: 0;
+          @media screen and (max-width: 960px) {
+            font-size: 10px;
+          }
+        }
+        .moneyPlus {
+          font-size: 12px;
+          color: var(--green);
+          margin: 0;
+        }
+        .moneyMinus {
+          font-size: 12px;
+          margin: 0;
+        }
+      }
+    }
+  }
+  .transferButton {
+    padding: 0px 6px 0px 45px;
+    border-radius: 30px !important;
+    background-color: var(--background);
+    border: 1px solid var(--secondaryBlack);
+    font-size: 12px;
+    margin-top: 8px;
+    .icon {
+      filter: invert(100%) sepia(36%) saturate(1%) hue-rotate(153deg) brightness(107%) contrast(96%);
+    }
+    &:hover {
+      background-color: var(--orange) !important;
+      color: var(--background) !important;
+      border: 1px solid var(--orange) !important;
+      .icon {
+        margin-top: 2px;
+      }
+    }
+  }
+}
+
+.careerAndAchievementsBlock {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  padding: 0px;
+  margin-top: 25px;
+  height: 42px;
+  width: min(363px, calc(100% - 24px));
+  overflow: visible;
+  border-radius: 20px;
+  border: 1px solid var(--border-grey);
+
+  .tabButton {
+    width: calc(50% - 5px);
+    min-width: 0;
+    height: 42px;
+    border-radius: 20px;
+    border: none;
+    display: flex;
+    align-items: center;
+    justify-content: flex-start;
+    gap: 22px;
+    cursor: pointer;
+    font-size: 14px;
+    color: var(--background);
+    background: transparent;
+    transition: background 0.2s;
+    position: relative;
+    z-index: 1;
+    flex-shrink: 0;
+    padding: 0px 20px;
+  }
+
+  .tabButtonActive {
+    background: linear-gradient(to right, #fb4724 16%, #951515 82%);
+    color: #fff;
+  }
+}
+
+.careerBlock {
+  margin-top: 25px;
+  background-color: var(--background);
+  border-radius: 20px 20px 0 0;
+  width: 100%;
+  max-width: 415px;
+  box-sizing: border-box;
+  height: calc(100vh - 435px);
+  min-height: 250px;
+  padding-top: 20px;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  position: relative;
+  @media screen and (max-width: 810px) {
+    width: 99%;
+  }
+
+  .careerViewButton {
+    display: block;
+    width: 80%;
+    border-radius: 40px;
+    border: 1px solid rgba(36, 36, 36, 0.2);
+    background: #e2e2e2;
+    color: var(--foreground);
+    cursor: pointer;
+    font-size: 14px;
+    padding: 8px 0;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    gap: 20px;
+  }
+
+  .collapseContainer {
+    position: absolute;
+    background: var(--foreground);
+    border-radius: 15px 15px 0 0;
+    width: 100%;
+    top: 74px;
+    bottom: 0;
+    display: flex;
+    flex-direction: column;
+    gap: 10px;
+    padding-bottom: 105px;
+    box-sizing: border-box;
+    overflow-y: auto;
+  }
+}
+.achievementsBlockContainer {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  width: 100%;
+  max-width: 415px;
+  height: calc(100vh - 435px);
+  min-height: 250px;
+  padding-top: 20px;
+  .titleInfo {
+    display: flex;
+    align-items: center;
+    gap: 20px;
+
+    padding: 30px 0 15px 0;
+    .title {
+      color: var(--grey);
+      margin: 0;
+    }
+    .info {
+      display: flex;
+      .a {
+        color: var(--orange);
+      }
+      .b {
+        color: var(--grey);
+      }
+    }
+  }
+
+  .achievementsBlock {
+    width: 100%;
+    box-sizing: border-box;
+    padding: 20px 10px 80px 10px;
+    border-radius: 25px;
+    border: 1px solid var(--border-grey);
+    display: flex;
+    justify-content: space-evenly;
+    flex-wrap: wrap;
+    overflow-y: auto;
+  }
+}
+
+.science {
+  background: var(--science);
+}
+.enginery {
+  background: var(--enginery);
+}
+.it {
+  background: var(--it);
+}
+.art {
+  background: var(--art);
+}
+.management {
+  background: var(--management);
+}
+.proj {
+  background: var(--proj);
+}
+.x {
+  background: var(--graphics8);
+}
+.defaultColor {
+  background: var(--graphics8);
+}

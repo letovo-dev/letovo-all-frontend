@@ -50,7 +50,11 @@ const authStore = create<TAuthStoreState>()(
               data: { result },
             } = response;
             userStore.setState((draft: IUserStore) => {
-              draft.store.userData = result[0];
+              draft.store.userData = {
+                ...result[0],
+                last_incoming_payment: response.data.last_incoming_payment,
+                last_outgoing_payment: response.data.last_outgoing_payment,
+              };
             });
             const token = response?.authorization;
             const registered = result[0]?.registered === 'f' ? false : true;

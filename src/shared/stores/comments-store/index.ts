@@ -35,6 +35,8 @@ export type TCommentsStoreState = {
   saveComment: (comment: string, post_id: string, author: string | undefined) => Promise<any>;
   deleteComment: (id: string, post_id: string) => void;
   getCurrentNewsPics: (id: number) => Promise<any>;
+  likeComment: (comment_id: string, parent_id: string, action: string) => Promise<void>;
+  dislikeComment: (comment_id: string, parent_id: string, action: string) => Promise<void>;
 };
 
 const initialState = {
@@ -111,6 +113,84 @@ const commentsStore = create<TCommentsStoreState>()(
           return [];
         } finally {
           set({ loading: false });
+        }
+      },
+      likeComment: async (comment_id: string, parent_id: string, action: string): Promise<void> => {
+        try {
+          const res = await SERVICES_DATA.Data.setLike(comment_id, action);
+          if (res.code === 200 || res.success) {
+            const state: any = get();
+            const list: OneComment[] | undefined = state.normalizedComments?.[parent_id];
+            if (!list) {
+              console.error(`Comments for post ${parent_id} not found`);
+              return;
+            }
+            const updated = list.map(c => {
+              if (c.post_id !== comment_id) return c;
+              const next: OneComment = {
+                ...c,
+                is_liked: action === 'delete' ? 'f' : 't',
+                likes: String(Math.max(Number(c.likes || 0) + (action === 'delete' ? -1 : 1), 0)),
+              };
+              if (c.is_disliked === 't' && action !== 'delete') {
+                next.is_disliked = 'f';
+                next.dislikes = String(Math.max(Number(c.dislikes || 0) - 1, 0));
+              }
+              return next;
+            });
+            set({
+              normalizedComments: {
+                ...state.normalizedComments,
+                [parent_id]: updated,
+              },
+            });
+          } else {
+            console.error('likeComment failed:', res);
+          }
+        } catch (error) {
+          console.error('likeComment error:', error);
+        }
+      },
+      dislikeComment: async (
+        comment_id: string,
+        parent_id: string,
+        action: string,
+      ): Promise<void> => {
+        try {
+          const res = await SERVICES_DATA.Data.setDislike(comment_id, action);
+          if (res.code === 200 || res.success) {
+            const state: any = get();
+            const list: OneComment[] | undefined = state.normalizedComments?.[parent_id];
+            if (!list) {
+              console.error(`Comments for post ${parent_id} not found`);
+              return;
+            }
+            const updated = list.map(c => {
+              if (c.post_id !== comment_id) return c;
+              const next: OneComment = {
+                ...c,
+                is_disliked: action === 'delete' ? 'f' : 't',
+                dislikes: String(
+                  Math.max(Number(c.dislikes || 0) + (action === 'delete' ? -1 : 1), 0),
+                ),
+              };
+              if (c.is_liked === 't' && action !== 'delete') {
+                next.is_liked = 'f';
+                next.likes = String(Math.max(Number(c.likes || 0) - 1, 0));
+              }
+              return next;
+            });
+            set({
+              normalizedComments: {
+                ...state.normalizedComments,
+                [parent_id]: updated,
+              },
+            });
+          } else {
+            console.error('dislikeComment failed:', res);
+          }
+        } catch (error) {
+          console.error('dislikeComment error:', error);
         }
       },
       deleteComment: async (id: string, post_id: string): Promise<any> => {

@@ -1,56 +1,73 @@
 .footerContainer {
   text-align: center;
+  opacity: 0;
+  transition: opacity 0.2s ease-in-out;
+  width: inherit;
 
-  .ant-tabs {
-    opacity: 0;
-    transition: opacity 0.2s ease-in-out;
-  }
-
-  .ant-tabs[role='tablist'] {
+  &.ready {
     opacity: 1;
   }
 }
 
 .placeholder {
-  height: 48px;
+  height: 56px;
   width: 100%;
 }
 
 .menu {
-  text-align: center;
-  :global {
-    .ant-tabs-tab {
-      position: relative;
-      padding: 6px 16px !important;
-      transition: all 0.2s ease-in-out;
-      &:not(:last-child) {
-        &::after {
-          content: '';
-          position: absolute;
-          right: -8px;
-          top: 50%;
-          transform: translateY(-50%);
-          width: 1px;
-          height: 20px;
-          background-color: var(--graphics11);
-        }
-      }
-      @media screen and (max-width: 960px) {
-        padding: 12px 0 !important;
-        padding-top: 20px;
-      }
-    }
-    .ant-tabs-tab:active {
-      transform: scale(1.07);
+  display: flex;
+  flex-direction: row;
+  justify-content: center;
+  align-items: center;
+  gap: 8px;
+  width: 100%;
+  padding: 4px 16px;
+}
 
-      @media screen and (max-width: 960px) {
-        transform: scale(1.3);
-        background-color: var(--secondaryWhite);
-      }
+.menuItem {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  gap: 4px;
+  flex: 1;
+  min-width: 0;
+  padding: 8px 4px;
+  background: none;
+  border: none;
+  cursor: pointer;
+  transition: transform 0.2s ease-in-out;
+
+  .icon {
+    filter: brightness(0);
+    transition: filter 0.2s ease-in-out;
+    flex-shrink: 0;
+  }
+
+  .label {
+    font-size: 10px;
+    color: #000;
+    transition: color 0.2s ease-in-out;
+    white-space: nowrap;
+  }
+
+  &.active {
+    .icon {
+      filter: invert(68%) sepia(92%) saturate(6319%) hue-rotate(346deg) brightness(98%)
+        contrast(100%) contrast(105%);
     }
 
-    .ant-tabs-tab + .ant-tabs-tab {
-      margin-left: 16px;
+    .label {
+      color: #fb4724;
     }
+  }
+
+  &:active {
+    transform: scale(1.1);
+  }
+
+  &:disabled {
+    opacity: 0.4;
+    cursor: not-allowed;
   }
 }

@@ -31,7 +31,7 @@ const InputModule: React.FC<InputModuleProps> = ({
 }) => {
   return (
     <>
-      <Divider className={style.inputDivider} />
+      <div className={style.inputDividerDotted} />
       <div className={style.commentInputContainer}>
         <div className={style.avatarTemplate}>
           {isAdmin ? (

@@ -1,8 +1,4 @@
 .spinWrapper {
-  background-image: url('/images/background_mobile.webp');
-  background-repeat: no-repeat;
-  background-size: contain;
-  background-position: center;
   height: 100vh;
   width: 100vw;
   display: flex;
@@ -11,17 +7,12 @@
   flex-direction: column;
 }
 
-.layoutContainer {
+.defaultLayoutContainer {
   display: flex;
   flex-direction: column;
-  min-height: calc(var(--vh, 1vh) * 100);
+  height: calc(var(--vh, 1vh) * 100);
   overscroll-behavior-y: contain;
   overflow-y: hidden;
-}
-
-.content {
-  flex: 1;
-  overflow: hidden;
 }
 
 .header {
@@ -48,6 +39,16 @@
   }
 }
 
+.pageContent {
+  flex: 1;
+  overflow-x: hidden;
+  overflow-y: auto;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: flex-start;
+}
+
 .footer {
   z-index: 3;
   transition: transform 0.3s ease-in-out;
@@ -55,14 +56,18 @@
   @media screen and (max-width: 960px) {
     display: block;
     position: fixed;
-    bottom: 0;
+    bottom: 20px;
     left: 50%;
     transform: translateX(-50%);
+    width: 350px;
+    height: 70px;
+    border-radius: 30px;
+    background-color: #f3f3f3;
   }
 }
 
 .footerHidden {
-  transform: translateX(-50%) translateY(100%) !important;
+  transform: translateX(-50%) translateY(145%) !important;
 }
 
 .emptyPage {

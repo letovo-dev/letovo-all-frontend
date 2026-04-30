@@ -37,6 +37,10 @@ export const API_ACHIEVEMENTS_SCHEME: IApiEntityScheme<IEndpoint> = {
     method: 'GET',
     url: `${baseUrl}/achivements/no_dep`,
   },
+  user: {
+    method: 'GET',
+    url: `${baseUrl}/achivements/user/departments`,
+  },
 };
 
 export const API_ACHIEVEMENTS_ENDPOINTS = [
@@ -48,4 +52,5 @@ export const API_ACHIEVEMENTS_ENDPOINTS = [
   'delete',
   'department',
   'list',
+  'user',
 ] as const;

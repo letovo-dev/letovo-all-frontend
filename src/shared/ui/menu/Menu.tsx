@@ -1,23 +1,54 @@
 'use client';
 import React, { useState, useEffect, useMemo } from 'react';
-import { ConfigProvider, Tabs } from 'antd';
 import style from './Menu.module.scss';
 import { usePathname, useRouter } from 'next/navigation';
 import userStore from '@/shared/stores/user-store';
 import articlesStore from '@/shared/stores/articles-store';
+import Image from 'next/image';
 
 interface MenuItem {
   label: string;
   key: string;
   disabled: boolean;
-  destroyOnHidden?: boolean;
+  icon: string;
+  width?: number;
+  height?: number;
 }
 
 const items: MenuItem[] = [
-  { label: 'База знаний', key: 'articles', disabled: false },
-  { label: 'Новости', key: 'news', disabled: false },
-  { label: 'Редактор статей', key: 'md-editor', disabled: false, destroyOnHidden: true },
-  { label: 'Личный кабинет', key: 'user', disabled: false },
+  {
+    label: 'База знаний',
+    key: 'articles',
+    disabled: false,
+    icon: '/26_article_icon.png',
+    width: 30,
+    height: 20,
+  },
+  {
+    label: 'Новости',
+    key: 'news',
+    disabled: false,
+    icon: '/26_news_icon.png',
+    width: 17,
+    height: 30,
+  },
+  {
+    label: 'Редактор статей',
+    key: 'md-editor',
+    disabled: false,
+    icon: '/26_article_icon.png',
+    width: 30,
+    height: 20,
+  },
+  { label: 'Чат', key: 'chat', disabled: false, icon: '/26_chat_icon.png', width: 27, height: 26 },
+  {
+    label: 'Личный кабинет',
+    key: 'user',
+    disabled: false,
+    icon: '/26_user_icon.png',
+    width: 30,
+    height: 23,
+  },
 ];
 
 const ALLOWED_ROLES = ['admin'];
@@ -64,7 +95,7 @@ const Menu = ({ isFooter }: { isFooter?: boolean }) => {
     [isFooter, userData.userrights],
   );
 
-  const handleTabClick = (key: string) => {
+  const handleItemClick = (key: string) => {
     if (key !== 'md-editor') {
       articlesStore.setState({ isEditArticle: false });
     }
@@ -82,30 +113,28 @@ const Menu = ({ isFooter }: { isFooter?: boolean }) => {
 
   return (
     <div className={`${style.footerContainer} ${isReady ? style.ready : ''}`}>
-      <ConfigProvider
-        theme={{
-          components: {
-            Tabs: {
-              itemSelectedColor: '#2d2d2d',
-              inkBarColor: '#fb4724',
-              itemHoverColor: '#494949',
-              itemActiveColor: '#2d2d2d',
-            },
-          },
-        }}
-      >
-        {isReady ? (
-          <Tabs
-            className={style.menu}
-            activeKey={activeKey}
-            centered
-            items={permittedItems}
-            onTabClick={handleTabClick}
-          />
-        ) : (
-          <div className={style.placeholder} />
-        )}
-      </ConfigProvider>
+      {isReady ? (
+        <nav className={style.menu}>
+          {permittedItems.map(item => (
+            <button
+              key={item.key}
+              className={`${style.menuItem} ${activeKey === item.key ? style.active : ''}`}
+              onClick={() => handleItemClick(item.key)}
+              disabled={item.disabled}
+            >
+              <Image
+                src={item.icon}
+                alt={item.label}
+                width={item.width}
+                height={item.height}
+                className={style.icon}
+              />
+            </button>
+          ))}
+        </nav>
+      ) : (
+        <div className={style.placeholder} />
+      )}
     </div>
   );
 };

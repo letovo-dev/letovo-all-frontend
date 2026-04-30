@@ -16,6 +16,11 @@ export default function Home() {
   const error = userStore((state: IUserStore) => state.error);
   const loading = authStore(state => state.loading);
   const [authChecked, setAuthChecked] = useState(false);
+  const [mounted, setMounted] = useState(false);
+
+  useEffect(() => {
+    setMounted(true);
+  }, []);
 
   useEffect(() => {
     async function handleAuthCheck() {
@@ -60,6 +65,8 @@ export default function Home() {
     document.addEventListener('visibilitychange', handleVisibilityChange);
     return () => document.removeEventListener('visibilitychange', handleVisibilityChange);
   }, []);
+
+  if (!mounted) return null;
 
   if (loading || !authChecked) {
     return (

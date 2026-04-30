@@ -13,6 +13,11 @@ export const metadata: Metadata = {
     apple: '/apple-touch-icon.png',
   },
   manifest: '/manifest.json',
+  appleWebApp: {
+    capable: true,
+    statusBarStyle: 'black-translucent',
+    title: 'Letovo',
+  },
 };
 
 export const viewport: Viewport = {
@@ -33,8 +38,8 @@ export default function RootLayout({
     <html lang="en">
       <body className="caleo-font">
         <FooterProvider>
-          <div className="layout-container">
-            <main className="content">{children}</main>
+          <div className="layoutContainer" translate="no" suppressHydrationWarning>
+            {children}
           </div>
         </FooterProvider>
       </body>

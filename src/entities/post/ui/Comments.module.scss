@@ -20,6 +20,16 @@ $overlay-color: rgba(0, 0, 0, 0.3);
         font-weight: 600;
         color: var(--foreground);
       }
+      .commentDate {
+        font-size: 10px;
+        font-weight: 500;
+        line-height: 1.426;
+        color: #a7adaa;
+        margin: 0;
+        .commentTime {
+          color: var(--foreground);
+        }
+      }
       .commentText {
         font-size: 11px;
         font-weight: 400;
@@ -101,6 +111,71 @@ $overlay-color: rgba(0, 0, 0, 0.3);
     color: var(--graphics10);
     font-weight: 400;
   }
+}
+
+.actions {
+  display: flex;
+  align-items: center;
+  gap: 21px;
+  margin-top: 5px;
+}
+
+.actionItem {
+  display: flex;
+  align-items: flex-start;
+  gap: 5px;
+  cursor: pointer;
+  background: none;
+}
+
+%icon {
+  display: inline-block;
+  margin-top: 4px;
+  background-color: var(--graphics11);
+  mask-repeat: no-repeat;
+  -webkit-mask-repeat: no-repeat;
+  mask-size: contain;
+  -webkit-mask-size: contain;
+  mask-position: center;
+  -webkit-mask-position: center;
+  transition: background-color 0.2s ease;
+}
+
+.likeIcon {
+  @extend %icon;
+  width: 25px;
+  height: 17px;
+  mask-image: url('/26_action_like.svg');
+  -webkit-mask-image: url('/26_action_like.svg');
+}
+
+.dislikeIcon {
+  @extend %icon;
+  width: 25px;
+  height: 18px;
+  mask-image: url('/26_action_dislike.svg');
+  -webkit-mask-image: url('/26_action_dislike.svg');
+}
+
+.iconActive {
+  background-color: var(--orange);
+}
+
+%count {
+  font-size: 10px;
+  font-weight: 600;
+  line-height: 1.426;
+  margin: 0;
+}
+
+.likesCount {
+  @extend %count;
+  color: var(--orange);
+}
+
+.dislikesCount {
+  @extend %count;
+  color: var(--graphics10);
 }
 .iconsItem {
   display: flex;
