@@ -1,6 +1,6 @@
 'use client';
 
-import React, { useEffect, useRef, useState } from 'react';
+import React, { useCallback, useEffect, useRef, useState } from 'react';
 import style from './MessageInput.module.scss';
 import EmojiPicker from './EmojiPicker';
 
@@ -10,6 +10,8 @@ interface MessageInputProps {
   disabled?: boolean;
   refreshing?: boolean;
 }
+
+const PLACEHOLDER = 'Напишите сообщение...';
 
 const MessageInput: React.FC<MessageInputProps> = ({ onSend, onRefresh, disabled, refreshing }) => {
   const [text, setText] = useState('');
@@ -28,12 +30,29 @@ const MessageInput: React.FC<MessageInputProps> = ({ onSend, onRefresh, disabled
     return () => document.removeEventListener('mousedown', handleClickOutside);
   }, [pickerOpen]);
 
-  useEffect(() => {
+  const adjustHeight = useCallback(() => {
     const ta = textareaRef.current;
     if (!ta) return;
     ta.style.height = 'auto';
-    ta.style.height = `${Math.min(ta.scrollHeight, 120)}px`;
-  }, [text]);
+    let needed = ta.scrollHeight;
+    if (!ta.value) {
+      ta.value = PLACEHOLDER;
+      ta.style.height = 'auto';
+      needed = Math.max(needed, ta.scrollHeight);
+      ta.value = '';
+      ta.style.height = 'auto';
+    }
+    ta.style.height = `${Math.min(needed, 120)}px`;
+  }, []);
+
+  useEffect(() => {
+    adjustHeight();
+  }, [text, adjustHeight]);
+
+  useEffect(() => {
+    window.addEventListener('resize', adjustHeight);
+    return () => window.removeEventListener('resize', adjustHeight);
+  }, [adjustHeight]);
 
   const send = () => {
     const value = text.trim();
@@ -79,7 +98,7 @@ const MessageInput: React.FC<MessageInputProps> = ({ onSend, onRefresh, disabled
       <textarea
         ref={textareaRef}
         className={style.input}
-        placeholder="Напишите сообщение..."
+        placeholder={PLACEHOLDER}
         value={text}
         onChange={e => setText(e.target.value)}
         onKeyDown={handleKeyDown}

@@ -1,6 +1,7 @@
 'use client';
 
 import React, { useCallback, useEffect, useMemo, useRef } from 'react';
+import Image from 'next/image';
 import { useFooterContext } from '@/shared/ui/context/FooterContext';
 import SideBarChat from '@/features/side-bar-chat';
 import chatStore from '@/shared/stores/chat-store';
@@ -10,7 +11,7 @@ import MessageBubble from './ui/MessageBubble';
 import MessageInput from './ui/MessageInput';
 
 const ChatPage: React.FC = () => {
-  const { scrollContainerRef } = useFooterContext();
+  const { scrollContainerRef, isFooterHidden, setFooterHidden, toggleFooter } = useFooterContext();
   const wrapRef = useRef<HTMLDivElement>(null);
   const messagesEndRef = useRef<HTMLDivElement>(null);
   const burgerRef = useRef<HTMLDivElement>(null);
@@ -34,12 +35,22 @@ const ChatPage: React.FC = () => {
     [activeChat, messagesByUsername],
   );
 
+  const visibleContacts = useMemo(
+    () => (currentUsername ? contacts.filter(c => c.username !== currentUsername) : contacts),
+    [contacts, currentUsername],
+  );
+
   useEffect(() => {
     scrollContainerRef.current = wrapRef.current;
     return () => {
       scrollContainerRef.current = null;
     };
   }, [scrollContainerRef]);
+
+  useEffect(() => {
+    setFooterHidden(true);
+    return () => setFooterHidden(false);
+  }, [setFooterHidden]);
 
   useEffect(() => {
     getContacts();
@@ -71,13 +82,16 @@ const ChatPage: React.FC = () => {
   return (
     <>
       <SideBarChat
-        contacts={contacts}
+        contacts={visibleContacts}
         loading={loadingContacts}
         activeUsername={activeChat}
         onSelectContact={setActiveChat}
         burgerRef={burgerRef}
       />
-      <div ref={wrapRef} className={style.chatContainer}>
+      <div
+        ref={wrapRef}
+        className={`${style.chatContainer} ${!isFooterHidden ? style.chatContainerMenuOpen : ''}`}
+      >
         {!activeChat && (
           <p className={style.emptyHint}>Выберите контакт, кому вы хотите написать...</p>
         )}
@@ -94,6 +108,20 @@ const ChatPage: React.FC = () => {
               ))}
               <div ref={messagesEndRef} />
             </div>
+            <button
+              type="button"
+              className={`${style.menuToggle} ${!isFooterHidden ? style.menuToggleOpen : ''}`}
+              onClick={toggleFooter}
+              aria-label={isFooterHidden ? 'Открыть меню' : 'Закрыть меню'}
+            >
+              <Image
+                src={isFooterHidden ? '/26_orange_arrow_l.svg' : '/26_orange_arrow_r.svg'}
+                alt=""
+                width={10}
+                height={10}
+              />
+              <span>{isFooterHidden ? 'открыть меню' : 'закрыть меню'}</span>
+            </button>
             <MessageInput
               onSend={handleSend}
               onRefresh={handleRefresh}

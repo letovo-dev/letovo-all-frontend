@@ -115,14 +115,12 @@ const chatStore = create<ChatStoreState>()(
             offset: currentOffset,
           });
           const result = (response?.data as { result?: ChatMessage[] })?.result ?? [];
-          const chronological = [...result].reverse();
           const hasMore = result.length === limit;
+          const ordered = [...result].sort((a, b) => a.sent_at.localeCompare(b.sent_at));
 
           set(draft => {
             const existing = draft.messagesByUsername[username] ?? [];
-            draft.messagesByUsername[username] = append
-              ? [...chronological, ...existing]
-              : chronological;
+            draft.messagesByUsername[username] = append ? [...ordered, ...existing] : ordered;
             draft.paginationByUsername[username] = {
               offset: currentOffset + result.length,
               hasMore,
