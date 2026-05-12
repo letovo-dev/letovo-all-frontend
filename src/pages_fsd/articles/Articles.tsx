@@ -1,15 +1,13 @@
 'use client';
 
-import React, { useEffect, useRef, useState, useMemo, useCallback } from 'react';
+import React, { useEffect, useRef, useState, useMemo } from 'react';
 import axios from 'axios';
 import { useRouter } from 'next/navigation';
 import { useFooterContext } from '@/shared/ui/context/FooterContext';
 import articlesStore from '@/shared/stores/articles-store';
 import SpinModule from '@/shared/ui/spiner';
 import { extractImageUrls } from '@/shared/utils/utils';
-import debounce from 'lodash/debounce';
 import style from './Articles.module.scss';
-import Burger from '@/shared/ui/burger-menu/Burger';
 import { SideBarArticles } from '@/features/side-bar-articles';
 import MarkdownContent from './ReactMd';
 import authStore from '@/shared/stores/auth-store';
@@ -18,15 +16,12 @@ const Articles: React.FC = () => {
   const { article, normalizedArticles, loading, articlesCategories, getArticlesCategories } =
     articlesStore();
   const router = useRouter();
-  const { setFooterHidden } = useFooterContext();
+  const { scrollContainerRef } = useFooterContext();
   const [processedText, setProcessedText] = useState('');
   const [mediaCache, setMediaCache] = useState<Record<string, string>>({});
   const [error, setError] = useState<string | null>(null);
   const wrapRef = useRef<HTMLDivElement>(null);
-  const burgerRef = useRef<HTMLDivElement>(null);
   const mediaCacheRef = useRef<Record<string, string>>({});
-  const lastScrollTopRef = useRef(0);
-  const [open, setOpen] = useState(false);
   const {
     userStatus: { token },
   } = authStore(state => state);
@@ -43,24 +38,12 @@ const Articles: React.FC = () => {
     }
   }, [router, getArticlesCategories, token]);
 
-  const handleScroll = useCallback(
-    debounce(() => {
-      if (wrapRef.current) {
-        const currentScrollTop = wrapRef.current.scrollTop;
-        setFooterHidden(currentScrollTop > 50);
-        lastScrollTopRef.current = currentScrollTop;
-      }
-    }, 50),
-    [setFooterHidden],
-  );
-
   useEffect(() => {
-    const element = wrapRef.current;
-    if (element) {
-      element.addEventListener('scroll', handleScroll, { passive: true });
-      return () => element.removeEventListener('scroll', handleScroll);
-    }
-  }, [handleScroll]);
+    scrollContainerRef.current = wrapRef.current;
+    return () => {
+      scrollContainerRef.current = null;
+    };
+  }, [scrollContainerRef]);
 
   useEffect(() => {
     let isMounted = true;
@@ -146,20 +129,12 @@ const Articles: React.FC = () => {
 
   return (
     <>
-      <div
-        className={`${style.burgerArticlesContainer} ${open ? style.sidebarOpenBurgerContainer : ''}`}
-        ref={burgerRef}
-      >
-        <Burger setOpen={setOpen} />
-      </div>
       <SideBarArticles
-        open={open}
-        setOpen={setOpen}
+        // desktop={false}
         normalizedArticles={normalizedArticles}
         articlesCategories={articlesCategories}
-        burgerRef={burgerRef}
       />
-      <div ref={wrapRef} className={`${style.newsContainer} ${open ? style.sidebarOpen : ''}`}>
+      <div ref={wrapRef} className={style.newsContainer}>
         <div className={style.wrap}>
           <MarkdownContent content={memoizedProcessedText} />
         </div>

@@ -40,12 +40,23 @@
   display: flex;
   flex-direction: column;
   align-items: center;
+  width: 98px;
+  min-width: 0;
+  box-sizing: border-box;
+  @media screen and (max-width: 960px) {
+    width: 100%;
+  }
+  img {
+    max-width: 100%;
+    height: auto;
+  }
   .itemImg {
     cursor: pointer;
     margin-bottom: 5px;
     display: flex;
     flex-direction: column;
     align-items: center;
+    max-width: 100%;
   }
   .achTextInactive {
     font-size: 11px;
@@ -55,8 +66,16 @@
   .achTextActive {
     font-size: 11px;
     font-weight: 400;
-    color: var(--graphics9);
+    color: var(--achieve-text);
     text-align: center;
+
+    width: 100%;
+    word-wrap: break-word;
+    overflow-wrap: anywhere;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    height: 100%;
   }
 }
 @media screen and (max-width: 424px) {

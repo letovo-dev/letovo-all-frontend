@@ -1,7 +1,7 @@
 'use client';
 import React, { useEffect, useState } from 'react';
 import { ExclamationCircleOutlined } from '@ant-design/icons';
-import { Button, Form, Typography, ConfigProvider, Spin, Flex, message } from 'antd';
+import { Button, Form, Typography, ConfigProvider, Spin, Flex, message, Input } from 'antd';
 import authStore from '@/shared/stores/auth-store';
 import { redirect } from 'next/navigation';
 import style from './EnterForm.module.scss';
@@ -22,6 +22,11 @@ function EnterForm() {
   const [open, setOpen] = useState(false);
   const [messageApi, contextHolder] = message.useMessage();
   const [user, setUser] = useState<IUserData | null>(null);
+  const [mounted, setMounted] = useState(false);
+
+  useEffect(() => {
+    setMounted(true);
+  }, []);
 
   useEffect(() => {
     if (userStatus?.logged && userStatus?.registered) {
@@ -77,27 +82,29 @@ function EnterForm() {
       type: 'warning',
       content:
         'Мы используем файлы cookie для повышения безопасности и предотвращения мошенничества. Нажимая «Войти», вы соглашаетесь на их использование. Собранные данные о ваших входах и устройстве не передаются третьим лицам.',
-      className: 'custom-class',
       style: {
-        marginTop: '77vh',
+        marginTop: 'calc(100vh - 200px)',
+        width: '380px',
       },
-      duration: 10,
+      duration: 15,
     });
   };
 
   useEffect(() => {
-    setTimeout(() => {
+    if (!mounted) return;
+    const timer = setTimeout(() => {
       warning();
-    }, 500);
-  }, []);
+    }, 1000);
+    return () => clearTimeout(timer);
+  }, [mounted]);
 
   return (
     <>
-      {contextHolder}
+      {mounted && contextHolder}
       <div className={style.loginFormWrapper}>
-        <div className={style.titleBorder}>
-          <Title level={4}>ВХОД</Title>
-        </div>
+        <Title level={4} className={style.titleBorder}>
+          ВХОД
+        </Title>
         <Form name="form" onFinish={onFinish} form={form}>
           <div className={style.card}>
             {loading && (
@@ -113,7 +120,7 @@ function EnterForm() {
                 </ConfigProvider>
               </div>
             )}
-            <div style={{ width: '90%' }}>
+            <div className={style.inputsContainer}>
               <Text className={style.inputTextHeader} type="secondary">
                 {'Логин'}
               </Text>
@@ -122,7 +129,7 @@ function EnterForm() {
                 initialValue={formData.login}
                 className={!error ? style.inputForm : style.inputFormError}
               >
-                <input
+                <Input
                   type="text"
                   className={style.customInput}
                   placeholder=""
@@ -139,7 +146,7 @@ function EnterForm() {
                 name="password"
                 initialValue={formData.password}
               >
-                <input
+                <Input
                   className={style.customInput}
                   type="password"
                   id="form_password"
