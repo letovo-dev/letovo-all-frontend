@@ -38,10 +38,14 @@ const CollapseBody = ({
           <Image src={departmentIcon} alt="" width={38} height={38} />
         </div>
         <div className={style.infoTexts}>
-          <span className={style.label}>Отдел</span>
-          <span className={style.value}>{brigade}</span>
-          <span className={style.label}>Должность 1</span>
-          <span className={style.value}>{post}</span>
+          <div className={style.infoPair}>
+            <span className={style.label}>Отдел</span>
+            <span className={style.value}>{brigade}</span>
+          </div>
+          <div className={style.infoPair}>
+            <span className={style.label}>Должность 1</span>
+            <span className={style.value}>{post}</span>
+          </div>
         </div>
       </div>
 

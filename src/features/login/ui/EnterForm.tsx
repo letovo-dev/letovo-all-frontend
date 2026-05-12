@@ -22,6 +22,11 @@ function EnterForm() {
   const [open, setOpen] = useState(false);
   const [messageApi, contextHolder] = message.useMessage();
   const [user, setUser] = useState<IUserData | null>(null);
+  const [mounted, setMounted] = useState(false);
+
+  useEffect(() => {
+    setMounted(true);
+  }, []);
 
   useEffect(() => {
     if (userStatus?.logged && userStatus?.registered) {
@@ -77,23 +82,25 @@ function EnterForm() {
       type: 'warning',
       content:
         'Мы используем файлы cookie для повышения безопасности и предотвращения мошенничества. Нажимая «Войти», вы соглашаетесь на их использование. Собранные данные о ваших входах и устройстве не передаются третьим лицам.',
-      className: 'custom-class',
       style: {
-        marginTop: '77vh',
+        marginTop: 'calc(100vh - 200px)',
+        width: '380px',
       },
       duration: 15,
     });
   };
 
   useEffect(() => {
-    setTimeout(() => {
+    if (!mounted) return;
+    const timer = setTimeout(() => {
       warning();
     }, 1000);
-  }, []);
+    return () => clearTimeout(timer);
+  }, [mounted]);
 
   return (
     <>
-      {contextHolder}
+      {mounted && contextHolder}
       <div className={style.loginFormWrapper}>
         <Title level={4} className={style.titleBorder}>
           ВХОД

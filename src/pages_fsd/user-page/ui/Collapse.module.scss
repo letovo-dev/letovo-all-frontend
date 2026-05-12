@@ -5,13 +5,13 @@
 }
 
 .collapseHeader {
-  height: 30px;
   display: flex;
   align-items: center;
   justify-content: space-between;
+  gap: 8px;
   border-radius: 25px;
   border: var(--collapse-header-border, 1px solid var(--border-grey));
-  padding: 0 10px;
+  padding: 5px 10px;
   background: var(--collapse-header-bg, transparent);
   position: relative;
   z-index: 2;
@@ -20,13 +20,26 @@
 .collapseLeftText {
   margin: 0;
   font-size: 14px;
+  line-height: 1.2;
   color: var(--background);
+  word-break: break-word;
+  min-width: 0;
 }
 
 .collapseRight {
   display: flex;
   align-items: center;
   gap: 8px;
+  min-width: 0;
+  flex: 1 1 0;
+
+  &:first-child {
+    flex: 5 1 0;
+  }
+
+  &:last-child {
+    flex: 4 1 0;
+  }
 }
 
 .collapseDot {
@@ -45,7 +58,10 @@
 .collapseRightText {
   margin: 0;
   font-size: 14px;
+  line-height: 1.2;
   color: var(--background);
+  word-break: break-word;
+  min-width: 0;
 }
 
 .collapseToggle {
@@ -56,6 +72,11 @@
   display: flex;
   align-items: center;
   justify-content: center;
+  flex-shrink: 0;
+  margin-left: auto;
+  img {
+    filter: brightness(0) invert(1);
+  }
 }
 
 .collapseBody {

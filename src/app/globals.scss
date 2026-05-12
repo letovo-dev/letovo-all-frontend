@@ -56,6 +56,35 @@ body {
   padding: 0;
 }
 
+html {
+  scrollbar-width: thin;
+}
+
+body ::-webkit-scrollbar {
+  width: 6px;
+  height: 6px;
+}
+
+body ::-webkit-scrollbar-thumb {
+  cursor: pointer;
+  border-radius: 5px;
+  background: #8c959c !important;
+  transition: background 0.2s ease;
+}
+
+body ::-webkit-scrollbar-track {
+  background: rgba(156, 165, 171, 0.35) !important;
+  border-radius: 0px;
+}
+
+body ::-webkit-scrollbar-thumb:hover {
+  background: #7d868c !important;
+}
+
+body ::-webkit-scrollbar-thumb:active {
+  background: #7d868c !important;
+}
+
 @font-face {
   font-family: 'Caleo';
   src: url('/fonts/Calleo.woff') format('woff');

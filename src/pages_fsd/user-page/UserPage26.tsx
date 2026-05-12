@@ -3,7 +3,7 @@
 import React, { useCallback, useEffect, useMemo, useRef, useState } from 'react';
 import style from './UserPage26.module.scss';
 import userStore, { IUserAchData, IUserStore } from '@/shared/stores/user-store';
-import { ConfigProvider, Form, Spin, message, Button, Avatar } from 'antd';
+import { Form, message, Button, Avatar } from 'antd';
 import { useRouter } from 'next/navigation';
 import authStore from '@/shared/stores/auth-store';
 import { setDataToLocaleStorage } from '@/shared/lib/ApiSPA/axios/helpers';
@@ -20,6 +20,8 @@ import { FileSearchOutlined } from '@ant-design/icons';
 import Collapse from './ui/Collapse';
 import CollapseBody from './ui/CollapseBody';
 import AchieveBlockMobile26 from './ui/AchieveBlockMobile26';
+import SpinModule from '@/shared/ui/spiner';
+import { Consts } from '@/shared/consts';
 
 const DONE_ACH = '/images/aceehimnstv/loched.png';
 
@@ -104,6 +106,57 @@ const departments: {
   },
 };
 
+const mockCareerAchievements = {
+  username: 'mock_user',
+  achivements: Array.from({ length: 12 }, (_, i) => {
+    const departmentName = [
+      'IT',
+      'Менеджмент',
+      'Инженерный',
+      'Связи с общественностью',
+      'Арт',
+      'Наука',
+      'Проект 11',
+    ][i % 7];
+    const roleName = [
+      'Стажёр',
+      'Junior Developer',
+      'Middle Developer',
+      'Senior Developer',
+      'Тимлид',
+      'Архитектор',
+      'Менеджер проекта',
+      'Руководитель отдела',
+    ][i % 8];
+    return {
+      year: 2014 + i,
+      chapter: `Глава ${i + 1}`,
+      department_id: ((i % 7) + 1) as number,
+      department: departmentName,
+      role: roleName,
+      brigade: departmentName,
+      post: roleName,
+      achivements: (() => {
+        const skillCount = (i % 5) + 1;
+        const newCount = Math.ceil(skillCount / 2);
+        return Array.from({ length: skillCount }, (_, j) => ({
+          id: i * 100 + j,
+          new: j < newCount,
+          datetime: `2024-0${(j % 9) + 1}-15T10:00:00`,
+          stage: (j % 3) + 1,
+          achivement_pic: '/Achievement_Closed.webp',
+          achivement_name: `Навык ${j + 1} (глава ${i + 1})`,
+          achivement_decsription: 'Тестовое описание навыка для проверки рендера',
+          stages: 1,
+          category: null,
+          category_name: j % 2 === 0 ? 'PRO' : undefined,
+          departmentid: (i % 7) + 1,
+        }));
+      })(),
+    };
+  }),
+} as any;
+
 const UserPage26 = () => {
   const router = useRouter();
   const { getAllUserAchievements, getAchievementsDepartment, getUserAchievements } = userStore(
@@ -119,7 +172,8 @@ const UserPage26 = () => {
   const [currentItem, setCurrentItem] = useState<IUserAchData | null>(null);
   const achievements = userStore.getState().store.allPossibleUserAchievements;
   const { departmentAchievements } = userStore.getState().store;
-  const { userAchievements } = userStore.getState().store;
+  const { userAchievements: apiUserAchievements } = userStore.getState().store;
+  const userAchievements = Consts.mock.enabled ? mockCareerAchievements : apiUserAchievements;
   const [currentImageElement, setCurrentImageElement] = useState<JSX.Element | null>(null);
   const [userData, setUserData] = useState(userStore.getState().store.userData);
   const [isLoading, setIsLoading] = useState(true);
@@ -135,9 +189,78 @@ const UserPage26 = () => {
   const [openCollapseIndex, setOpenCollapseIndex] = useState<number | null>(0);
   const [viewSection, setViewSection] = useState<string>('career');
 
+  const achievementsBlockRef = useRef<HTMLElement>(null);
+  const achievementsScrollRef = useRef<HTMLDivElement>(null);
+  const achievementsThumbRef = useRef<HTMLDivElement>(null);
+  const [achievementsScrollbar, setAchievementsScrollbar] = useState<{
+    top: number;
+    height: number;
+    thumbY: number;
+    active: boolean;
+  }>({ top: 0, height: 0, thumbY: 0, active: false });
+  const ACHIEVEMENTS_THUMB_SIZE = 22;
+
   const achievementsToDisplay = useMemo(() => {
     return currentAchievements === 'all' ? achievements : departmentAchievements;
   }, [currentAchievements, achievements, departmentAchievements]);
+
+  useEffect(() => {
+    const list = achievementsScrollRef.current;
+    const wrapper = achievementsBlockRef.current;
+    if (!list || !wrapper) return;
+
+    const update = () => {
+      const listRect = list.getBoundingClientRect();
+      const wrapperRect = wrapper.getBoundingClientRect();
+      const top = listRect.top - wrapperRect.top + 10;
+      const height = Math.max(0, wrapperRect.height - top - 10);
+      const maxScroll = list.scrollHeight - list.clientHeight;
+      const isActive = maxScroll > 1 && listRect.height > ACHIEVEMENTS_THUMB_SIZE;
+      const maxThumbY = Math.max(0, height - ACHIEVEMENTS_THUMB_SIZE);
+      const ratio = maxScroll > 0 ? list.scrollTop / maxScroll : 0;
+      const thumbY = ratio * maxThumbY;
+      setAchievementsScrollbar({ top, height, thumbY, active: isActive });
+    };
+
+    update();
+    list.addEventListener('scroll', update, { passive: true });
+    const ro = new ResizeObserver(update);
+    ro.observe(list);
+    ro.observe(wrapper);
+    window.addEventListener('resize', update);
+    return () => {
+      list.removeEventListener('scroll', update);
+      ro.disconnect();
+      window.removeEventListener('resize', update);
+    };
+  }, [achievementsToDisplay, windowWidth, viewSection]);
+
+  const startAchievementsThumbDrag = (clientY: number) => {
+    const list = achievementsScrollRef.current;
+    const thumb = achievementsThumbRef.current;
+    if (!list || !thumb) return;
+    const maxScroll = list.scrollHeight - list.clientHeight;
+    const maxThumbY = Math.max(0, achievementsScrollbar.height - ACHIEVEMENTS_THUMB_SIZE);
+    if (maxScroll <= 0 || maxThumbY <= 0) return;
+    const startY = clientY;
+    const startThumbY = achievementsScrollbar.thumbY;
+    const onMove = (y: number) => {
+      const nextThumbY = Math.max(0, Math.min(maxThumbY, startThumbY + (y - startY)));
+      list.scrollTop = (nextThumbY / maxThumbY) * maxScroll;
+    };
+    const onMouseMove = (ev: MouseEvent) => onMove(ev.clientY);
+    const onTouchMove = (ev: TouchEvent) => onMove(ev.touches[0].clientY);
+    const cleanup = () => {
+      document.removeEventListener('mousemove', onMouseMove);
+      document.removeEventListener('mouseup', cleanup);
+      document.removeEventListener('touchmove', onTouchMove);
+      document.removeEventListener('touchend', cleanup);
+    };
+    document.addEventListener('mousemove', onMouseMove);
+    document.addEventListener('mouseup', cleanup);
+    document.addEventListener('touchmove', onTouchMove);
+    document.addEventListener('touchend', cleanup);
+  };
 
   useEffect(() => {
     setWindowWidth(window.innerWidth);
@@ -303,88 +426,117 @@ const UserPage26 = () => {
   };
 
   if (isLoading) {
-    return (
-      <div className={style.spinner}>
-        <ConfigProvider
-          theme={{
-            token: {
-              colorPrimary: '#FB4724',
-            },
-          }}
-        >
-          <Spin size={'large'} />
-        </ConfigProvider>
-      </div>
-    );
+    return <SpinModule />;
   }
 
   return (
     <>
-      <section aria-label="Профиль пользователя" className={style.userBlock}>
-        <div className={style.icons}>
-          <div className={style.userIcon}>
-            <Avatar
-              src={`${process.env.NEXT_PUBLIC_BASE_URL_MEDIA}/${userData.avatar_pic}`}
-              size={80}
-              shape="circle"
+      <div className={style.topRow}>
+        <section aria-label="Профиль пользователя" className={style.userBlock}>
+          <div className={style.icons}>
+            <div className={style.userIcon}>
+              <Avatar
+                src={`${process.env.NEXT_PUBLIC_BASE_URL_MEDIA}/${userData.avatar_pic}`}
+                size={80}
+                shape="circle"
+              />
+            </div>
+            <Image
+              className={`${style.depIcon} ${style.depIconMobile}`}
+              src={departments[userData?.departmentid]?.icon}
+              alt="icon"
+              height={80}
+              width={80}
             />
           </div>
-          <Image
-            className={style.depIcon}
-            src={departments[userData.departmentid].icon}
-            alt="icon"
-            height={80}
-            width={80}
-          />
-        </div>
-        <div className={style.userData}>
-          <h1 className={style.userName}>{userData.display_name.toUpperCase()}</h1>
-          <p className={style.status}>{userOnBoard}</p>
-          <div className={style.depData}>
-            <p className={style.depName}>{`${departments[userData.departmentid].name} >`}</p>
-            <p className={style.branchName}>{userData?.brigadename ?? 'xxxxx'}</p>
+          <div className={style.userData}>
+            {(() => {
+              const fullName = (userData.display_name || '').trim();
+              const parts = fullName.split(/\s+/);
+              const surname = parts[0] ?? '';
+              const givenName = parts.slice(1).join(' ');
+              return (
+                <h1 className={style.userName}>
+                  <span className={style.surname}>{surname.toUpperCase()}</span>{' '}
+                  <span className={style.givenName}>{givenName.toUpperCase()}</span>
+                </h1>
+              );
+            })()}
+            <p className={style.status}>{userOnBoard}</p>
+            <div className={style.depData}>
+              <Image
+                className={`${style.depIcon} ${style.depIconDesktop}`}
+                src={departments[userData.departmentid].icon}
+                alt=""
+                height={41}
+                width={50}
+              />
+              <div className={style.depTextWrap}>
+                <p className={style.depName}>{`${departments[userData.departmentid].name} >`}</p>
+                <p className={style.branchName}>{userData?.brigadename ?? 'xxxxx'}</p>
+              </div>
+            </div>
           </div>
-        </div>
-        <button
-          type="button"
-          aria-label="Выйти"
-          className={style.menuButtonDiv}
-          onClick={() => logout()}
-        >
-          <Image className={style.logout} src="/26_logout.svg" alt="exit" height={20} width={20} />
-        </button>
-      </section>
-      <section aria-label="Финансы" className={style.moneyBlock}>
-        <Money26 userData={userData} />
-        <div className={style.salary}>
-          <p className={style.salaryText}>Заработная плата</p>
-          <p className={style.salarySum}>{`${userData?.paycheck} энк / д.`}</p>
-        </div>
-        <div className={style.transferBlock}>
-          <Button className={style.transferButton} onClick={() => setOpenTransferModal(true)}>
-            Перевести
+          <button
+            type="button"
+            aria-label="Выйти"
+            className={style.menuButtonDiv}
+            onClick={() => logout()}
+          >
             <Image
-              className={style.icon}
-              src="/26_refresh.svg"
-              alt="wallet"
-              height={13}
+              className={style.logout}
+              src="/26_logout.svg"
+              alt="exit"
+              height={20}
               width={20}
             />
-          </Button>
-          <div className={style.moneyActions}>
-            <div className={style.moneyActionLine}>
-              <p className={style.moneyText}>последний приход</p>
-              <p className={style.moneyPlus}>{`+${userData.last_incoming_payment?.amount ?? 0}`}</p>
-            </div>
-            <div className={style.moneyActionLine}>
-              <p className={style.moneyText}>последний платеж</p>
-              <p
-                className={style.moneyMinus}
-              >{`-${userData.last_outgoing_payment?.amount ?? 0}`}</p>
+          </button>
+        </section>
+        <div className={style.profileDivider} aria-hidden="true" />
+        <section aria-label="Финансы" className={style.moneyBlock}>
+          <div className={style.balanceWidget}>
+            <Money26 userData={userData} />
+          </div>
+          <div className={style.salary}>
+            <p className={style.salaryText}>Заработная плата</p>
+            <p className={style.salarySum}>{`${userData?.paycheck} энк / д.`}</p>
+          </div>
+          <div className={style.transferBlock}>
+            <Button className={style.transferButton} onClick={() => setOpenTransferModal(true)}>
+              Перевести
+              <Image
+                className={style.icon}
+                src="/26_refresh.svg"
+                alt="wallet"
+                height={13}
+                width={20}
+              />
+            </Button>
+            <div className={style.moneyActions}>
+              <div className={style.moneyActionLine}>
+                <p className={style.moneyText}>последний приход</p>
+                <p
+                  className={style.moneyPlus}
+                >{`+${userData.last_incoming_payment?.amount ?? 0}`}</p>
+              </div>
+              <div className={style.moneyActionLine}>
+                <p className={style.moneyText}>последний платеж</p>
+                <p
+                  className={style.moneyMinus}
+                >{`-${userData.last_outgoing_payment?.amount ?? 0}`}</p>
+              </div>
             </div>
           </div>
-        </div>
-      </section>
+        </section>
+        <Image
+          className={style.corpLogo}
+          src="/26_corp_logo.svg"
+          alt=""
+          width={120}
+          height={102}
+          aria-hidden="true"
+        />
+      </div>
       <section aria-label="Карьера и достижения" className={style.careerAndAchievementsBlock}>
         <button
           type="button"
@@ -404,12 +556,18 @@ const UserPage26 = () => {
         </button>
       </section>
 
-      {viewSection === 'career' && (
-        <section aria-label="Карьера" className={style.careerBlock}>
-          <button type="button" className={style.careerViewButton}>
-            Посмотреть развитие карьеры на карте
-            <Image src="/26_arrowUp.svg" alt="" height={12} width={12} />
-          </button>
+      <div className={style.careerAchieveRow}>
+        <section
+          aria-label="Карьера"
+          className={`${style.careerBlock} ${viewSection !== 'career' ? style.mobileHidden : ''}`}
+        >
+          <div className={style.careerHeader}>
+            <h3 className={style.careerHeaderTitle}>Карьера</h3>
+            <button type="button" className={style.careerViewButton}>
+              Посмотреть развитие карьеры на карте
+              <Image src="/26_arrowUp.svg" alt="" height={12} width={12} />
+            </button>
+          </div>
           <div className={style.collapseContainer}>
             {/* {[
             {
@@ -456,32 +614,36 @@ const UserPage26 = () => {
               {children}
             </Collapse>
           ))} */}
-            {userAchievements?.achivements?.map((achivement, i) => (
-              <Collapse
-                key={`${i}-${userAchievements?.username}`}
-                leftText={achivement.role}
-                rightText={`${achivement.department} | ${achivement.chapter} | ${achivement.year}`}
-                isOpen={openCollapseIndex === i}
-                onToggle={() => setOpenCollapseIndex(prev => (prev === i ? null : i))}
-                headerColor={departments[userData.departmentid].color}
-                dotColor={departments[userData.departmentid].iconColor}
-                borderColor={departments[userData.departmentid].borderColor}
-              >
-                <CollapseBody
-                  departmentIcon={departments[userData.departmentid].icon}
-                  brigade={(achivement as any).brigade}
-                  post={(achivement as any).Post}
-                  achivements={achivement.achivements}
-                  iconColor={departments[userData.departmentid].iconColor}
-                />
-                <></>
-              </Collapse>
-            ))}
+            {userAchievements?.achivements?.map((achivement: any, i: number) => {
+              const depKey = String(achivement.department_id ?? userData.departmentid);
+              const dep = departments[depKey] ?? departments[userData.departmentid];
+              return (
+                <Collapse
+                  key={`${i}-${userAchievements?.username}`}
+                  leftText={achivement.role}
+                  rightText={`${achivement.department} | ${achivement.chapter} | ${achivement.year}`}
+                  isOpen={openCollapseIndex === i}
+                  onToggle={() => setOpenCollapseIndex(prev => (prev === i ? null : i))}
+                  headerColor={dep.color}
+                  dotColor={dep.iconColor}
+                  borderColor={dep.borderColor}
+                >
+                  <CollapseBody
+                    departmentIcon={dep.icon}
+                    brigade={achivement.department}
+                    post={achivement.role}
+                    achivements={achivement.achivements}
+                    iconColor={dep.iconColor}
+                  />
+                  <></>
+                </Collapse>
+              );
+            })}
           </div>
         </section>
-      )}
-      {viewSection === 'achievements' && (
-        <div className={style.achievementsBlockContainer}>
+        <div
+          className={`${style.achievementsBlockContainer} ${viewSection !== 'achievements' ? style.mobileHidden : ''}`}
+        >
           <div className={style.titleInfo}>
             <h5 className={style.title}>Корпоративные достижения</h5>
             <div className={style.info}>
@@ -490,22 +652,64 @@ const UserPage26 = () => {
             </div>
           </div>
 
-          <section aria-label="Достижения" className={style.achievementsBlock}>
-            {achievementsToDisplay &&
-              achievementsToDisplay.length > 0 &&
-              (windowWidth <= 960 ? (
-                <AchieveBlockMobile26
-                  achievements={achievementsToDisplay ?? []}
-                  openModal={openModal}
-                />
-              ) : (
-                <div className={style.achieveBlockContainer}>
-                  <AchieveBlock achievements={achievementsToDisplay ?? []} openModal={openModal} />
-                </div>
-              ))}
+          <section
+            ref={achievementsBlockRef}
+            aria-label="Достижения"
+            className={style.achievementsBlock}
+          >
+            <div
+              ref={achievementsScrollRef}
+              className={`${style.achievementsScroll} ${
+                achievementsScrollbar.active ? style.achievementsScrollFaded : ''
+              }`}
+            >
+              {achievementsToDisplay &&
+                achievementsToDisplay.length > 0 &&
+                (windowWidth <= 960 ? (
+                  <AchieveBlockMobile26
+                    achievements={achievementsToDisplay ?? []}
+                    openModal={openModal}
+                  />
+                ) : (
+                  <div className={style.achieveBlockContainer}>
+                    <AchieveBlock
+                      achievements={achievementsToDisplay ?? []}
+                      openModal={openModal}
+                    />
+                  </div>
+                ))}
+            </div>
+            <div
+              className={`${style.achievementsScrollContainer} ${
+                !achievementsScrollbar.active ? style.achievementsScrollContainerInactive : ''
+              }`}
+              style={{
+                top: achievementsScrollbar.top,
+                height: achievementsScrollbar.height,
+              }}
+              onClick={e => e.stopPropagation()}
+            >
+              <div className={style.achievementsScrollTrack} />
+              <div
+                ref={achievementsThumbRef}
+                className={style.achievementsScrollThumb}
+                style={{ transform: `translateY(${achievementsScrollbar.thumbY}px)` }}
+                onMouseDown={e => {
+                  e.preventDefault();
+                  e.stopPropagation();
+                  startAchievementsThumbDrag(e.clientY);
+                }}
+                onTouchStart={e => {
+                  e.stopPropagation();
+                  startAchievementsThumbDrag(e.touches[0].clientY);
+                }}
+              >
+                <div className={style.achievementsScrollThumbDot} />
+              </div>
+            </div>
           </section>
         </div>
-      )}
+      </div>
 
       {openTransferModal && (
         <TransferModal26

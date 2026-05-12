@@ -12,12 +12,23 @@
     display: flex;
     align-items: start;
     height: 20px;
+    @media screen and (min-width: 961px) {
+      color: var(--secondaryWhite);
+      img {
+        filter: brightness(0) invert(1);
+      }
+    }
   }
 }
 .count {
   font-size: 26px;
   font-weight: 600;
   color: var(--foreground);
+  @media screen and (min-width: 961px) {
+    color: var(--secondaryWhite);
+    font-size: 22px;
+    line-height: 1.15;
+  }
 }
 .text {
   font-size: 34px;

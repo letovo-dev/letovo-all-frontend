@@ -1,0 +1,33 @@
+.picker {
+  position: absolute;
+  bottom: calc(100% + 8px);
+  right: 0;
+  width: 280px;
+  max-height: 280px;
+  overflow-y: auto;
+  overflow-x: hidden;
+  background: var(--foreground);
+  border: 1px solid var(--border-grey);
+  border-radius: 16px;
+  padding: 12px;
+  display: grid;
+  grid-template-columns: repeat(6, 1fr);
+  gap: 4px;
+  z-index: 20;
+  box-shadow: 0 6px 24px rgba(0, 0, 0, 0.35);
+}
+
+.emoji {
+  background: none;
+  border: none;
+  font-size: 22px;
+  line-height: 1;
+  padding: 6px;
+  cursor: pointer;
+  border-radius: 8px;
+  transition: background 0.15s ease;
+
+  &:hover {
+    background: var(--graphics10);
+  }
+}

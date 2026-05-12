@@ -30,17 +30,28 @@
 .infoTexts {
   display: flex;
   flex-direction: column;
+  gap: 10px;
+  flex: 1;
+  min-width: 0;
+
+  @media screen and (min-width: 961px) {
+    flex-direction: row;
+    align-items: flex-start;
+    gap: 60px;
+    flex-wrap: wrap;
+  }
+}
+
+.infoPair {
+  display: flex;
+  flex-direction: column;
   gap: 1px;
+  min-width: 0;
 }
 
 .label {
   font-size: 12px;
   color: #888;
-  margin-top: 10px;
-}
-
-.label:first-child {
-  margin-top: 0;
 }
 
 .value {
@@ -65,7 +76,7 @@
 .skillsRow {
   display: flex;
   align-items: flex-start;
-  gap: 14px;
+  gap: 40px;
   padding: 12px 20px;
 }
 
@@ -84,6 +95,14 @@
   flex-direction: column;
   gap: 14px;
   flex: 1;
+
+  @media screen and (min-width: 961px) {
+    flex-direction: row;
+    flex-wrap: wrap;
+    column-gap: 20px;
+    row-gap: 14px;
+    min-width: 0;
+  }
 }
 
 .skillItem {

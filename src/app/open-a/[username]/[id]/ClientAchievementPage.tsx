@@ -1,7 +1,8 @@
 'use client';
 
 import style from './page.module.scss';
-import { Button, ConfigProvider, Spin } from 'antd';
+import { Button, ConfigProvider } from 'antd';
+import SpinModule from '@/shared/ui/spiner';
 import dataStore from '@/shared/stores/data-store';
 import { useEffect, useRef, useState } from 'react';
 import { getDataFromLocaleStorage } from '@/shared/lib/ApiSPA/axios/helpers';
@@ -61,7 +62,7 @@ function ClientAchievementPage({ id, username }: ClientAchievementPageProps) {
       }}
     >
       {userData.userrights === '' || loading ? (
-        <Spin size="large" />
+        <SpinModule />
       ) : (
         <div className={style.pageContainer}>
           {trueUser ? (

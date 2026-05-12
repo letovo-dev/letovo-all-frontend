@@ -198,11 +198,7 @@ const SideBarNews = ({
       const listRect = list.getBoundingClientRect();
       const sidebarRect = sidebar.getBoundingClientRect();
       const top = listRect.top - sidebarRect.top - 20;
-      const computedMaxHeight = parseFloat(window.getComputedStyle(list).maxHeight) - 70;
-      const fullHeight = Number.isFinite(computedMaxHeight)
-        ? computedMaxHeight
-        : window.innerHeight * 0.6;
-      const height = fullHeight;
+      const height = Math.max(0, sidebarRect.height - top - 30);
       const maxScroll = list.scrollHeight - list.clientHeight;
       const isActive = maxScroll > 1 && listRect.height > THUMB_SIZE;
       const maxThumbY = Math.max(0, height - THUMB_SIZE);

@@ -4,6 +4,7 @@ import style from './Menu.module.scss';
 import { usePathname, useRouter } from 'next/navigation';
 import userStore from '@/shared/stores/user-store';
 import articlesStore from '@/shared/stores/articles-store';
+import navigationStore from '@/shared/stores/navigation-store';
 import Image from 'next/image';
 
 interface MenuItem {
@@ -53,18 +54,23 @@ const items: MenuItem[] = [
 
 const ALLOWED_ROLES = ['admin'];
 
+type MenuVariant = 'footer' | 'sidebar';
+
 const getFilteredItems = (
   items: MenuItem[],
-  isFooter: boolean | undefined,
+  variant: MenuVariant,
   userrights: string | undefined,
 ): MenuItem[] => {
-  if (isFooter || !ALLOWED_ROLES.includes(userrights || '')) {
+  const isAdmin = ALLOWED_ROLES.includes(userrights || '');
+  if (variant === 'footer' || !isAdmin) {
     return items.filter(item => item.key !== 'md-editor');
   }
   return items;
 };
 
-const Menu = ({ isFooter }: { isFooter?: boolean }) => {
+const Menu = ({ isFooter, variant }: { isFooter?: boolean; variant?: MenuVariant }) => {
+  const resolvedVariant: MenuVariant = variant ?? (isFooter ? 'footer' : 'footer');
+  const isSidebar = resolvedVariant === 'sidebar';
   const router = useRouter();
   const pathname = usePathname();
   const {
@@ -91,19 +97,23 @@ const Menu = ({ isFooter }: { isFooter?: boolean }) => {
   }, []);
 
   const permittedItems = useMemo(
-    () => getFilteredItems(items, isFooter, userData.userrights),
-    [isFooter, userData.userrights],
+    () => getFilteredItems(items, resolvedVariant, userData.userrights),
+    [resolvedVariant, userData.userrights],
   );
 
   const handleItemClick = (key: string) => {
     if (key !== 'md-editor') {
       articlesStore.setState({ isEditArticle: false });
     }
+    const targetPath = key === 'user' ? `/user/${username}` : `/${key}`;
+    if (pathname !== targetPath) {
+      navigationStore.getState().setNavigating(true);
+    }
     if (key === 'user') {
       userStore.getState().loading = true;
-      router.push(`/user/${username}`);
+      router.push(targetPath);
     } else {
-      router.push('/' + key);
+      router.push(targetPath);
     }
   };
 
@@ -112,15 +122,18 @@ const Menu = ({ isFooter }: { isFooter?: boolean }) => {
   }
 
   return (
-    <div className={`${style.footerContainer} ${isReady ? style.ready : ''}`}>
+    <div
+      className={`${style.footerContainer} ${isSidebar ? style.sidebarContainer : ''} ${isReady ? style.ready : ''}`}
+    >
       {isReady ? (
-        <nav className={style.menu}>
+        <nav className={`${style.menu} ${isSidebar ? style.menuSidebar : ''}`}>
           {permittedItems.map(item => (
             <button
               key={item.key}
               className={`${style.menuItem} ${activeKey === item.key ? style.active : ''}`}
               onClick={() => handleItemClick(item.key)}
               disabled={item.disabled}
+              title={item.label}
             >
               <Image
                 src={item.icon}
@@ -129,6 +142,7 @@ const Menu = ({ isFooter }: { isFooter?: boolean }) => {
                 height={item.height}
                 className={style.icon}
               />
+              {isSidebar && <span className={style.label}>{item.label}</span>}
             </button>
           ))}
         </nav>

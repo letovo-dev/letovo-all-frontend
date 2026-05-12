@@ -13,6 +13,118 @@
   height: calc(var(--vh, 1vh) * 100);
   overscroll-behavior-y: contain;
   overflow-y: hidden;
+
+  @media screen and (min-width: 961px) {
+    flex-direction: row;
+    padding: 40px 30px 60px 45px;
+    box-sizing: border-box;
+    gap: 100px;
+  }
+}
+
+.desktopSidebar {
+  display: none;
+
+  @media screen and (min-width: 961px) {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    flex-shrink: 0;
+    width: 80px;
+    height: 100%;
+    box-sizing: border-box;
+    z-index: 5;
+  }
+}
+
+.sidebarLine {
+  flex: 1;
+  position: relative;
+  width: 100%;
+  min-height: 80px;
+  display: flex;
+  flex-direction: column;
+  justify-content: flex-end;
+  align-items: center;
+  padding-bottom: 16px;
+}
+
+.sidebarLineTrack {
+  position: absolute;
+  top: 0;
+  bottom: 0;
+  left: 50%;
+  transform: translateX(-50%);
+  width: 1px;
+  background: rgba(255, 255, 255, 0.15);
+}
+
+.sidebarDots {
+  position: relative;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 4px;
+}
+
+.sidebarDot {
+  width: 7px;
+  height: 7px;
+  border-radius: 50%;
+  display: block;
+}
+
+.sidebarDotBlue {
+  background: #3d76af;
+}
+
+.sidebarDotYellow {
+  background: #ac9128;
+}
+
+.sidebarDotRed {
+  background: #c1543f;
+}
+
+.sidebarDotRing {
+  width: 13px;
+  height: 13px;
+  border-radius: 50%;
+  border: 1px solid rgba(255, 255, 255, 0.4);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  box-sizing: border-box;
+}
+
+.sidebarAvatar {
+  width: 63px;
+  height: 63px;
+  border-radius: 50%;
+  border: 1px solid rgba(255, 255, 255, 0.15);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  box-sizing: border-box;
+  flex-shrink: 0;
+}
+
+.sidebarAvatarInner {
+  width: 42px;
+  height: 42px;
+  border-radius: 50%;
+  background: #c3c3c3;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  overflow: hidden;
+
+  img {
+    width: 100%;
+    height: 100%;
+    object-fit: cover;
+    border-radius: 50%;
+  }
 }
 
 .header {
@@ -47,6 +159,10 @@
   flex-direction: column;
   align-items: center;
   justify-content: flex-start;
+  gap: 40px;
+  @media screen and (max-width: 960px) {
+    gap: 0;
+  }
 }
 
 .footer {

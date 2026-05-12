@@ -2,23 +2,24 @@
 import style from './page.module.scss';
 import { useEffect, useRef, useState } from 'react';
 import Footer from '@/shared/ui/footer';
-import Image from 'next/image';
 import Menu from '@/shared/ui/menu';
 import { useFooterContext } from '@/shared/ui/context/FooterContext';
-import { useRouter } from 'next/navigation';
+import { useRouter, usePathname } from 'next/navigation';
 import userStore from '@/shared/stores/user-store';
 import authStore from '@/shared/stores/auth-store';
+import navigationStore from '@/shared/stores/navigation-store';
 import { checkAuthToken } from '@/shared/api/auth/models/checkAuthToken';
-import { ConfigProvider, Spin } from 'antd';
+import SpinModule from '@/shared/ui/spiner';
+import Image from 'next/image';
 
 export default function DefaultLayout({ children }: { children: React.ReactNode }) {
   const layoutRef = useRef<HTMLDivElement>(null);
   const { isFooterHidden, setFooterHidden, toggleFooter, scrollContainerRef } = useFooterContext();
   const lastScrollTop = useRef(0);
   const router = useRouter();
-  const {
-    userData: { username },
-  } = userStore.getState().store;
+  const pathname = usePathname();
+  const isNavigating = navigationStore(state => state.isNavigating);
+  const setNavigating = navigationStore(state => state.setNavigating);
   const [isAuthChecked, setIsAuthChecked] = useState(false);
   const [isLoading, setIsLoading] = useState(true);
   const [mounted, setMounted] = useState(false);
@@ -26,6 +27,10 @@ export default function DefaultLayout({ children }: { children: React.ReactNode 
   useEffect(() => {
     setMounted(true);
   }, []);
+
+  useEffect(() => {
+    setNavigating(false);
+  }, [pathname, setNavigating]);
 
   useEffect(() => {
     const verifyToken = async () => {
@@ -107,13 +112,7 @@ export default function DefaultLayout({ children }: { children: React.ReactNode 
   if (!mounted) return null;
 
   if (isLoading || !isAuthChecked) {
-    return (
-      <div className={style.emptyPage}>
-        <ConfigProvider theme={{ token: { colorPrimary: '#FB4724' } }}>
-          <Spin size="large" />
-        </ConfigProvider>
-      </div>
-    );
+    return <SpinModule />;
   }
 
   const currentUserStatus = authStore.getState().userStatus;
@@ -121,25 +120,35 @@ export default function DefaultLayout({ children }: { children: React.ReactNode 
     return null;
   }
 
+  const avatarPic = userStore.getState().store.userData.avatar_pic;
+  const avatarSrc = avatarPic
+    ? `${process.env.NEXT_PUBLIC_BASE_URL_MEDIA}/${avatarPic}`
+    : '/26_user_icon.png';
+
   return (
     <div className={style.defaultLayoutContainer}>
-      {/* <header className={style.header}>
-        <Image
-          className={style.letovoCorp}
-          src="/Logo_Mini.svg"
-          alt="Letovo.corp"
-          height={25}
-          width={250}
-          priority
-          onClick={() => username && router.push(`/user/${username}`)}
-        />
-        <div className={style.headerMenu}>
-          <Menu />
+      <aside className={style.desktopSidebar}>
+        <Menu variant="sidebar" />
+        <div className={style.sidebarLine}>
+          <div className={style.sidebarLineTrack} />
+          <div className={style.sidebarDots}>
+            <span className={`${style.sidebarDot} ${style.sidebarDotBlue}`} />
+            <span className={style.sidebarDotRing}>
+              <span className={`${style.sidebarDot} ${style.sidebarDotRed}`} />
+            </span>
+            <span className={`${style.sidebarDot} ${style.sidebarDotYellow}`} />
+          </div>
         </div>
-      </header> */}
+        <div className={style.sidebarAvatar}>
+          <div className={style.sidebarAvatarInner}>
+            <Image src={avatarSrc} alt="" width={42} height={42} unoptimized />
+          </div>
+        </div>
+      </aside>
       <main ref={layoutRef} className={style.pageContent}>
         {children}
       </main>
+      {isNavigating && <SpinModule />}
       <footer
         className={`${style.footer} ${isFooterHidden ? style.footerHidden : ''}`}
         onClick={isFooterHidden ? toggleFooter : undefined}
