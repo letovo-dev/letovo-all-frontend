@@ -5,6 +5,7 @@ import { SERVICES_ACHIEVEMENTS } from '@/shared/api/achievements';
 import { SERVICES_DATA } from '@/shared/api/data';
 import type { IUserData, IUserAchNew, IUserAchData } from '@/shared/stores/user-store';
 import type { RealNews, RealMedia } from '@/shared/stores/data-store';
+import dataStore from '@/shared/stores/data-store';
 
 export interface ProfilePost {
   news: RealNews;
@@ -86,6 +87,18 @@ const publicProfileStore = create<TPublicProfileState>()(
             }),
           );
         }
+
+        // Inject posts into dataStore.normalizedNews so NewsActionPanel can read like/dislike state.
+        const normalizedPosts = posts.reduce<Record<string, any>>(
+          (acc, p) => ({ ...acc, [p.news.post_id]: p }),
+          {},
+        );
+        dataStore.setState(s => ({
+          data: {
+            ...s.data,
+            normalizedNews: { ...(s.data.normalizedNews ?? {}), ...normalizedPosts },
+          },
+        }));
 
         set({ userData, career, achievements, posts, loading: false, error: undefined });
       } catch (error) {
