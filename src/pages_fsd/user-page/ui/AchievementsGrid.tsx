@@ -1,6 +1,6 @@
 'use client';
 
-import React, { useEffect, useRef, useState } from 'react';
+import React, { useEffect, useMemo, useRef, useState } from 'react';
 import style from '../UserPage26.module.scss';
 import { IUserAchData } from '@/shared/stores/user-store';
 import AchieveBlock from './AchieveBlock';
@@ -8,11 +8,26 @@ import AchieveBlockMobile26 from './AchieveBlockMobile26';
 
 const ACHIEVEMENTS_THUMB_SIZE = 22;
 
+const isCompletedAchievement = (item: IUserAchData): boolean => {
+  const stages = Number(item.stages);
+  const level = Number(item.level);
+  return stages > 0 && level >= stages;
+};
+
 interface AchievementsGridProps {
   achievements: IUserAchData[];
+  /** When true the block sizes to its content and the whole page scrolls (no nested scroll). */
+  fitContent?: boolean;
 }
 
-const AchievementsGrid: React.FC<AchievementsGridProps> = ({ achievements }) => {
+const AchievementsGrid: React.FC<AchievementsGridProps> = ({
+  achievements,
+  fitContent = false,
+}) => {
+  const completed = useMemo(
+    () => (achievements ?? []).filter(isCompletedAchievement),
+    [achievements],
+  );
   const [windowWidth, setWindowWidth] = useState<number>(0);
   const achievementsBlockRef = useRef<HTMLElement>(null);
   const achievementsScrollRef = useRef<HTMLDivElement>(null);
@@ -60,7 +75,7 @@ const AchievementsGrid: React.FC<AchievementsGridProps> = ({ achievements }) => 
       ro.disconnect();
       window.removeEventListener('resize', update);
     };
-  }, [achievements, windowWidth]);
+  }, [completed, windowWidth]);
 
   const startAchievementsThumbDrag = (clientY: number) => {
     const list = achievementsScrollRef.current;
@@ -93,12 +108,15 @@ const AchievementsGrid: React.FC<AchievementsGridProps> = ({ achievements }) => 
   const openModal = (_item: IUserAchData, _opacity: number, _activeIcon: boolean) => {};
 
   return (
-    <div className={style.achievementsBlockContainer}>
+    <div
+      className={`${style.achievementsBlockContainer} ${
+        fitContent ? style.achievementsBlockContainerFlow : ''
+      }`}
+    >
       <div className={style.titleInfo}>
-        <h5 className={style.title}>Корпоративные достижения</h5>
+        <h5 className={style.title}>Достижения</h5>
         <div className={style.info}>
-          <span className={style.a}>30</span>
-          <span className={style.b}>/50</span>
+          <span className={style.a}>{completed.length}</span>
         </div>
       </div>
 
@@ -113,15 +131,17 @@ const AchievementsGrid: React.FC<AchievementsGridProps> = ({ achievements }) => 
             achievementsScrollbar.active ? style.achievementsScrollFaded : ''
           }`}
         >
-          {achievements &&
-            achievements.length > 0 &&
-            (windowWidth <= 960 ? (
-              <AchieveBlockMobile26 achievements={achievements} openModal={openModal} />
+          {completed.length > 0 ? (
+            windowWidth <= 960 ? (
+              <AchieveBlockMobile26 achievements={completed} openModal={openModal} />
             ) : (
               <div className={style.achieveBlockContainer}>
-                <AchieveBlock achievements={achievements} openModal={openModal} />
+                <AchieveBlock achievements={completed} openModal={openModal} />
               </div>
-            ))}
+            )
+          ) : (
+            <p className={style.emptyAchievements}>Завершённых достижений пока нет</p>
+          )}
         </div>
         <div
           className={`${style.achievementsScrollContainer} ${

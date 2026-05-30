@@ -1,6 +1,6 @@
 'use client';
 
-import React, { useEffect, useState } from 'react';
+import React, { useEffect } from 'react';
 import { useRouter } from 'next/navigation';
 import { Avatar } from 'antd';
 import Image from 'next/image';
@@ -9,8 +9,6 @@ import { departments } from './model/departments';
 import publicProfileStore from '@/shared/stores/public-profile-store';
 import userStore from '@/shared/stores/user-store';
 import SpinModule from '@/shared/ui/spiner';
-import Collapse from './ui/Collapse';
-import CollapseBody from './ui/CollapseBody';
 import AchievementsGrid from './ui/AchievementsGrid';
 import ProfilePosts from './ui/ProfilePosts';
 
@@ -20,10 +18,9 @@ interface PublicUserPage26Props {
 
 const PublicUserPage26: React.FC<PublicUserPage26Props> = ({ username }) => {
   const router = useRouter();
-  const { loading, error, userData, career, achievements, posts, loadProfile, reset } =
-    publicProfileStore(state => state);
-  const [openCollapseIndex, setOpenCollapseIndex] = useState<number | null>(0);
-  const [viewSection, setViewSection] = useState<string>('career');
+  const { loading, error, userData, achievements, posts, loadProfile, reset } = publicProfileStore(
+    state => state,
+  );
 
   useEffect(() => {
     const ownUsername = userStore.getState().store.userData?.username;
@@ -103,66 +100,9 @@ const PublicUserPage26: React.FC<PublicUserPage26Props> = ({ username }) => {
         />
       </div>
 
-      <section aria-label="Карьера и достижения" className={style.careerAndAchievementsBlock}>
-        <button
-          type="button"
-          className={`${style.tabButton} ${viewSection === 'career' ? style.tabButtonActive : ''}`}
-          onClick={() => setViewSection('career')}
-        >
-          <Image src="/26_career.svg" alt="" height={18} width={18} />
-          Карьера
-        </button>
-        <button
-          type="button"
-          className={`${style.tabButton} ${viewSection === 'achievements' ? style.tabButtonActive : ''}`}
-          onClick={() => setViewSection('achievements')}
-        >
-          Достижения
-          <Image src="/26_achive.svg" alt="" height={18} width={18} />
-        </button>
+      <section aria-label="Достижения">
+        <AchievementsGrid achievements={achievements} fitContent />
       </section>
-
-      <div className={style.careerAchieveRow}>
-        <section
-          aria-label="Карьера"
-          className={`${style.careerBlock} ${viewSection !== 'career' ? style.mobileHidden : ''}`}
-        >
-          <div className={style.careerHeader}>
-            <h3 className={style.careerHeaderTitle}>Карьера</h3>
-          </div>
-          <div className={style.collapseContainer}>
-            {career?.achivements?.map((achivement: any, i: number) => {
-              const depKey = String(achivement.department_id ?? depId);
-              const itemDep = departments[depKey] ?? dep;
-              return (
-                <Collapse
-                  key={`${i}-${career?.username}`}
-                  leftText={achivement.role}
-                  rightText={`${achivement.department} | ${achivement.chapter} | ${achivement.year}`}
-                  isOpen={openCollapseIndex === i}
-                  onToggle={() => setOpenCollapseIndex(prev => (prev === i ? null : i))}
-                  headerColor={itemDep.color}
-                  dotColor={itemDep.iconColor}
-                  borderColor={itemDep.borderColor}
-                >
-                  <CollapseBody
-                    departmentIcon={itemDep.icon}
-                    brigade={achivement.department}
-                    post={achivement.role}
-                    achivements={achivement.achivements}
-                    iconColor={itemDep.iconColor}
-                  />
-                  <></>
-                </Collapse>
-              );
-            })}
-          </div>
-        </section>
-
-        <div className={viewSection !== 'achievements' ? style.mobileHidden : ''}>
-          <AchievementsGrid achievements={achievements} />
-        </div>
-      </div>
 
       <section aria-label="Посты пользователя">
         <ProfilePosts posts={posts} />

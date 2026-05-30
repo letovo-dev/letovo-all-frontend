@@ -1,8 +1,13 @@
 .postsWrap {
   display: flex;
   flex-direction: column;
-  gap: 16px;
-  width: 100%;
+  align-items: stretch;
+  gap: 30px;
+  width: 390px;
+  max-width: 100%;
+  margin: 0 auto;
+  box-sizing: border-box;
+  padding-bottom: 55px;
 }
 
 .postContainer {

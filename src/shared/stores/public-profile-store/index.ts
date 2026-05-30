@@ -12,6 +12,39 @@ export interface ProfilePost {
   media: string[];
 }
 
+// The per-user career tree (IUserAchNew) carries each achievement's `stage`/`stages`,
+// unlike the viewer-scoped catalog. Flatten it into IUserAchData[] (deduped, keeping the
+// highest stage) so the achievements grid can render and filter completed ones.
+const flattenCareerAchievements = (
+  career: IUserAchNew | undefined,
+  username: string,
+): IUserAchData[] => {
+  const byId = new Map<string, IUserAchData>();
+  career?.achivements?.forEach(role => {
+    role?.achivements?.forEach((a: any) => {
+      const id = String(a.id);
+      const mapped: IUserAchData = {
+        id,
+        username,
+        achivement_id: id,
+        datetime: a.datetime ?? '',
+        stage: String(a.stage ?? 0),
+        achivement_pic: a.achivement_pic ?? '',
+        achivement_name: a.achivement_name ?? '',
+        achivement_decsription: a.achivement_decsription ?? '',
+        achivement_tree: '',
+        level: String(a.stage ?? 0),
+        stages: String(a.stages ?? 0),
+      };
+      const existing = byId.get(id);
+      if (!existing || Number(mapped.level) > Number(existing.level)) {
+        byId.set(id, mapped);
+      }
+    });
+  });
+  return Array.from(byId.values());
+};
+
 export type TPublicProfileState = {
   loading: boolean;
   error?: string;
@@ -46,10 +79,9 @@ const publicProfileStore = create<TPublicProfileState>()(
     loadProfile: async (username: string) => {
       set({ ...initialState, loading: true });
       try {
-        const [userRes, careerRes, achRes, postsRes] = await Promise.all([
+        const [userRes, careerRes, postsRes] = await Promise.all([
           SERVICES_USERS.UsersData.getUserData(username),
           SERVICES_ACHIEVEMENTS.AchievementsData.user(username),
-          SERVICES_ACHIEVEMENTS.AchievementsData.list(),
           SERVICES_DATA.Data.getPostsByAuthor(username),
         ]);
 
@@ -69,10 +101,9 @@ const publicProfileStore = create<TPublicProfileState>()(
             ? (careerRes.data as IUserAchNew)
             : undefined;
 
-        let achievements: IUserAchData[] = [];
-        if (achRes?.success && achRes.code === 200) {
-          achievements = (achRes.data as { result: IUserAchData[] }).result ?? [];
-        }
+        // Derive the target user's achievements from their career tree (user-specific,
+        // unlike the viewer-scoped /achivements/no_dep list). The grid filters completed ones.
+        const achievements = flattenCareerAchievements(career, username);
 
         let posts: ProfilePost[] = [];
         if (postsRes?.success && postsRes.code === 200) {

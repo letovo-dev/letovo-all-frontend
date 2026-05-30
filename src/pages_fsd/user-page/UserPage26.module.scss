@@ -684,6 +684,14 @@
     position: relative;
   }
 
+  .emptyAchievements {
+    width: 100%;
+    text-align: center;
+    color: var(--grey);
+    opacity: 0.7;
+    padding: 24px 0;
+  }
+
   .achieveBlockContainer {
     width: 100%;
     min-width: 0;
@@ -828,6 +836,44 @@
         height: 0;
         display: none;
       }
+    }
+  }
+}
+
+// Flow mode: the block sizes to its content and lets the whole page scroll as one
+// column (used by the public profile, where achievements sit on top of the posts).
+.achievementsBlockContainer.achievementsBlockContainerFlow {
+  height: auto;
+  min-height: 0;
+  flex: 0 0 auto;
+
+  .achievementsBlock {
+    height: auto;
+    flex: 0 0 auto;
+    min-height: 0;
+    overflow: visible;
+  }
+
+  .achievementsScroll {
+    height: auto;
+    overflow: visible;
+  }
+
+  @media screen and (min-width: 961px) {
+    flex: 0 0 auto;
+    align-self: center;
+    width: 100%;
+    max-width: 415px;
+    height: auto;
+
+    .achievementsBlock {
+      height: auto;
+      overflow: visible;
+    }
+
+    .achievementsScroll {
+      height: auto;
+      overflow: visible;
     }
   }
 }
