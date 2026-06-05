@@ -2,6 +2,7 @@
 
 import React, { useEffect, useRef, useState, useMemo } from 'react';
 import axios from 'axios';
+import Image from 'next/image';
 import { useRouter } from 'next/navigation';
 import { useFooterContext } from '@/shared/ui/context/FooterContext';
 import articlesStore from '@/shared/stores/articles-store';
@@ -11,6 +12,7 @@ import style from './Articles.module.scss';
 import { SideBarArticles } from '@/features/side-bar-articles';
 import MarkdownContent from './ReactMd';
 import authStore from '@/shared/stores/auth-store';
+import UserBlock26 from '@/pages/user-page/ui/UserBlock26';
 
 const Articles: React.FC = () => {
   const { article, normalizedArticles, loading, articlesCategories, getArticlesCategories } =
@@ -21,7 +23,10 @@ const Articles: React.FC = () => {
   const [mediaCache, setMediaCache] = useState<Record<string, string>>({});
   const [error, setError] = useState<string | null>(null);
   const wrapRef = useRef<HTMLDivElement>(null);
+  const innerWrapRef = useRef<HTMLDivElement>(null);
   const mediaCacheRef = useRef<Record<string, string>>({});
+  const [windowWidth, setWindowWidth] = useState<number>(0);
+  const isDesktop = windowWidth >= 961;
   const {
     userStatus: { token },
   } = authStore(state => state);
@@ -39,11 +44,18 @@ const Articles: React.FC = () => {
   }, [router, getArticlesCategories, token]);
 
   useEffect(() => {
-    scrollContainerRef.current = wrapRef.current;
+    setWindowWidth(window.innerWidth);
+    const handleResize = () => setWindowWidth(window.innerWidth);
+    window.addEventListener('resize', handleResize);
+    return () => window.removeEventListener('resize', handleResize);
+  }, []);
+
+  useEffect(() => {
+    scrollContainerRef.current = isDesktop ? innerWrapRef.current : wrapRef.current;
     return () => {
       scrollContainerRef.current = null;
     };
-  }, [scrollContainerRef]);
+  }, [scrollContainerRef, isDesktop]);
 
   useEffect(() => {
     let isMounted = true;
@@ -129,14 +141,35 @@ const Articles: React.FC = () => {
 
   return (
     <>
-      <SideBarArticles
-        // desktop={false}
-        normalizedArticles={normalizedArticles}
-        articlesCategories={articlesCategories}
-      />
+      {!isDesktop && (
+        <SideBarArticles
+          normalizedArticles={normalizedArticles}
+          articlesCategories={articlesCategories}
+        />
+      )}
       <div ref={wrapRef} className={style.newsContainer}>
-        <div className={style.wrap}>
+        <div className={style.desktopLeftPanel}>
+          <UserBlock26 />
+          {isDesktop && (
+            <SideBarArticles
+              desktop
+              normalizedArticles={normalizedArticles}
+              articlesCategories={articlesCategories}
+            />
+          )}
+        </div>
+        <div ref={innerWrapRef} className={style.wrap}>
           <MarkdownContent content={memoizedProcessedText} />
+        </div>
+        <div className={style.desktopRightPanel}>
+          <Image
+            className={style.corpLogo}
+            src="/26_corp_logo.svg"
+            alt=""
+            width={120}
+            height={102}
+            aria-hidden="true"
+          />
         </div>
       </div>
     </>

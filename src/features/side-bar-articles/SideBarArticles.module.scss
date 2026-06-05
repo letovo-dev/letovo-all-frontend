@@ -24,6 +24,59 @@ $overlay-color: rgba(0, 0, 0, 0.3);
   z-index: 100;
 }
 
+.sidebarDesktopInline {
+  display: flex;
+  flex-direction: column;
+  width: 100%;
+  margin-top: 20px;
+  color: var(--secondaryWhite);
+
+  :global(.ant-collapse > .ant-collapse-item > .ant-collapse-header) {
+    padding: 8px 4px !important;
+  }
+  :global(.ant-collapse .ant-collapse-content > .ant-collapse-content-box) {
+    padding: 8px 0 8px 20px !important;
+  }
+  :global(.ant-collapse-header-text) {
+    color: var(--secondaryWhite) !important;
+  }
+  :global(.ant-collapse-content) {
+    color: var(--secondaryWhite) !important;
+  }
+  :global(.ant-collapse-arrow) {
+    color: var(--secondaryWhite) !important;
+  }
+}
+
+.searchInputDesktop {
+  margin-bottom: 8px;
+}
+
+.welcomeLinkDesktop {
+  display: inline-block;
+  margin-bottom: 12px;
+  color: var(--secondaryWhite);
+  text-decoration: none;
+  font-size: 14px;
+  transition: color 0.3s ease;
+  &:hover {
+    color: var(--graphics11);
+  }
+}
+
+.sidebarItemsDesktop {
+  display: flex;
+  flex-direction: column;
+  width: 100%;
+  max-height: calc(100vh - 280px);
+  overflow-y: auto;
+  scrollbar-width: none;
+  -ms-overflow-style: none;
+  &::-webkit-scrollbar {
+    display: none;
+  }
+}
+
 .sidebarContainer {
   z-index: 10;
   position: absolute;
@@ -297,7 +350,7 @@ $overlay-color: rgba(0, 0, 0, 0.3);
 }
 
 .extraIcon {
-  color: inherit;
+  color: var(--secondaryWhite);
   &:hover {
     color: var(--orange);
   }

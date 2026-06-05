@@ -2,8 +2,45 @@
 
 $overlay-color: rgba(0, 0, 0, 0.3);
 
+.desktopLeftPanel {
+  display: none;
+
+  @media screen and (min-width: 961px) {
+    display: block;
+    flex-shrink: 0;
+    align-self: flex-start;
+    width: 390px;
+    padding: 24px 20px 0 40px;
+    box-sizing: border-box;
+  }
+}
+
+.desktopRightPanel {
+  display: none;
+
+  @media screen and (min-width: 961px) {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: flex-start;
+    flex: 1;
+    min-width: 0;
+    padding: 24px 20px 0 20px;
+    box-sizing: border-box;
+  }
+}
+
+.corpLogo {
+  display: none;
+
+  @media screen and (min-width: 961px) {
+    display: block;
+    width: auto;
+    height: auto;
+  }
+}
+
 .newsContainer {
-  // background-image: url('/images/Background_News_PC.webp');
   background-repeat: no-repeat;
   background-size: cover;
   background-position: center;
@@ -22,6 +59,12 @@ $overlay-color: rgba(0, 0, 0, 0.3);
   -webkit-overflow-scrolling: touch;
   overscroll-behavior-y: contain;
 
+  @media screen and (min-width: 961px) {
+    flex-direction: row;
+    align-items: flex-start;
+    overflow: hidden;
+  }
+
   &.sidebarOpen {
     overflow: hidden;
     position: fixed;
@@ -30,6 +73,7 @@ $overlay-color: rgba(0, 0, 0, 0.3);
     width: 100%;
     height: 100%;
   }
+
   .wrap {
     z-index: 1;
     position: relative;
@@ -40,6 +84,25 @@ $overlay-color: rgba(0, 0, 0, 0.3);
     box-sizing: border-box;
     overflow: visible;
     width: 390px;
+
+    @media screen and (min-width: 961px) {
+      width: 519px;
+      height: calc(100vh - 54px);
+      margin-top: 24px;
+      margin-left: 0;
+      margin-right: 0;
+      flex-shrink: 0;
+      overflow-y: auto;
+      overflow-x: hidden;
+      border: 1px solid rgba(255, 255, 255, 0.4);
+      border-radius: 35px;
+      background: transparent;
+      scrollbar-width: none;
+      -ms-overflow-style: none;
+      &::-webkit-scrollbar {
+        display: none;
+      }
+    }
   }
 
   .mdContent {

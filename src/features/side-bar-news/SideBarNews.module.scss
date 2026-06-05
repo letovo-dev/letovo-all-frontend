@@ -265,3 +265,31 @@ $overlay-color: rgba(0, 0, 0, 0.3);
   margin: 20px 0 0 10px;
   font-style: italic;
 }
+
+.sidebarDesktopInline {
+  display: flex;
+  flex-direction: column;
+  width: 100%;
+  margin-top: 50px;
+  color: var(--secondaryWhite);
+}
+
+.sidebarItemsDesktop {
+  display: flex;
+  flex-direction: column;
+  width: 100%;
+  margin-top: 8px;
+  padding-left: 0;
+
+  .sidebarItem {
+    margin-left: 0;
+  }
+
+  .sidebarItemSaved {
+    margin-left: 0;
+  }
+
+  .sidebarItemNews {
+    margin-left: 0;
+  }
+}

@@ -1,6 +1,6 @@
 'use client';
 
-import React, { useCallback, useEffect, useMemo, useRef } from 'react';
+import React, { useCallback, useEffect, useMemo, useRef, useState } from 'react';
 import Image from 'next/image';
 import { useFooterContext } from '@/shared/ui/context/FooterContext';
 import SideBarChat from '@/features/side-bar-chat';
@@ -15,6 +15,8 @@ const ChatPage: React.FC = () => {
   const wrapRef = useRef<HTMLDivElement>(null);
   const messagesEndRef = useRef<HTMLDivElement>(null);
   const burgerRef = useRef<HTMLDivElement>(null);
+  const [windowWidth, setWindowWidth] = useState<number>(0);
+  const isDesktop = windowWidth >= 961;
 
   const contacts = chatStore(state => state.contacts);
   const loadingContacts = chatStore(state => state.loadingContacts);
@@ -39,6 +41,13 @@ const ChatPage: React.FC = () => {
     () => (currentUsername ? contacts.filter(c => c.username !== currentUsername) : contacts),
     [contacts, currentUsername],
   );
+
+  useEffect(() => {
+    setWindowWidth(window.innerWidth);
+    const handleResize = () => setWindowWidth(window.innerWidth);
+    window.addEventListener('resize', handleResize);
+    return () => window.removeEventListener('resize', handleResize);
+  }, []);
 
   useEffect(() => {
     scrollContainerRef.current = wrapRef.current;
@@ -81,55 +90,71 @@ const ChatPage: React.FC = () => {
 
   return (
     <>
-      <SideBarChat
-        contacts={visibleContacts}
-        loading={loadingContacts}
-        activeUsername={activeChat}
-        onSelectContact={setActiveChat}
-        burgerRef={burgerRef}
-      />
+      {!isDesktop && (
+        <SideBarChat
+          contacts={visibleContacts}
+          loading={loadingContacts}
+          activeUsername={activeChat}
+          onSelectContact={setActiveChat}
+          burgerRef={burgerRef}
+        />
+      )}
       <div
         ref={wrapRef}
         className={`${style.chatContainer} ${!isFooterHidden ? style.chatContainerMenuOpen : ''}`}
       >
-        {!activeChat && (
-          <p className={style.emptyHint}>Выберите контакт, кому вы хотите написать...</p>
-        )}
-        {activeChat && (
-          <div className={style.chatArea}>
-            <div className={style.messagesList}>
-              {error && <div className={style.chatError}>{error}</div>}
-              {messages.map(message => (
-                <MessageBubble
-                  key={message.message_id}
-                  message={message}
-                  isOwn={message.sender === currentUsername}
-                />
-              ))}
-              <div ref={messagesEndRef} />
-            </div>
-            <button
-              type="button"
-              className={`${style.menuToggle} ${!isFooterHidden ? style.menuToggleOpen : ''}`}
-              onClick={toggleFooter}
-              aria-label={isFooterHidden ? 'Открыть меню' : 'Закрыть меню'}
-            >
-              <Image
-                src={isFooterHidden ? '/26_orange_arrow_l.svg' : '/26_orange_arrow_r.svg'}
-                alt=""
-                width={10}
-                height={10}
-              />
-              <span>{isFooterHidden ? 'открыть меню' : 'закрыть меню'}</span>
-            </button>
-            <MessageInput
-              onSend={handleSend}
-              onRefresh={handleRefresh}
-              disabled={sendingMessage}
-              refreshing={loadingMessages}
+        <div className={style.desktopLeftPanel}>
+          {isDesktop && (
+            <SideBarChat
+              desktop
+              contacts={visibleContacts}
+              loading={loadingContacts}
+              activeUsername={activeChat}
+              onSelectContact={setActiveChat}
+              burgerRef={burgerRef}
             />
-          </div>
-        )}
+          )}
+        </div>
+        <div className={style.chatArea}>
+          {!activeChat && (
+            <p className={style.emptyHint}>Выберите контакт, кому вы хотите написать...</p>
+          )}
+          {activeChat && (
+            <>
+              <div className={style.messagesList}>
+                {error && <div className={style.chatError}>{error}</div>}
+                {messages.map(message => (
+                  <MessageBubble
+                    key={message.message_id}
+                    message={message}
+                    isOwn={message.sender === currentUsername}
+                  />
+                ))}
+                <div ref={messagesEndRef} />
+              </div>
+              <button
+                type="button"
+                className={`${style.menuToggle} ${!isFooterHidden ? style.menuToggleOpen : ''}`}
+                onClick={toggleFooter}
+                aria-label={isFooterHidden ? 'Открыть меню' : 'Закрыть меню'}
+              >
+                <Image
+                  src={isFooterHidden ? '/26_orange_arrow_l.svg' : '/26_orange_arrow_r.svg'}
+                  alt=""
+                  width={10}
+                  height={10}
+                />
+                <span>{isFooterHidden ? 'открыть меню' : 'закрыть меню'}</span>
+              </button>
+              <MessageInput
+                onSend={handleSend}
+                onRefresh={handleRefresh}
+                disabled={sendingMessage}
+                refreshing={loadingMessages}
+              />
+            </>
+          )}
+        </div>
       </div>
     </>
   );

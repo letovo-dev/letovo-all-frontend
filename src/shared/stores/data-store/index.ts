@@ -85,6 +85,7 @@ export type Titles = {
 interface GetLimitNewsParams {
   start: number;
   size: number;
+  date?: string;
 }
 
 interface SearchNewsParams {
@@ -98,6 +99,7 @@ interface FetchNewsParams {
   start?: number;
   size?: number;
   searchQuery?: string;
+  date?: string;
 }
 
 interface RequestConfig {
@@ -451,12 +453,12 @@ const dataStore = create<TDataStoreState>()(
       }
     },
     fetchNews: async (params: FetchNewsParams): Promise<any> => {
-      const { type, start, size, searchQuery } = params;
+      const { type, start, size, searchQuery, date } = params;
 
       const requestConfig: Record<FetchNewsParams['type'], RequestConfig> = {
         getLimitNews: {
           method: SERVICES_DATA.Data.getLimitNews,
-          params: { start: start, size: size } as GetLimitNewsParams,
+          params: { start, size, ...(date ? { date } : {}) } as GetLimitNewsParams,
           newsField: 'normalizedNews',
           commentsField: 'normalizedComments',
           updatePostIds: true,

@@ -27,13 +27,13 @@ interface MainSections {
 const SideBarNews = ({
   newsTitles,
   burgerRef,
-}: // desktop,
-{
+  desktop,
+}: {
   open?: boolean;
   setOpen?: (value: boolean | ((prev: boolean) => boolean)) => void;
   newsTitles: Titles[];
   burgerRef: React.RefObject<HTMLDivElement>;
-  // desktop: boolean;
+  desktop?: boolean;
 }) => {
   const [form] = Form.useForm();
   const { loading, setCurrentNewsState, fetchNews, createNews, currentNewsState } = dataStore(
@@ -283,6 +283,104 @@ const SideBarNews = ({
       setOpen(prev => !prev);
     }
   };
+
+  if (desktop) {
+    return (
+      <>
+        {contextHolder}
+        <div className={style.sidebarDesktopInline}>
+          <SideBarNewsContent loading={loading} form={form} onFinish={onFinish} />
+          {currentNewsState.searched && !searchedNews && (
+            <div className={style.noSearchResult}>По запросу ничего не найдено</div>
+          )}
+          <div className={style.sidebarItemsDesktop}>
+            {Object.keys(mainSections).map((section, index) => {
+              const sectionKey = `${section}-${index}`;
+              return section === 'news' ? (
+                <div
+                  key={sectionKey}
+                  className={`${style.sidebarItemSaved} ${currentNewsState.saved ? style.active : ''}`}
+                  onClick={() => mainSections.saved.method()}
+                >
+                  <Image src="/26_saved.svg" alt="saved" width={30} height={18} />
+                  <span>Сохраненное</span>
+                </div>
+              ) : (
+                <div
+                  key={sectionKey}
+                  className={style.sidebarItem}
+                  onClick={mainSections[section].method}
+                >
+                  <div className={style.sidebarItemSavedContainer}>
+                    <div
+                      className={`${style.newsTitle} ${currentNewsState.default ? style.active : ''}`}
+                      onClick={(e: React.MouseEvent<HTMLDivElement>) => {
+                        e.stopPropagation();
+                        setCurrentNewsState({
+                          default: true,
+                          saved: false,
+                          selectedNews: undefined,
+                          searched: false,
+                          selectedAuthor: false,
+                        });
+                        form.resetFields();
+                      }}
+                    >
+                      <Image src="/26_news_icon.svg" alt="i" width={30} height={18} />
+                      <span>Новости</span>
+                    </div>
+                    {permittedUsers.includes(userrights) && (
+                      <PlusOutlined className={style.addArticleIcon} onClick={() => handleOpen()} />
+                    )}
+                  </div>
+                  <div
+                    className={`${style.newsListMaskWrapper} ${scrollbar.active ? style.newsListMaskWrapperFaded : ''}`}
+                  >
+                    <div ref={newsListRef} className={style.sidebarItemNewsContainer}>
+                      {newsDataStructure.map((news, idx) => (
+                        <React.Fragment key={news.author.username + idx}>
+                          {news.data.map(item =>
+                            item[1].news.title !== '' ? (
+                              <div
+                                key={item[0]}
+                                className={`${style.sidebarItemNews} ${currentNewsState.selectedNews === item[1].news.post_id ? style.active : ''}`}
+                                onClick={(e: React.MouseEvent<HTMLDivElement>) => {
+                                  e.stopPropagation();
+                                  setCurrentNewsState({
+                                    default: false,
+                                    saved: false,
+                                    selectedNews: item[1].news.post_id,
+                                    searched: false,
+                                    selectedAuthor: false,
+                                  });
+                                  form.resetFields();
+                                }}
+                              >
+                                <span>{item[1].news.title}</span>
+                              </div>
+                            ) : null,
+                          )}
+                        </React.Fragment>
+                      ))}
+                    </div>
+                  </div>
+                </div>
+              );
+            })}
+          </div>
+        </div>
+        {(userrights === 'admin' || userrights === 'moder') && (
+          <PostModal
+            visible={visible}
+            onCancel={handleCancel}
+            onSubmit={handleSubmit}
+            post={post}
+            authors={authors}
+          />
+        )}
+      </>
+    );
+  }
 
   return (
     <>

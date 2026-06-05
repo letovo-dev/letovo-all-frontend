@@ -12,6 +12,7 @@ interface SideBarChatProps {
   activeUsername?: string | null;
   onSelectContact?: (username: string) => void;
   burgerRef: React.RefObject<HTMLDivElement>;
+  desktop?: boolean;
 }
 
 const SideBarChat: React.FC<SideBarChatProps> = ({
@@ -20,6 +21,7 @@ const SideBarChat: React.FC<SideBarChatProps> = ({
   activeUsername,
   onSelectContact,
   burgerRef,
+  desktop,
 }) => {
   const [open, setOpen] = useState(false);
   const [search, setSearch] = useState('');
@@ -139,6 +141,46 @@ const SideBarChat: React.FC<SideBarChatProps> = ({
     onSelectContact?.(username);
     setOpen(false);
   };
+
+  if (desktop) {
+    return (
+      <div className={style.sidebarDesktopInline}>
+        <div className={style.searchInputDesktop}>
+          <SideBarChatSearch value={search} onChange={setSearch} disabled={loading} />
+        </div>
+        <div className={style.sidebarItemsDesktop}>
+          <div className={style.contactsHeader} onClick={() => onSelectContact?.('')}>
+            <Image src="/26_chat_icon.svg" alt="chat" width={17} height={15} />
+            <span>Список контактов</span>
+          </div>
+          <div className={style.contactsListDesktop}>
+            {filteredContacts.length === 0 && !loading && (
+              <div className={style.emptyState}>Контакты не найдены</div>
+            )}
+            {filteredContacts.map(contact => (
+              <div
+                key={contact.username}
+                className={`${style.contactItem} ${
+                  activeUsername === contact.username ? style.contactItemActive : ''
+                }`}
+                onClick={e => {
+                  e.stopPropagation();
+                  onSelectContact?.(contact.username);
+                }}
+              >
+                <span className={style.contactName}>
+                  {contact.display_name || contact.username}
+                </span>
+                {contact.last_message && (
+                  <span className={style.contactLastMessage}>{contact.last_message}</span>
+                )}
+              </div>
+            ))}
+          </div>
+        </div>
+      </div>
+    );
+  }
 
   const sidebarClass = open ? style.sidebarContainer : `${style.sidebarContainer} ${style.hidden}`;
 

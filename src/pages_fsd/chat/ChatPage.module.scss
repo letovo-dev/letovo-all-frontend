@@ -1,5 +1,18 @@
 @use '../../app/_mixins.scss';
 
+.desktopLeftPanel {
+  display: none;
+
+  @media screen and (min-width: 961px) {
+    display: block;
+    flex-shrink: 0;
+    align-self: flex-start;
+    width: 390px;
+    padding: 24px 20px 0 40px;
+    box-sizing: border-box;
+  }
+}
+
 .chatContainer {
   background-repeat: no-repeat;
   background-size: cover;
@@ -17,6 +30,11 @@
   -webkit-overflow-scrolling: touch;
   overscroll-behavior-y: contain;
 
+  @media screen and (min-width: 961px) {
+    flex-direction: row;
+    align-items: flex-start;
+  }
+
   .chatArea {
     width: 100%;
     max-width: 720px;
@@ -26,6 +44,17 @@
     flex-direction: column;
     box-sizing: border-box;
     padding: 20px 20px 0 0;
+
+    @media screen and (min-width: 961px) {
+      flex: 1;
+      max-width: none;
+      height: calc(100vh - 54px);
+      margin-top: 24px;
+      padding: 16px 12px;
+      border: 1px solid rgba(255, 255, 255, 0.4);
+      border-radius: 35px;
+      background: transparent;
+    }
   }
 
   .messagesList {
@@ -43,6 +72,15 @@
 
     & > *:first-child {
       margin-top: auto;
+    }
+
+    @media screen and (min-width: 961px) {
+      scrollbar-width: none;
+      -ms-overflow-style: none;
+      scrollbar-gutter: auto;
+      &::-webkit-scrollbar {
+        display: none;
+      }
     }
   }
 
@@ -66,6 +104,16 @@
       margin: 350px auto 0;
       padding: 0 20px;
       font-size: 14px;
+    }
+
+    @media screen and (min-width: 961px) {
+      display: block;
+      color: var(--secondaryWhite);
+      text-align: center;
+      margin: auto;
+      padding: 0 20px;
+      font-size: 14px;
+      opacity: 0.6;
     }
   }
 

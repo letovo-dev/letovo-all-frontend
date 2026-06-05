@@ -7,10 +7,15 @@
     display: flex;
     align-items: center;
     gap: 12px;
+    @media screen and (min-width: 961px) {
+      img:last-child {
+        filter: brightness(0) invert(0.969);
+      }
+    }
   }
   .sign {
     display: flex;
-    align-items: start;
+    align-items: flex-start;
     height: 20px;
     @media screen and (min-width: 961px) {
       color: var(--secondaryWhite);

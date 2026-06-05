@@ -2,6 +2,45 @@
 
 $overlay-color: rgba(0, 0, 0, 0.5);
 
+.desktopLeftPanel {
+  display: none;
+
+  @media screen and (min-width: 961px) {
+    display: block;
+    flex-shrink: 0;
+    align-self: flex-start;
+    width: 390px;
+    padding: 24px 20px 0 40px;
+    box-sizing: border-box;
+  }
+}
+
+.desktopRightPanel {
+  display: none;
+
+  @media screen and (min-width: 961px) {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: flex-start;
+    flex: 1;
+    min-width: 0;
+    padding: 24px 20px 0 20px;
+    box-sizing: border-box;
+    gap: 50px;
+  }
+}
+
+.corpLogo {
+  display: none;
+
+  @media screen and (min-width: 961px) {
+    display: block;
+    width: auto;
+    height: auto;
+  }
+}
+
 .newsContainer {
   // background-image: url('/images/Background_News_PC.webp');
   background-repeat: no-repeat;
@@ -21,6 +60,12 @@ $overlay-color: rgba(0, 0, 0, 0.5);
   scrollbar-gutter: stable;
   -webkit-overflow-scrolling: touch;
   overscroll-behavior-y: contain;
+
+  @media screen and (min-width: 961px) {
+    flex-direction: row;
+    align-items: flex-start;
+  }
+
   &.commentsOpen {
     overflow-y: hidden;
     padding-right: 0;
@@ -54,6 +99,26 @@ $overlay-color: rgba(0, 0, 0, 0.5);
     margin-top: 46px;
     padding-bottom: 55px;
     width: 390px;
+
+    @media screen and (min-width: 961px) {
+      width: 519px;
+      height: calc(100vh - 54px);
+      margin-top: 24px;
+      margin-left: 0;
+      margin-right: 0;
+      padding: 16px 12px;
+      flex-shrink: 0;
+      overflow-y: auto;
+      overflow-x: hidden;
+      border: 1px solid rgba(255, 255, 255, 0.4);
+      border-radius: 35px;
+      background: transparent;
+      scrollbar-width: none;
+      -ms-overflow-style: none;
+      &::-webkit-scrollbar {
+        display: none;
+      }
+    }
   }
 
   .newsMenu {

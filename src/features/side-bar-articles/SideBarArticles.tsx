@@ -47,12 +47,12 @@ const SideBarArticles = ({
   normalizedArticles,
   articlesCategories,
   burgerRef,
-}: // desktop,
-{
+  desktop,
+}: {
   normalizedArticles: Record<string, OneArticle[]> | null;
   articlesCategories: ArticleCategory[];
   burgerRef?: React.RefObject<HTMLDivElement>;
-  // desktop?: boolean;
+  desktop?: boolean;
 }) => {
   const {
     loading,
@@ -508,6 +508,28 @@ const SideBarArticles = ({
   useEffect(() => {
     setItems(preparedItems);
   }, [preparedItems]);
+
+  if (desktop) {
+    return (
+      <>
+        <div className={style.sidebarDesktopInline}>
+          <div className={style.searchInputDesktop}>
+            <SideBarNewsContent loading={loading} form={form} onFinish={onFinish} />
+          </div>
+          {searchQuery && filteredCategories.length === 0 && (
+            <div className={style.noSearchResult}>По запросу ничего не найдено</div>
+          )}
+          <a className={style.welcomeLinkDesktop} href="/articles/welcome">
+            Welcome page
+          </a>
+          <div className={style.sidebarItemsDesktop} onClick={e => e.stopPropagation()}>
+            <Collapse items={items} defaultActiveKey={article && [article?.category]} ghost />
+          </div>
+        </div>
+        {qrUrl && <QRCode type="svg" value={qrUrl ?? BASE_URL} className={style.qrCode} />}
+      </>
+    );
+  }
 
   return (
     <>
