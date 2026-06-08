@@ -26,6 +26,17 @@ yarn-error.log*
 .env.*
 !.env.example
 front-env.local
+.npmrc
+.yarnrc*
+.pnpmrc
+*.pem
+*.key
+*.crt
+*.p12
+*.pfx
+certs/
+id_rsa*
+id_ed25519*
 
 # OS / IDE
 .DS_Store
