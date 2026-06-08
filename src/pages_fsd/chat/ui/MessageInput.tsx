@@ -104,6 +104,7 @@ const MessageInput: React.FC<MessageInputProps> = ({ onSend, onRefresh, disabled
         onKeyDown={handleKeyDown}
         rows={1}
         disabled={disabled}
+        maxLength={4000}
       />
       <button
         type="button"

@@ -136,6 +136,7 @@ function EnterForm() {
                   autoComplete="username"
                   onChange={handleNameInput}
                   value={formData.login || ''}
+                  maxLength={32}
                 />
               </Form.Item>
               <Text className={style.inputTextHeader} type="secondary">
@@ -154,6 +155,7 @@ function EnterForm() {
                   autoComplete="current-password"
                   placeholder=""
                   value={formData.password || ''}
+                  maxLength={128}
                 />
               </Form.Item>
 

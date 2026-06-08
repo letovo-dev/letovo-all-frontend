@@ -4,8 +4,22 @@ import React from 'react';
 import ReactMarkdown from 'react-markdown';
 import remarkGfm from 'remark-gfm';
 import rehypeRaw from 'rehype-raw';
+import rehypeSanitize, { defaultSchema } from 'rehype-sanitize';
 import Image from 'next/image';
 import style from './Articles.module.scss';
+
+const SAFE_PROTOCOLS = /^(https?|mailto|tel):/i;
+const sanitizeSchema = {
+  ...defaultSchema,
+  attributes: {
+    ...defaultSchema.attributes,
+    a: [...(defaultSchema.attributes?.a ?? []), 'download', 'className'],
+    video: ['src', 'controls', 'playsInline', 'width', 'style', 'aria-label'],
+    source: ['src', 'type'],
+    img: ['src', 'alt', 'width', 'height', 'style', 'loading', 'decoding'],
+    '*': [...(defaultSchema.attributes?.['*'] ?? []), 'className'],
+  },
+};
 
 const MarkdownContent: React.FC<{ content: string }> = React.memo(
   ({ content }) => {
@@ -21,7 +35,7 @@ const MarkdownContent: React.FC<{ content: string }> = React.memo(
       <ReactMarkdown
         className={style.mdContent}
         remarkPlugins={[remarkGfm]}
-        rehypePlugins={[rehypeRaw]}
+        rehypePlugins={[rehypeRaw, [rehypeSanitize, sanitizeSchema]]}
         components={{
           img: ({ src, alt }) => {
             if (src && isVideoUrl(src)) {
@@ -76,10 +90,11 @@ const MarkdownContent: React.FC<{ content: string }> = React.memo(
             const isSecretLink =
               typeof children === 'string' && children.toLowerCase().includes('secret link');
             const isDownloadLink = href ? isDownloadableFile(href) : false;
+            const safeHref = href && SAFE_PROTOCOLS.test(href) ? href : '#';
 
             return (
               <a
-                href={href}
+                href={safeHref}
                 className={
                   isSecretLink ? style.secretLink : isDownloadLink ? style.downloadLink : undefined
                 }

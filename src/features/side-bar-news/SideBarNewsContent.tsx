@@ -23,6 +23,7 @@ const SideBarNewsContent: React.FC<SideBarNewsContentProps> = ({ loading, form, 
             onChange={e => form.setFieldsValue({ search_query: e.target.value })}
             value={form.getFieldValue('search_query') || ''}
             disabled={loading}
+            maxLength={200}
           />
         </Form.Item>
         <Form.Item className={style.searchButtonItem}>

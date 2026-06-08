@@ -112,7 +112,10 @@ const TransferModal26: React.FC<ModalProps> = ({
       form.resetFields();
     }
     if (values.nick && values.sum) {
-      const res = await transferMoney({ receiver: values.nick, amount: Number(values.sum) });
+      const amount = Math.floor(Number(values.sum));
+      if (!isAdmin && (amount <= 0 || amount > selfMoney)) return;
+      if (isAdmin && amount <= 0) return;
+      const res = await transferMoney({ receiver: values.nick, amount });
       if (res && res === 'success') {
         userStore.setState((state: IUserStore) => ({
           store: {
@@ -195,6 +198,7 @@ const TransferModal26: React.FC<ModalProps> = ({
                       className={style.customInput}
                       placeholder="Nickname"
                       autoComplete="username"
+                      maxLength={32}
                     />
                   </Form.Item>
                 </div>
@@ -213,6 +217,8 @@ const TransferModal26: React.FC<ModalProps> = ({
                         className={style.customInput}
                         placeholder="0"
                         autoComplete="off"
+                        min="1"
+                        step="1"
                       />
                     </Form.Item>
                   </div>
