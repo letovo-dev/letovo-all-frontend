@@ -57,8 +57,10 @@ const Registration = () => {
     }
   };
 
+  const NICK_VALID = /^[a-zA-Z0-9_-]{4,32}$/;
+
   const getIcon = (value: string | undefined) => {
-    if (value && value.length > 3) {
+    if (value && NICK_VALID.test(value)) {
       return <CheckCircleOutlined className={style.icon} />;
     } else {
       return <MinusCircleOutlined className={style.icon} />;
@@ -69,8 +71,11 @@ const Registration = () => {
     setDataToLocaleStorage('token', userStatus?.token);
   }, [userStatus?.token]);
 
+  const NICK_RE = /^[a-zA-Z0-9_-]{4,32}$/;
+
   const onFinish = async (values: FormData) => {
     if (values.avatar && values.nick) {
+      if (!NICK_RE.test(values.nick)) return;
       await changeLogin(values.nick);
       await changeAvatar(values.avatar);
       if (!error) {
@@ -142,6 +147,7 @@ const Registration = () => {
                   placeholder="Nickname"
                   autoComplete="username"
                   value={nick || ''}
+                  maxLength={32}
                 />
               </Form.Item>
               {error && (
@@ -170,7 +176,7 @@ const Registration = () => {
               <Space style={{ marginTop: '15px', width: '90%', justifyContent: 'end' }}>
                 <Button
                   htmlType="submit"
-                  disabled={!avatar || !nick || nick.length < 4}
+                  disabled={!avatar || !nick || !/^[a-zA-Z0-9_-]{4,32}$/.test(nick)}
                   className={style.submitButton}
                 >
                   Продолжить
@@ -189,8 +195,8 @@ const Registration = () => {
             </Space>
             <Space direction="horizontal" style={{ width: '100%' }}>
               {getIcon(nick)}
-              <Text className={nick && nick.length >= 4 ? style.text : ''}>
-                Ник должен состоять не менее чем из 4 символов
+              <Text className={nick && /^[a-zA-Z0-9_-]{4,32}$/.test(nick) ? style.text : ''}>
+                Ник: 4–32 символа, только латинские буквы, цифры, _ и -
               </Text>
             </Space>
             <Space direction="horizontal" style={{ width: '100%' }}>

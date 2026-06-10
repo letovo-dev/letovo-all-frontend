@@ -1,6 +1,7 @@
 'use client';
 
 import React from 'react';
+import Image from 'next/image';
 import { Swiper, SwiperSlide } from 'swiper/react';
 import { Navigation, Pagination } from 'swiper/modules';
 
@@ -35,7 +36,15 @@ const CarouselElement = ({ imgs }: { imgs: string[] }) => {
             ) : isPDF(item) ? (
               <iframe src={url} className={style.media} title={`pdf-${i}`} />
             ) : (
-              <img src={url} className={style.media} alt={`img-${i}`} loading="lazy" />
+              <div className={style.imageWrapper}>
+                <Image
+                  src={url}
+                  alt={`img-${i}`}
+                  fill
+                  className={style.media}
+                  sizes="(max-width: 760px) 100vw, 760px"
+                />
+              </div>
             )}
           </SwiperSlide>
         );

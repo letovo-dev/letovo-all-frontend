@@ -7,7 +7,7 @@ export class Consts {
   static version = `ver ${packageJson.version}`;
 
   static mock = {
-    enabled: false,
+    enabled: process.env.NEXT_PUBLIC_USE_MOCK_DATA === 'true',
     delay: 250,
     errorChance: 0,
     assetsRoutes: true,

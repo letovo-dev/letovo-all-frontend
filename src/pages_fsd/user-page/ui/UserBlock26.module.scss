@@ -1,0 +1,226 @@
+@use '../../../app/mixins.scss';
+
+.userBlock {
+  display: flex;
+  align-items: flex-start;
+  width: 100%;
+  max-width: 415px;
+  box-sizing: border-box;
+  min-height: 145px;
+  flex-shrink: 0;
+  padding: 35px 10px 5px 20px;
+  .icons {
+    border-radius: 25px;
+    border: 1px solid var(--background);
+    background: transparent;
+    display: flex;
+    flex-direction: column;
+    min-width: 80px;
+    min-height: 148px;
+    flex-shrink: 0;
+    .userIcon {
+      width: inherit;
+      height: 80px;
+      background: var(--background);
+      border-radius: 22px;
+      border: 1px solid var(--background);
+      display: flex;
+      align-items: center;
+      justify-content: center;
+    }
+    .depIcon {
+      color: var(--background);
+    }
+  }
+  .userData {
+    flex: 1;
+    display: flex;
+    flex-direction: column;
+    height: 100%;
+    padding: 10px 10px 10px 15px;
+    .userName {
+      color: var(--background);
+      font-size: inherit;
+      font-weight: inherit;
+      margin: 0;
+      padding: 0;
+      line-height: inherit;
+      .surname,
+      .givenName {
+        display: inline;
+      }
+    }
+    .status {
+      color: var(--orange);
+      display: flex;
+      align-items: center;
+      font-size: 12px;
+      margin: 0;
+    }
+    .status::before {
+      content: '•';
+      font-weight: bold;
+      font-size: 2em;
+      color: var(--orange);
+      margin: 0 8px 0 0;
+      line-height: 1;
+    }
+    .depData {
+      padding: 30px 0 0 0;
+      display: flex;
+      flex-direction: column;
+      .depTextWrap {
+        display: contents;
+      }
+      .branchName {
+        color: var(--background);
+        font-size: 14px;
+        margin: 0;
+      }
+      .depName {
+        @extend .branchName;
+        font-weight: bold;
+      }
+    }
+  }
+  .menuButtonDiv {
+    width: 30px;
+    flex-shrink: 0;
+    color: var(--background) !important;
+    padding: 11px 3px 3px 3px;
+    background: none;
+    border: none;
+    cursor: pointer;
+    .logout {
+      filter: invert(98%) sepia(4%) saturate(425%) hue-rotate(296deg) brightness(117%) contrast(96%);
+      cursor: pointer;
+    }
+  }
+
+  .depIconDesktop {
+    display: none;
+  }
+
+  @media screen and (min-width: 961px) {
+    max-width: 480px;
+    width: auto;
+    flex: 1 1 auto;
+    min-width: 0;
+    min-height: 102px;
+    height: 102px;
+    align-items: flex-start;
+    padding: 0;
+    gap: 12px;
+    position: relative;
+
+    .menuButtonDiv {
+      position: absolute;
+      top: 0;
+      right: 0;
+      padding: 0;
+      width: 24px;
+      height: 24px;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+    }
+
+    .icons {
+      border: none;
+      border-radius: 0;
+      min-width: 102px;
+      width: 102px;
+      min-height: 102px;
+      height: 102px;
+      .userIcon {
+        width: 102px;
+        height: 102px;
+        border-radius: 50%;
+        border: 1px solid var(--background);
+        background: transparent;
+        overflow: hidden;
+        :global(.ant-avatar) {
+          width: 100% !important;
+          height: 100% !important;
+        }
+        :global(.ant-avatar img) {
+          width: 100%;
+          height: 100%;
+          object-fit: cover;
+        }
+      }
+      .depIconMobile {
+        display: none;
+      }
+    }
+
+    .userData {
+      flex: 1;
+      min-width: 0;
+      height: 102px;
+      padding: 4px 32px 0 12px;
+      justify-content: flex-start;
+      position: relative;
+
+      .userName {
+        font-size: 12px;
+        font-weight: 600;
+        line-height: 1.4;
+        text-transform: uppercase;
+        color: #ffffff;
+        .surname,
+        .givenName {
+          display: block;
+        }
+      }
+
+      .status {
+        margin-top: 6px;
+        font-size: 12px;
+        font-weight: 500;
+        color: var(--orange);
+      }
+      .status::before {
+        content: '';
+        display: inline-block;
+        width: 9px;
+        height: 9px;
+        border-radius: 50%;
+        background: var(--orange);
+        margin: 0 8px 0 0;
+        font-size: inherit;
+      }
+
+      .depData {
+        padding: 0;
+        margin-top: 8px;
+        flex-direction: row;
+        align-items: center;
+        gap: 11px;
+        margin-left: -16px;
+
+        .depIconDesktop {
+          display: block;
+          width: 50px;
+          height: 41px;
+          flex-shrink: 0;
+        }
+
+        .depTextWrap {
+          display: flex;
+          flex-direction: column;
+          margin-left: -11px;
+          min-width: 190px;
+        }
+
+        .branchName,
+        .depName {
+          font-size: 12px;
+          font-weight: 500;
+          line-height: 1.2;
+          color: #ffffff;
+        }
+      }
+    }
+  }
+}

@@ -1,27 +1,19 @@
 @use '../../../app/_mixins.scss';
 
 .loginFormWrapper {
-  @extend %entryCover;
-  padding-top: 14vh;
-  @media screen and (max-width: 960px) {
-    background-image: url('/images/background_mobile.webp');
-  }
-}
-
-.loginFormWrapperPc {
-  @extend %entryPcCover;
-  padding-top: 14vh;
+  height: inherit;
+  display: flex;
+  align-items: center;
+  flex-direction: column;
+  justify-content: center;
 }
 
 .card {
-  @extend %transparentContainer;
-  background-image: url('/images/base_login.webp');
   width: 332px;
   display: flex;
   justify-content: center;
   align-items: center;
   height: 220px;
-  background-position: center;
   .spinWrapper {
     position: absolute;
     left: 50%;
@@ -30,33 +22,38 @@
   }
 }
 
-%input {
-  @extend %transparentContainer;
-  width: 291px;
-  height: 40px;
-  justify-content: flex-start;
-  align-items: center;
-  background-position: left;
-  margin-bottom: 15px;
+.inputsContainer {
+  border: 1px solid rgba(255, 255, 255, 0.3) !important;
+  border-radius: 24px;
+  padding: 10px 20px;
+  .spinWrapper {
+    position: absolute;
+    left: 50%;
+    transform: translate(-50%, -50%);
+    z-index: 1002;
+  }
 }
 
+// %input {
+//   width: 291px;
+//   height: 40px;
+//   justify-content: flex-start;
+//   align-items: center;
+//   background-position: left;
+//   margin-bottom: 15px;
+// }
+
 .inputForm {
-  @extend %input;
-  background-image: url('/images/base_login_input.webp');
+  // @extend %input;
+  // background-image: url('/images/base_login_input.webp');
 }
 .inputFormError {
-  @extend %input;
-  background-image: url('/images/base_login_input_error.webp');
+  // @extend %input;
+  // background-image: url('/images/base_login_input_error.webp');
 }
 
 .titleBorder {
-  @extend %transparentContainer;
-  background-image: url('/images/title_login_empty.webp');
-  width: 95px;
-  justify-content: center;
-  align-items: center;
-  height: 35px;
-  background-size: 100% 35px;
+  color: var(--secondaryWhite) !important;
 }
 
 .buttonsContainer {
@@ -67,13 +64,16 @@
 }
 .forgetPass {
   text-decoration: underline;
-  padding-top: 10px;
+  padding-top: 5px;
   width: 50%;
   cursor: pointer;
+  color: var(--secondaryWhite);
+  text-decoration: none;
 }
 
 .inputTextHeader {
   margin: 0 0 5px 10px;
+  color: var(--secondaryWhite) !important;
 }
 
 .formItem {
@@ -81,15 +81,16 @@
 }
 
 .customInput {
-  background: transparent;
-  border: none;
-  outline: none; /* Убирает обводку при фокусе */
-  color: #000;
+  border: 1px solid var(--graphics11) !important;
+  border-radius: 24px;
+  outline: none;
+  color: var(--secondaryWhite);
   font-size: 14px;
   font-weight: 400;
   width: 100%;
   padding: 8px 4px 8px 16px;
   cursor: text;
+  background: transparent !important;
 }
 
 .customInput::placeholder {
@@ -100,6 +101,7 @@
 .customInput:focus {
   border: none;
   outline: none;
+  background: transparent !important;
 }
 
 .formItemPass {

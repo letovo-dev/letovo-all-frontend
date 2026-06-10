@@ -6,6 +6,19 @@
   display: flex;
   flex-direction: column;
   gap: 10px;
+
+  > h2,
+  > h3 {
+    color: var(--secondaryWhite);
+  }
+
+  :global(.ant-form-item-label) > label {
+    color: var(--secondaryWhite);
+  }
+
+  :global(.ant-radio-wrapper) {
+    color: var(--secondaryWhite);
+  }
 }
 .markdownEditor {
   height: 53vh !important;
@@ -43,6 +56,7 @@
 
 .inputTitleInstruction {
   font-size: 10px;
+  color: var(--secondaryWhite);
 }
 
 .secretLink {
@@ -72,6 +86,10 @@
   display: flex;
   gap: 30px;
   align-items: center;
+
+  > p {
+    color: var(--secondaryWhite);
+  }
 }
 .upload {
   width: 500px;

@@ -4,9 +4,9 @@ import { useCallback, useEffect, useMemo, useRef, useState } from 'react';
 import dataStore from '@/shared/stores/data-store';
 import commentsStore from '@/shared/stores/comments-store';
 import SpinModule from '@/shared/ui/spiner';
-import { News } from '@/pages_fsd/news';
 import { message } from 'antd';
 import NewsList from './NewsList';
+import { News26 } from '@/pages_fsd/news';
 
 const LOAD_NEWS_SIZE = 10;
 
@@ -21,6 +21,7 @@ const NewsPage = () => {
   const openComments = commentsStore(state => state.openComments);
   const [renderNews, setRenderNews] = useState(normalizedNews);
   const [startNewsItem, setStartNewsItem] = useState(0);
+  const [selectedDate, setSelectedDate] = useState<string | undefined>(undefined);
   const [newsLength, setNewsLength] = useState(0);
   const observerRef = useRef<IntersectionObserver | null>(null);
   const lastElementRef = useRef<HTMLDivElement | null>(null);
@@ -55,7 +56,7 @@ const NewsPage = () => {
   }, []);
 
   useEffect(() => {
-    setNewsLength(newsTitles.length);
+    setNewsLength(newsTitles?.length);
   }, [newsTitles]);
 
   useEffect(() => {
@@ -118,6 +119,24 @@ const NewsPage = () => {
     }
   }, [getRenderNews, currentNewsState]);
 
+  const handleDateSelect = useCallback(
+    (date: string | null) => {
+      const dateParam = date ?? undefined;
+      setSelectedDate(dateParam);
+      const displayedSize = startNewsItem + LOAD_NEWS_SIZE;
+      fetchNews({ type: 'getLimitNews', start: 0, size: displayedSize, date: dateParam });
+      setCurrentNewsState({
+        default: true,
+        saved: false,
+        selectedNews: undefined,
+        searched: false,
+        selectedAuthor: false,
+      });
+      setStartNewsItem(0);
+    },
+    [fetchNews, setCurrentNewsState, startNewsItem],
+  );
+
   const loadMore = useCallback(async () => {
     if (!currentNewsState.default || loading || isFetching.current || openComments) {
       return;
@@ -140,6 +159,7 @@ const NewsPage = () => {
         type: 'getLimitNews',
         start: nextStart,
         size: LOAD_NEWS_SIZE,
+        date: selectedDate,
       });
       await getTitles();
       setStartNewsItem(nextStart);
@@ -148,7 +168,15 @@ const NewsPage = () => {
     } finally {
       isFetching.current = false;
     }
-  }, [fetchNews, startNewsItem, loading, newsLength, openComments, currentNewsState.default]);
+  }, [
+    fetchNews,
+    startNewsItem,
+    loading,
+    newsLength,
+    openComments,
+    currentNewsState.default,
+    selectedDate,
+  ]);
 
   useEffect(() => {
     if (!currentNewsState.default) {
@@ -225,7 +253,10 @@ const NewsPage = () => {
   return (
     <>
       {contextHolder}
-      <News onContainerRef={ref => (containerRef.current = ref.current)}>
+      <News26
+        onContainerRef={ref => (containerRef.current = ref.current)}
+        onDateSelect={handleDateSelect}
+      >
         {loading && startNewsItem === 0 && <SpinModule />}
         <NewsList
           news={sortedNews}
@@ -235,7 +266,7 @@ const NewsPage = () => {
           saveComment={saveComment}
         />
         {loading && startNewsItem > 0 && <SpinModule />}
-      </News>
+      </News26>
     </>
   );
 };

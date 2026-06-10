@@ -1,80 +1,116 @@
 @use '../../../app/mixins.scss';
 
-.actionContainer {
-  @extend %transparentContainer;
-  width: 87px;
-  height: 36px;
-  background-size: contain;
-  background-repeat: no-repeat;
-  gap: 10px;
-  align-items: center;
-  justify-content: center;
-  cursor: pointer;
-}
-
 .sectionContainer {
   display: flex;
   justify-content: space-between;
-  padding: 0;
+  align-items: center;
+  padding: 0 15px;
   @media screen and (min-width: 961px) {
     padding: 0 15px;
   }
+
   .firstSection {
     display: flex;
-    gap: 3px;
     align-items: center;
-    justify-content: center;
-    .likesContainer {
-      @extend %transparentContainer;
-      @extend .actionContainer;
-      background-image: url('/images/Frame_Like_1.webp');
-      gap: 6px;
-    }
-    .likesContainerLiked {
-      @extend .likesContainer;
-      background-image: url('/images/Frame_Like_2.webp');
-      gap: 6px;
-    }
-    .likesCount {
-      font-size: 14px;
-      font-weight: 400;
-      color: var(--orange);
-    }
+    gap: 21px;
+  }
+}
 
-    .dislikesContainer {
-      @extend %transparentContainer;
-      @extend .actionContainer;
-      background-image: url('/images/Frame_Dislike_1.webp');
-      gap: 6px;
-    }
-    .dislikesContainerDisLiked {
-      @extend .dislikesContainer;
-      background-image: url('/images/Frame_Dislike_2.webp');
-      gap: 6px;
-    }
-    .dislikesCount {
-      font-size: 14px;
-      font-weight: 400;
-      color: var(--graphics10);
-    }
+.actionItem {
+  display: flex;
+  align-items: flex-start;
+  gap: 5px;
+  cursor: pointer;
+  background: none;
+}
 
-    .commentsContainer {
-      @extend %transparentContainer;
-      @extend .actionContainer;
-      background-image: url('/images/Frame_CommentAndFavourite.webp');
-    }
-    .dislikesCount {
-      font-size: 14px;
-      font-weight: 400;
-      color: var(--graphics10);
-    }
-  }
-  .saveContainer {
-    @extend .actionContainer;
-    background-image: url('/images/Frame_Dislike_1.webp');
-  }
-  .saveContainerSaved {
-    @extend .actionContainer;
-    background-image: url('/images/Frame_Favourite2.webp');
-  }
+%icon {
+  display: inline-block;
+  margin-top: 4px;
+  background-color: var(--graphics11);
+  mask-repeat: no-repeat;
+  -webkit-mask-repeat: no-repeat;
+  mask-size: contain;
+  -webkit-mask-size: contain;
+  mask-position: center;
+  -webkit-mask-position: center;
+  transition: background-color 0.2s ease;
+}
+
+.likeIcon {
+  @extend %icon;
+  width: 25px;
+  height: 17px;
+  mask-image: url('/26_action_like.svg');
+  -webkit-mask-image: url('/26_action_like.svg');
+}
+
+.dislikeIcon {
+  @extend %icon;
+  width: 25px;
+  height: 18px;
+  mask-image: url('/26_action_dislike.svg');
+  -webkit-mask-image: url('/26_action_dislike.svg');
+}
+
+.commentIcon {
+  @extend %icon;
+  width: 21px;
+  height: 18px;
+  mask-image: url('/26_action_comment.svg');
+  -webkit-mask-image: url('/26_action_comment.svg');
+}
+
+.saveIcon {
+  @extend %icon;
+  width: 18px;
+  height: 17px;
+  mask-image: url('/26_action_save.svg');
+  -webkit-mask-image: url('/26_action_save.svg');
+}
+
+.iconActive {
+  background-color: var(--orange);
+}
+
+%count {
+  font-size: 10px;
+  font-weight: 600;
+  line-height: 1.426;
+  margin: 0;
+}
+
+.likesCount {
+  @extend %count;
+  color: var(--orange);
+}
+
+.dislikesCount {
+  @extend %count;
+  color: var(--graphics10);
+}
+
+.commentsCount {
+  @extend %count;
+  color: var(--graphics10);
+}
+
+.savedCount {
+  @extend %count;
+  color: var(--orange);
+}
+
+.inputDivider {
+  margin: 12px 0;
+}
+
+.inputDividerDotted {
+  border: none;
+  height: 2px;
+  background-image: radial-gradient(circle, #999797 1px, transparent 1px);
+  background-size: 4px 1px;
+  background-repeat: repeat-x;
+  background-position: center;
+  margin: 18px 16px;
+  box-sizing: border-box;
 }

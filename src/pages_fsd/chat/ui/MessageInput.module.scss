@@ -1,0 +1,90 @@
+.inputBar {
+  position: relative;
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  width: 100%;
+  padding: 10px 12px;
+  background: var(--foreground);
+  border-top: 1px solid var(--border-grey);
+  box-sizing: border-box;
+  flex-shrink: 0;
+  z-index: 5;
+}
+
+.input {
+  flex: 1 1 auto;
+  min-width: 0;
+  resize: none;
+  background: var(--graphics10);
+  color: var(--background);
+  border: none;
+  border-radius: 18px;
+  padding: 10px 14px;
+  font-size: 14px;
+  line-height: 1.35;
+  font-family: inherit;
+  outline: none;
+  max-height: 120px;
+  overflow-y: auto;
+
+  &::placeholder {
+    color: var(--graphics11);
+  }
+
+  &:disabled {
+    opacity: 0.6;
+    cursor: not-allowed;
+  }
+}
+
+.emojiButton,
+.refreshButton,
+.sendButton {
+  flex-shrink: 0;
+  width: 38px;
+  height: 38px;
+  border-radius: 50%;
+  border: none;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  cursor: pointer;
+  font-size: 18px;
+  line-height: 1;
+  background: var(--graphics10);
+  color: var(--background);
+  transition:
+    background 0.15s ease,
+    color 0.15s ease;
+
+  &:hover:not(:disabled) {
+    background: var(--orange);
+    color: #ffffff;
+  }
+
+  &:disabled {
+    opacity: 0.4;
+    cursor: not-allowed;
+  }
+}
+
+.sendButton {
+  background: var(--orange);
+  color: #ffffff;
+}
+
+.refreshButton {
+  font-size: 20px;
+}
+
+.refreshButtonSpin span {
+  display: inline-block;
+  animation: refreshSpin 1s linear infinite;
+}
+
+@keyframes refreshSpin {
+  to {
+    transform: rotate(360deg);
+  }
+}
