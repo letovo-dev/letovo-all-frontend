@@ -3,6 +3,7 @@
 import React, { memo, useEffect, useState } from 'react';
 import style from './Comments.module.scss';
 import { Avatar } from 'antd';
+import Link from 'next/link';
 import { RealComment } from '@/shared/stores/data-store';
 import InputModule from './InputModule';
 import commentsStore from '@/shared/stores/comments-store';
@@ -164,15 +165,24 @@ const OneComment: React.FC<OneCommentProps> = ({
     <section className={style.comment}>
       {commentState ? (
         <div className={style.commentContainer}>
-          <div className={style.avatarTemplate}>
+          <Link
+            href={`/profile/${commentState.author}`}
+            className={style.avatarTemplate}
+            style={{ color: 'inherit', textDecoration: 'none' }}
+          >
             <Avatar
               src={`${process.env.NEXT_PUBLIC_BASE_URL_MEDIA}/${commentState.avatar_pic}`}
               size={40}
               className={style.avatar}
             />
-          </div>
+          </Link>
           <div className={style.commentTextBox}>
-            <p className={style.commentAuthor}>{commentState.author}</p>
+            <Link
+              href={`/profile/${commentState.author}`}
+              style={{ color: 'inherit', textDecoration: 'none', cursor: 'pointer' }}
+            >
+              <p className={style.commentAuthor}>{commentState.author}</p>
+            </Link>
             {(() => {
               const { time, date } = formatCommentDate(commentState.date);
               return (

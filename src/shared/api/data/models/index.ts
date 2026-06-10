@@ -21,6 +21,7 @@ import { createNews } from './createNews';
 import { deleteNews } from './deleteNews';
 import { editNews } from './editNews';
 import { getAllPostsAuthors } from './getAllPostsAuthors';
+import { getPostsByAuthor } from './getPostsByAuthor';
 import { updateArticle } from './updateArticle';
 import { revealSecretArticle } from './revealSecretArticle';
 
@@ -48,6 +49,7 @@ const apiMethods = {
   editNews,
   deleteNews,
   getAllPostsAuthors,
+  getPostsByAuthor,
   updateArticle,
   revealSecretArticle,
 };
