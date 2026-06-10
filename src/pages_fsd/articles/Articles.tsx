@@ -1,32 +1,32 @@
 'use client';
 
-import React, { useEffect, useRef, useState, useMemo, useCallback } from 'react';
+import React, { useEffect, useRef, useState, useMemo } from 'react';
 import axios from 'axios';
+import Image from 'next/image';
 import { useRouter } from 'next/navigation';
 import { useFooterContext } from '@/shared/ui/context/FooterContext';
 import articlesStore from '@/shared/stores/articles-store';
 import SpinModule from '@/shared/ui/spiner';
 import { extractImageUrls } from '@/shared/utils/utils';
-import debounce from 'lodash/debounce';
 import style from './Articles.module.scss';
-import Burger from '@/shared/ui/burger-menu/Burger';
 import { SideBarArticles } from '@/features/side-bar-articles';
 import MarkdownContent from './ReactMd';
 import authStore from '@/shared/stores/auth-store';
+import UserBlock26 from '@/pages/user-page/ui/UserBlock26';
 
 const Articles: React.FC = () => {
   const { article, normalizedArticles, loading, articlesCategories, getArticlesCategories } =
     articlesStore();
   const router = useRouter();
-  const { setFooterHidden } = useFooterContext();
+  const { scrollContainerRef } = useFooterContext();
   const [processedText, setProcessedText] = useState('');
   const [mediaCache, setMediaCache] = useState<Record<string, string>>({});
   const [error, setError] = useState<string | null>(null);
   const wrapRef = useRef<HTMLDivElement>(null);
-  const burgerRef = useRef<HTMLDivElement>(null);
+  const innerWrapRef = useRef<HTMLDivElement>(null);
   const mediaCacheRef = useRef<Record<string, string>>({});
-  const lastScrollTopRef = useRef(0);
-  const [open, setOpen] = useState(false);
+  const [windowWidth, setWindowWidth] = useState<number>(0);
+  const isDesktop = windowWidth >= 961;
   const {
     userStatus: { token },
   } = authStore(state => state);
@@ -43,24 +43,19 @@ const Articles: React.FC = () => {
     }
   }, [router, getArticlesCategories, token]);
 
-  const handleScroll = useCallback(
-    debounce(() => {
-      if (wrapRef.current) {
-        const currentScrollTop = wrapRef.current.scrollTop;
-        setFooterHidden(currentScrollTop > 50);
-        lastScrollTopRef.current = currentScrollTop;
-      }
-    }, 50),
-    [setFooterHidden],
-  );
+  useEffect(() => {
+    setWindowWidth(window.innerWidth);
+    const handleResize = () => setWindowWidth(window.innerWidth);
+    window.addEventListener('resize', handleResize);
+    return () => window.removeEventListener('resize', handleResize);
+  }, []);
 
   useEffect(() => {
-    const element = wrapRef.current;
-    if (element) {
-      element.addEventListener('scroll', handleScroll, { passive: true });
-      return () => element.removeEventListener('scroll', handleScroll);
-    }
-  }, [handleScroll]);
+    scrollContainerRef.current = isDesktop ? innerWrapRef.current : wrapRef.current;
+    return () => {
+      scrollContainerRef.current = null;
+    };
+  }, [scrollContainerRef, isDesktop]);
 
   useEffect(() => {
     let isMounted = true;
@@ -146,22 +141,35 @@ const Articles: React.FC = () => {
 
   return (
     <>
-      <div
-        className={`${style.burgerArticlesContainer} ${open ? style.sidebarOpenBurgerContainer : ''}`}
-        ref={burgerRef}
-      >
-        <Burger setOpen={setOpen} />
-      </div>
-      <SideBarArticles
-        open={open}
-        setOpen={setOpen}
-        normalizedArticles={normalizedArticles}
-        articlesCategories={articlesCategories}
-        burgerRef={burgerRef}
-      />
-      <div ref={wrapRef} className={`${style.newsContainer} ${open ? style.sidebarOpen : ''}`}>
-        <div className={style.wrap}>
+      {!isDesktop && (
+        <SideBarArticles
+          normalizedArticles={normalizedArticles}
+          articlesCategories={articlesCategories}
+        />
+      )}
+      <div ref={wrapRef} className={style.newsContainer}>
+        <div className={style.desktopLeftPanel}>
+          <UserBlock26 />
+          {isDesktop && (
+            <SideBarArticles
+              desktop
+              normalizedArticles={normalizedArticles}
+              articlesCategories={articlesCategories}
+            />
+          )}
+        </div>
+        <div ref={innerWrapRef} className={style.wrap}>
           <MarkdownContent content={memoizedProcessedText} />
+        </div>
+        <div className={style.desktopRightPanel}>
+          <Image
+            className={style.corpLogo}
+            src="/26_corp_logo.svg"
+            alt=""
+            width={120}
+            height={102}
+            aria-hidden="true"
+          />
         </div>
       </div>
     </>

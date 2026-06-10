@@ -102,15 +102,23 @@ const MarkdownEditor: React.FC = () => {
 
   const handleFileUpload = (event: ChangeEvent<HTMLInputElement>): void => {
     const file = event.target.files?.[0];
-    if (file) {
-      const reader = new FileReader();
-      reader.onload = (e: ProgressEvent<FileReader>): void => {
-        if (e.target?.result) {
-          setMarkdown(e.target.result as string);
-        }
-      };
-      reader.readAsText(file);
+    event.target.value = '';
+    if (!file) return;
+    if (!file.name.toLowerCase().endsWith('.md')) {
+      error('Допускаются только файлы с расширением .md');
+      return;
     }
+    if (file.size > 512_000) {
+      error('Файл слишком большой (максимум 500 КБ)');
+      return;
+    }
+    const reader = new FileReader();
+    reader.onload = (e: ProgressEvent<FileReader>): void => {
+      if (e.target?.result) {
+        setMarkdown(e.target.result as string);
+      }
+    };
+    reader.readAsText(file);
   };
 
   const handleDownload = (): void => {
@@ -236,6 +244,8 @@ const MarkdownEditor: React.FC = () => {
     }
   };
 
+  const SAFE_HREF = /^(https?|mailto|tel):/i;
+
   const linkComponent = ({
     href,
     children,
@@ -243,8 +253,9 @@ const MarkdownEditor: React.FC = () => {
   }: React.AnchorHTMLAttributes<HTMLAnchorElement>) => {
     const isSecretLink =
       typeof children === 'string' && children.toLowerCase().includes('secret link');
+    const safeHref = href && SAFE_HREF.test(href) ? href : '#';
     return (
-      <a href={href} className={isSecretLink ? style.secretLink : undefined} {...props}>
+      <a href={safeHref} className={isSecretLink ? style.secretLink : undefined} {...props}>
         {children}
       </a>
     );
@@ -295,6 +306,7 @@ const MarkdownEditor: React.FC = () => {
                 value={articleTitle}
                 onChange={handleTitleChange}
                 placeholder="Название статьи"
+                maxLength={200}
               />
               <Button
                 type="primary"
@@ -327,6 +339,7 @@ const MarkdownEditor: React.FC = () => {
                 value={articleTitle}
                 onChange={handleTitleChange}
                 placeholder="Название статьи"
+                maxLength={200}
               />
             </Form.Item>
           )}
@@ -370,6 +383,7 @@ const MarkdownEditor: React.FC = () => {
                       value={categoryName}
                       onChange={onNameChange}
                       onKeyDown={e => e.stopPropagation()}
+                      maxLength={100}
                     />
                     <Button type="text" icon={<PlusOutlined />} onClick={addItem}>
                       Добавить

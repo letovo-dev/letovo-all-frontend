@@ -2,6 +2,7 @@ import React from 'react';
 import { Button, Form, FormInstance } from 'antd';
 import style from './SideBarNewsContent.module.scss';
 import { SearchOutlined } from '@ant-design/icons';
+import Image from 'next/image';
 
 interface SideBarNewsContentProps {
   loading: boolean;
@@ -17,16 +18,17 @@ const SideBarNewsContent: React.FC<SideBarNewsContentProps> = ({ loading, form, 
           <input
             type="text"
             className={style.customInput}
-            placeholder="Введите текст для поиска"
+            placeholder="поиск"
             autoComplete="text"
             onChange={e => form.setFieldsValue({ search_query: e.target.value })}
             value={form.getFieldValue('search_query') || ''}
             disabled={loading}
+            maxLength={200}
           />
         </Form.Item>
         <Form.Item className={style.searchButtonItem}>
           <Button htmlType="submit" disabled={false} type="link">
-            <SearchOutlined style={{ fontSize: 18, color: ' rgba(0, 0, 0, 0.5)' }} />
+            <Image src="/26_search.svg" alt="search" height={20} width={20} />
           </Button>
         </Form.Item>
       </div>

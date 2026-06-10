@@ -2,7 +2,6 @@
 import React, { useEffect, useState } from 'react';
 import style from './NewsActionPanel.module.scss';
 import dataStore, { RealNews } from '@/shared/stores/data-store';
-import Image from 'next/image';
 import commentsStore from '@/shared/stores/comments-store';
 import { Divider } from 'antd';
 
@@ -116,55 +115,37 @@ const NewsActionPanel = ({
     <>
       <div className={style.sectionContainer}>
         <div className={style.firstSection}>
-          <div
-            className={actionsState.liked ? style.likesContainerLiked : style.likesContainer}
-            onClick={handleLike}
-          >
-            <Image
-              src={actionsState.liked ? '/images/Icon_Like_2.webp' : '/images/Icon_Like.webp'}
-              alt="like"
-              width={22}
-              height={22}
+          <div className={style.actionItem} onClick={handleLike}>
+            <span
+              className={`${style.likeIcon} ${actionsState.liked ? style.iconActive : ''}`}
+              aria-label="like"
+              role="img"
             />
             <p className={style.likesCount}>{formatCount(actionsState.likesCount)}</p>
           </div>
-          <div
-            className={
-              actionsState.disliked ? style.dislikesContainerDisLiked : style.dislikesContainer
-            }
-            onClick={handleDislike}
-          >
-            <Image
-              src={
-                actionsState.disliked ? '/images/Icon_Dislike_2.webp' : '/images/Icon_Dislike.webp'
-              }
-              alt="dislike"
-              width={22}
-              height={22}
+          <div className={style.actionItem} onClick={handleDislike}>
+            <span
+              className={`${style.dislikeIcon} ${actionsState.disliked ? style.iconActive : ''}`}
+              aria-label="dislike"
+              role="img"
             />
             <p className={style.dislikesCount}>{formatCount(actionsState.dislikesCount)}</p>
           </div>
-          <div className={style.commentsContainer} onClick={() => handleComment(String(postId))}>
-            <Image src={'/images/Icon_Comment.webp'} alt="comment" width={22} height={22} />
-            <p className={style.dislikesCount}>{currentNewsComments?.length}</p>
+          <div className={style.actionItem} onClick={() => handleComment(String(postId))}>
+            <span className={style.commentIcon} aria-label="comment" role="img" />
+            <p className={style.commentsCount}>{currentNewsComments?.length}</p>
           </div>
         </div>
-        <div
-          className={actionsState.saved ? style.saveContainerSaved : style.saveContainer}
-          onClick={handleSave}
-        >
-          <Image
-            src={
-              actionsState.saved ? '/images/Icon_Favorites.webp' : '/images/Icon_Favorites_.webp'
-            }
-            alt="save"
-            width={22}
-            height={22}
+        <div className={style.actionItem} onClick={handleSave}>
+          <span
+            className={`${style.saveIcon} ${actionsState.saved ? style.iconActive : ''}`}
+            aria-label="save"
+            role="img"
           />
-          <p className={style.likesCount}>{actionsState.savedCountState}</p>
+          <p className={style.savedCount}>{actionsState.savedCountState}</p>
         </div>
       </div>
-      {commentsCount > 0 && <Divider className={style.inputDivider} />}
+      {commentsCount > 0 && <div className={style.inputDividerDotted} />}
     </>
   );
 };

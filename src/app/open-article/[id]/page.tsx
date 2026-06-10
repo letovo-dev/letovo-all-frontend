@@ -2,10 +2,9 @@
 
 import articlesStore from '@/shared/stores/articles-store';
 import userStore from '@/shared/stores/user-store';
-import { ConfigProvider, Spin } from 'antd';
+import SpinModule from '@/shared/ui/spiner';
 import { useRouter, useParams, useSearchParams } from 'next/navigation';
 import { useEffect } from 'react';
-import style from './page.module.scss';
 import bcrypt from 'bcryptjs';
 
 const SECRET_KEY = 'очень-секретный-key';
@@ -54,11 +53,5 @@ export default function AchievementPage() {
     checkToken();
   }, [id, token, userData]);
 
-  return (
-    <div className={style.spinWrapper}>
-      <ConfigProvider theme={{ token: { colorPrimary: '#FB4724' } }}>
-        <Spin size="large" />
-      </ConfigProvider>
-    </div>
-  );
+  return <SpinModule />;
 }

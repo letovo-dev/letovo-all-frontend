@@ -105,6 +105,10 @@ export const API_DATA_SCHEME: IApiEntityScheme<IEndpoint> = {
     method: 'GET',
     url: `${baseUrl}/authors_list`,
   },
+  getPostsByAuthor: {
+    method: 'GET',
+    url: `${baseUrl}/social/posts/author`,
+  },
   revealSecretArticle: {
     method: 'GET',
     url: `${baseUrl}/post/reveal_secret`,
@@ -137,5 +141,6 @@ export const API_DATA_ENDPOINTS = [
   'editNews',
   'deleteNews',
   'getAllPostsAuthors',
+  'getPostsByAuthor',
   'revealSecretArticle',
 ] as const;

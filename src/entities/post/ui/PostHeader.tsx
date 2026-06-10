@@ -2,6 +2,7 @@ import React from 'react';
 import style from './PostHeader.module.scss';
 import { App, Avatar, Tooltip } from 'antd';
 import Image from 'next/image';
+import Link from 'next/link';
 import { DeleteOutlined, EditOutlined } from '@ant-design/icons';
 
 const PostHeader = ({
@@ -34,10 +35,15 @@ const PostHeader = ({
         className={index === 0 ? style.infoContainerFirst : style.infoContainer}
       >
         <div className={style.contentContainer}>
-          <div className={style.avatarTemplate}>
-            <Avatar src={avatarSrc} size={70} className={style.avatar} />
-          </div>
-          <p>{author.username || 'Unknown'}</p>
+          <Link
+            href={`/profile/${author.username}`}
+            style={{ display: 'contents', color: 'inherit', textDecoration: 'none' }}
+          >
+            <div className={style.avatarTemplate}>
+              <Avatar src={avatarSrc} size={70} className={style.avatar} />
+            </div>
+            <p style={{ cursor: 'pointer' }}>{author.username || 'Unknown'}</p>
+          </Link>
           <Image src="/images/Checkmark 3.webp" alt="like" height={18} width={18} />
         </div>
 

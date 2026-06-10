@@ -3,8 +3,7 @@ import React, { useEffect, useState } from 'react';
 import { useRouter } from 'next/navigation';
 import userStore, { IUserStore } from '@/shared/stores/user-store';
 import authStore from '@/shared/stores/auth-store';
-import { ConfigProvider, Spin, Button } from 'antd';
-import style from './page.module.scss';
+import SpinModule from '@/shared/ui/spiner';
 import '@ant-design/v5-patch-for-react-19';
 
 export const dynamic = 'force-dynamic';
@@ -16,6 +15,11 @@ export default function Home() {
   const error = userStore((state: IUserStore) => state.error);
   const loading = authStore(state => state.loading);
   const [authChecked, setAuthChecked] = useState(false);
+  const [mounted, setMounted] = useState(false);
+
+  useEffect(() => {
+    setMounted(true);
+  }, []);
 
   useEffect(() => {
     async function handleAuthCheck() {
@@ -61,21 +65,11 @@ export default function Home() {
     return () => document.removeEventListener('visibilitychange', handleVisibilityChange);
   }, []);
 
+  if (!mounted) return null;
+
   if (loading || !authChecked) {
-    return (
-      <div className={style.spinWrapper}>
-        <ConfigProvider theme={{ token: { colorPrimary: '#FB4724' } }}>
-          <Spin size="large" />
-        </ConfigProvider>
-      </div>
-    );
+    return <SpinModule />;
   }
 
-  return (
-    <div className={style.spinWrapper}>
-      <ConfigProvider theme={{ token: { colorPrimary: '#FB4724' } }}>
-        <Spin size="large" />
-      </ConfigProvider>
-    </div>
-  );
+  return <SpinModule />;
 }
