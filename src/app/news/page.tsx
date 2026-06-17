@@ -11,10 +11,16 @@ import { News26 } from '@/pages_fsd/news';
 const LOAD_NEWS_SIZE = 10;
 
 const NewsPage = () => {
-  const { getTitles, likeNewsOrComment, dislikeNews, fetchNews } = dataStore(state => state);
-  const { saveComment } = commentsStore(state => state);
+  const getTitles = dataStore(state => state.getTitles);
+  const likeNewsOrComment = dataStore(state => state.likeNewsOrComment);
+  const dislikeNews = dataStore(state => state.dislikeNews);
+  const fetchNews = dataStore(state => state.fetchNews);
+  const saveComment = commentsStore(state => state.saveComment);
   const normalizedNews = dataStore(state => state.data.normalizedNews);
-  const { currentNewsState, setCurrentNewsState, loading, error } = dataStore(state => state);
+  const currentNewsState = dataStore(state => state.currentNewsState);
+  const setCurrentNewsState = dataStore(state => state.setCurrentNewsState);
+  const loading = dataStore(state => state.loading);
+  const error = dataStore(state => state.error);
   const savedNews = dataStore(state => state.data.savedNews);
   const searchedNews = dataStore(state => state.data.searchedNews);
   const newsTitles = dataStore(state => state.data.newsTitles);
@@ -33,6 +39,7 @@ const NewsPage = () => {
   const containerRef = useRef<HTMLDivElement | null>(null);
 
   const [messageApi, contextHolder] = message.useMessage();
+  const staleError = useRef<string | undefined>(error);
 
   const info = () => {
     messageApi.open({
@@ -42,9 +49,10 @@ const NewsPage = () => {
   };
 
   useEffect(() => {
-    if (error) {
+    if (error && error !== staleError.current) {
       info();
     }
+    staleError.current = undefined;
   }, [error]);
 
   useEffect(() => {
@@ -105,7 +113,13 @@ const NewsPage = () => {
     const news = getRenderNews();
 
     if (news && Object.keys(news).length > 0) {
-      setRenderNews(news);
+      setRenderNews(prev => {
+        const prevIds = Object.keys(prev ?? {})
+          .sort()
+          .join(',');
+        const nextIds = Object.keys(news).sort().join(',');
+        return prevIds === nextIds ? prev : news;
+      });
     } else if (currentNewsState.saved && news && Object.keys(news).length === 0) {
       setCurrentNewsState({
         default: true,

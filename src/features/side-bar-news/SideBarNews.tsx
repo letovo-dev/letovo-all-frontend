@@ -2,6 +2,7 @@
 
 import React, { useEffect, useMemo, useRef, useState } from 'react';
 import style from './SideBarNews.module.scss';
+import { useSwipeSidebar } from '@/shared/hooks/useSwipeSidebar';
 import { Form } from 'antd';
 import dataStore, { Titles } from '@/shared/stores/data-store';
 import Image from 'next/image';
@@ -51,6 +52,9 @@ const SideBarNews = ({
     { author: IUserData; data: [string, any][] }[]
   >([]);
   const [open, setOpen] = useState<boolean>(false);
+
+  useSwipeSidebar({ open, setOpen, disabled: desktop });
+
   const [scrollbar, setScrollbar] = useState<{
     top: number;
     height: number;

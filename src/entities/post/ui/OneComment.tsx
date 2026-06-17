@@ -73,8 +73,11 @@ const OneComment: React.FC<OneCommentProps> = ({
   allPostsAuthors,
 }) => {
   const [commentState, setCommentState] = useState<RealComment | undefined>(undefined);
-  const { setOpenComments, normalizedComments, deleteComment, likeComment, dislikeComment } =
-    commentsStore(state => state);
+  const normalizedComments = commentsStore(state => state.normalizedComments);
+  const setOpenComments = commentsStore(state => state.setOpenComments);
+  const deleteComment = commentsStore(state => state.deleteComment);
+  const likeComment = commentsStore(state => state.likeComment);
+  const dislikeComment = commentsStore(state => state.dislikeComment);
   const [text, setText] = useState('');
   const usageCommentText = setCommentText ?? setText;
   const usageCommentTextValue = commentText ?? text;
@@ -172,7 +175,9 @@ const OneComment: React.FC<OneCommentProps> = ({
             />
           </div>
           <div className={style.commentTextBox}>
-            <p className={style.commentAuthor}>{commentState.author}</p>
+            <p className={style.commentAuthor}>
+              {commentState.display_name || commentState.author}
+            </p>
             {(() => {
               const { time, date } = formatCommentDate(commentState.date);
               return (

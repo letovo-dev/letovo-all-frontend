@@ -1,7 +1,7 @@
 'use client';
-import React, { useEffect, useState } from 'react';
+import React, { useCallback, useEffect, useState } from 'react';
 import style from './NewsActionPanel.module.scss';
-import dataStore, { RealNews } from '@/shared/stores/data-store';
+import dataStore from '@/shared/stores/data-store';
 import commentsStore from '@/shared/stores/comments-store';
 import { Divider } from 'antd';
 
@@ -27,8 +27,10 @@ const NewsActionPanel = ({
   likeNewsOrComment: (post_id: string, action: string) => Promise<void>;
   dislikeNews: (post_id: string, action: string) => Promise<void>;
 }) => {
-  const { normalizedComments } = commentsStore(state => state);
-  const currentNewsComments = normalizedComments ? normalizedComments[postId] : [];
+  const currentNewsComments = commentsStore(state => state.normalizedComments?.[postId]);
+  const saveNews = dataStore(state => state.saveNews);
+  const setOpenComments = commentsStore(state => state.setOpenComments);
+  const post = dataStore(state => state.data.normalizedNews[postId]);
 
   const [actionsState, setActionsState] = useState({
     liked: false,
@@ -38,10 +40,6 @@ const NewsActionPanel = ({
     saved: false,
     savedCountState: 0,
   });
-
-  const { saveNews } = dataStore(state => state);
-  const { setOpenComments } = commentsStore(state => state);
-  const post = dataStore(state => state.data.normalizedNews[postId]);
 
   useEffect(() => {
     if (post) {
@@ -56,60 +54,37 @@ const NewsActionPanel = ({
     }
   }, [post]);
 
-  const handleLike = () => {
+  const handleLike = useCallback(() => {
     setActionsState(prev => {
-      if (prev.liked) {
-        likeNewsOrComment(String(postId), 'delete');
-
-        return {
-          ...prev,
-        };
-      } else {
-        likeNewsOrComment(String(postId), 'like');
-
-        return {
-          ...prev,
-        };
-      }
+      likeNewsOrComment(String(postId), prev.liked ? 'delete' : 'like');
+      return { ...prev };
     });
-  };
+  }, [likeNewsOrComment, postId]);
 
-  const handleDislike = () => {
+  const handleDislike = useCallback(() => {
     setActionsState(prev => {
-      if (prev.disliked) {
-        dislikeNews(String(postId), 'delete');
-        return {
-          ...prev,
-        };
-      } else {
-        dislikeNews(String(postId), 'like');
-
-        return {
-          ...prev,
-        };
-      }
+      dislikeNews(String(postId), prev.disliked ? 'delete' : 'like');
+      return { ...prev };
     });
-  };
+  }, [dislikeNews, postId]);
 
-  const handleComment = (id: string) => {
-    if (commentsCount > 0) {
-      setOpenComments(id);
-    } else {
-      setOpenComments('');
-    }
-  };
+  const handleComment = useCallback(
+    (id: string) => {
+      setOpenComments(commentsCount > 0 ? id : '');
+    },
+    [commentsCount, setOpenComments],
+  );
 
-  const handleSave = () => {
+  const handleSave = useCallback(() => {
     setActionsState(prev => {
+      saveNews(String(postId), prev.saved ? 'delete' : 'save');
       return {
         ...prev,
         saved: !prev.saved,
         savedCountState: prev.saved ? prev.savedCountState - 1 : prev.savedCountState + 1,
       };
     });
-    const action = actionsState.saved ? 'delete' : 'save';
-    saveNews(String(postId), action);
-  };
+  }, [postId, saveNews]);
 
   return (
     <>
@@ -133,7 +108,7 @@ const NewsActionPanel = ({
           </div>
           <div className={style.actionItem} onClick={() => handleComment(String(postId))}>
             <span className={style.commentIcon} aria-label="comment" role="img" />
-            <p className={style.commentsCount}>{currentNewsComments?.length}</p>
+            <p className={style.commentsCount}>{currentNewsComments?.length ?? 0}</p>
           </div>
         </div>
         <div className={style.actionItem} onClick={handleSave}>

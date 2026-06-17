@@ -3,6 +3,7 @@
 import React, { useEffect, useMemo, useRef, useState } from 'react';
 import bcrypt from 'bcryptjs';
 import style from './SideBarArticles.module.scss';
+import { useSwipeSidebar } from '@/shared/hooks/useSwipeSidebar';
 import articlesStore, { ArticleCategory, OneArticle } from '@/shared/stores/articles-store';
 import type { MenuProps } from 'antd';
 import { Form, Collapse, Dropdown, Input, Button, Space, QRCode } from 'antd';
@@ -75,6 +76,8 @@ const SideBarArticles = ({
 
   const [form] = Form.useForm();
   const [open, setOpen] = useState<boolean>(false);
+
+  useSwipeSidebar({ open, setOpen, disabled: desktop });
   const [searchQuery, setSearchQuery] = useState<string>('');
   // const [windowWidth, setWindowWidth] = useState<number | undefined>(undefined);
   const sidebarRef = useRef<HTMLDivElement>(null);

@@ -130,6 +130,11 @@ const nextConfig = {
       },
       {
         protocol: 'http',
+        hostname: '192.168.68.105',
+        pathname: '/api/media/get/**',
+      },
+      {
+        protocol: 'http',
         hostname: 'localhost',
         pathname: '/api/media/get/**',
       },

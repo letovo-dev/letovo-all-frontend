@@ -21,6 +21,7 @@ export interface Comment {
 
 export interface RealComment {
   author: string;
+  display_name: string | null;
   avatar_pic: string;
   date: string;
   dislikes: string;
@@ -45,7 +46,9 @@ export interface RealNews {
   likes: string;
   title: string;
   author: string;
+  display_name: string | null;
   text: string;
+  date?: string;
   dislikes: string;
   parent_id: string;
   is_liked: string;

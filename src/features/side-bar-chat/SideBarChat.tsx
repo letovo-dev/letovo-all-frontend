@@ -5,6 +5,7 @@ import Image from 'next/image';
 import style from './SideBarChat.module.scss';
 import SideBarChatSearch from './SideBarChatSearch';
 import type { ChatContact } from '@/shared/api/chat';
+import { useSwipeSidebar } from '@/shared/hooks/useSwipeSidebar';
 
 interface SideBarChatProps {
   contacts: ChatContact[];
@@ -25,6 +26,8 @@ const SideBarChat: React.FC<SideBarChatProps> = ({
 }) => {
   const [open, setOpen] = useState(false);
   const [search, setSearch] = useState('');
+
+  useSwipeSidebar({ open, setOpen, disabled: desktop });
   const sidebarRef = useRef<HTMLDivElement>(null);
   const listRef = useRef<HTMLDivElement>(null);
   const thumbRef = useRef<HTMLDivElement>(null);
