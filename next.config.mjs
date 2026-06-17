@@ -95,28 +95,28 @@ const nextConfig = {
     remotePatterns: [
       {
         protocol: 'https',
-        hostname: 'letovocorp.ru',
-        pathname: '/api/media/getimages/avatars/**',
+        hostname: 'ya.sergeiscv.ru',
+        pathname: '/letovo-api/media/getimages/avatars/**',
       },
       {
         protocol: 'https',
-        hostname: 'letovocorp.ru',
-        pathname: '/api/media/get/images/avatars/**',
+        hostname: 'ya.sergeiscv.ru',
+        pathname: '/letovo-api/media/get/images/avatars/**',
       },
       {
         protocol: 'https',
-        hostname: 'letovocorp.ru',
-        pathname: '/api/media/get/pages/images/achivements/**',
+        hostname: 'ya.sergeiscv.ru',
+        pathname: '/letovo-api/media/get/pages/images/achivements/**',
       },
       {
         protocol: 'https',
-        hostname: 'letovocorp.ru',
-        pathname: '/api/achivements/qr_code/**',
+        hostname: 'ya.sergeiscv.ru',
+        pathname: '/letovo-api/achivements/qr_code/**',
       },
       {
         protocol: 'https',
-        hostname: 'letovocorp.ru',
-        pathname: '/api/media/get/**',
+        hostname: 'ya.sergeiscv.ru',
+        pathname: '/letovo-api/media/get/**',
       },
       {
         protocol: 'http',
@@ -125,8 +125,8 @@ const nextConfig = {
       },
       {
         protocol: 'https',
-        hostname: 'letovocorp.ru',
-        pathname: '/api/media/get/images/achivements/**',
+        hostname: 'ya.sergeiscv.ru',
+        pathname: '/letovo-api/media/get/images/achivements/**',
       },
       {
         protocol: 'http',
@@ -144,7 +144,7 @@ const nextConfig = {
     return [
       {
         source: '/api/media/get/:path*',
-        destination: 'https://letovocorp.ru/api/media/get/:path*',
+        destination: 'https://ya.sergeiscv.ru/letovo-api/media/get/:path*',
       },
     ];
   },
