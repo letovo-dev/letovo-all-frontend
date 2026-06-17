@@ -3,12 +3,12 @@
 import React, { useCallback, useEffect, useMemo, useRef, useState } from 'react';
 import style from './UserPage26.module.scss';
 import userStore, { IUserAchData, IUserStore } from '@/shared/stores/user-store';
-import { Form, message, Button, Avatar } from 'antd';
+import { message, Button, Avatar } from 'antd';
 import { useRouter } from 'next/navigation';
 import authStore from '@/shared/stores/auth-store';
 import { setDataToLocaleStorage } from '@/shared/lib/ApiSPA/axios/helpers';
 import dataStore from '@/shared/stores/data-store';
-import GetAvatars from '@/features/getAvatars';
+import CustomSelect from '@/shared/ui/select/CustomSelect';
 import Image from 'next/image';
 import { AchievementModal } from '@/entities/achievement/ui/modal';
 import { TransferModal26 } from '@/features/moneyTranfer/ui';
@@ -82,7 +82,6 @@ const UserPage26 = () => {
   const { getAllUserAchievements, getAchievementsDepartment, getUserAchievements } = userStore(
     (state: IUserStore) => state,
   );
-  const [form] = Form.useForm();
   const changeAvatar = userStore((state: IUserStore) => state.setAvatar);
   const getAvatars = dataStore(state => state.getAvatars);
   const userStatus = authStore(state => state.userStatus);
@@ -237,14 +236,8 @@ const UserPage26 = () => {
     router.push(`/login`);
   };
 
-  const onValuesChange = async (changedValues: any, allValues: any) => {
-    if (changedValues.avatar) {
-      await changeAvatar(changedValues.avatar);
-    }
-  };
-
   const toggleVisible = () => {
-    setVisible(!visible);
+    setVisible(v => !v);
   };
 
   const ViewFinder = () => (
@@ -354,11 +347,28 @@ const UserPage26 = () => {
       <div className={style.topRow}>
         <section aria-label="Профиль пользователя" className={style.userBlock}>
           <div className={style.icons}>
-            <div className={style.userIcon}>
-              <Avatar
-                src={`${process.env.NEXT_PUBLIC_BASE_URL_MEDIA}/${userData.avatar_pic}`}
-                size={80}
-                shape="circle"
+            <div
+              ref={avatarRef}
+              style={{ position: 'relative', display: 'inline-block', cursor: 'pointer' }}
+              onClick={toggleVisible}
+            >
+              <div className={style.userIcon}>
+                <Avatar
+                  src={`${process.env.NEXT_PUBLIC_BASE_URL_MEDIA}/${avatar}`}
+                  size={80}
+                  shape="circle"
+                />
+              </div>
+              <CustomSelect
+                value={avatar}
+                onChange={value => {
+                  setAvatar(value);
+                  changeAvatar(value);
+                }}
+                visible={visible}
+                setVisible={setVisible}
+                avatars={avatars ?? []}
+                userPageSelectPosition={true}
               />
             </div>
             <Image
@@ -481,13 +491,13 @@ const UserPage26 = () => {
           aria-label="Карьера"
           className={`${style.careerBlock} ${viewSection !== 'career' ? style.mobileHidden : ''}`}
         >
-          <div className={style.careerHeader}>
+          {/* <div className={style.careerHeader}>
             <h3 className={style.careerHeaderTitle}>Карьера</h3>
             <button type="button" className={style.careerViewButton}>
               Посмотреть развитие карьеры на карте
               <Image src="/26_arrowUp.svg" alt="" height={12} width={12} />
             </button>
-          </div>
+          </div> */}
           <div className={style.collapseContainer}>
             {/* {[
             {
@@ -640,6 +650,17 @@ const UserPage26 = () => {
           userData={userData}
         />
       )}
+
+      <AchievementModal
+        open={open}
+        setOpen={setOpen}
+        title="Достижение"
+        currentItem={currentItem}
+        allPossibleUserAchievements={achievements ?? []}
+        setCurrentItem={setCurrentItem}
+        currentImageElement={currentImageElement}
+        setCurrentImageElement={setCurrentImageElement}
+      />
 
       {contextHolder}
     </>

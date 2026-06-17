@@ -2,11 +2,23 @@
 
 import { useRouter } from 'next/navigation';
 import Image from 'next/image';
-import { Orbitron, Inter } from 'next/font/google';
+import localFont from 'next/font/local';
 import styles from './not-found.module.scss';
 
-const orbitron = Orbitron({ subsets: ['latin'], weight: ['500', '700'] });
-const inter = Inter({ subsets: ['latin'], weight: ['400', '600'] });
+const orbitron = localFont({
+  src: [
+    { path: '../../public/fonts/orbitron.woff2', weight: '500', style: 'normal' },
+    { path: '../../public/fonts/orbitron.woff2', weight: '700', style: 'normal' },
+  ],
+  variable: '--font-orbitron',
+});
+const inter = localFont({
+  src: [
+    { path: '../../public/fonts/inter-latin-400.woff2', weight: '400', style: 'normal' },
+    { path: '../../public/fonts/inter-latin-600.woff2', weight: '600', style: 'normal' },
+  ],
+  variable: '--font-inter',
+});
 
 export default function NotFound() {
   const router = useRouter();

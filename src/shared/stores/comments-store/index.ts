@@ -6,6 +6,7 @@ import { Comment } from '../data-store';
 
 export interface OneComment {
   author: string;
+  display_name: string | null;
   avatar_pic: string;
   date: string;
   dislikes: string;

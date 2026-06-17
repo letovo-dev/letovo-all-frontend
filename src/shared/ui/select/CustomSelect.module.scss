@@ -91,11 +91,10 @@
 
 .customSelectUserPage {
   @extend .customSelect;
-  left: 5px;
   top: 110px;
   @media screen and (max-width: 960px) {
-    left: -6px;
-    top: 275%;
+    left: -13px;
+    top: 110%;
   }
 }
 

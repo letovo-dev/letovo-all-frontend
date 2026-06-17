@@ -3,3 +3,20 @@
   border-radius: 20px;
   box-shadow: 0 -2px 4px rgba(0, 0, 0, 0.1);
 }
+
+.letovoPostContainer {
+  background: #242424;
+  border: 1px solid rgba(255, 255, 255, 0.21);
+  border-radius: 22px;
+  overflow: hidden;
+
+  textarea {
+    background: #242424;
+    color: #ffffff;
+    caret-color: #ffffff;
+
+    &::placeholder {
+      color: rgba(255, 255, 255, 0.4);
+    }
+  }
+}

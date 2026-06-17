@@ -506,15 +506,14 @@
 
 .careerBlock {
   margin-top: 25px;
-  background-color: var(--background);
+  background: var(--foreground);
   border-radius: 20px 20px 0 0;
   width: 100%;
   max-width: 415px;
   box-sizing: border-box;
-  height: calc(100vh - 435px);
-  min-height: 250px;
+  height: auto;
   flex-shrink: 0;
-  padding-top: 20px;
+  padding-top: 5px;
   display: flex;
   flex-direction: column;
   align-items: center;
@@ -548,18 +547,15 @@
   }
 
   .collapseContainer {
-    position: absolute;
     background: var(--foreground);
-    border-radius: 15px 15px 0 0;
+    border-radius: 2px;
     width: 100%;
-    top: 74px;
-    bottom: 0;
     display: flex;
     flex-direction: column;
     gap: 10px;
     padding-bottom: 105px;
     box-sizing: border-box;
-    overflow-y: auto;
+    overflow-y: visible;
   }
 
   @media screen and (min-width: 961px) {
@@ -630,10 +626,7 @@
       height: auto;
       padding: 16px;
       padding-bottom: 16px;
-      border-bottom-left-radius: 36px;
-      border-bottom-right-radius: 36px;
-      border-top-right-radius: 0px;
-      border-top-left-radius: 0px;
+      border-radius: 36px;
       background: transparent;
       box-sizing: border-box;
       overflow-y: auto;
@@ -648,8 +641,7 @@
   align-items: center;
   width: 100%;
   max-width: 415px;
-  height: calc(100vh - 435px);
-  min-height: 250px;
+  height: auto;
   flex-shrink: 0;
   margin-top: 25px;
   // padding-top: 20px;
@@ -680,9 +672,13 @@
     box-sizing: border-box;
     border-radius: 25px;
     border: 1px solid var(--border-grey);
-    overflow: hidden;
+    overflow: visible;
     isolation: isolate;
     position: relative;
+
+    @media screen and (min-width: 961px) {
+      overflow: hidden;
+    }
   }
 
   .emptyAchievements {
@@ -718,6 +714,9 @@
     flex-wrap: wrap;
 
     @media screen and (max-width: 960px) {
+      height: auto;
+      overflow-y: visible;
+      overflow-x: visible;
       display: grid;
       grid-template-columns: repeat(4, 1fr);
       column-gap: 4px;

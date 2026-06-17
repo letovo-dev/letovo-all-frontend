@@ -1,6 +1,6 @@
 'use client';
 
-import { memo, useMemo, useState } from 'react';
+import { memo, useCallback, useMemo, useState } from 'react';
 import PostHeader from './PostHeader';
 import CarouselElement from './Carousel';
 import NewsActionPanel from '@/features/news-action-panel/ui';
@@ -32,8 +32,11 @@ const NewsPost: React.FC<OnePostProps> = ({
   newsId,
 }) => {
   const { avatar_pic, userrights } = userStore((state: IUserStore) => state.store.userData);
-  const { allPostsAuthors } = userStore((state: IUserStore) => state.store);
-  const { editNews, deleteNews, setCurrentNewsState, currentNewsState } = dataStore(state => state);
+  const allPostsAuthors = userStore((state: IUserStore) => state.store.allPostsAuthors);
+  const editNews = dataStore(state => state.editNews);
+  const deleteNews = dataStore(state => state.deleteNews);
+  const setCurrentNewsState = dataStore(state => state.setCurrentNewsState);
+  const currentNewsStateSaved = dataStore(state => state.currentNewsState?.saved ?? false);
   const comments = useMemo(
     () =>
       commentsStore.getState().normalizedComments
@@ -60,50 +63,56 @@ const NewsPost: React.FC<OnePostProps> = ({
     });
   }, [allPostsAuthors]);
 
-  const handleOpen = (editPost?: Post) => {
-    setVisible(true);
-  };
+  const handleOpen = useCallback(() => setVisible(true), []);
 
-  const handleDelete = (id: string) => {
-    deleteNews(id);
-    setCurrentNewsState({
-      default: true,
-      saved: false,
-      selectedNews: undefined,
-      searched: false,
-      selectedAuthor: false,
-    });
-  };
+  const handleDelete = useCallback(
+    (id: string) => {
+      deleteNews(id);
+      setCurrentNewsState({
+        default: true,
+        saved: false,
+        selectedNews: undefined,
+        searched: false,
+        selectedAuthor: false,
+      });
+    },
+    [deleteNews, setCurrentNewsState],
+  );
 
-  const handleSubmit = async (values: any) => {
-    try {
-      editNews({ ...post, ...values });
-      setVisible(false);
-    } catch (error) {
-      console.error('Submit error:', error);
-    }
-  };
+  const handleSubmit = useCallback(
+    async (values: any) => {
+      try {
+        editNews({ ...post, ...values });
+        setVisible(false);
+      } catch (error) {
+        console.error('Submit error:', error);
+      }
+    },
+    [editNews, post],
+  );
 
-  const handleCancel = () => {
-    setVisible(false);
-  };
+  const handleCancel = useCallback(() => setVisible(false), []);
 
   const permittedUser = userrights === 'admin' || userrights === 'moder';
+  const isLetovo = el.news.author === 'LETOVO';
 
   return (
-    <div key={generateKey()} className={style.postContainer}>
+    <div key={generateKey()} className={isLetovo ? style.letovoPostContainer : style.postContainer}>
       <PostHeader
         index={index}
         author={{
-          username: el.news.author || 'Unknown',
+          username: el.news.display_name || el.news.author || 'Unknown',
           avatar: el.news.avatar_pic || '',
           id: String(el.news.post_id),
         }}
         text={el.news.text || ''}
+        title={el.news.title || ''}
+        date={el.news.date || ''}
+        isLetovo={isLetovo}
         userStatus={userrights}
         handleOpen={handleOpen}
         handleDelete={handleDelete}
-        currentNewsStateSaved={currentNewsState.saved}
+        currentNewsStateSaved={currentNewsStateSaved}
       />
       {el.media?.length > 0 ? (
         <CarouselElement imgs={el.media} />
@@ -142,4 +151,19 @@ const NewsPost: React.FC<OnePostProps> = ({
   );
 };
 
-export default memo(NewsPost);
+const newsPostAreEqual = (prev: OnePostProps, next: OnePostProps): boolean => {
+  if (prev.newsId !== next.newsId || prev.index !== next.index) return false;
+  if (prev.el.media !== next.el.media) return false;
+  const pn = prev.el.news;
+  const nn = next.el.news;
+  return (
+    pn.post_id === nn.post_id &&
+    pn.text === nn.text &&
+    pn.title === nn.title &&
+    pn.author === nn.author &&
+    pn.avatar_pic === nn.avatar_pic &&
+    pn.is_published === nn.is_published
+  );
+};
+
+export default memo(NewsPost, newsPostAreEqual);

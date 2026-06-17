@@ -3,6 +3,7 @@
 import React, { useEffect, useRef, useState, forwardRef, memo, useCallback } from 'react';
 import { useVideoSessionCache } from '@/shared/stores/media-cash';
 import authStore from '@/shared/stores/auth-store';
+import { ConfigProvider, Spin } from 'antd';
 
 interface LazyVideoProps extends React.VideoHTMLAttributes<HTMLVideoElement> {
   src: string;
@@ -14,7 +15,7 @@ const LazyVideo = forwardRef<HTMLVideoElement, LazyVideoProps>(({ src, ...rest }
   const objectUrlRef = useRef<string | null>(null);
   const abortRef = useRef<AbortController | null>(null);
   const [objectUrl, setObjectUrl] = useState<string | null>(null);
-  const [isVisible, setIsVisible] = useState(false);
+  const [isLoading, setIsLoading] = useState(false);
 
   const getCachedVideo = useVideoSessionCache(state => state.getCachedVideo);
   const setCachedVideo = useVideoSessionCache(state => state.setCachedVideo);
@@ -24,7 +25,7 @@ const LazyVideo = forwardRef<HTMLVideoElement, LazyVideoProps>(({ src, ...rest }
     if (!ref || !videoRef.current) return;
     if (typeof ref === 'function') ref(videoRef.current);
     else (ref as React.MutableRefObject<HTMLVideoElement | null>).current = videoRef.current;
-  }, [ref]);
+  }, [ref, objectUrl]);
 
   const loadVideo = useCallback(async () => {
     if (objectUrlRef.current) return;
@@ -37,6 +38,7 @@ const LazyVideo = forwardRef<HTMLVideoElement, LazyVideoProps>(({ src, ...rest }
       return;
     }
 
+    setIsLoading(true);
     abortRef.current = new AbortController();
     try {
       const response = await fetch(src, {
@@ -53,28 +55,10 @@ const LazyVideo = forwardRef<HTMLVideoElement, LazyVideoProps>(({ src, ...rest }
       if ((err as Error).name !== 'AbortError') {
         console.error('LazyVideo: failed to load', src, err);
       }
+    } finally {
+      setIsLoading(false);
     }
   }, [src, token, getCachedVideo, setCachedVideo]);
-
-  useEffect(() => {
-    const observer = new IntersectionObserver(([entry]) => setIsVisible(entry.isIntersecting), {
-      threshold: 0.3,
-    });
-    const el = containerRef.current;
-    if (el) observer.observe(el);
-    return () => {
-      if (el) observer.unobserve(el);
-      observer.disconnect();
-    };
-  }, []);
-
-  useEffect(() => {
-    if (isVisible) {
-      loadVideo();
-    } else if (videoRef.current && objectUrlRef.current) {
-      videoRef.current.pause();
-    }
-  }, [isVisible, loadVideo]);
 
   useEffect(() => {
     return () => {
@@ -86,16 +70,79 @@ const LazyVideo = forwardRef<HTMLVideoElement, LazyVideoProps>(({ src, ...rest }
     };
   }, []);
 
+  const notLoaded = !objectUrl && !isLoading;
+
   return (
-    <div ref={containerRef} style={{ width: '100%', height: '100%' }}>
-      <video
-        ref={videoRef}
-        src={objectUrl ?? undefined}
-        controls
-        preload="none"
-        style={{ width: '100%', height: '100%' }}
-        {...rest}
-      />
+    <div
+      ref={containerRef}
+      style={{
+        position: 'relative',
+        width: '100%',
+        aspectRatio: objectUrl ? undefined : '4 / 3',
+        background: objectUrl ? 'transparent' : 'rgba(0,0,0,0.06)',
+        borderRadius: 8,
+        overflow: 'hidden',
+      }}
+    >
+      {notLoaded && (
+        <div
+          onClick={loadVideo}
+          style={{
+            position: 'absolute',
+            inset: 0,
+            display: 'flex',
+            alignItems: 'center',
+            justifyContent: 'center',
+            cursor: 'pointer',
+          }}
+        >
+          <div
+            style={{
+              width: 56,
+              height: 56,
+              borderRadius: '50%',
+              background: 'rgba(0,0,0,0.45)',
+              display: 'flex',
+              alignItems: 'center',
+              justifyContent: 'center',
+            }}
+          >
+            <svg width="22" height="26" viewBox="0 0 22 26" fill="none">
+              <path d="M2 2L20 13L2 24V2Z" fill="white" />
+            </svg>
+          </div>
+        </div>
+      )}
+
+      {isLoading && (
+        <div
+          style={{
+            position: 'absolute',
+            inset: 0,
+            display: 'flex',
+            alignItems: 'center',
+            justifyContent: 'center',
+            background: 'rgba(0,0,0,0.15)',
+            zIndex: 1,
+          }}
+        >
+          <ConfigProvider theme={{ token: { colorPrimary: '#FB4724' } }}>
+            <Spin size="large" />
+          </ConfigProvider>
+        </div>
+      )}
+
+      {objectUrl && (
+        <video
+          ref={videoRef}
+          src={objectUrl}
+          controls
+          autoPlay
+          preload="none"
+          style={{ width: '100%', height: '100%' }}
+          {...rest}
+        />
+      )}
     </div>
   );
 });

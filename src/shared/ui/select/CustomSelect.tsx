@@ -46,7 +46,45 @@ const CustomSelect: React.FC<CustomSelectProps> = ({
     setVisible(false);
   };
 
-  return visible ? (
+  if (!visible) return null;
+
+  if (avatarsToSelect.length === 0) {
+    return (
+      <div
+        style={{
+          position: 'absolute',
+          left: userPageSelectPosition ? 5 : -15,
+          top: userPageSelectPosition ? 110 : '200%',
+          zIndex: 10,
+          background: 'rgba(36,36,36,0.95)',
+          border: '1px solid rgba(255,255,255,0.15)',
+          borderRadius: 10,
+          padding: '10px 12px',
+          width: 109,
+          boxSizing: 'border-box',
+          display: 'flex',
+          flexDirection: 'column',
+          alignItems: 'center',
+          gap: 4,
+        }}
+      >
+        <span style={{ fontSize: 20 }}>😔</span>
+        <span
+          style={{
+            fontSize: 11,
+            color: 'rgba(255,255,255,0.75)',
+            textAlign: 'center',
+            lineHeight: 1.4,
+            wordBreak: 'break-word',
+          }}
+        >
+          Нет доступных аватаров
+        </span>
+      </div>
+    );
+  }
+
+  return (
     <div className={!userPageSelectPosition ? style.customSelect : style.customSelectUserPage}>
       <div className={style.scrollContainer}>
         <Menu
@@ -59,7 +97,7 @@ const CustomSelect: React.FC<CustomSelectProps> = ({
         />
       </div>
     </div>
-  ) : null;
+  );
 };
 
 export default CustomSelect;
