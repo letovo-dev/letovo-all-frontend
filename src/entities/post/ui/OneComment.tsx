@@ -58,6 +58,7 @@ interface OneCommentProps {
   likesCount?: string;
   isAdmin: boolean;
   allPostsAuthors: IUserData[];
+  isLetovo?: boolean;
 }
 
 const OneComment: React.FC<OneCommentProps> = ({
@@ -72,6 +73,7 @@ const OneComment: React.FC<OneCommentProps> = ({
   commentText,
   isAdmin,
   allPostsAuthors,
+  isLetovo,
 }) => {
   const [commentState, setCommentState] = useState<RealComment | undefined>(undefined);
   const normalizedComments = commentsStore(state => state.normalizedComments);
@@ -198,7 +200,9 @@ const OneComment: React.FC<OneCommentProps> = ({
                 </p>
               );
             })()}
-            <p className={style.commentText}>{commentState.text}</p>
+            <p className={style.commentText} data-leto={isLetovo}>
+              {commentState.text}
+            </p>
             <div className={style.actions}>
               <div className={style.actionItem} onClick={handleLike}>
                 <span
@@ -218,7 +222,7 @@ const OneComment: React.FC<OneCommentProps> = ({
               </div>
             </div>
             <div className={style.footer}>
-              <div className={style.commentTextReply} onClick={handleReply}>
+              <div className={style.commentTextReply} onClick={handleReply} data-leto={isLetovo}>
                 Ответить
               </div>
               <div className={style.iconsItem}>

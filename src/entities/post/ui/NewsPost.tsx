@@ -137,6 +137,7 @@ const NewsPost: React.FC<OnePostProps> = ({
         likeNewsOrComment={likeNewsOrComment}
         isAdmin={userrights === 'admin'}
         allPostsAuthors={allPostsAuthors}
+        isLetovo={isLetovo}
       />
       {permittedUser && (
         <PostModal
