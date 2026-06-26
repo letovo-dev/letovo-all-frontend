@@ -35,6 +35,7 @@ const TransferModal26: React.FC<ModalProps> = ({
   const [sum, setSum] = useState<number | undefined>(undefined);
   const { isRequireUserInDatabase, transferMoney } = userStore((state: IUserStore) => state);
   const [finished, setFinished] = useState<boolean>(false);
+  const [transferRemainingBalance, setTransferRemainingBalance] = useState<number>(selfMoney);
   const [avatar, setAvatar] = useState<string | undefined>(undefined);
   const [isButtonDisable, setIsButtonDisable] = useState<boolean>(true);
   const [mounted, setMounted] = useState(false);
@@ -117,12 +118,21 @@ const TransferModal26: React.FC<ModalProps> = ({
       if (isAdmin && amount <= 0) return;
       const res = await transferMoney({ receiver: values.nick, amount });
       if (res && res === 'success') {
+        const remainingBalance = Number(selfMoney) - amount;
+        setTransferRemainingBalance(remainingBalance);
         userStore.setState((state: IUserStore) => ({
           store: {
             ...state.store,
             userData: {
               ...state.store.userData,
-              balance: Number(selfMoney) - Number(values.sum),
+              balance: remainingBalance,
+              last_outgoing_payment: {
+                transactionid: 0,
+                amount,
+                sender: state.store.userData.username,
+                receiver: values.nick,
+                transactiontime: new Date().toISOString(),
+              },
             },
           },
         }));
@@ -272,7 +282,7 @@ const TransferModal26: React.FC<ModalProps> = ({
             <p className={style.successSubtext}>
               {isAdmin
                 ? `Средства отправлены пользователю ${receiver ?? ''}`
-                : `Остаток: ${selfMoney} энк.`}
+                : `Остаток: ${transferRemainingBalance} энк.`}
             </p>
             <div className={style.readyRow}>
               <Button
