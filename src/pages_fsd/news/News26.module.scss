@@ -60,6 +60,9 @@ $overlay-color: rgba(0, 0, 0, 0.5);
   scrollbar-gutter: stable;
   -webkit-overflow-scrolling: touch;
   overscroll-behavior-y: contain;
+  @supports (height: 1dvh) {
+    height: 100dvh;
+  }
 
   @media screen and (min-width: 961px) {
     flex-direction: row;

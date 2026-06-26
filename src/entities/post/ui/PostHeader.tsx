@@ -52,9 +52,6 @@ const PostHeader = ({
   currentNewsStateSaved: boolean;
 }) => {
   const avatarSrc = author.avatar && `${process.env.NEXT_PUBLIC_BASE_URL_MEDIA}/${author.avatar}`;
-  const cleanedParagraphs = text
-    .replace(/\n(?!\n)/g, ' ') // убрать одиночные переносы
-    .split(/\n{2,}/);
   const permittedUser = userStatus === 'admin' || userStatus === 'moder';
   const formattedDate = date ? formatPostDate(date) : '';
 
@@ -89,11 +86,7 @@ const PostHeader = ({
           )}
         </div>
         {title && <p className={style.letovoTitle}>{title}</p>}
-        {cleanedParagraphs.map((paragraph, i) => (
-          <p key={i} className={style.letovoText}>
-            {paragraph}
-          </p>
-        ))}
+        <p className={style.letovoText}>{text}</p>
       </App>
     );
   }
@@ -130,11 +123,7 @@ const PostHeader = ({
         )}
       </div>
       <>
-        {cleanedParagraphs.map((paragraph, index) => (
-          <p key={index} className={style.newsText}>
-            {paragraph}
-          </p>
-        ))}
+        <p className={style.newsText}>{text}</p>
       </>
     </App>
   );

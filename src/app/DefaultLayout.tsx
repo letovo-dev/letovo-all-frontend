@@ -78,8 +78,8 @@ export default function DefaultLayout({ children }: { children: React.ReactNode 
 
   useEffect(() => {
     const updateVh = () => {
-      const vh = window.innerHeight * 0.01;
-      document.documentElement.style.setProperty('--vh', `${vh}px`);
+      const height = window.visualViewport?.height ?? window.innerHeight;
+      document.documentElement.style.setProperty('--vh', `${height * 0.01}px`);
     };
 
     const handleScroll = (e: Event) => {
@@ -95,6 +95,8 @@ export default function DefaultLayout({ children }: { children: React.ReactNode 
 
     updateVh();
     window.addEventListener('resize', updateVh);
+    window.visualViewport?.addEventListener('resize', updateVh);
+    window.visualViewport?.addEventListener('scroll', updateVh);
 
     const element = scrollContainerRef.current ?? layoutRef.current;
     if (element) {
@@ -103,6 +105,8 @@ export default function DefaultLayout({ children }: { children: React.ReactNode 
 
     return () => {
       window.removeEventListener('resize', updateVh);
+      window.visualViewport?.removeEventListener('resize', updateVh);
+      window.visualViewport?.removeEventListener('scroll', updateVh);
       if (element) {
         element.removeEventListener('scroll', handleScroll);
       }

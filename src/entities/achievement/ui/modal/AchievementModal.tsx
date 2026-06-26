@@ -99,8 +99,8 @@ const AchievementModal: React.FC<ModalProps> = ({
     navigateTo((((idx - 1) % len) + len) % len);
   };
 
-  const stage = currentItem?.stages === '' ? '0' : currentItem?.stages;
-  const level = currentItem?.level === '' ? '0' : currentItem?.level;
+  const stage = currentItem?.stages || '0';
+  const level = currentItem?.level || '0';
 
   const handleOpenQr = () => {
     setQrUrl(qrData);
