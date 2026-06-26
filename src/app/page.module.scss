@@ -13,6 +13,9 @@
   height: calc(var(--vh, 1vh) * 100);
   overscroll-behavior-y: contain;
   overflow-y: hidden;
+  @supports (height: 1dvh) {
+    height: 100dvh;
+  }
 
   @media screen and (min-width: 961px) {
     flex-direction: row;

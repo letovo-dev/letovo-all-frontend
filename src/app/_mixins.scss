@@ -3,12 +3,15 @@
   background-repeat: no-repeat;
   background-size: contain;
   background-position: center;
-  height: 100vh;
+  height: calc(var(--vh, 1vh) * 100);
   display: flex;
   align-items: center;
   justify-content: center;
   flex-direction: column;
   margin: 0 auto;
+  @supports (height: 1dvh) {
+    height: 100dvh;
+  }
   @media screen and (max-width: 424px) {
     background-size: cover;
   }
@@ -19,12 +22,15 @@
   background-repeat: no-repeat;
   background-size: contain;
   background-position: center;
-  height: 100vh;
+  height: calc(var(--vh, 1vh) * 100);
   display: flex;
   align-items: center;
   justify-content: center;
   flex-direction: column;
   margin: 0 auto;
+  @supports (height: 1dvh) {
+    height: 100dvh;
+  }
 }
 
 %transparentContainer {

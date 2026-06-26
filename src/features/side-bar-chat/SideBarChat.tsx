@@ -24,8 +24,12 @@ const SideBarChat: React.FC<SideBarChatProps> = ({
   burgerRef,
   desktop,
 }) => {
-  const [open, setOpen] = useState(false);
+  const [open, setOpen] = useState(!activeUsername);
   const [search, setSearch] = useState('');
+
+  useEffect(() => {
+    if (!open) setSearch('');
+  }, [open]);
 
   useSwipeSidebar({ open, setOpen, disabled: desktop });
   const sidebarRef = useRef<HTMLDivElement>(null);
@@ -234,20 +238,8 @@ const SideBarChat: React.FC<SideBarChatProps> = ({
           <SideBarChatSearch value={search} onChange={setSearch} disabled={loading} />
         </div>
 
-        {!activeUsername && (
-          <div className={style.placeholder}>
-            <p>Выберите контакт,</p>
-            <p>кому вы хотите написать...</p>
-          </div>
-        )}
-
         <div className={style.sidebarItemsContainer}>
-          <div
-            className={style.contactsHeader}
-            onClick={() => {
-              onSelectContact?.('');
-            }}
-          >
+          <div className={style.contactsHeader} onClick={e => e.stopPropagation()}>
             <Image src="/26_chat_icon.svg" alt="chat" width={17} height={15} />
             <span>Список контактов</span>
           </div>

@@ -58,6 +58,9 @@ $overlay-color: rgba(0, 0, 0, 0.3);
   scrollbar-gutter: stable;
   -webkit-overflow-scrolling: touch;
   overscroll-behavior-y: contain;
+  @supports (height: 1dvh) {
+    height: 100dvh;
+  }
 
   @media screen and (min-width: 961px) {
     flex-direction: row;
@@ -83,9 +86,13 @@ $overlay-color: rgba(0, 0, 0, 0.3);
     margin: 0 auto;
     box-sizing: border-box;
     overflow: visible;
-    width: 390px;
+    width: min(390px, 100%);
+    padding-right: 25px;
+    padding-bottom: 55px;
 
     @media screen and (min-width: 961px) {
+      padding-right: 0;
+      padding-bottom: 0;
       width: 519px;
       height: calc(100vh - 54px);
       margin-top: 24px;

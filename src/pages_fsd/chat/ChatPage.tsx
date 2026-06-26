@@ -116,9 +116,6 @@ const ChatPage: React.FC = () => {
           )}
         </div>
         <div className={style.chatArea}>
-          {!activeChat && (
-            <p className={style.emptyHint}>Выберите контакт, кому вы хотите написать...</p>
-          )}
           {activeChat && (
             <>
               <div className={style.messagesList}>
