@@ -7,6 +7,13 @@ export interface DepartmentMeta {
 }
 
 export const departments: { [key: string]: DepartmentMeta } = {
+  '0': {
+    color: 'var(--x-header)',
+    borderColor: 'var(--x-border)',
+    iconColor: 'var(--x-icon)',
+    name: '[НЕТ ДОСТУПА]',
+    icon: '/26_x.svg',
+  },
   '1': {
     color: 'var(--it-header)',
     borderColor: 'var(--it-border)',
@@ -63,6 +70,13 @@ export const departments: { [key: string]: DepartmentMeta } = {
     name: 'Клуб',
     icon: '/26_proj11.svg',
   },
+  '9': {
+    color: 'var(--x-header)',
+    borderColor: 'var(--x-border)',
+    iconColor: 'var(--x-icon)',
+    name: '[БЕЗ НАЗВАНИЯ]',
+    icon: '/26_x.svg',
+  },
   '10': {
     color: 'var(--design-header)',
     borderColor: 'var(--design-border)',
@@ -77,4 +91,8 @@ export const departments: { [key: string]: DepartmentMeta } = {
     name: 'Х',
     icon: '/26_x.svg',
   },
+};
+
+export const getDepartmentMeta = (departmentId?: string | number | null): DepartmentMeta => {
+  return departments[String(departmentId ?? '')] ?? departments['0'] ?? departments['1'];
 };

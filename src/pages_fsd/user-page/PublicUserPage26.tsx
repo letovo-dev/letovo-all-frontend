@@ -5,7 +5,7 @@ import { useRouter } from 'next/navigation';
 import { Avatar } from 'antd';
 import Image from 'next/image';
 import style from './UserPage26.module.scss';
-import { departments } from './model/departments';
+import { getDepartmentMeta } from './model/departments';
 import publicProfileStore from '@/shared/stores/public-profile-store';
 import userStore from '@/shared/stores/user-store';
 import SpinModule from '@/shared/ui/spiner';
@@ -41,7 +41,7 @@ const PublicUserPage26: React.FC<PublicUserPage26Props> = ({ username }) => {
   }
 
   const depId = userData.departmentid;
-  const dep = departments[depId] ?? departments['1'];
+  const dep = getDepartmentMeta(depId);
   const userOnBoard = userData.active === 't' ? 'Работает' : 'В отпуске';
 
   const fullName = (userData.display_name || '').trim();
