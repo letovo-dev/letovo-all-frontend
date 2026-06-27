@@ -95,27 +95,27 @@ const nextConfig = {
     remotePatterns: [
       {
         protocol: 'https',
-        hostname: 'ya.sergeiscv.ru',
+        hostname: 'letovocorp.ru',
         pathname: '/letovo-api/media/getimages/avatars/**',
       },
       {
         protocol: 'https',
-        hostname: 'ya.sergeiscv.ru',
+        hostname: 'letovocorp.ru',
         pathname: '/letovo-api/media/get/images/avatars/**',
       },
       {
         protocol: 'https',
-        hostname: 'ya.sergeiscv.ru',
+        hostname: 'letovocorp.ru',
         pathname: '/letovo-api/media/get/pages/images/achivements/**',
       },
       {
         protocol: 'https',
-        hostname: 'ya.sergeiscv.ru',
+        hostname: 'letovocorp.ru',
         pathname: '/letovo-api/achivements/qr_code/**',
       },
       {
         protocol: 'https',
-        hostname: 'ya.sergeiscv.ru',
+        hostname: 'letovocorp.ru',
         pathname: '/letovo-api/media/get/**',
       },
       {
@@ -125,7 +125,7 @@ const nextConfig = {
       },
       {
         protocol: 'https',
-        hostname: 'ya.sergeiscv.ru',
+        hostname: 'letovocorp.ru',
         pathname: '/letovo-api/media/get/images/achivements/**',
       },
       {
@@ -144,7 +144,7 @@ const nextConfig = {
     return [
       {
         source: '/api/media/get/:path*',
-        destination: 'https://ya.sergeiscv.ru/letovo-api/media/get/:path*',
+        destination: 'https://letovocorp.ru/letovo-api/media/get/:path*',
       },
     ];
   },
