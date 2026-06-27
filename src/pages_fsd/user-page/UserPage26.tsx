@@ -22,7 +22,7 @@ import CollapseBody from './ui/CollapseBody';
 import AchieveBlockMobile26 from './ui/AchieveBlockMobile26';
 import SpinModule from '@/shared/ui/spiner';
 import { Consts } from '@/shared/consts';
-import { departments } from './model/departments';
+import { getDepartmentMeta } from './model/departments';
 
 const DONE_ACH = '/images/aceehimnstv/loched.png';
 
@@ -95,6 +95,7 @@ const UserPage26 = () => {
   const userAchievements = Consts.mock.enabled ? mockCareerAchievements : apiUserAchievements;
   const [currentImageElement, setCurrentImageElement] = useState<JSX.Element | null>(null);
   const [userData, setUserData] = useState(userStore.getState().store.userData);
+  const currentDepartment = getDepartmentMeta(userData?.departmentid);
   const [isLoading, setIsLoading] = useState(true);
   const { error, loading } = userStore((state: IUserStore) => state);
   const [avatar, setAvatar] = useState<string | undefined>(undefined);
@@ -373,7 +374,7 @@ const UserPage26 = () => {
             </div>
             <Image
               className={`${style.depIcon} ${style.depIconMobile}`}
-              src={departments[userData?.departmentid]?.icon}
+              src={currentDepartment.icon}
               alt="icon"
               height={80}
               width={80}
@@ -396,13 +397,13 @@ const UserPage26 = () => {
             <div className={style.depData}>
               <Image
                 className={`${style.depIcon} ${style.depIconDesktop}`}
-                src={departments[userData.departmentid].icon}
+                src={currentDepartment.icon}
                 alt=""
                 height={41}
                 width={50}
               />
               <div className={style.depTextWrap}>
-                <p className={style.depName}>{`${departments[userData.departmentid].name} >`}</p>
+                <p className={style.depName}>{`${currentDepartment.name} >`}</p>
                 <p className={style.branchName}>{userData?.brigadename ?? 'xxxxx'}</p>
               </div>
             </div>
@@ -537,16 +538,15 @@ const UserPage26 = () => {
               rightText={rightText}
               isOpen={openCollapseIndex === i}
               onToggle={() => setOpenCollapseIndex(prev => (prev === i ? null : i))}
-              headerColor={departments[userData.departmentid].color}
-              dotColor={departments[userData.departmentid].iconColor}
-              borderColor={departments[userData.departmentid].borderColor}
+              headerColor={currentDepartment.color}
+              dotColor={currentDepartment.iconColor}
+              borderColor={currentDepartment.borderColor}
             >
               {children}
             </Collapse>
           ))} */}
             {userAchievements?.achivements?.map((achivement: any, i: number) => {
-              const depKey = String(achivement.department_id ?? userData.departmentid);
-              const dep = departments[depKey] ?? departments[userData.departmentid];
+              const dep = getDepartmentMeta(achivement.department_id ?? userData.departmentid);
               return (
                 <Collapse
                   key={`${i}-${userAchievements?.username}`}

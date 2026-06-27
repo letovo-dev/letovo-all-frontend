@@ -18,6 +18,13 @@ const departments: {
     icon: string;
   };
 } = {
+  '0': {
+    color: 'var(--x-header)',
+    borderColor: 'var(--x-border)',
+    iconColor: 'var(--x-icon)',
+    name: '[НЕТ ДОСТУПА]',
+    icon: '/26_x.svg',
+  },
   '1': {
     color: 'var(--it-header)',
     borderColor: 'var(--it-border)',
@@ -73,6 +80,13 @@ const departments: {
     iconColor: 'var(--proj-icon)',
     name: 'Клуб',
     icon: '/26_proj11.svg',
+  },
+  '9': {
+    color: 'var(--x-header)',
+    borderColor: 'var(--x-border)',
+    iconColor: 'var(--x-icon)',
+    name: '[БЕЗ НАЗВАНИЯ]',
+    icon: '/26_x.svg',
   },
   '10': {
     color: 'var(--design-header)',
