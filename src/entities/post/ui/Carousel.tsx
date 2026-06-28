@@ -28,7 +28,9 @@ const CarouselElement = ({ imgs }: { imgs: string[] }) => {
       className={`${style.carouselWrapper} custom-swiper`}
     >
       {imgs.map((item, i) => {
-        const url = `${process.env.NEXT_PUBLIC_BASE_URL_MEDIA}/${item}`;
+        const baseUrl = (process.env.NEXT_PUBLIC_BASE_URL_MEDIA || '').replace(/\/+$/, '');
+        const mediaPath = item.replace(/^\/+/, '');
+        const url = `${baseUrl}/${mediaPath}`;
         return (
           <SwiperSlide key={item} className={style.slide}>
             {isVideo(item) ? (
@@ -41,6 +43,7 @@ const CarouselElement = ({ imgs }: { imgs: string[] }) => {
                   src={url}
                   alt={`img-${i}`}
                   fill
+                  unoptimized
                   className={style.media}
                   sizes="(max-width: 760px) 100vw, 760px"
                 />
