@@ -4,8 +4,9 @@ import React, { useState, ChangeEvent, useRef, useEffect } from 'react';
 import MDEditor from '@uiw/react-md-editor';
 import style from './MdEditor.module.scss';
 import { mdExample } from '../lib/mdExapmle';
+import { buildArticlePayload, type CategorySelectItem } from '../model/buildArticlePayload';
 import UploadFiles from './upload-file/UploadFiles';
-import articlesStore, { OneArticle } from '@/shared/stores/articles-store';
+import articlesStore from '@/shared/stores/articles-store';
 import { Button, ConfigProvider, Input, message, Radio, Space, Select, Form, Divider } from 'antd';
 import { PlusOutlined, SaveOutlined } from '@ant-design/icons';
 import { usePathname } from 'next/navigation';
@@ -35,13 +36,12 @@ const MarkdownEditor: React.FC = () => {
     createOrUpdateArticle,
     articlesCategories,
     setCurrentArticle,
+    refreshArticles,
   } = articlesStore(state => state);
   const [form] = Form.useForm();
   const [messageApi, contextHolder] = message.useMessage();
   const inputTitleHeader = isEditArticle ? EDIT_ARTICLE_TITLE : INPUT_ARTICLE_TITLE;
-  const [selectCategoryItems, setSelectCategoryItems] = useState<
-    { value: string; label: string; text: string }[]
-  >([]);
+  const [selectCategoryItems, setSelectCategoryItems] = useState<CategorySelectItem[]>([]);
   const [categoryName, setCategoryName] = useState('');
   const inputCategoryRef = useRef<InputRef>(null);
 
@@ -139,6 +139,11 @@ const MarkdownEditor: React.FC = () => {
       return;
     }
 
+    if (isEditArticle && !article) {
+      error('Не удалось сохранить статью');
+      return;
+    }
+
     const articleName = isEditArticle
       ? article?.post_path.split('/').at(-1)
       : `${uniqueId('article_')}.md`;
@@ -157,54 +162,30 @@ const MarkdownEditor: React.FC = () => {
       if (!uploadResponse.ok) {
         throw new Error('Ошибка загрузки файла');
       }
-      const categoryValueItem = selectCategoryItems.find(
-        (category: { value: string; label: string }) => category.value === values.category,
-      );
-
-      const currentCategory = articlesCategories.find(
-        item => item.category_name === values.category,
-      );
 
       const uploadResult = await uploadResponse.json();
       const fileUrl = uploadResult.file;
-      const editedDataCategoryValue =
-        categoryValueItem?.text === 'new' ? 'category_name' : 'category';
-      const data: Partial<OneArticle> = isEditArticle
-        ? {
-            ...article,
-            text: '',
-            is_secret: values.isSecret,
-            [editedDataCategoryValue]:
-              categoryValueItem?.text === 'new' ? values.category : currentCategory?.category,
-          }
-        : {
-            title: values.articleTitle ?? '',
-            text: '',
-            is_secret: values.isSecret,
-            category_name: values.category,
-            post_path: fileUrl ?? '',
-          };
 
-      if (isEditArticle) {
-        if (categoryValueItem?.text === 'new') {
-          delete data.category;
-          delete data.post_id;
+      const { payload, isNewRequest, shouldRefreshAfterSuccess } = buildArticlePayload({
+        article,
+        isEditArticle,
+        values,
+        articlesCategories,
+        selectCategoryItems,
+        uploadedFilePath: fileUrl,
+      });
+
+      const res = await createOrUpdateArticle(payload, isNewRequest);
+
+      if (res === 'success') {
+        if (shouldRefreshAfterSuccess) {
+          await refreshArticles();
         }
-        const res = await createOrUpdateArticle(data, categoryValueItem?.text === 'new');
-        if (res === 'success') {
-          success('Статья обновлена');
-        } else {
-          error('Не удалось обновить статью');
-        }
+        success(isEditArticle ? 'Статья обновлена' : 'Статья сохранена');
+        router.push('/articles');
       } else {
-        const res = await createOrUpdateArticle(data, true);
-        if (res === 'success') {
-          success('Статья сохранена');
-        } else {
-          error('Не удалось сохранить статью');
-        }
+        error(isEditArticle ? 'Не удалось обновить статью' : 'Не удалось сохранить статью');
       }
-      router.push('/articles');
     } catch (err) {
       console.error('Save article error:', err);
       error('Не удалось сохранить статью');

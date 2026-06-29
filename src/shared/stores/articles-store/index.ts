@@ -77,7 +77,7 @@ const articlesStore = create<TArticlesStoreState>()(
           draft.article = article;
         });
       },
-      createOrUpdateArticle: async (article: OneArticle, isNew: boolean) => {
+      createOrUpdateArticle: async (article: Partial<OneArticle>, isNew: boolean) => {
         set({
           loading: true,
         });
@@ -90,24 +90,29 @@ const articlesStore = create<TArticlesStoreState>()(
             data: { result: [OneArticle] };
           };
           if (response.code === 200 && response.data?.result) {
-            const data = response.data.result;
-            const normalizedArticles = get().normalizedArticles;
-            let updatedArticles;
-            if (!isNew) {
-              updatedArticles = normalizedArticles[article.category].map((el: OneArticle) =>
-                el.post_id === data[0].post_id ? { ...data[0] } : el,
-              );
-            } else {
-              updatedArticles = [...(normalizedArticles[article.category] || []), data[0]];
+            const savedArticle = response.data.result[0];
+            const normalizedArticles = (get().normalizedArticles || {}) as Record<
+              string,
+              OneArticle[]
+            >;
+            const nextNormalizedArticles: Record<string, OneArticle[]> = { ...normalizedArticles };
+
+            if (savedArticle.category && savedArticle.post_id) {
+              Object.entries(normalizedArticles).forEach(([categoryId, articles]) => {
+                nextNormalizedArticles[categoryId] = articles.filter(
+                  (el: OneArticle) => el.post_id !== savedArticle.post_id,
+                );
+              });
+              nextNormalizedArticles[savedArticle.category] = [
+                ...(nextNormalizedArticles[savedArticle.category] || []),
+                savedArticle,
+              ];
             }
 
             set((draft: TArticlesStoreState) => {
-              draft.normalizedArticles = {
-                ...normalizedArticles,
-                [article.category]: updatedArticles,
-              };
+              draft.normalizedArticles = nextNormalizedArticles;
               draft.loading = false;
-              draft.article = data[0];
+              draft.article = savedArticle;
             });
             return 'success';
           } else {
@@ -124,6 +129,7 @@ const articlesStore = create<TArticlesStoreState>()(
             error: error instanceof Error ? error.message : 'Failed to save article',
             loading: false,
           });
+          return 'error';
         }
       },
       deleteArticle: async (categoryId: string, articleId: string) => {
