@@ -16,7 +16,6 @@ import { ImgWithBackground } from '@/shared/ui/image-background';
 import { generateKey } from '@/shared/api/utils';
 import AchieveBlock from './ui/AchieveBlock';
 import Money26 from './ui/Money26';
-import { FileSearchOutlined } from '@ant-design/icons';
 import Collapse from './ui/Collapse';
 import CollapseBody from './ui/CollapseBody';
 import AchieveBlockMobile26 from './ui/AchieveBlockMobile26';
@@ -403,9 +402,10 @@ const UserPage26 = () => {
               />
               <div className={style.depTextWrap}>
                 <p className={style.depName}>{`${departments[userData.departmentid].name} >`}</p>
-                <p className={style.branchName}>{userData?.brigadename ?? 'xxxxx'}</p>
+                <p className={style.branchName}>{userData?.brigadename ?? ''}</p>
               </div>
             </div>
+            <p className={style.role}>{userData?.role}</p>
           </div>
           <button
             type="button"
