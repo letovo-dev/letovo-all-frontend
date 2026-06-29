@@ -8,7 +8,6 @@ import { useRouter, usePathname } from 'next/navigation';
 import userStore from '@/shared/stores/user-store';
 import authStore from '@/shared/stores/auth-store';
 import navigationStore from '@/shared/stores/navigation-store';
-import { checkAuthToken } from '@/shared/api/auth/models/checkAuthToken';
 import SpinModule from '@/shared/ui/spiner';
 import Image from 'next/image';
 
@@ -37,26 +36,9 @@ export default function DefaultLayout({ children }: { children: React.ReactNode 
       try {
         await authStore.persist.rehydrate();
         const currentUserStatus = authStore.getState().userStatus;
-        if (currentUserStatus.token) {
-          const authData = await checkAuthToken(currentUserStatus.token);
-          if (
-            authData?.success &&
-            authData.data &&
-            typeof authData.data === 'object' &&
-            'status' in authData.data &&
-            (authData.data as { status?: string }).status === 't'
-          ) {
-            authStore.setState(state => ({
-              ...state,
-              userStatus: {
-                logged: true,
-                authed: true,
-                registered: true,
-                token: currentUserStatus.token,
-              },
-            }));
-          } else {
-            authStore.getState().logout();
+        if (currentUserStatus.logged) {
+          const authData = await authStore.getState().auth();
+          if (!authData.success) {
             router.push('/login');
           }
         } else {
@@ -120,7 +102,7 @@ export default function DefaultLayout({ children }: { children: React.ReactNode 
   }
 
   const currentUserStatus = authStore.getState().userStatus;
-  if (!currentUserStatus?.logged || !currentUserStatus?.token || !currentUserStatus?.registered) {
+  if (!currentUserStatus?.logged || !currentUserStatus?.authed || !currentUserStatus?.registered) {
     return null;
   }
 

@@ -10,7 +10,6 @@ import { Button, ConfigProvider, Input, message, Radio, Space, Select, Form, Div
 import { PlusOutlined, SaveOutlined } from '@ant-design/icons';
 import { usePathname } from 'next/navigation';
 import type { UploadFile } from 'antd';
-import authStore from '@/shared/stores/auth-store';
 import { uniqueId } from 'lodash';
 import { useRouter } from 'next/navigation';
 import type { InputRef } from 'antd';
@@ -40,7 +39,6 @@ const MarkdownEditor: React.FC = () => {
   const [form] = Form.useForm();
   const [messageApi, contextHolder] = message.useMessage();
   const inputTitleHeader = isEditArticle ? EDIT_ARTICLE_TITLE : INPUT_ARTICLE_TITLE;
-  const { userStatus } = authStore(state => state);
   const [selectCategoryItems, setSelectCategoryItems] = useState<
     { value: string; label: string; text: string }[]
   >([]);
@@ -152,9 +150,7 @@ const MarkdownEditor: React.FC = () => {
       formData.append('file', file);
       const uploadResponse = await fetch(`${process.env.NEXT_PUBLIC_BASE_URL_UPLOAD}`, {
         method: 'POST',
-        headers: {
-          Bearer: `${userStatus.token || ''}`,
-        },
+        credentials: 'include',
         body: formData,
       });
 
@@ -420,11 +416,7 @@ const MarkdownEditor: React.FC = () => {
         ![image](https://example.com/image.png)
       </p>
       <div className={style.uploadContainer}>
-        <UploadFiles
-          setFileList={setFileList}
-          fileList={fileList}
-          token={userStatus?.token ?? ''}
-        />
+        <UploadFiles setFileList={setFileList} fileList={fileList} />
         {fileList && fileList[0]?.response && typeof fileList[0].response === 'string' && (
           <p>
             {`${process.env.NEXT_PUBLIC_BASE_URL_MEDIA}`}

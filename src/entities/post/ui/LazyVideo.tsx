@@ -2,7 +2,6 @@
 
 import React, { useEffect, useRef, useState, forwardRef, memo, useCallback } from 'react';
 import { useVideoSessionCache } from '@/shared/stores/media-cash';
-import authStore from '@/shared/stores/auth-store';
 import { ConfigProvider, Spin } from 'antd';
 
 interface LazyVideoProps extends React.VideoHTMLAttributes<HTMLVideoElement> {
@@ -19,7 +18,6 @@ const LazyVideo = forwardRef<HTMLVideoElement, LazyVideoProps>(({ src, ...rest }
 
   const getCachedVideo = useVideoSessionCache(state => state.getCachedVideo);
   const setCachedVideo = useVideoSessionCache(state => state.setCachedVideo);
-  const token = authStore(state => state.userStatus.token);
 
   useEffect(() => {
     if (!ref || !videoRef.current) return;
@@ -43,7 +41,7 @@ const LazyVideo = forwardRef<HTMLVideoElement, LazyVideoProps>(({ src, ...rest }
     try {
       const response = await fetch(src, {
         signal: abortRef.current.signal,
-        headers: token ? { Bearer: token } : {},
+        credentials: 'include',
       });
       if (!response.ok) throw new Error(`HTTP ${response.status}`);
       const blob = await response.blob();
@@ -58,7 +56,7 @@ const LazyVideo = forwardRef<HTMLVideoElement, LazyVideoProps>(({ src, ...rest }
     } finally {
       setIsLoading(false);
     }
-  }, [src, token, getCachedVideo, setCachedVideo]);
+  }, [src, getCachedVideo, setCachedVideo]);
 
   useEffect(() => {
     return () => {

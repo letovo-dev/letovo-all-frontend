@@ -55,7 +55,6 @@ export type TArticlesStoreState = {
   setCurrentArticle: (article: OneArticle | undefined) => void;
   refreshArticles: () => Promise<void>;
   createOrUpdateArticle: (article: Partial<OneArticle>, isNew: boolean) => Promise<string>;
-  revealSecretArticle: (articleId: string) => Promise<void>;
 };
 
 const initialState = {
@@ -77,13 +76,6 @@ const articlesStore = create<TArticlesStoreState>()(
         set((draft: TArticlesStoreState) => {
           draft.article = article;
         });
-      },
-      revealSecretArticle: async (articleId: string) => {
-        try {
-          await SERVICES_DATA.Data.revealSecretArticle(articleId);
-        } catch (error) {
-          console.error('Error saving article:', error);
-        }
       },
       createOrUpdateArticle: async (article: OneArticle, isNew: boolean) => {
         set({

@@ -2,7 +2,7 @@ import { API, IApiReturn } from '@/shared/lib/ApiSPA';
 import { API_USER_SCHEME } from '../settings';
 
 interface IPayload {
-  unlogin: boolean;
+  current_password: string;
   new_password: string;
 }
 

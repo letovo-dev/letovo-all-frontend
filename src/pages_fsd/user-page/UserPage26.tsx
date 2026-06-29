@@ -6,7 +6,6 @@ import userStore, { IUserAchData, IUserStore } from '@/shared/stores/user-store'
 import { message, Button, Avatar } from 'antd';
 import { useRouter } from 'next/navigation';
 import authStore from '@/shared/stores/auth-store';
-import { setDataToLocaleStorage } from '@/shared/lib/ApiSPA/axios/helpers';
 import dataStore from '@/shared/stores/data-store';
 import CustomSelect from '@/shared/ui/select/CustomSelect';
 import Image from 'next/image';
@@ -194,7 +193,7 @@ const UserPage26 = () => {
   }, []);
 
   useEffect(() => {
-    if (!userStatus?.logged || !userStatus?.token) {
+    if (!userStatus?.logged || !userStatus?.authed) {
       return;
     }
 
@@ -233,7 +232,6 @@ const UserPage26 = () => {
 
   const logout = () => {
     authStore.getState().logout();
-    setDataToLocaleStorage('token', '');
     router.push(`/login`);
   };
 

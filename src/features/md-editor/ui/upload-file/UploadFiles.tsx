@@ -22,11 +22,9 @@ const getBase64 = (file: FileType): Promise<string> =>
 const UploadFiles = ({
   setFileList,
   fileList,
-  token,
 }: {
   setFileList: React.Dispatch<React.SetStateAction<CustomUploadFile[] | undefined>>;
   fileList: CustomUploadFile[] | undefined;
-  token: string;
 }) => {
   const handleChange: UploadProps['onChange'] = ({ file, fileList: newFileList }) => {
     const transformedFileList = newFileList.map(item => {
@@ -61,9 +59,7 @@ const UploadFiles = ({
       try {
         const response = await fetch(`YOUR_SERVER_URL/delete/${file.uid}`, {
           method: 'DELETE',
-          headers: {
-            Bearer: `${token || ''}`,
-          },
+          credentials: 'include',
         });
 
         if (!response.ok) {
@@ -88,9 +84,7 @@ const UploadFiles = ({
     onChange: handleChange,
     onRemove: handleRemove,
     multiple: false,
-    headers: {
-      Bearer: `${token || ''}`,
-    },
+    withCredentials: true,
   };
 
   return (

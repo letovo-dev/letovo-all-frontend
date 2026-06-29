@@ -5,6 +5,8 @@ import { SERVICES_AUTH } from '@/shared/api/auth';
 import { SERVICES_USERS } from '@/shared/api/user';
 import userStore, { IUserStore } from '../user-store';
 
+const AUTH_STORE_VERSION = 1;
+
 export interface TAuthStoreState {
   loading: boolean;
   error: string | undefined;
@@ -12,12 +14,11 @@ export interface TAuthStoreState {
     logged: boolean;
     authed: boolean;
     registered: boolean;
-    token: string | undefined;
   };
   login: (data: { login: string; password: string }) => Promise<void>;
   auth: () => Promise<{ success: boolean; message?: string }>;
   register: () => Promise<{ success: boolean }>;
-  changePass: (pass: string) => Promise<void>;
+  changePass: (data: { current_password: string; new_password: string }) => Promise<void>;
   logout: () => void;
   resetState: () => void;
 }
@@ -29,12 +30,59 @@ const initialState: Pick<TAuthStoreState, 'loading' | 'error' | 'userStatus'> = 
     logged: false,
     authed: false,
     registered: false,
-    token: '',
   },
 };
 
-const persistOptions: PersistOptions<TAuthStoreState> = {
+type PersistedAuthStoreState = Pick<TAuthStoreState, 'userStatus'>;
+
+const isObjectRecord = (value: unknown): value is Record<string, unknown> =>
+  typeof value === 'object' && value !== null;
+
+const readPersistedBoolean = (value: unknown, fallback: boolean): boolean =>
+  typeof value === 'boolean' ? value : fallback;
+
+const removeLegacyTokenStorage = (): void => {
+  if (typeof window !== 'undefined') {
+    window.localStorage.removeItem('token');
+  }
+};
+
+const redirectToLogin = (): void => {
+  if (typeof window !== 'undefined') {
+    window.location.assign('/login');
+  }
+};
+
+const sanitizePersistedAuthState = (persistedState: unknown): PersistedAuthStoreState => {
+  const userStatus =
+    isObjectRecord(persistedState) && isObjectRecord(persistedState.userStatus)
+      ? persistedState.userStatus
+      : {};
+
+  return {
+    userStatus: {
+      logged: readPersistedBoolean(userStatus.logged, initialState.userStatus.logged),
+      authed: readPersistedBoolean(userStatus.authed, initialState.userStatus.authed),
+      registered: readPersistedBoolean(userStatus.registered, initialState.userStatus.registered),
+    },
+  };
+};
+
+const persistOptions: PersistOptions<TAuthStoreState, PersistedAuthStoreState> = {
   name: 'authStore',
+  version: AUTH_STORE_VERSION,
+  migrate: persistedState => {
+    removeLegacyTokenStorage();
+    return sanitizePersistedAuthState(persistedState);
+  },
+  partialize: state =>
+    ({
+      userStatus: {
+        logged: state.userStatus.logged,
+        authed: state.userStatus.authed,
+        registered: state.userStatus.registered,
+      },
+    }) as PersistedAuthStoreState,
 };
 
 const authStore = create<TAuthStoreState>()(
@@ -56,10 +104,9 @@ const authStore = create<TAuthStoreState>()(
                 last_outgoing_payment: response.data.last_outgoing_payment,
               };
             });
-            const token = response?.authorization;
             const registered = result[0]?.registered === 'f' ? false : true;
             set({
-              userStatus: { logged: true, authed: true, registered, token },
+              userStatus: { logged: true, authed: true, registered },
               error: undefined,
             });
           } else {
@@ -126,14 +173,15 @@ const authStore = create<TAuthStoreState>()(
           set({ loading: false });
         }
       },
-      changePass: async (pass: string): Promise<void> => {
+      changePass: async (payload: {
+        current_password: string;
+        new_password: string;
+      }): Promise<void> => {
         set({ error: undefined, loading: true });
         try {
-          await SERVICES_USERS.UsersData.changePass({
-            unlogin: false,
-            new_password: pass,
-          });
-          set({ error: undefined });
+          await SERVICES_USERS.UsersData.changePass(payload);
+          set({ ...initialState, error: undefined });
+          redirectToLogin();
         } catch (error) {
           console.error(error);
           set({ error: 'Failed to change password' });
@@ -142,8 +190,11 @@ const authStore = create<TAuthStoreState>()(
         }
       },
       logout: (): void => {
+        void SERVICES_AUTH.Auth.logout().catch(error => {
+          console.error('Failed to revoke auth session:', error);
+        });
         set({
-          userStatus: { logged: false, authed: false, registered: false, token: undefined },
+          userStatus: { logged: false, authed: false, registered: false },
           error: undefined,
           loading: false,
         });
