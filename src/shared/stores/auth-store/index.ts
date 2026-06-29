@@ -47,6 +47,12 @@ const removeLegacyTokenStorage = (): void => {
   }
 };
 
+const redirectToLogin = (): void => {
+  if (typeof window !== 'undefined') {
+    window.location.assign('/login');
+  }
+};
+
 const sanitizePersistedAuthState = (persistedState: unknown): PersistedAuthStoreState => {
   const userStatus =
     isObjectRecord(persistedState) && isObjectRecord(persistedState.userStatus)
@@ -174,7 +180,8 @@ const authStore = create<TAuthStoreState>()(
         set({ error: undefined, loading: true });
         try {
           await SERVICES_USERS.UsersData.changePass(payload);
-          set({ error: undefined });
+          set({ ...initialState, error: undefined });
+          redirectToLogin();
         } catch (error) {
           console.error(error);
           set({ error: 'Failed to change password' });
@@ -183,6 +190,9 @@ const authStore = create<TAuthStoreState>()(
         }
       },
       logout: (): void => {
+        void SERVICES_AUTH.Auth.logout().catch(error => {
+          console.error('Failed to revoke auth session:', error);
+        });
         set({
           userStatus: { logged: false, authed: false, registered: false },
           error: undefined,

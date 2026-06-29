@@ -78,9 +78,13 @@ const Articles: React.FC = () => {
             responseType: 'blob',
             cancelToken: cancelTokenSource.token,
           });
-          const mimeType =
-            response.headers['content-type'] ||
-            (isVideoUrl(url) ? `video/${url.split('.').pop()?.toLowerCase()}` : 'image/jpeg');
+          const contentTypeHeader = response.headers['content-type'];
+          let mimeType = 'image/jpeg';
+          if (typeof contentTypeHeader === 'string') {
+            mimeType = contentTypeHeader;
+          } else if (isVideoUrl(url)) {
+            mimeType = `video/${url.split('.').pop()?.toLowerCase()}`;
+          }
           const objectUrl = URL.createObjectURL(new Blob([response.data], { type: mimeType }));
           newMediaCache[url] = objectUrl;
         } catch (error) {

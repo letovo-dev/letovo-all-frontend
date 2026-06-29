@@ -190,12 +190,17 @@ def test_pwa_runtime_cache_does_not_cache_api_requests_broadly():
 
     assert "urlPattern: /^https?.*/" not in next_config
     assert "urlPattern: /^http" not in next_config
-    assert "runtimeCaching: []" in next_config
+    assert "next-pwa" not in next_config
+    assert "withPWA" not in next_config
+    assert not list(ROOT.glob("public/workbox-*.js"))
+    assert ".unregister()" in _read(ROOT / "public/sw.js")
 
 
 def test_password_change_payload_uses_backend_cookie_session_contract():
     auth_store_source = _read(ROOT / "src/shared/stores/auth-store/index.ts")
     change_pass_source = _read(ROOT / "src/shared/api/user/models/changePass.ts")
+    auth_models_index = _read(ROOT / "src/shared/api/auth/models/index.ts")
+    auth_settings = _read(ROOT / "src/shared/api/auth/settings.ts")
 
     assert "current_password" in auth_store_source
     assert "current_password" in change_pass_source
@@ -203,3 +208,21 @@ def test_password_change_payload_uses_backend_cookie_session_contract():
     assert "new_password" in change_pass_source
     assert "unlogin" not in auth_store_source
     assert "unlogin" not in change_pass_source
+    assert "changePass" not in auth_models_index
+    assert "changePass" not in auth_settings
+
+
+def test_cookie_auth_logout_and_password_change_clear_server_session():
+    auth_store_source = _read(ROOT / "src/shared/stores/auth-store/index.ts")
+    auth_models_index = _read(ROOT / "src/shared/api/auth/models/index.ts")
+    logout_model = _read(ROOT / "src/shared/api/auth/models/logout.ts")
+    auth_settings = _read(ROOT / "src/shared/api/auth/settings.ts")
+
+    assert "url: `${baseUrl}/auth/logout`" in auth_settings
+    assert "import { logout } from './logout'" in auth_models_index
+    assert "logout," in auth_models_index
+    assert "API_AUTH_SCHEME.logout" in logout_model
+    assert "SERVICES_AUTH.Auth.logout()" in auth_store_source
+    assert "Failed to revoke auth session" in auth_store_source
+    assert "redirectToLogin()" in auth_store_source
+    assert "window.location.assign('/login')" in auth_store_source

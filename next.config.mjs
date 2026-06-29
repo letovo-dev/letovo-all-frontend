@@ -4,18 +4,6 @@ import { fileURLToPath } from 'url';
 const __filename = fileURLToPath(import.meta.url);
 const __dirname = path.dirname(__filename);
 
-import withPWA from 'next-pwa';
-
-const pwaConfig = {
-  dest: 'public',
-  disable: process.env.NODE_ENV === 'development', // Отключить PWA в разработке
-  register: true, // Автоматически регистрировать Service Worker
-  skipWaiting: true, // Пропускать ожидание для активации нового Service Worker
-  runtimeCaching: [],
-};
-
-const configuredWithPWA = withPWA(pwaConfig);
-
 const nextConfig = {
   reactStrictMode: false,
   productionBrowserSourceMaps: false,
@@ -165,4 +153,4 @@ const nextConfig = {
   },
 };
 
-export default configuredWithPWA(nextConfig);
+export default nextConfig;
