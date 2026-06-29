@@ -3,7 +3,7 @@ import React, { useEffect, useState } from 'react';
 import { ExclamationCircleOutlined } from '@ant-design/icons';
 import { Button, Form, Typography, ConfigProvider, Spin, Flex, message, Input } from 'antd';
 import authStore from '@/shared/stores/auth-store';
-import { redirect } from 'next/navigation';
+import { useRouter } from 'next/navigation';
 import style from './EnterForm.module.scss';
 import userStore, { IUserData } from '@/shared/stores/user-store';
 import CustomModal from './CustomForgetPassModal';
@@ -12,6 +12,7 @@ import { getDataFromLocaleStorage } from '@/shared/lib/ApiSPA/axios/helpers';
 
 function EnterForm() {
   const { Title, Text } = Typography;
+  const router = useRouter();
   const userStatus = authStore(state => state.userStatus);
   const userName = userStore((state: IUserStore) => state.store?.userData.username);
   const error = authStore(state => state.error);
@@ -22,18 +23,27 @@ function EnterForm() {
   const [messageApi, contextHolder] = message.useMessage();
   const [user, setUser] = useState<IUserData | null>(null);
   const [mounted, setMounted] = useState(false);
+  const [nextPath, setNextPath] = useState<string | null>(null);
+  const [nextPathReady, setNextPathReady] = useState(false);
 
   useEffect(() => {
     setMounted(true);
+    const params = new URLSearchParams(window.location.search);
+    const requestedNextPath = params.get('next');
+    if (requestedNextPath?.startsWith('/') && !requestedNextPath.startsWith('//')) {
+      setNextPath(requestedNextPath);
+    }
+    setNextPathReady(true);
   }, []);
 
   useEffect(() => {
+    if (!nextPathReady) return;
     if (userStatus?.logged && userStatus?.registered) {
-      redirect(`/user/${userName}`);
+      router.replace(nextPath ?? `/user/${userName}`);
     } else if (userStatus?.logged && !userStatus?.registered) {
-      redirect('/registration');
+      router.replace('/registration');
     }
-  }, [userStatus]);
+  }, [nextPath, nextPathReady, router, userName, userStatus]);
 
   useEffect(() => {
     authStore.setState({ error: undefined });

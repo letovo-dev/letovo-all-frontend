@@ -164,6 +164,18 @@ def test_secret_article_unlock_is_not_implemented_in_the_browser():
     assert "bcrypt.compare" not in source
 
 
+def test_login_honors_safe_next_redirect_after_cookie_login():
+    enter_form_source = _read(ROOT / "src/features/login/ui/EnterForm.tsx")
+
+    assert "new URLSearchParams(window.location.search)" in enter_form_source
+    assert "params.get('next')" in enter_form_source
+    assert "requestedNextPath?.startsWith('/')" in enter_form_source
+    assert "!requestedNextPath.startsWith('//')" in enter_form_source
+    assert "setNextPathReady(true)" in enter_form_source
+    assert "if (!nextPathReady) return" in enter_form_source
+    assert "router.replace(nextPath ?? `/user/${userName}`)" in enter_form_source
+
+
 def test_next_production_config_disables_source_maps_and_powered_by_header():
     next_config = _read(NEXT_CONFIG_FILE)
 
