@@ -6,6 +6,7 @@ SOURCE_DIRS = [ROOT / "src"]
 ENV_FILE = ROOT / "front-env.env"
 AXIOS_FILE = ROOT / "src/shared/lib/ApiSPA/axios/axios.ts"
 NEXT_CONFIG_FILE = ROOT / "next.config.mjs"
+AUTH_STORE_FILE = ROOT / "src/shared/stores/auth-store/index.ts"
 API_SETTINGS_GLOB = "src/shared/api/**/settings.ts"
 
 
@@ -21,6 +22,21 @@ def _source_files():
 
 def _source_text() -> str:
     return "\n".join(_read(path) for path in _source_files())
+
+
+def _balanced_block_after(source: str, marker: str) -> str:
+    start = source.index(marker)
+    brace_start = source.index("{", start)
+    depth = 0
+    for index in range(brace_start, len(source)):
+        char = source[index]
+        if char == "{":
+            depth += 1
+        elif char == "}":
+            depth -= 1
+            if depth == 0:
+                return source[brace_start + 1 : index]
+    raise AssertionError(f"could not find balanced block after {marker!r}")
 
 
 def _env_keys(env_content: str) -> set[str]:
@@ -105,6 +121,22 @@ def test_frontend_does_not_persist_or_read_auth_tokens_from_local_storage():
     assert "setDataToLocaleStorage('token'" not in source
     assert 'setDataToLocaleStorage("token"' not in source
     assert "withCredentials: true" in axios_source
+
+
+def test_auth_store_migrates_legacy_token_storage_and_keeps_auth_state_token_free():
+    auth_store_source = _read(AUTH_STORE_FILE)
+    auth_store_interface = _balanced_block_after(auth_store_source, "interface TAuthStoreState")
+    user_status_interface = _balanced_block_after(auth_store_interface, "userStatus")
+    initial_state = _balanced_block_after(auth_store_source, "const initialState")
+    initial_user_status = _balanced_block_after(initial_state, "userStatus")
+
+    assert re.search(r"\bAUTH_STORE_VERSION\s*=\s*\d+", auth_store_source)
+    assert re.search(r"\bversion\s*:\s*AUTH_STORE_VERSION\b", auth_store_source)
+    assert re.search(r"\bmigrate\s*:", auth_store_source)
+    assert re.search(r"\blocalStorage\s*\.\s*removeItem\s*\(\s*['\"]token['\"]\s*\)", auth_store_source)
+    assert re.search(r"\bpartialize\s*:", auth_store_source)
+    assert not re.search(r"\btoken\s*\??\s*:", user_status_interface)
+    assert not re.search(r"\btoken\s*:", initial_user_status)
 
 
 def test_axios_does_not_inject_bearer_auth_headers():

@@ -5,6 +5,8 @@ import { SERVICES_AUTH } from '@/shared/api/auth';
 import { SERVICES_USERS } from '@/shared/api/user';
 import userStore, { IUserStore } from '../user-store';
 
+const AUTH_STORE_VERSION = 1;
+
 export interface TAuthStoreState {
   loading: boolean;
   error: string | undefined;
@@ -31,8 +33,42 @@ const initialState: Pick<TAuthStoreState, 'loading' | 'error' | 'userStatus'> = 
   },
 };
 
-const persistOptions: PersistOptions<TAuthStoreState> = {
+type PersistedAuthStoreState = Pick<TAuthStoreState, 'userStatus'>;
+
+const isObjectRecord = (value: unknown): value is Record<string, unknown> =>
+  typeof value === 'object' && value !== null;
+
+const readPersistedBoolean = (value: unknown, fallback: boolean): boolean =>
+  typeof value === 'boolean' ? value : fallback;
+
+const removeLegacyTokenStorage = (): void => {
+  if (typeof window !== 'undefined') {
+    window.localStorage.removeItem('token');
+  }
+};
+
+const sanitizePersistedAuthState = (persistedState: unknown): PersistedAuthStoreState => {
+  const userStatus =
+    isObjectRecord(persistedState) && isObjectRecord(persistedState.userStatus)
+      ? persistedState.userStatus
+      : {};
+
+  return {
+    userStatus: {
+      logged: readPersistedBoolean(userStatus.logged, initialState.userStatus.logged),
+      authed: readPersistedBoolean(userStatus.authed, initialState.userStatus.authed),
+      registered: readPersistedBoolean(userStatus.registered, initialState.userStatus.registered),
+    },
+  };
+};
+
+const persistOptions: PersistOptions<TAuthStoreState, PersistedAuthStoreState> = {
   name: 'authStore',
+  version: AUTH_STORE_VERSION,
+  migrate: persistedState => {
+    removeLegacyTokenStorage();
+    return sanitizePersistedAuthState(persistedState);
+  },
   partialize: state =>
     ({
       userStatus: {
@@ -40,7 +76,7 @@ const persistOptions: PersistOptions<TAuthStoreState> = {
         authed: state.userStatus.authed,
         registered: state.userStatus.registered,
       },
-    }) as TAuthStoreState,
+    }) as PersistedAuthStoreState,
 };
 
 const authStore = create<TAuthStoreState>()(
