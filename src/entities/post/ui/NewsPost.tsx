@@ -101,7 +101,8 @@ const NewsPost: React.FC<OnePostProps> = ({
       <PostHeader
         index={index}
         author={{
-          username: el.news.display_name || el.news.author || 'Unknown',
+          username: el.news.author || 'Unknown',
+          displayName: el.news.display_name,
           avatar: el.news.avatar_pic || '',
           id: String(el.news.post_id),
         }}
@@ -162,6 +163,7 @@ const newsPostAreEqual = (prev: OnePostProps, next: OnePostProps): boolean => {
     pn.text === nn.text &&
     pn.title === nn.title &&
     pn.author === nn.author &&
+    pn.display_name === nn.display_name &&
     pn.avatar_pic === nn.avatar_pic &&
     pn.is_published === nn.is_published
   );

@@ -78,3 +78,14 @@ def test_frontend_ci_scans_built_bundle_for_broken_api_prefixes():
     assert "undefined/auth" in workflow
     assert "undefined/message" in workflow
     assert "/letovo-api/letovo-api" in workflow
+
+
+def test_news_post_profile_link_uses_author_username_not_display_name():
+    """News feed profile links must route to stable username even when display name is localized."""
+    news_post_source = _read(ROOT / "src/entities/post/ui/NewsPost.tsx")
+    post_header_source = _read(ROOT / "src/entities/post/ui/PostHeader.tsx")
+
+    assert "profile/${author.username}" in post_header_source
+    assert "username: el.news.author || 'Unknown'" in news_post_source
+    assert "displayName: el.news.display_name" in news_post_source
+    assert "username: el.news.display_name" not in news_post_source

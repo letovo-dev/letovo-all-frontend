@@ -41,7 +41,7 @@ const PostHeader = ({
   currentNewsStateSaved,
 }: {
   index: number;
-  author: { username: string; avatar: string; id: string };
+  author: { username: string; displayName?: string | null; avatar: string; id: string };
   text: string;
   title?: string;
   date?: string;
@@ -106,7 +106,9 @@ const PostHeader = ({
               <Avatar src={avatarSrc} size={70} className={style.avatar} />
             </div>
             <div className={style.authorBlock}>
-              <p className={style.authorName}>{author.username || 'Unknown'}</p>
+              <p className={style.authorName}>
+                {author.displayName || author.username || 'Unknown'}
+              </p>
               {formattedDate && <p className={style.postDate}>{formattedDate}</p>}
             </div>
           </Link>
