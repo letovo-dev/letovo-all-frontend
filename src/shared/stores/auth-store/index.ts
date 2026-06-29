@@ -12,12 +12,11 @@ export interface TAuthStoreState {
     logged: boolean;
     authed: boolean;
     registered: boolean;
-    token: string | undefined;
   };
   login: (data: { login: string; password: string }) => Promise<void>;
   auth: () => Promise<{ success: boolean; message?: string }>;
   register: () => Promise<{ success: boolean }>;
-  changePass: (pass: string) => Promise<void>;
+  changePass: (data: { current_password: string; new_password: string }) => Promise<void>;
   logout: () => void;
   resetState: () => void;
 }
@@ -29,12 +28,19 @@ const initialState: Pick<TAuthStoreState, 'loading' | 'error' | 'userStatus'> = 
     logged: false,
     authed: false,
     registered: false,
-    token: '',
   },
 };
 
 const persistOptions: PersistOptions<TAuthStoreState> = {
   name: 'authStore',
+  partialize: state =>
+    ({
+      userStatus: {
+        logged: state.userStatus.logged,
+        authed: state.userStatus.authed,
+        registered: state.userStatus.registered,
+      },
+    }) as TAuthStoreState,
 };
 
 const authStore = create<TAuthStoreState>()(
@@ -56,10 +62,9 @@ const authStore = create<TAuthStoreState>()(
                 last_outgoing_payment: response.data.last_outgoing_payment,
               };
             });
-            const token = response?.authorization;
             const registered = result[0]?.registered === 'f' ? false : true;
             set({
-              userStatus: { logged: true, authed: true, registered, token },
+              userStatus: { logged: true, authed: true, registered },
               error: undefined,
             });
           } else {
@@ -126,13 +131,13 @@ const authStore = create<TAuthStoreState>()(
           set({ loading: false });
         }
       },
-      changePass: async (pass: string): Promise<void> => {
+      changePass: async (payload: {
+        current_password: string;
+        new_password: string;
+      }): Promise<void> => {
         set({ error: undefined, loading: true });
         try {
-          await SERVICES_USERS.UsersData.changePass({
-            unlogin: false,
-            new_password: pass,
-          });
+          await SERVICES_USERS.UsersData.changePass(payload);
           set({ error: undefined });
         } catch (error) {
           console.error(error);
@@ -143,7 +148,7 @@ const authStore = create<TAuthStoreState>()(
       },
       logout: (): void => {
         set({
-          userStatus: { logged: false, authed: false, registered: false, token: undefined },
+          userStatus: { logged: false, authed: false, registered: false },
           error: undefined,
           loading: false,
         });

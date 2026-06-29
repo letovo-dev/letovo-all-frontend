@@ -15,7 +15,6 @@ import {
 } from 'antd';
 import { UploadOutlined } from '@ant-design/icons';
 import type { UploadProps } from 'antd';
-import authStore from '@/shared/stores/auth-store';
 
 export interface Post {
   id?: string;
@@ -51,9 +50,6 @@ const PostModal: React.FC<PostModalProps> = ({ visible, onCancel, onSubmit, post
   const [form] = Form.useForm();
   const [fileList, setFileList] = React.useState<any[]>([]);
   const [messageApi, contextHolder] = message.useMessage();
-  const {
-    userStatus: { token },
-  } = authStore(state => state);
 
   useEffect(() => {
     if (visible) {
@@ -118,17 +114,15 @@ const PostModal: React.FC<PostModalProps> = ({ visible, onCancel, onSubmit, post
     accept: 'image/*,video/*',
     fileList,
     action: `${process.env.NEXT_PUBLIC_BASE_URL_UPLOAD}`,
-    headers: {
-      Bearer: token || '',
-    },
+    withCredentials: true,
     onChange: async ({ file, fileList: newFileList }) => {
       if (file.status === 'removed' && file.url) {
         try {
           const response = await fetch('/api/delete-file', {
             method: 'DELETE',
+            credentials: 'include',
             headers: {
               'Content-Type': 'application/json',
-              Bearer: token || '',
             },
             body: JSON.stringify({ url: file.url }),
           });
@@ -167,7 +161,6 @@ const PostModal: React.FC<PostModalProps> = ({ visible, onCancel, onSubmit, post
               error: file.error,
             },
             action: `${process.env.NEXT_PUBLIC_BASE_URL_UPLOAD}`,
-            token,
           });
         }
       }
@@ -176,10 +169,6 @@ const PostModal: React.FC<PostModalProps> = ({ visible, onCancel, onSubmit, post
       const isValid = file.type.startsWith('image/') || file.type.startsWith('video/');
       if (!isValid) {
         message.error('Можно загружать только изображения или видео!');
-        return Upload.LIST_IGNORE;
-      }
-      if (!token) {
-        message.error('Токен авторизации отсутствует. Пожалуйста, войдите в систему.');
         return Upload.LIST_IGNORE;
       }
       return true;

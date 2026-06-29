@@ -1,7 +1,6 @@
 'use client';
 
 import React, { useEffect, useMemo, useRef, useState } from 'react';
-import bcrypt from 'bcryptjs';
 import style from './SideBarArticles.module.scss';
 import { useSwipeSidebar } from '@/shared/hooks/useSwipeSidebar';
 import articlesStore, { ArticleCategory, OneArticle } from '@/shared/stores/articles-store';
@@ -25,13 +24,6 @@ import Image from 'next/image';
 import SideBarNewsContent from '@/features/side-bar-news/SideBarNewsContent';
 
 const BASE_URL = 'https://letovo.ru';
-const SECRET_KEY = 'очень-секретный-key';
-const saltRounds = 4;
-
-const generateToken = async (key: string): Promise<string> => {
-  const hashedPassword = await bcrypt.hash(key, saltRounds);
-  return hashedPassword;
-};
 
 interface FormValues {
   search_query: string;
@@ -238,9 +230,8 @@ const SideBarArticles = ({
     setOpen(false);
   };
 
-  const qrOpen = async () => {
-    const token = await generateToken(SECRET_KEY + article?.post_id);
-    const qr_url = `${process.env.NEXT_PUBLIC_BASE_URL_CLEAR}/open-article/${article?.post_id}?token=${token}`;
+  const qrOpen = () => {
+    const qr_url = `${process.env.NEXT_PUBLIC_BASE_URL_CLEAR}/open-article/${article?.post_id}`;
     setQrUrl(qr_url);
     setTimeout(() => setQrUrl(null), 10000);
   };

@@ -5,7 +5,6 @@ import { Button, Form, Typography, ConfigProvider, Spin, Flex, message, Input } 
 import authStore from '@/shared/stores/auth-store';
 import { redirect } from 'next/navigation';
 import style from './EnterForm.module.scss';
-import { setDataToLocaleStorage } from '@/shared/lib/ApiSPA/axios/helpers';
 import userStore, { IUserData } from '@/shared/stores/user-store';
 import CustomModal from './CustomForgetPassModal';
 import { IUserStore } from '@/shared/stores/user-store';
@@ -30,7 +29,6 @@ function EnterForm() {
 
   useEffect(() => {
     if (userStatus?.logged && userStatus?.registered) {
-      setDataToLocaleStorage('token', userStatus?.token);
       redirect(`/user/${userName}`);
     } else if (userStatus?.logged && !userStatus?.registered) {
       redirect('/registration');

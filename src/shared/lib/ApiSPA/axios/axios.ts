@@ -1,19 +1,8 @@
 import axios from 'axios';
 
-const instance = axios.create();
-
-instance.interceptors.request.use(
-  config => {
-    if (!config?.headers) {
-      throw new Error('Expected config and config.headers not to be undefined');
-    }
-    config.headers.Bearer = `${localStorage.getItem('token')}`;
-    return config;
-  },
-  error => {
-    return Promise.reject(error);
-  },
-);
+const instance = axios.create({
+  withCredentials: true,
+});
 
 instance.interceptors.response.use(
   function (dataResponse) {

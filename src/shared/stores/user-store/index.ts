@@ -325,15 +325,10 @@ const userStore = create<IUserStore>()(
               const response: {
                 code?: number;
                 success: boolean;
-                authorization?: string;
                 data: { result: IUserData[] };
                 codeMessage?: string;
               } = await SERVICES_USERS.UsersData.changeNick({ new_username });
               if (response?.success && response.code === 200) {
-                const token = response.authorization;
-                authStore.setState((draft: TAuthStoreState) => {
-                  draft.userStatus = { ...draft.userStatus, token: token };
-                });
                 const {
                   data: { result },
                 } = response;

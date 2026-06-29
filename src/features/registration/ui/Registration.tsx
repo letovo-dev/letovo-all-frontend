@@ -12,7 +12,6 @@ import {
 import userStore, { IUserStore } from '@/shared/stores/user-store';
 import authStore from '@/shared/stores/auth-store';
 import dataStore from '@/shared/stores/data-store';
-import { setDataToLocaleStorage } from '@/shared/lib/ApiSPA/axios/helpers';
 import Avatar from '@/shared/ui/avatar';
 type FormData = {
   avatar?: string | undefined;
@@ -66,10 +65,6 @@ const Registration = () => {
       return <MinusCircleOutlined className={style.icon} />;
     }
   };
-
-  useEffect(() => {
-    setDataToLocaleStorage('token', userStatus?.token);
-  }, [userStatus?.token]);
 
   const NICK_RE = /^[a-zA-Z0-9_-]{4,32}$/;
 

@@ -12,7 +12,6 @@ interface ISuccessResponseProps {
 }
 
 export const SuccessResponse = ({ data, noNestedData }: ISuccessResponseProps) => {
-  const authorizationHeader = data?.headers?.authorization;
   return {
     success: true,
     data: noNestedData ? data?.data : (data?.data?.data ?? data?.data),
@@ -20,7 +19,6 @@ export const SuccessResponse = ({ data, noNestedData }: ISuccessResponseProps) =
     codeMessage: codeTranslator(data?.status),
     meta: data?.data?.meta,
     statusText: data?.statusText ?? null,
-    authorization: authorizationHeader,
   };
 };
 

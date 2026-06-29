@@ -5,6 +5,7 @@ ROOT = Path(__file__).resolve().parents[1]
 SOURCE_DIRS = [ROOT / "src"]
 ENV_FILE = ROOT / "front-env.env"
 AXIOS_FILE = ROOT / "src/shared/lib/ApiSPA/axios/axios.ts"
+NEXT_CONFIG_FILE = ROOT / "next.config.mjs"
 API_SETTINGS_GLOB = "src/shared/api/**/settings.ts"
 
 
@@ -16,6 +17,10 @@ def _source_files():
     for source_dir in SOURCE_DIRS:
         yield from source_dir.rglob("*.ts")
         yield from source_dir.rglob("*.tsx")
+
+
+def _source_text() -> str:
+    return "\n".join(_read(path) for path in _source_files())
 
 
 def _env_keys(env_content: str) -> set[str]:
@@ -89,3 +94,68 @@ def test_news_post_profile_link_uses_author_username_not_display_name():
     assert "username: el.news.author || 'Unknown'" in news_post_source
     assert "displayName: el.news.display_name" in news_post_source
     assert "username: el.news.display_name" not in news_post_source
+
+
+def test_frontend_does_not_persist_or_read_auth_tokens_from_local_storage():
+    source = _source_text()
+    axios_source = _read(AXIOS_FILE)
+
+    assert "localStorage.getItem('token')" not in source
+    assert 'localStorage.getItem("token")' not in source
+    assert "setDataToLocaleStorage('token'" not in source
+    assert 'setDataToLocaleStorage("token"' not in source
+    assert "withCredentials: true" in axios_source
+
+
+def test_axios_does_not_inject_bearer_auth_headers():
+    axios_source = _read(AXIOS_FILE)
+
+    assert "config.headers.Bearer" not in axios_source
+    assert "Authorization" not in axios_source
+    assert "Bearer" not in axios_source
+
+
+def test_api_response_helpers_do_not_expose_authorization_as_auth_state():
+    api_utils_source = _read(ROOT / "src/shared/lib/ApiSPA/utils/index.ts")
+    api_types_source = _read(ROOT / "src/shared/lib/ApiSPA/types/index.ts")
+
+    assert "authorization" not in api_utils_source
+    assert "authorization" not in api_types_source
+
+
+def test_secret_article_unlock_is_not_implemented_in_the_browser():
+    source = _source_text()
+
+    assert "revealSecretArticle" not in source
+    assert "/post/reveal_secret" not in source
+    assert "очень-секретный-key" not in source
+    assert "bcrypt.compare" not in source
+
+
+def test_next_production_config_disables_source_maps_and_powered_by_header():
+    next_config = _read(NEXT_CONFIG_FILE)
+
+    assert "productionBrowserSourceMaps: false" in next_config
+    assert "poweredByHeader: false" in next_config
+    assert "X-Content-Type-Options" in next_config
+    assert "Referrer-Policy" in next_config
+
+
+def test_pwa_runtime_cache_does_not_cache_api_requests_broadly():
+    next_config = _read(NEXT_CONFIG_FILE)
+
+    assert "urlPattern: /^https?.*/" not in next_config
+    assert "urlPattern: /^http" not in next_config
+    assert "runtimeCaching: []" in next_config
+
+
+def test_password_change_payload_uses_backend_cookie_session_contract():
+    auth_store_source = _read(ROOT / "src/shared/stores/auth-store/index.ts")
+    change_pass_source = _read(ROOT / "src/shared/api/user/models/changePass.ts")
+
+    assert "current_password" in auth_store_source
+    assert "current_password" in change_pass_source
+    assert "new_password" in auth_store_source
+    assert "new_password" in change_pass_source
+    assert "unlogin" not in auth_store_source
+    assert "unlogin" not in change_pass_source

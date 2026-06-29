@@ -11,25 +11,15 @@ const pwaConfig = {
   disable: process.env.NODE_ENV === 'development', // Отключить PWA в разработке
   register: true, // Автоматически регистрировать Service Worker
   skipWaiting: true, // Пропускать ожидание для активации нового Service Worker
-  // Опционально: настройка кэширования
-  runtimeCaching: [
-    {
-      urlPattern: /^https?.*/, // Кэшировать все HTTP/HTTPS запросы
-      handler: 'NetworkFirst', // Сначала сеть, затем кэш
-      options: {
-        cacheName: 'offlineCache',
-        expiration: {
-          maxEntries: 200,
-        },
-      },
-    },
-  ],
+  runtimeCaching: [],
 };
 
 const configuredWithPWA = withPWA(pwaConfig);
 
 const nextConfig = {
   reactStrictMode: false,
+  productionBrowserSourceMaps: false,
+  poweredByHeader: false,
   transpilePackages: [
     'antd',
     '@ant-design/icons',
@@ -145,6 +135,31 @@ const nextConfig = {
       {
         source: '/api/media/get/:path*',
         destination: 'https://letovocorp.ru/letovo-api/media/get/:path*',
+      },
+    ];
+  },
+  async headers() {
+    return [
+      {
+        source: '/:path*',
+        headers: [
+          {
+            key: 'X-Content-Type-Options',
+            value: 'nosniff',
+          },
+          {
+            key: 'X-Frame-Options',
+            value: 'DENY',
+          },
+          {
+            key: 'Referrer-Policy',
+            value: 'strict-origin-when-cross-origin',
+          },
+          {
+            key: 'Permissions-Policy',
+            value: 'camera=(), microphone=(), geolocation=()',
+          },
+        ],
       },
     ];
   },

@@ -27,21 +27,19 @@ const Articles: React.FC = () => {
   const mediaCacheRef = useRef<Record<string, string>>({});
   const [windowWidth, setWindowWidth] = useState<number>(0);
   const isDesktop = windowWidth >= 961;
-  const {
-    userStatus: { token },
-  } = authStore(state => state);
+  const userStatus = authStore(state => state.userStatus);
 
   const isVideoUrl = (url: string): boolean => {
     return /\.(mp4|webm|ogg|mkv|avi)(\?.*)?$/i.test(url);
   };
 
   useEffect(() => {
-    if (!token) {
+    if (!userStatus.logged || !userStatus.authed) {
       router.push('/login');
     } else {
       getArticlesCategories();
     }
-  }, [router, getArticlesCategories, token]);
+  }, [router, getArticlesCategories, userStatus.logged, userStatus.authed]);
 
   useEffect(() => {
     setWindowWidth(window.innerWidth);
@@ -62,7 +60,7 @@ const Articles: React.FC = () => {
     const cancelTokenSource = axios.CancelToken.source();
 
     const fetchMedia = async () => {
-      if (!isMounted || !article?.text || !token) {
+      if (!isMounted || !article?.text || !userStatus.logged || !userStatus.authed) {
         return;
       }
 
@@ -76,7 +74,7 @@ const Articles: React.FC = () => {
         }
         try {
           const response = await axios.get(url, {
-            headers: { Bearer: `${token}` },
+            withCredentials: true,
             responseType: 'blob',
             cancelToken: cancelTokenSource.token,
           });
@@ -123,7 +121,7 @@ const Articles: React.FC = () => {
       isMounted = false;
       cancelTokenSource.cancel('Компонент размонтирован или статья изменена');
     };
-  }, [article?.text, token]);
+  }, [article?.text, userStatus.logged, userStatus.authed]);
 
   useEffect(() => {
     return () => {

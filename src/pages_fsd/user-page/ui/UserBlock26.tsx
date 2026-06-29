@@ -6,7 +6,6 @@ import { Avatar } from 'antd';
 import Image from 'next/image';
 import userStore, { IUserStore } from '@/shared/stores/user-store';
 import authStore from '@/shared/stores/auth-store';
-import { setDataToLocaleStorage } from '@/shared/lib/ApiSPA/axios/helpers';
 import style from './UserBlock26.module.scss';
 
 const departments: {
@@ -110,7 +109,6 @@ const UserBlock26 = () => {
 
   const logout = () => {
     authStore.getState().logout();
-    setDataToLocaleStorage('token', '');
     router.push('/login');
   };
 
