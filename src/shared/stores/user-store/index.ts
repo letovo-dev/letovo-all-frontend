@@ -94,7 +94,7 @@ export interface IUserStore {
   getAllUserAchievements: (value: string) => void;
   getAchievementsDepartment: () => void;
   getUserAchievements: (name: string) => void;
-  isRequireUserInDatabase: (value: string) => { userName: string; avatar: string };
+  isRequireUserInDatabase: (value: string) => { userName: string; avatar?: string };
   transferMoney: (data: { receiver: string; amount: number }) => Promise<any>;
   setEndPreload: (value: boolean) => Promise<void>;
   setError: (error?: string) => void;
@@ -228,16 +228,20 @@ const userStore = create<IUserStore>()(
           isRequireUserInDatabase: async (userName: string) => {
             set({ loading: true });
             try {
-              const response = await SERVICES_USERS.UsersData.getUserData(userName);
+              const response = await SERVICES_USERS.UsersData.isUser(userName);
 
               if (response?.success && response.code === 200) {
-                const { result } = response?.data as { result: IUserData[] };
-                if (result[0].username === userStore.getState().store.userData.username) {
+                const { status } = response?.data as { status?: string };
+                if (status !== 't') {
+                  set({ error: 'Пользователь не найден' });
+                  return undefined;
+                }
+                if (userName === userStore.getState().store.userData.username) {
                   set({ error: 'Перевод себе невозможен' });
                   return undefined;
                 }
                 set({ error: undefined });
-                return { userName: result[0].username, avatar: result[0].avatar_pic };
+                return { userName };
               } else {
                 set({ error: response.codeMessage });
                 return undefined;
@@ -250,19 +254,56 @@ const userStore = create<IUserStore>()(
             }
           },
           transferMoney: async (data: { receiver: string; amount: number }) => {
+            const transferErrorMessage = (
+              step: string,
+              response?: {
+                code?: number;
+                codeMessage?: string;
+                data?: unknown;
+                message?: string;
+              },
+            ) => {
+              const body =
+                typeof response?.data === 'string'
+                  ? response.data
+                  : response?.data
+                    ? JSON.stringify(response.data)
+                    : undefined;
+              const details = [response?.codeMessage, body, response?.message]
+                .filter(Boolean)
+                .join(': ');
+              const httpStatus = response?.code ? `HTTP ${response.code}` : undefined;
+
+              return [step, httpStatus, details || 'Something went wrong, try later']
+                .filter(Boolean)
+                .join(': ');
+            };
+
             set({ error: undefined, loading: true });
             try {
               const response: {
                 code?: number;
-                data: string;
+                data?: string;
                 codeMessage?: string;
+                message?: string;
               } = await SERVICES_USERS.UsersData.transferPrepare(data);
               if (response && response.code === 200) {
+                if (!response.data) {
+                  set({
+                    error: transferErrorMessage('/transactions/prepare', {
+                      ...response,
+                      codeMessage: 'Не получен идентификатор перевода',
+                    }),
+                  });
+                  return undefined;
+                }
+
                 try {
                   const responseToSend: {
                     code?: number;
-                    data: { result: any };
+                    data?: { result: any };
                     codeMessage?: string;
+                    message?: string;
                     statusText?: string;
                   } = await SERVICES_USERS.UsersData.transferSend({ tr_id: response.data });
                   if (
@@ -273,7 +314,7 @@ const userStore = create<IUserStore>()(
                     set({ error: undefined });
                     return 'success';
                   } else {
-                    set({ error: responseToSend.codeMessage });
+                    set({ error: transferErrorMessage('/transactions/send', responseToSend) });
                   }
                 } catch (error) {
                   console.error(error);
@@ -284,7 +325,7 @@ const userStore = create<IUserStore>()(
 
                 set({ error: undefined });
               } else {
-                set({ error: response.codeMessage });
+                set({ error: transferErrorMessage('/transactions/prepare', response) });
               }
             } catch (error) {
               console.error(error);
