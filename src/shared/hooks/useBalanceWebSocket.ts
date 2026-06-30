@@ -24,12 +24,15 @@ const isBalanceUpdateEvent = (data: unknown): data is IBalanceUpdateEvent => {
   );
 };
 
-const websocketUrl = (): string => {
-  const baseUrl = process.env.NEXT_PUBLIC_BASE_URL || window.location.origin;
-  const url = new URL('/ws', baseUrl);
+export const buildBalanceWebSocketUrl = (baseUrl: string | undefined, origin: string): string => {
+  const normalizedBaseUrl = (baseUrl || origin).replace(/\/+$/, '');
+  const url = new URL('ws', `${normalizedBaseUrl}/`);
   url.protocol = url.protocol === 'https:' ? 'wss:' : 'ws:';
   return url.toString();
 };
+
+const websocketUrl = (): string =>
+  buildBalanceWebSocketUrl(process.env.NEXT_PUBLIC_BASE_URL, window.location.origin);
 
 const remainsAuthenticated = (): boolean => {
   const { logged, authed, registered } = authStore.getState().userStatus;

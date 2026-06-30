@@ -1,5 +1,6 @@
 import re
 from pathlib import Path
+from urllib.parse import urljoin, urlparse, urlunparse
 
 ROOT = Path(__file__).resolve().parents[1]
 SOURCE_DIRS = [ROOT / "src"]
@@ -12,6 +13,7 @@ USER_PAGE_FILE = ROOT / "src/pages_fsd/user-page/UserPage26.tsx"
 USER_API_SETTINGS_FILE = ROOT / "src/shared/api/user/settings.ts"
 USER_API_MODELS_INDEX_FILE = ROOT / "src/shared/api/user/models/index.ts"
 USER_FULL_DATA_MODEL_FILE = ROOT / "src/shared/api/user/models/getFullUserData.ts"
+BALANCE_WS_HOOK_FILE = ROOT / "src/shared/hooks/useBalanceWebSocket.ts"
 API_SETTINGS_GLOB = "src/shared/api/**/settings.ts"
 
 
@@ -66,6 +68,13 @@ def _env_value(env_content: str, key: str) -> str | None:
     return None
 
 
+def _websocket_url_like_frontend(base_url: str | None, origin: str) -> str:
+    normalized_base_url = (base_url or origin).rstrip("/")
+    parsed = urlparse(urljoin(f"{normalized_base_url}/", "ws"))
+    scheme = "wss" if parsed.scheme == "https" else "ws"
+    return urlunparse((scheme, parsed.netloc, parsed.path, "", parsed.query, ""))
+
+
 def test_all_next_public_build_time_vars_used_by_source_are_declared_in_front_env():
     """Missing NEXT_PUBLIC_* build env bakes `undefined/...` API URLs into .next."""
     used_vars: set[str] = set()
@@ -85,6 +94,24 @@ def test_login_api_base_url_is_declared_and_points_at_letovo_api_prefix():
     assert base_url is not None
     assert base_url.endswith("/letovo-api")
     assert "undefined" not in base_url
+
+
+def test_balance_websocket_url_preserves_production_api_prefix():
+    """Production WS must use the same /letovo-api backend prefix as HTTP API calls."""
+    base_url = _env_value(_read(ENV_FILE), "NEXT_PUBLIC_BASE_URL")
+    hook_source = _read(BALANCE_WS_HOOK_FILE)
+
+    assert _websocket_url_like_frontend(base_url, "https://letovocorp.ru") == (
+        "wss://letovocorp.ru/letovo-api/ws"
+    )
+    assert _websocket_url_like_frontend(base_url, "https://letovocorp.ru") != (
+        "wss://letovocorp.ru/ws"
+    )
+    assert "/letovo-api/letovo-api" not in _websocket_url_like_frontend(
+        base_url, "https://letovocorp.ru"
+    )
+    assert "new URL('ws'" in hook_source
+    assert "new URL('/ws'" not in hook_source
 
 
 def test_axios_instance_does_not_duplicate_the_api_scheme_base_url():
