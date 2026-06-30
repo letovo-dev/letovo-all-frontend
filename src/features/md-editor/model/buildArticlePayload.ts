@@ -1,16 +1,17 @@
+import type { OneArticle } from '@/shared/stores/articles-store';
+
 type ArticleCategory = {
   category: string;
   category_name: string;
 };
 
-type ArticleLike = {
+type ArticleLike = Omit<
+  Partial<OneArticle>,
+  'post_id' | 'is_secret' | 'category' | 'likes' | 'dislikes' | 'saved_count'
+> & {
   post_id?: string | number;
-  post_path?: string;
   is_secret?: string | boolean;
-  title?: string;
-  text?: string;
   category?: string | number;
-  category_name?: string;
   likes?: string | number;
   dislikes?: string | number;
   saved_count?: string | number;
@@ -38,7 +39,7 @@ type BuildArticlePayloadParams = {
 };
 
 export type BuildArticlePayloadResult = {
-  payload: Partial<ArticleLike>;
+  payload: Partial<OneArticle>;
   isNewRequest: boolean;
   shouldRefreshAfterSuccess: boolean;
 };
@@ -73,11 +74,11 @@ export const buildArticlePayload = ({
     : (selectedCategory?.category_name ?? selectedCategoryItem?.label ?? values.category);
   const categoryChanged =
     isEditArticle &&
-    (isNewCategory || (!!selectedCategoryId && selectedCategoryId !== article?.category));
+    (isNewCategory ||
+      (!!selectedCategoryId && selectedCategoryId !== stringValue(article?.category)));
 
   if (isEditArticle) {
-    const payload: Partial<ArticleLike> = {
-      ...article,
+    const payload: Partial<OneArticle> = {
       post_id: stringValue(article?.post_id),
       likes: stringValue(article?.likes),
       dislikes: stringValue(article?.dislikes),
@@ -87,6 +88,9 @@ export const buildArticlePayload = ({
       title: values.articleTitle ?? article?.title ?? '',
       post_path: uploadedFilePath ?? article?.post_path ?? '',
       category_name: categoryName,
+      author: article?.author,
+      parent_id: article?.parent_id,
+      date: article?.date,
     };
 
     if (selectedCategoryId) {
@@ -102,7 +106,7 @@ export const buildArticlePayload = ({
     };
   }
 
-  const payload: Partial<ArticleLike> = {
+  const payload: Partial<OneArticle> = {
     title: values.articleTitle ?? '',
     text: '',
     is_secret: values.isSecret,
