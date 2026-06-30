@@ -78,9 +78,12 @@ const mockCareerAchievements = {
 
 const UserPage26 = () => {
   const router = useRouter();
-  const { getAllUserAchievements, getAchievementsDepartment, getUserAchievements } = userStore(
-    (state: IUserStore) => state,
-  );
+  const {
+    getAllUserAchievements,
+    getAchievementsDepartment,
+    getUserAchievements,
+    refreshUserData,
+  } = userStore((state: IUserStore) => state);
   const changeAvatar = userStore((state: IUserStore) => state.setAvatar);
   const getAvatars = dataStore(state => state.getAvatars);
   const userStatus = authStore(state => state.userStatus);
@@ -99,6 +102,7 @@ const UserPage26 = () => {
   const { error, loading } = userStore((state: IUserStore) => state);
   const [avatar, setAvatar] = useState<string | undefined>(undefined);
   const avatarRef = useRef<HTMLDivElement>(null);
+  const completedProfileLoadUsernameRef = useRef<string | null>(null);
   const [openTransferModal, setOpenTransferModal] = useState(false);
   const { getAllPostsAuthors } = userStore.getState();
   const [messageApi, contextHolder] = message.useMessage();
@@ -197,16 +201,36 @@ const UserPage26 = () => {
       return;
     }
 
+    let cancelled = false;
+
     const loadData = async () => {
       const initialData = userStore.getState().store.userData;
       setUserData(initialData);
       setAvatar(initialData.avatar_pic);
 
       if (initialData?.username) {
+        if (completedProfileLoadUsernameRef.current === initialData.username) {
+          setIsLoading(false);
+          return;
+        }
+
         setIsLoading(true);
+        const freshData = await refreshUserData(initialData.username);
+        if (cancelled) {
+          return;
+        }
+
+        const currentData = freshData ?? userStore.getState().store.userData;
+        setUserData(currentData);
+        setAvatar(currentData.avatar_pic);
+
         getAllUserAchievements(initialData.username);
+        completedProfileLoadUsernameRef.current = initialData.username;
         if (!avatars || avatars.length === 0) {
           await getAvatars();
+          if (cancelled) {
+            return;
+          }
         }
 
         setIsLoading(false);
@@ -224,11 +248,22 @@ const UserPage26 = () => {
     const unsubscribe = userStore.subscribe((state: IUserStore) => {
       setUserData(state.store.userData);
       setAvatar(state.store.userData?.avatar_pic);
-      setIsLoading(false);
     });
 
-    return () => unsubscribe();
-  }, [userStatus, avatars]);
+    return () => {
+      cancelled = true;
+      unsubscribe();
+    };
+  }, [
+    userStatus,
+    avatars,
+    refreshUserData,
+    getAllUserAchievements,
+    getAchievementsDepartment,
+    getUserAchievements,
+    getAllPostsAuthors,
+    getAvatars,
+  ]);
 
   const logout = () => {
     authStore.getState().logout();

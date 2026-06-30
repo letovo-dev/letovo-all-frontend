@@ -7,6 +7,11 @@ ENV_FILE = ROOT / "front-env.env"
 AXIOS_FILE = ROOT / "src/shared/lib/ApiSPA/axios/axios.ts"
 NEXT_CONFIG_FILE = ROOT / "next.config.mjs"
 AUTH_STORE_FILE = ROOT / "src/shared/stores/auth-store/index.ts"
+USER_STORE_FILE = ROOT / "src/shared/stores/user-store/index.ts"
+USER_PAGE_FILE = ROOT / "src/pages_fsd/user-page/UserPage26.tsx"
+USER_API_SETTINGS_FILE = ROOT / "src/shared/api/user/settings.ts"
+USER_API_MODELS_INDEX_FILE = ROOT / "src/shared/api/user/models/index.ts"
+USER_FULL_DATA_MODEL_FILE = ROOT / "src/shared/api/user/models/getFullUserData.ts"
 API_SETTINGS_GLOB = "src/shared/api/**/settings.ts"
 
 
@@ -226,3 +231,44 @@ def test_cookie_auth_logout_and_password_change_clear_server_session():
     assert "Failed to revoke auth session" in auth_store_source
     assert "redirectToLogin()" in auth_store_source
     assert "window.location.assign('/login')" in auth_store_source
+
+
+def test_user_store_exposes_refresh_user_data_from_backend_full_profile_endpoint():
+    user_store_source = _read(USER_STORE_FILE)
+    user_settings_source = _read(USER_API_SETTINGS_FILE)
+    user_models_index_source = _read(USER_API_MODELS_INDEX_FILE)
+    user_full_data_model_source = _read(USER_FULL_DATA_MODEL_FILE)
+
+    assert "userFullData" in user_settings_source
+    assert "url: `${baseUrl}/user/full`" in user_settings_source
+    assert "import { getFullUserData } from './getFullUserData'" in user_models_index_source
+    assert "getFullUserData," in user_models_index_source
+    assert "API_USER_SCHEME.userFullData.method" in user_full_data_model_source
+    assert "`${API_USER_SCHEME.userFullData.url}/${userName}`" in user_full_data_model_source
+    assert "refreshUserData: (username?: string) => Promise<IUserData | undefined>;" in user_store_source
+    assert "refreshUserData: async (username?: string)" in user_store_source
+    assert "const requestedUsername = username ?? get().store.userData.username;" in user_store_source
+    assert "SERVICES_USERS.UsersData.getFullUserData(requestedUsername)" in user_store_source
+    assert "const responseData = response.data as {" in user_store_source
+    assert "result: IUserData[];" in user_store_source
+    assert "last_incoming_payment?: IPayment;" in user_store_source
+    assert "last_outgoing_payment?: IPayment;" in user_store_source
+    assert "const { result } = responseData;" in user_store_source
+    assert "const freshUser = result?.[0];" in user_store_source
+    assert "const freshUserWithPayments = {" in user_store_source
+    assert "last_incoming_payment: responseData.last_incoming_payment" in user_store_source
+    assert "last_outgoing_payment: responseData.last_outgoing_payment" in user_store_source
+    assert "draft.store.userData = freshUserWithPayments;" in user_store_source
+    assert "return freshUserWithPayments;" in user_store_source
+
+
+def test_logged_in_profile_refreshes_user_data_before_loading_finance_widgets():
+    user_page_source = _read(USER_PAGE_FILE)
+    load_data_block = _balanced_block_after(user_page_source, "const loadData = async () =>")
+
+    assert "refreshUserData" in user_page_source
+    assert "const freshData = await refreshUserData(initialData.username);" in load_data_block
+    assert "const currentData = freshData ?? userStore.getState().store.userData;" in load_data_block
+    assert "setUserData(currentData);" in load_data_block
+    assert "setAvatar(currentData.avatar_pic);" in load_data_block
+    assert load_data_block.index("await refreshUserData(initialData.username)") < load_data_block.index("getAllUserAchievements(initialData.username)")

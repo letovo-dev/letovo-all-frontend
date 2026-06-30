@@ -5,6 +5,7 @@ import { changePass } from './changePass';
 import { getAllUserAchievements } from './getAllUserAchievements';
 import { getMessage } from './getMessage';
 import { getUserAchievements } from './getUserAchievements';
+import { getFullUserData } from './getFullUserData';
 import { getUserData } from './getUserData';
 import { isUser } from './isUser';
 import { setAvatar } from './setAvatar';
@@ -15,6 +16,7 @@ import { transferSend } from './transferSend';
 export default {
   getAllUserAchievements,
   getUserAchievements,
+  getFullUserData,
   getUserData,
   isUser,
   setAvatar,
