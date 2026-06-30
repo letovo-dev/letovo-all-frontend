@@ -27,12 +27,14 @@ interface IErrorResponseProps {
 }
 
 export const ErrorResponse = ({ error }: IErrorResponseProps) => {
+  const status = error?.response?.status ?? error?.status;
   const errResponse = {
     success: false,
-    data: undefined,
-    codeMessage: codeTranslator(error?.status ?? error?.code),
+    data: error?.response?.data,
+    codeMessage: codeTranslator(status ?? error?.code),
     message: error?.message,
-    code: error?.status,
+    code: status,
+    statusText: error?.response?.statusText ?? null,
   };
   return errResponse;
 };
