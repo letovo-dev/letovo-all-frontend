@@ -10,6 +10,7 @@ import authStore from '@/shared/stores/auth-store';
 import navigationStore from '@/shared/stores/navigation-store';
 import SpinModule from '@/shared/ui/spiner';
 import Image from 'next/image';
+import { useBalanceWebSocket } from '@/shared/hooks/useBalanceWebSocket';
 
 export default function DefaultLayout({ children }: { children: React.ReactNode }) {
   const layoutRef = useRef<HTMLDivElement>(null);
@@ -17,6 +18,7 @@ export default function DefaultLayout({ children }: { children: React.ReactNode 
   const lastScrollTop = useRef(0);
   const router = useRouter();
   const pathname = usePathname();
+  const currentUserStatus = authStore(state => state.userStatus);
   const isNavigating = navigationStore(state => state.isNavigating);
   const setNavigating = navigationStore(state => state.setNavigating);
   const [isAuthChecked, setIsAuthChecked] = useState(false);
@@ -95,13 +97,20 @@ export default function DefaultLayout({ children }: { children: React.ReactNode 
     };
   }, [setFooterHidden, isAuthChecked, scrollContainerRef]);
 
+  useBalanceWebSocket(
+    isAuthChecked &&
+      !isLoading &&
+      currentUserStatus.logged &&
+      currentUserStatus.authed &&
+      currentUserStatus.registered,
+  );
+
   if (!mounted) return null;
 
   if (isLoading || !isAuthChecked) {
     return <SpinModule />;
   }
 
-  const currentUserStatus = authStore.getState().userStatus;
   if (!currentUserStatus?.logged || !currentUserStatus?.authed || !currentUserStatus?.registered) {
     return null;
   }
