@@ -80,6 +80,14 @@ export interface IUserData {
   last_outgoing_payment?: IPayment;
 }
 
+export interface IBalanceUpdateEvent {
+  balance: number;
+  delta: number;
+  counterparty: string;
+  direction: 'incoming' | 'outgoing' | 'self';
+  transaction_id: number;
+}
+
 export interface IUserStore {
   store: {
     userData: IUserData;
@@ -97,6 +105,7 @@ export interface IUserStore {
   refreshUserData: (username?: string) => Promise<IUserData | undefined>;
   isRequireUserInDatabase: (value: string) => { userName: string; avatar?: string };
   transferMoney: (data: { receiver: string; amount: number }) => Promise<any>;
+  applyBalanceUpdate: (event: IBalanceUpdateEvent) => void;
   setEndPreload: (value: boolean) => Promise<void>;
   setError: (error?: string) => void;
   resetState: () => void;
@@ -378,6 +387,32 @@ const userStore = create<IUserStore>()(
             } finally {
               set({ loading: false });
             }
+          },
+          applyBalanceUpdate: (event: IBalanceUpdateEvent) => {
+            set((state: IUserStore) => {
+              const username = state.store.userData.username;
+              state.store.userData.balance = String(event.balance);
+
+              if (event.direction === 'outgoing') {
+                state.store.userData.last_outgoing_payment = {
+                  transactionid: event.transaction_id,
+                  amount: Math.abs(event.delta),
+                  sender: username,
+                  receiver: event.counterparty,
+                  transactiontime: new Date().toISOString(),
+                };
+              }
+
+              if (event.direction === 'incoming') {
+                state.store.userData.last_incoming_payment = {
+                  transactionid: event.transaction_id,
+                  amount: Math.abs(event.delta),
+                  sender: event.counterparty,
+                  receiver: username,
+                  transactiontime: new Date().toISOString(),
+                };
+              }
+            });
           },
           setAvatar: async (avatar: string) => {
             set({ error: undefined, loading: true });
