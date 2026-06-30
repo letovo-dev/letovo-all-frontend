@@ -39,6 +39,9 @@ const TransferModal26: React.FC<ModalProps> = ({
   const [avatar, setAvatar] = useState<string | undefined>(undefined);
   const [isButtonDisable, setIsButtonDisable] = useState<boolean>(true);
   const [mounted, setMounted] = useState(false);
+  const receiverAvatarSrc = avatar
+    ? `${process.env.NEXT_PUBLIC_BASE_URL_MEDIA}/${avatar}`
+    : undefined;
 
   useEffect(() => {
     setMounted(true);
@@ -193,7 +196,7 @@ const TransferModal26: React.FC<ModalProps> = ({
                   </div>
                 ) : (
                   <div className={style.avatarTemplate}>
-                    <Avatar src={`${process.env.NEXT_PUBLIC_BASE_URL_MEDIA}/${avatar}`} size={42} />
+                    <Avatar src={receiverAvatarSrc} size={42} />
                   </div>
                 )}
                 <div className={style.inputBox}>
