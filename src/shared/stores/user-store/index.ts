@@ -94,6 +94,7 @@ export interface IUserStore {
   getAllUserAchievements: (value: string) => void;
   getAchievementsDepartment: () => void;
   getUserAchievements: (name: string) => void;
+  refreshUserData: (username?: string) => Promise<IUserData | undefined>;
   isRequireUserInDatabase: (value: string) => { userName: string; avatar?: string };
   transferMoney: (data: { receiver: string; amount: number }) => Promise<any>;
   setEndPreload: (value: boolean) => Promise<void>;
@@ -143,6 +144,40 @@ const userStore = create<IUserStore>()(
             set((state: IUserStore) => {
               state.endPreload = value;
             });
+          },
+          refreshUserData: async (username?: string): Promise<IUserData | undefined> => {
+            const requestedUsername = username ?? get().store.userData.username;
+            if (!requestedUsername) {
+              return undefined;
+            }
+
+            set({ error: undefined, loading: true });
+            try {
+              const response = await SERVICES_USERS.UsersData.getUserData(requestedUsername);
+              if (response?.success && response.code === 200) {
+                const { result } = response.data as { result: IUserData[] };
+                const freshUser = result?.[0];
+                if (!freshUser) {
+                  set({ error: 'Пользователь не найден' });
+                  return undefined;
+                }
+
+                userStore.setState((draft: IUserStore) => {
+                  draft.store.userData = freshUser;
+                });
+                set({ error: undefined });
+                return freshUser;
+              }
+
+              set({ error: response?.codeMessage ?? 'Ошибка загрузки данных с сервера' });
+              return undefined;
+            } catch (error) {
+              console.error(error);
+              set({ error: 'Network or system error' });
+              return undefined;
+            } finally {
+              set({ loading: false });
+            }
           },
           getMessageText: async () => {
             try {
