@@ -78,9 +78,12 @@ const mockCareerAchievements = {
 
 const UserPage26 = () => {
   const router = useRouter();
-  const { getAllUserAchievements, getAchievementsDepartment, getUserAchievements } = userStore(
-    (state: IUserStore) => state,
-  );
+  const {
+    getAllUserAchievements,
+    getAchievementsDepartment,
+    getUserAchievements,
+    refreshUserData,
+  } = userStore((state: IUserStore) => state);
   const changeAvatar = userStore((state: IUserStore) => state.setAvatar);
   const getAvatars = dataStore(state => state.getAvatars);
   const userStatus = authStore(state => state.userStatus);
@@ -204,6 +207,11 @@ const UserPage26 = () => {
 
       if (initialData?.username) {
         setIsLoading(true);
+        const freshData = await refreshUserData(initialData.username);
+        const currentData = freshData ?? userStore.getState().store.userData;
+        setUserData(currentData);
+        setAvatar(currentData.avatar_pic);
+
         getAllUserAchievements(initialData.username);
         if (!avatars || avatars.length === 0) {
           await getAvatars();
@@ -228,7 +236,16 @@ const UserPage26 = () => {
     });
 
     return () => unsubscribe();
-  }, [userStatus, avatars]);
+  }, [
+    userStatus,
+    avatars,
+    refreshUserData,
+    getAllUserAchievements,
+    getAchievementsDepartment,
+    getUserAchievements,
+    getAllPostsAuthors,
+    getAvatars,
+  ]);
 
   const logout = () => {
     authStore.getState().logout();
