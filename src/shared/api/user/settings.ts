@@ -9,6 +9,10 @@ export const API_USER_SCHEME: IApiEntityScheme<IEndpoint> = {
     method: 'GET',
     url: `${baseUrl}/user`,
   },
+  userFullData: {
+    method: 'GET',
+    url: `${baseUrl}/user/full`,
+  },
   userAchiv: {
     method: 'GET',
     url: `${baseUrl}/achivements/user`,
@@ -69,6 +73,7 @@ export const API_USER_SCHEME: IApiEntityScheme<IEndpoint> = {
 
 export const API_USER_ENDPOINTS = [
   'userData',
+  'userFullData',
   'userAchiv',
   'userHistory',
   'userActives',

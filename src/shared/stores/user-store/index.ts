@@ -153,7 +153,7 @@ const userStore = create<IUserStore>()(
 
             set({ error: undefined, loading: true });
             try {
-              const response = await SERVICES_USERS.UsersData.getUserData(requestedUsername);
+              const response = await SERVICES_USERS.UsersData.getFullUserData(requestedUsername);
               if (response?.success && response.code === 200) {
                 const { result } = response.data as { result: IUserData[] };
                 const freshUser = result?.[0];

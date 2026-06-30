@@ -225,6 +225,7 @@ const UserPage26 = () => {
         setAvatar(currentData.avatar_pic);
 
         getAllUserAchievements(initialData.username);
+        completedProfileLoadUsernameRef.current = initialData.username;
         if (!avatars || avatars.length === 0) {
           await getAvatars();
           if (cancelled) {
@@ -236,7 +237,6 @@ const UserPage26 = () => {
         getAchievementsDepartment();
         getUserAchievements(initialData.username);
         getAllPostsAuthors();
-        completedProfileLoadUsernameRef.current = initialData.username;
       }
       // if (initialData?.userrights === 'admin' || initialData?.userrights === 'moder') {
       //   getAllPostsAuthors();

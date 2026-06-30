@@ -9,6 +9,9 @@ NEXT_CONFIG_FILE = ROOT / "next.config.mjs"
 AUTH_STORE_FILE = ROOT / "src/shared/stores/auth-store/index.ts"
 USER_STORE_FILE = ROOT / "src/shared/stores/user-store/index.ts"
 USER_PAGE_FILE = ROOT / "src/pages_fsd/user-page/UserPage26.tsx"
+USER_API_SETTINGS_FILE = ROOT / "src/shared/api/user/settings.ts"
+USER_API_MODELS_INDEX_FILE = ROOT / "src/shared/api/user/models/index.ts"
+USER_FULL_DATA_MODEL_FILE = ROOT / "src/shared/api/user/models/getFullUserData.ts"
 API_SETTINGS_GLOB = "src/shared/api/**/settings.ts"
 
 
@@ -230,13 +233,22 @@ def test_cookie_auth_logout_and_password_change_clear_server_session():
     assert "window.location.assign('/login')" in auth_store_source
 
 
-def test_user_store_exposes_refresh_user_data_from_backend_profile_endpoint():
+def test_user_store_exposes_refresh_user_data_from_backend_full_profile_endpoint():
     user_store_source = _read(USER_STORE_FILE)
+    user_settings_source = _read(USER_API_SETTINGS_FILE)
+    user_models_index_source = _read(USER_API_MODELS_INDEX_FILE)
+    user_full_data_model_source = _read(USER_FULL_DATA_MODEL_FILE)
 
+    assert "userFullData" in user_settings_source
+    assert "url: `${baseUrl}/user/full`" in user_settings_source
+    assert "import { getFullUserData } from './getFullUserData'" in user_models_index_source
+    assert "getFullUserData," in user_models_index_source
+    assert "API_USER_SCHEME.userFullData.method" in user_full_data_model_source
+    assert "`${API_USER_SCHEME.userFullData.url}/${userName}`" in user_full_data_model_source
     assert "refreshUserData: (username?: string) => Promise<IUserData | undefined>;" in user_store_source
     assert "refreshUserData: async (username?: string)" in user_store_source
     assert "const requestedUsername = username ?? get().store.userData.username;" in user_store_source
-    assert "SERVICES_USERS.UsersData.getUserData(requestedUsername)" in user_store_source
+    assert "SERVICES_USERS.UsersData.getFullUserData(requestedUsername)" in user_store_source
     assert "const { result } = response.data as { result: IUserData[] };" in user_store_source
     assert "const freshUser = result?.[0];" in user_store_source
     assert "draft.store.userData = freshUser;" in user_store_source
