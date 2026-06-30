@@ -249,9 +249,17 @@ def test_user_store_exposes_refresh_user_data_from_backend_full_profile_endpoint
     assert "refreshUserData: async (username?: string)" in user_store_source
     assert "const requestedUsername = username ?? get().store.userData.username;" in user_store_source
     assert "SERVICES_USERS.UsersData.getFullUserData(requestedUsername)" in user_store_source
-    assert "const { result } = response.data as { result: IUserData[] };" in user_store_source
+    assert "const responseData = response.data as {" in user_store_source
+    assert "result: IUserData[];" in user_store_source
+    assert "last_incoming_payment?: IPayment;" in user_store_source
+    assert "last_outgoing_payment?: IPayment;" in user_store_source
+    assert "const { result } = responseData;" in user_store_source
     assert "const freshUser = result?.[0];" in user_store_source
-    assert "draft.store.userData = freshUser;" in user_store_source
+    assert "const freshUserWithPayments = {" in user_store_source
+    assert "last_incoming_payment: responseData.last_incoming_payment" in user_store_source
+    assert "last_outgoing_payment: responseData.last_outgoing_payment" in user_store_source
+    assert "draft.store.userData = freshUserWithPayments;" in user_store_source
+    assert "return freshUserWithPayments;" in user_store_source
 
 
 def test_logged_in_profile_refreshes_user_data_before_loading_finance_widgets():

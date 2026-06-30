@@ -155,18 +155,28 @@ const userStore = create<IUserStore>()(
             try {
               const response = await SERVICES_USERS.UsersData.getFullUserData(requestedUsername);
               if (response?.success && response.code === 200) {
-                const { result } = response.data as { result: IUserData[] };
+                const responseData = response.data as {
+                  result: IUserData[];
+                  last_incoming_payment?: IPayment;
+                  last_outgoing_payment?: IPayment;
+                };
+                const { result } = responseData;
                 const freshUser = result?.[0];
                 if (!freshUser) {
                   set({ error: 'Пользователь не найден' });
                   return undefined;
                 }
+                const freshUserWithPayments = {
+                  ...freshUser,
+                  last_incoming_payment: responseData.last_incoming_payment,
+                  last_outgoing_payment: responseData.last_outgoing_payment,
+                };
 
                 userStore.setState((draft: IUserStore) => {
-                  draft.store.userData = freshUser;
+                  draft.store.userData = freshUserWithPayments;
                 });
                 set({ error: undefined });
-                return freshUser;
+                return freshUserWithPayments;
               }
 
               set({ error: response?.codeMessage ?? 'Ошибка загрузки данных с сервера' });
