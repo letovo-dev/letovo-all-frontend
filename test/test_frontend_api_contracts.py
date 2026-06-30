@@ -7,6 +7,8 @@ ENV_FILE = ROOT / "front-env.env"
 AXIOS_FILE = ROOT / "src/shared/lib/ApiSPA/axios/axios.ts"
 NEXT_CONFIG_FILE = ROOT / "next.config.mjs"
 AUTH_STORE_FILE = ROOT / "src/shared/stores/auth-store/index.ts"
+USER_STORE_FILE = ROOT / "src/shared/stores/user-store/index.ts"
+USER_PAGE_FILE = ROOT / "src/pages_fsd/user-page/UserPage26.tsx"
 API_SETTINGS_GLOB = "src/shared/api/**/settings.ts"
 
 
@@ -226,3 +228,27 @@ def test_cookie_auth_logout_and_password_change_clear_server_session():
     assert "Failed to revoke auth session" in auth_store_source
     assert "redirectToLogin()" in auth_store_source
     assert "window.location.assign('/login')" in auth_store_source
+
+
+def test_user_store_exposes_refresh_user_data_from_backend_profile_endpoint():
+    user_store_source = _read(USER_STORE_FILE)
+
+    assert "refreshUserData: (username?: string) => Promise<IUserData | undefined>;" in user_store_source
+    assert "refreshUserData: async (username?: string)" in user_store_source
+    assert "const requestedUsername = username ?? get().store.userData.username;" in user_store_source
+    assert "SERVICES_USERS.UsersData.getUserData(requestedUsername)" in user_store_source
+    assert "const { result } = response.data as { result: IUserData[] };" in user_store_source
+    assert "const freshUser = result?.[0];" in user_store_source
+    assert "draft.store.userData = freshUser;" in user_store_source
+
+
+def test_logged_in_profile_refreshes_user_data_before_loading_finance_widgets():
+    user_page_source = _read(USER_PAGE_FILE)
+    load_data_block = _balanced_block_after(user_page_source, "const loadData = async () =>")
+
+    assert "refreshUserData" in user_page_source
+    assert "const freshData = await refreshUserData(initialData.username);" in load_data_block
+    assert "const currentData = freshData ?? userStore.getState().store.userData;" in load_data_block
+    assert "setUserData(currentData);" in load_data_block
+    assert "setAvatar(currentData.avatar_pic);" in load_data_block
+    assert load_data_block.index("await refreshUserData(initialData.username)") < load_data_block.index("getAllUserAchievements(initialData.username)")
