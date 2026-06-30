@@ -14,6 +14,7 @@ USER_API_SETTINGS_FILE = ROOT / "src/shared/api/user/settings.ts"
 USER_API_MODELS_INDEX_FILE = ROOT / "src/shared/api/user/models/index.ts"
 USER_FULL_DATA_MODEL_FILE = ROOT / "src/shared/api/user/models/getFullUserData.ts"
 BALANCE_WS_HOOK_FILE = ROOT / "src/shared/hooks/useBalanceWebSocket.ts"
+DELETE_ARTICLE_MODEL_FILE = ROOT / "src/shared/api/data/models/deleteArticle.ts"
 API_SETTINGS_GLOB = "src/shared/api/**/settings.ts"
 
 
@@ -242,6 +243,14 @@ def test_password_change_payload_uses_backend_cookie_session_contract():
     assert "unlogin" not in change_pass_source
     assert "changePass" not in auth_models_index
     assert "changePass" not in auth_settings
+
+
+def test_article_delete_payload_sends_numeric_ids_without_nan_nulling():
+    delete_article_source = _read(DELETE_ARTICLE_MODEL_FILE)
+
+    assert "const postId = Number(id)" in delete_article_source
+    assert "Number.isFinite(postId) ? postId : id" in delete_article_source
+    assert "data: { post_id: id }" not in delete_article_source
 
 
 def test_cookie_auth_logout_and_password_change_clear_server_session():

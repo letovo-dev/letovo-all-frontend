@@ -4,13 +4,16 @@ type ArticleCategory = {
 };
 
 type ArticleLike = {
-  post_id?: string;
+  post_id?: string | number;
   post_path?: string;
-  is_secret?: string;
+  is_secret?: string | boolean;
   title?: string;
   text?: string;
-  category?: string;
+  category?: string | number;
   category_name?: string;
+  likes?: string | number;
+  dislikes?: string | number;
+  saved_count?: string | number;
 };
 
 export type CategorySelectItem = {
@@ -42,6 +45,13 @@ export type BuildArticlePayloadResult = {
 
 const NEW_CATEGORY_MARKER = 'new';
 
+const stringValue = (value: string | number | boolean | undefined): string | undefined => {
+  if (value === undefined) {
+    return undefined;
+  }
+  return String(value);
+};
+
 export const buildArticlePayload = ({
   article,
   isEditArticle,
@@ -68,6 +78,10 @@ export const buildArticlePayload = ({
   if (isEditArticle) {
     const payload: Partial<ArticleLike> = {
       ...article,
+      post_id: stringValue(article?.post_id),
+      likes: stringValue(article?.likes),
+      dislikes: stringValue(article?.dislikes),
+      saved_count: stringValue(article?.saved_count),
       text: '',
       is_secret: values.isSecret,
       title: values.articleTitle ?? article?.title ?? '',
