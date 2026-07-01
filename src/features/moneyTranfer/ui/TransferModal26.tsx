@@ -33,7 +33,9 @@ const TransferModal26: React.FC<ModalProps> = ({
   const { Text } = Typography;
   const [nick, setNick] = useState<string | undefined>('');
   const [sum, setSum] = useState<number | undefined>(undefined);
-  const { isRequireUserInDatabase, transferMoney } = userStore((state: IUserStore) => state);
+  const { isRequireUserInDatabase, transferMoney, refreshUserData } = userStore(
+    (state: IUserStore) => state,
+  );
   const [finished, setFinished] = useState<boolean>(false);
   const [transferRemainingBalance, setTransferRemainingBalance] = useState<number>(selfMoney);
   const [avatar, setAvatar] = useState<string | undefined>(undefined);
@@ -139,6 +141,12 @@ const TransferModal26: React.FC<ModalProps> = ({
             },
           },
         }));
+        const currentUsername = userStore.getState().store.userData.username;
+        const freshUserData = await refreshUserData(currentUsername);
+        const freshBalance = Number(freshUserData?.balance);
+        if (Number.isFinite(freshBalance)) {
+          setTransferRemainingBalance(freshBalance);
+        }
         setFinished(true);
       }
     }

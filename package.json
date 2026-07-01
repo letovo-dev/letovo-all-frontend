@@ -8,6 +8,7 @@
     "build": "npm run optimize-images && next build",
     "start": "next start",
     "test:article-payload": "node --experimental-strip-types scripts/test-article-payload.mjs",
+    "test:balance-websocket-url": "node --experimental-strip-types scripts/test-balance-websocket-url.mjs",
     "optimize-images": "node optimize-images.js",
     "prepare": "husky",
     "clean": "rm -rf dist"

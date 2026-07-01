@@ -14,13 +14,23 @@ const selectCategoryItems = [
 ];
 
 const article = {
-  post_id: '42',
+  post_id: 42,
   post_path: '/media/article_42.md',
-  is_secret: 'f',
+  is_secret: false,
+  likes: 7,
+  dislikes: '2',
+  saved_count: 3,
   title: 'Old title',
   text: '# Old',
-  category: '2',
+  category: 2,
   category_name: 'ENVIRO',
+};
+
+const productionArticle = {
+  ...article,
+  author: null,
+  parent_id: null,
+  date: '2026-07-01 15:40:32',
 };
 
 {
@@ -52,8 +62,13 @@ const article = {
   assert.equal(result.isNewRequest, false);
   assert.equal(result.shouldRefreshAfterSuccess, true);
   assert.equal(result.payload.post_id, '42');
+  assert.equal(result.payload.is_secret, 't');
+  assert.equal(result.payload.likes, '7');
+  assert.equal(result.payload.dislikes, '2');
+  assert.equal(result.payload.saved_count, '3');
   assert.equal(result.payload.category_name, 'Admissions');
   assert.equal(result.payload.category, '5');
+  assert.equal(result.payload.post_path, '/media/article_42.md');
 }
 
 {
@@ -86,6 +101,24 @@ const article = {
   assert.equal(result.payload.post_id, '42');
   assert.equal(result.payload.category_name, 'New Category');
   assert.equal('category' in result.payload, false);
+}
+
+{
+  const result = buildArticlePayload({
+    article: productionArticle,
+    isEditArticle: true,
+    values: { isSecret: 'f', category: '2', articleTitle: 'Production article' },
+    articlesCategories,
+    selectCategoryItems,
+    uploadedFilePath: '/media/article_42.md',
+  });
+
+  assert.equal(result.isNewRequest, false);
+  assert.equal(result.payload.post_id, '42');
+  assert.equal(result.payload.category_name, 'ENVIRO');
+  assert.equal('author' in result.payload, false);
+  assert.equal('parent_id' in result.payload, false);
+  assert.equal(result.payload.date, '2026-07-01 15:40:32');
 }
 
 console.log('article payload tests passed');

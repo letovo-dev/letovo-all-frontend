@@ -30,6 +30,14 @@ assert(
   'transfer modal should store the computed remaining balance for the success state',
 );
 assert(
+  transferModal.includes('await refreshUserData(currentUsername);'),
+  'transfer modal should refresh the current user from the server after a successful transfer',
+);
+assert(
+  transferModal.includes('setTransferRemainingBalance(freshBalance);'),
+  'success state should use the refreshed authoritative balance when it is available',
+);
+assert(
   transferModal.includes('Остаток: ${transferRemainingBalance} энк.'),
   'success state should display the computed remaining balance, not the stale selfMoney prop',
 );
