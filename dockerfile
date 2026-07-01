@@ -18,8 +18,10 @@ RUN npm run build && rm -f .next/standalone/.env .next/standalone/.npmrc
 FROM node:22-alpine@sha256:968df39aedcea65eeb078fb336ed7191baf48f972b4479711397108be0966920 AS runner
 WORKDIR /app
 
+ARG LETOVO_BUILD_SHA=unknown
 ENV NODE_ENV=production \
     NEXT_TELEMETRY_DISABLED=1 \
+    LETOVO_BUILD_SHA=${LETOVO_BUILD_SHA} \
     PORT=3000 \
     HOSTNAME=0.0.0.0
 
