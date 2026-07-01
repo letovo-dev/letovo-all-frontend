@@ -5,9 +5,19 @@ type ArticleCategory = {
   category_name: string;
 };
 
+type NullableString = string | null | undefined;
+
 type ArticleLike = Omit<
   Partial<OneArticle>,
-  'post_id' | 'is_secret' | 'category' | 'likes' | 'dislikes' | 'saved_count'
+  | 'post_id'
+  | 'is_secret'
+  | 'category'
+  | 'likes'
+  | 'dislikes'
+  | 'saved_count'
+  | 'author'
+  | 'parent_id'
+  | 'date'
 > & {
   post_id?: string | number;
   is_secret?: string | boolean;
@@ -15,6 +25,9 @@ type ArticleLike = Omit<
   likes?: string | number;
   dislikes?: string | number;
   saved_count?: string | number;
+  author?: NullableString;
+  parent_id?: NullableString;
+  date?: NullableString;
 };
 
 export type CategorySelectItem = {
@@ -53,6 +66,13 @@ const stringValue = (value: string | number | boolean | undefined): string | und
   return String(value);
 };
 
+const optionalStringValue = (value: NullableString): string | undefined => {
+  if (value === null || value === undefined) {
+    return undefined;
+  }
+  return value;
+};
+
 export const buildArticlePayload = ({
   article,
   isEditArticle,
@@ -78,6 +98,9 @@ export const buildArticlePayload = ({
       (!!selectedCategoryId && selectedCategoryId !== stringValue(article?.category)));
 
   if (isEditArticle) {
+    const author = optionalStringValue(article?.author);
+    const parentId = optionalStringValue(article?.parent_id);
+    const date = optionalStringValue(article?.date);
     const payload: Partial<OneArticle> = {
       post_id: stringValue(article?.post_id),
       likes: stringValue(article?.likes),
@@ -88,10 +111,17 @@ export const buildArticlePayload = ({
       title: values.articleTitle ?? article?.title ?? '',
       post_path: uploadedFilePath ?? article?.post_path ?? '',
       category_name: categoryName,
-      author: article?.author,
-      parent_id: article?.parent_id,
-      date: article?.date,
     };
+
+    if (author !== undefined) {
+      payload.author = author;
+    }
+    if (parentId !== undefined) {
+      payload.parent_id = parentId;
+    }
+    if (date !== undefined) {
+      payload.date = date;
+    }
 
     if (selectedCategoryId) {
       payload.category = selectedCategoryId;
