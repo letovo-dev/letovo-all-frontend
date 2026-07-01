@@ -1,8 +1,11 @@
 'use client';
 
 import { useEffect } from 'react';
+import { buildBalanceWebSocketUrl } from '@/shared/lib/buildBalanceWebSocketUrl';
 import authStore from '@/shared/stores/auth-store';
 import userStore, { IBalanceUpdateEvent } from '@/shared/stores/user-store';
+
+export { buildBalanceWebSocketUrl } from '@/shared/lib/buildBalanceWebSocketUrl';
 
 interface WsEnvelope {
   type?: string;
@@ -22,13 +25,6 @@ const isBalanceUpdateEvent = (data: unknown): data is IBalanceUpdateEvent => {
     typeof event.transaction_id === 'number' &&
     (event.direction === 'incoming' || event.direction === 'outgoing' || event.direction === 'self')
   );
-};
-
-export const buildBalanceWebSocketUrl = (baseUrl: string | undefined, origin: string): string => {
-  const normalizedBaseUrl = (baseUrl || origin).replace(/\/+$/, '');
-  const url = new URL('ws', `${normalizedBaseUrl}/`);
-  url.protocol = url.protocol === 'https:' ? 'wss:' : 'ws:';
-  return url.toString();
 };
 
 const websocketUrl = (): string =>
