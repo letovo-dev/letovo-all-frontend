@@ -14,12 +14,15 @@ const selectCategoryItems = [
 ];
 
 const article = {
-  post_id: '42',
+  post_id: 42,
   post_path: '/media/article_42.md',
-  is_secret: 'f',
+  is_secret: false,
+  likes: 7,
+  dislikes: '2',
+  saved_count: 3,
   title: 'Old title',
   text: '# Old',
-  category: '2',
+  category: 2,
   category_name: 'ENVIRO',
 };
 
@@ -52,8 +55,13 @@ const article = {
   assert.equal(result.isNewRequest, false);
   assert.equal(result.shouldRefreshAfterSuccess, true);
   assert.equal(result.payload.post_id, '42');
+  assert.equal(result.payload.is_secret, 't');
+  assert.equal(result.payload.likes, '7');
+  assert.equal(result.payload.dislikes, '2');
+  assert.equal(result.payload.saved_count, '3');
   assert.equal(result.payload.category_name, 'Admissions');
   assert.equal(result.payload.category, '5');
+  assert.equal(result.payload.post_path, '/media/article_42.md');
 }
 
 {
