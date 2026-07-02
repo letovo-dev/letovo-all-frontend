@@ -73,6 +73,7 @@ export interface IUserData {
   userid: string;
   username: string;
   userrights: string;
+  can_award_achievements?: boolean | 'true' | 'false' | string;
   display_name: string;
   brigade: string;
   brigadename: string;

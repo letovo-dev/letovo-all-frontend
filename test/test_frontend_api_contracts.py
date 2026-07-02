@@ -10,6 +10,7 @@ NEXT_CONFIG_FILE = ROOT / "next.config.mjs"
 AUTH_STORE_FILE = ROOT / "src/shared/stores/auth-store/index.ts"
 USER_STORE_FILE = ROOT / "src/shared/stores/user-store/index.ts"
 USER_PAGE_FILE = ROOT / "src/pages_fsd/user-page/UserPage26.tsx"
+OPEN_ACHIEVEMENT_PAGE_FILE = ROOT / "src/app/open-a/[username]/[id]/ClientAchievementPage.tsx"
 USER_API_SETTINGS_FILE = ROOT / "src/shared/api/user/settings.ts"
 USER_API_MODELS_INDEX_FILE = ROOT / "src/shared/api/user/models/index.ts"
 USER_FULL_DATA_MODEL_FILE = ROOT / "src/shared/api/user/models/getFullUserData.ts"
@@ -87,6 +88,17 @@ def test_all_next_public_build_time_vars_used_by_source_are_declared_in_front_en
 
     assert used_vars, "test must see at least one NEXT_PUBLIC_* usage"
     assert used_vars <= declared_vars
+
+
+def test_open_achievement_page_uses_backend_award_permission_flag():
+    source = _read(OPEN_ACHIEVEMENT_PAGE_FILE)
+    user_store = _read(USER_STORE_FILE)
+
+    assert "can_award_achievements?: boolean | 'true' | 'false' | string;" in user_store
+    assert "userData?.can_award_achievements === true" in source
+    assert "userData?.can_award_achievements === 'true'" in source
+    assert "if (!canAwardAchievements)" in source
+    assert "userData.userrights !== 'admin' && userData.userrights !== 'moder'" not in source
 
 
 def test_login_api_base_url_is_declared_and_points_at_letovo_api_prefix():

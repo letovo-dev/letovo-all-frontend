@@ -20,10 +20,18 @@ function ClientAchievementPage({ id, username }: ClientAchievementPageProps) {
   const [trueUser, setTrueUser] = useState<boolean>(false);
   const router = useRouter();
 
-  useEffect(() => {
-    if (!userData) return;
+  const hasLegacyAwardRights = userData?.userrights === 'admin' || userData?.userrights === 'moder';
+  const hasLoadedAwardPermission =
+    userData?.can_award_achievements !== undefined || userData?.userrights !== '';
+  const canAwardAchievements =
+    hasLegacyAwardRights ||
+    userData?.can_award_achievements === true ||
+    userData?.can_award_achievements === 'true';
 
-    if (userData.userrights !== 'admin' && userData.userrights !== 'moder') {
+  useEffect(() => {
+    if (!userData || !hasLoadedAwardPermission) return;
+
+    if (!canAwardAchievements) {
       const timeoutId = setTimeout(() => {
         router.push(`/user/${userData?.username || 'unknown'}`);
       }, 1000);
@@ -31,7 +39,7 @@ function ClientAchievementPage({ id, username }: ClientAchievementPageProps) {
     } else {
       setTrueUser(true);
     }
-  }, [userData]);
+  }, [canAwardAchievements, hasLoadedAwardPermission, router, userData]);
 
   const handleButtonClick = async () => {
     if (!userData?.username) {
@@ -61,7 +69,7 @@ function ClientAchievementPage({ id, username }: ClientAchievementPageProps) {
         },
       }}
     >
-      {userData.userrights === '' || loading ? (
+      {!hasLoadedAwardPermission || loading ? (
         <SpinModule />
       ) : (
         <div className={style.pageContainer}>
