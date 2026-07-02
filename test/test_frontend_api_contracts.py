@@ -14,6 +14,7 @@ USER_API_SETTINGS_FILE = ROOT / "src/shared/api/user/settings.ts"
 USER_API_MODELS_INDEX_FILE = ROOT / "src/shared/api/user/models/index.ts"
 USER_FULL_DATA_MODEL_FILE = ROOT / "src/shared/api/user/models/getFullUserData.ts"
 BALANCE_WS_HOOK_FILE = ROOT / "src/shared/hooks/useBalanceWebSocket.ts"
+BALANCE_WS_BUILDER_FILE = ROOT / "src/shared/lib/buildBalanceWebSocketUrl.ts"
 DELETE_ARTICLE_MODEL_FILE = ROOT / "src/shared/api/data/models/deleteArticle.ts"
 API_SETTINGS_GLOB = "src/shared/api/**/settings.ts"
 
@@ -101,6 +102,7 @@ def test_balance_websocket_url_preserves_production_api_prefix():
     """Production WS must use the same /letovo-api backend prefix as HTTP API calls."""
     base_url = _env_value(_read(ENV_FILE), "NEXT_PUBLIC_BASE_URL")
     hook_source = _read(BALANCE_WS_HOOK_FILE)
+    builder_source = _read(BALANCE_WS_BUILDER_FILE)
 
     assert _websocket_url_like_frontend(base_url, "https://letovocorp.ru") == (
         "wss://letovocorp.ru/letovo-api/ws"
@@ -111,8 +113,9 @@ def test_balance_websocket_url_preserves_production_api_prefix():
     assert "/letovo-api/letovo-api" not in _websocket_url_like_frontend(
         base_url, "https://letovocorp.ru"
     )
-    assert "new URL('ws'" in hook_source
-    assert "new URL('/ws'" not in hook_source
+    assert "buildBalanceWebSocketUrl(process.env.NEXT_PUBLIC_BASE_URL" in hook_source
+    assert "new URL('ws'" in builder_source
+    assert "new URL('/ws'" not in builder_source
 
 
 def test_axios_instance_does_not_duplicate_the_api_scheme_base_url():

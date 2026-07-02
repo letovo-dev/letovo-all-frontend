@@ -11,6 +11,7 @@ import navigationStore from '@/shared/stores/navigation-store';
 import SpinModule from '@/shared/ui/spiner';
 import Image from 'next/image';
 import { useBalanceWebSocket } from '@/shared/hooks/useBalanceWebSocket';
+import { useActivityAnalytics } from '@/shared/hooks/useActivityAnalytics';
 
 export default function DefaultLayout({ children }: { children: React.ReactNode }) {
   const layoutRef = useRef<HTMLDivElement>(null);
@@ -98,6 +99,13 @@ export default function DefaultLayout({ children }: { children: React.ReactNode 
   }, [setFooterHidden, isAuthChecked, scrollContainerRef]);
 
   useBalanceWebSocket(
+    isAuthChecked &&
+      !isLoading &&
+      currentUserStatus.logged &&
+      currentUserStatus.authed &&
+      currentUserStatus.registered,
+  );
+  useActivityAnalytics(
     isAuthChecked &&
       !isLoading &&
       currentUserStatus.logged &&
