@@ -10,6 +10,7 @@ import { getNewsMedia } from './getNewsMedia';
 import { getNewsRelated } from './getNewsRelated';
 import { getSavedNews } from './getSavedNews';
 import { getTitles } from './getTitles';
+import { getTopMediaDownloads } from './getTopMediaDownloads';
 import { saveComments } from './saveComments';
 import { saveNews } from './saveNews';
 import { searchNews } from './searchNews';
@@ -32,6 +33,7 @@ const apiMethods = {
   getLimitNewsComments,
   getLimitNews,
   getNewsRelated,
+  getTopMediaDownloads,
   getSavedNews,
   getNewsMedia,
   saveNews,

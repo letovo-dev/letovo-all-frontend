@@ -1,6 +1,7 @@
 import type { Metadata, Viewport } from 'next';
 import './globals.scss';
 import { FooterProvider } from '@/shared/ui/context/FooterContext';
+import { MediaPrefetcher } from '@/features/media-prefetch';
 
 export const metadata: Metadata = {
   title: 'Letovo',
@@ -38,6 +39,7 @@ export default function RootLayout({
     <html lang="en">
       <body className="caleo-font">
         <FooterProvider>
+          <MediaPrefetcher />
           <div className="layoutContainer" translate="no" suppressHydrationWarning>
             {children}
           </div>
