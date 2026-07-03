@@ -44,7 +44,7 @@ async function prefetchTopMedia(): Promise<void> {
 
   const items = ((response.data as { result: TopMediaDownload[] })?.result ?? []).filter(
     item =>
-      item.url.startsWith('/media/get/') &&
+      item.url.startsWith('/api/media/get/') &&
       item.bytes > 0 &&
       item.bytes <= MAX_PREFETCH_FILE_BYTES &&
       item.content_type.startsWith('image/'),
@@ -59,8 +59,7 @@ async function prefetchTopMedia(): Promise<void> {
     fetch(item.url, {
       method: 'GET',
       cache: 'force-cache',
-      priority: 'low',
-    } as RequestInit).catch(() => undefined);
+    }).catch(() => undefined);
   }
 }
 

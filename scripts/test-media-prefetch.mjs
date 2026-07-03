@@ -36,6 +36,9 @@ if (!component.includes('MAX_PREFETCH_FILE_BYTES')) {
 if (!component.includes("cache: 'force-cache'")) {
   throw new Error('media prefetch must use browser HTTP cache');
 }
+if (!component.includes("item.url.startsWith('/api/media/get/')")) {
+  throw new Error('media prefetch must fetch through the backend API prefix');
+}
 if (!layout.includes('<MediaPrefetcher />')) {
   throw new Error('root layout must mount MediaPrefetcher');
 }
