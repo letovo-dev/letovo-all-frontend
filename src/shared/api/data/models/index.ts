@@ -7,6 +7,7 @@ import { getLimitNews } from './getLimitNews';
 import { getLimitNewsComments } from './getLimitNewsComments';
 import { getMdMedia } from './getMdMedia';
 import { getNewsMedia } from './getNewsMedia';
+import { getNewsRelated } from './getNewsRelated';
 import { getSavedNews } from './getSavedNews';
 import { getTitles } from './getTitles';
 import { saveComments } from './saveComments';
@@ -30,6 +31,7 @@ const apiMethods = {
   getCurrentNews,
   getLimitNewsComments,
   getLimitNews,
+  getNewsRelated,
   getSavedNews,
   getNewsMedia,
   saveNews,

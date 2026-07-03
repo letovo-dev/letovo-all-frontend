@@ -3,6 +3,7 @@ import { immer } from 'zustand/middleware/immer';
 import { SERVICES_DATA } from '@/shared/api/data';
 import commentsStore from '../comments-store';
 import { SERVICES_USERS } from '@/shared/api/user';
+import type { RelatedNewsItem } from '@/shared/api/data/models/getNewsRelated';
 
 interface Author {
   id: string;
@@ -500,34 +501,35 @@ const dataStore = create<TDataStoreState>()(
           return response;
         }
 
-        const newsData = (response.data as { result: RealNews[] })?.result;
+        const newsData = (response.data as { result: RealNews[] })?.result ?? [];
 
-        let data;
-        try {
-          const promises = newsData?.map(async news => {
-            const media = await commentsStore.getState().getCurrentNewsPics(news.post_id);
-            const comments = await commentsStore
-              .getState()
-              .getLimitNewsComments(news.post_id, 0, 500);
-            return { media, comments, news };
-          });
-          data = await Promise.all(promises);
-        } catch (error) {
-          console.error('Error in Promise.all:', error);
-          set({
-            error: 'Не удалось загрузить новости',
-            loading: false,
-          });
-          return response;
-        }
+        const postIds = newsData?.map(news => news.post_id) ?? [];
+        const relatedResponse =
+          postIds.length > 0
+            ? await SERVICES_DATA.Data.getNewsRelated({ postIds, commentsSize: 3 })
+            : null;
 
-        const news = data.map(post => {
-          const newsComments =
-            (post.comments ?? []).filter(
-              (comment: RealComment) => comment.parent_id === String(post.news.post_id),
+        const relatedItems =
+          relatedResponse?.success && relatedResponse.code === 200
+            ? ((relatedResponse.data as { result: RelatedNewsItem[] })?.result ?? [])
+            : [];
+
+        const relatedByPostId = relatedItems.reduce<Record<string, RelatedNewsItem>>(
+          (acc, item) => {
+            acc[String(item.post_id)] = item;
+            return acc;
+          },
+          {},
+        );
+
+        const news = newsData.map(newsItem => {
+          const related = relatedByPostId[String(newsItem.post_id)];
+          const comments =
+            (related?.comments ?? []).filter(
+              (comment: RealComment) => comment.parent_id === String(newsItem.post_id),
             ) ?? [];
-          const newsMedia = post?.media?.map((media: RealMedia) => media.media);
-          return { ...post, comments: newsComments, media: newsMedia };
+          const media = (related?.media ?? []).map((item: RealMedia) => item.media);
+          return { news: newsItem, comments, media };
         });
 
         const normalizedComments = news.reduce(
