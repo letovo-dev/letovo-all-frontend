@@ -9,7 +9,7 @@ interface GetNewsRelatedParams {
 export interface RelatedNewsItem {
   post_id: string;
   media: Array<{
-    media: string;
+    media: string | null;
     is_pic: string;
     is_secret: string;
     post_id: string;
