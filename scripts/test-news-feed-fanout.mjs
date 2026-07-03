@@ -36,3 +36,13 @@ if (store.includes('getCurrentNewsPics(news.post_id)')) {
 if (store.includes('getLimitNewsComments(news.post_id, 0, 500)')) {
   throw new Error('fetchNews still calls per-post comments endpoint');
 }
+
+const newsPagePath = path.join(root, 'src/app/news/page.tsx');
+const newsPage = fs.readFileSync(newsPagePath, 'utf8');
+const loadMoreStart = newsPage.indexOf('const loadMore = useCallback');
+const loadMoreEnd = newsPage.indexOf('useEffect(() => {', loadMoreStart);
+const loadMoreBlock = newsPage.slice(loadMoreStart, loadMoreEnd);
+
+if (loadMoreBlock.includes('await getTitles()')) {
+  throw new Error('loadMore must not reload all titles on every scroll page');
+}

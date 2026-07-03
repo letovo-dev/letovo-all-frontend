@@ -175,7 +175,6 @@ const NewsPage = () => {
         size: LOAD_NEWS_SIZE,
         date: selectedDate,
       });
-      await getTitles();
       setStartNewsItem(nextStart);
     } catch (error) {
       console.error('Failed to load more news:', error);
