@@ -1,6 +1,6 @@
 'use client';
 
-import React from 'react';
+import React, { useMemo } from 'react';
 import Image from 'next/image';
 import { Swiper, SwiperSlide } from 'swiper/react';
 import { Navigation, Pagination } from 'swiper/modules';
@@ -12,9 +12,17 @@ import 'swiper/css/pagination';
 import style from './Carousel.module.scss';
 import LazyVideo from './LazyVideo';
 
-const CarouselElement = ({ imgs }: { imgs: string[] }) => {
+const CarouselElement = ({ imgs }: { imgs: Array<string | null | undefined> }) => {
   const isVideo = (src: string) => /\.(mp4|webm|ogg)$/i.test(src);
   const isPDF = (src: string) => /\.pdf$/i.test(src);
+  const visibleImgs = useMemo(
+    () => imgs.filter((item): item is string => typeof item === 'string' && item.trim().length > 0),
+    [imgs],
+  );
+
+  if (visibleImgs.length === 0) {
+    return null;
+  }
 
   return (
     <Swiper
@@ -27,7 +35,7 @@ const CarouselElement = ({ imgs }: { imgs: string[] }) => {
       watchSlidesProgress={true}
       className={`${style.carouselWrapper} custom-swiper`}
     >
-      {imgs.map((item, i) => {
+      {visibleImgs.map((item, i) => {
         const baseUrl = (process.env.NEXT_PUBLIC_BASE_URL_MEDIA || '').replace(/\/+$/, '');
         const mediaPath = item.replace(/^\/+/, '');
         const url = `${baseUrl}/${mediaPath}`;

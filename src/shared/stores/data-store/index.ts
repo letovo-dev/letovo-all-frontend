@@ -528,7 +528,9 @@ const dataStore = create<TDataStoreState>()(
             (related?.comments ?? []).filter(
               (comment: RealComment) => comment.parent_id === String(newsItem.post_id),
             ) ?? [];
-          const media = (related?.media ?? []).map((item: RealMedia) => item.media);
+          const media = (related?.media ?? [])
+            .map((item: { media: string | null }) => item.media)
+            .filter((item): item is string => typeof item === 'string' && item.trim().length > 0);
           return { news: newsItem, comments, media };
         });
 
