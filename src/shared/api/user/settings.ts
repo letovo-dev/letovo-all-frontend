@@ -69,6 +69,14 @@ export const API_USER_SCHEME: IApiEntityScheme<IEndpoint> = {
     method: 'GET',
     url: `${baseUrl}/message`,
   },
+  departments: {
+    method: 'GET',
+    url: `${baseUrl}/user/department/roles`,
+  },
+  departmentRoles: {
+    method: 'GET',
+    url: `${baseUrl}/user/department/roles`,
+  },
 };
 
 export const API_USER_ENDPOINTS = [
@@ -88,4 +96,6 @@ export const API_USER_ENDPOINTS = [
   'transactionsSend',
   'addAch',
   'getMessage',
+  'departments',
+  'departmentRoles',
 ] as const;
