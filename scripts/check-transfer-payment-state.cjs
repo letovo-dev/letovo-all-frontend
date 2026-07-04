@@ -6,6 +6,10 @@ const transferModal = fs.readFileSync(
   path.join(repoRoot, 'src/features/moneyTranfer/ui/TransferModal26.tsx'),
   'utf8',
 );
+const userStore = fs.readFileSync(
+  path.join(repoRoot, 'src/shared/stores/user-store/index.ts'),
+  'utf8',
+);
 
 function assert(condition, message) {
   if (!condition) {
@@ -40,6 +44,15 @@ assert(
 assert(
   transferModal.includes('Остаток: ${transferRemainingBalance} энк.'),
   'success state should display the computed remaining balance, not the stale selfMoney prop',
+);
+assert(
+  userStore.includes("responseData === 'receiver not found'") &&
+    userStore.includes("responseData === 'receiver is not whireable'"),
+  'transfer store should recognize backend invalid-recipient responses',
+);
+assert(
+  userStore.includes("'Нельзя выполнить перевод этому пользователю'"),
+  'transfer store should show a dedicated invalid-recipient error',
 );
 
 console.log('transfer modal payment state regression checks passed');
