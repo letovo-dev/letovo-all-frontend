@@ -42,6 +42,14 @@ assert(
   'success state should use the refreshed authoritative balance when it is available',
 );
 assert(
+  !transferModal.includes('if (isAdmin && amount <= 0) return;'),
+  'admin transfer flow should allow zero and negative correction amounts',
+);
+assert(
+  transferModal.includes('min={isAdmin ? undefined : 1}'),
+  'admin transfer amount input should not keep the non-admin minimum constraint',
+);
+assert(
   transferModal.includes('Остаток: ${transferRemainingBalance} энк.'),
   'success state should display the computed remaining balance, not the stale selfMoney prop',
 );

@@ -17,8 +17,11 @@ interface ModalProps {
 
 interface FormValues {
   nick: string;
-  sum: number;
+  sum?: number | string;
 }
+
+const hasAmount = (value: FormValues['sum']): value is number | string =>
+  value !== undefined && value !== null && value !== '';
 
 const TransferModal26: React.FC<ModalProps> = ({
   openTransferModal,
@@ -41,6 +44,7 @@ const TransferModal26: React.FC<ModalProps> = ({
   const [avatar, setAvatar] = useState<string | undefined>(undefined);
   const [isButtonDisable, setIsButtonDisable] = useState<boolean>(true);
   const [mounted, setMounted] = useState(false);
+  const isAdmin = userData?.userrights === 'admin';
   const receiverAvatarSrc = avatar
     ? `${process.env.NEXT_PUBLIC_BASE_URL_MEDIA}/${avatar}`
     : undefined;
@@ -69,10 +73,13 @@ const TransferModal26: React.FC<ModalProps> = ({
       if (!nick || nick.length <= 4) {
         return true;
       }
-      if (receiver && (!sum || (sum <= 0 && userData?.userrights !== 'admin'))) {
+      if (
+        receiver &&
+        (!hasAmount(sum) || !Number.isFinite(Number(sum)) || (!isAdmin && Number(sum) <= 0))
+      ) {
         return true;
       }
-      if (sum && userData?.userrights !== 'admin' && sum > selfMoney) {
+      if (hasAmount(sum) && !isAdmin && Number(sum) > selfMoney) {
         return true;
       }
       return false;
@@ -83,14 +90,14 @@ const TransferModal26: React.FC<ModalProps> = ({
     const timeOutId = setTimeout(() => {
       userStore.setState({
         error:
-          sum && sum > selfMoney && userData?.userrights !== 'admin'
+          hasAmount(sum) && Number(sum) > selfMoney && !isAdmin
             ? 'Недостаточно средств'
             : undefined,
       });
     }, 500);
 
     return () => clearTimeout(timeOutId);
-  }, [sum, selfMoney, nick, receiver]);
+  }, [sum, selfMoney, nick, receiver, isAdmin]);
 
   if (!openTransferModal || !mounted) return null;
 
@@ -105,22 +112,22 @@ const TransferModal26: React.FC<ModalProps> = ({
       setNick(changedValues.nick || undefined);
     }
     if ('sum' in changedValues) {
-      setSum(changedValues.sum || undefined);
+      setSum(hasAmount(changedValues.sum) ? Number(changedValues.sum) : undefined);
     }
   };
 
   const onFinish = async (values: FormValues) => {
-    if (values.nick && !values.sum) {
+    if (values.nick && !hasAmount(values.sum)) {
       const user = await isRequireUserInDatabase(values?.nick);
       setIsButtonDisable(false);
       setReceiver(user ? values.nick : undefined);
       setAvatar(user?.avatar);
       form.resetFields();
     }
-    if (values.nick && values.sum) {
+    if (values.nick && hasAmount(values.sum)) {
       const amount = Math.floor(Number(values.sum));
+      if (!Number.isFinite(amount)) return;
       if (!isAdmin && (amount <= 0 || amount > selfMoney)) return;
-      if (isAdmin && amount <= 0) return;
       const res = await transferMoney({ receiver: values.nick, amount });
       if (res && res === 'success') {
         const remainingBalance = Number(selfMoney) - amount;
@@ -151,8 +158,6 @@ const TransferModal26: React.FC<ModalProps> = ({
       }
     }
   };
-
-  const isAdmin = userData?.userrights === 'admin';
 
   const modalNode = (
     <div className={style.modalOverlay} onClick={onClose}>
@@ -238,7 +243,7 @@ const TransferModal26: React.FC<ModalProps> = ({
                         className={style.customInput}
                         placeholder="0"
                         autoComplete="off"
-                        min="1"
+                        min={isAdmin ? undefined : 1}
                         step="1"
                       />
                     </Form.Item>
