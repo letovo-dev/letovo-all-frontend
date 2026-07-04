@@ -9,6 +9,7 @@
     "start": "next start",
     "test:article-payload": "node --experimental-strip-types scripts/test-article-payload.mjs",
     "test:balance-websocket-url": "node --experimental-strip-types scripts/test-balance-websocket-url.mjs",
+    "test:transfer-payment-state": "node scripts/check-transfer-payment-state.cjs",
     "test:news-feed-fanout": "node scripts/test-news-feed-fanout.mjs",
     "test:media-prefetch": "node scripts/test-media-prefetch.mjs",
     "test:news-media-null-paths": "node scripts/test-news-media-null-paths.mjs",
