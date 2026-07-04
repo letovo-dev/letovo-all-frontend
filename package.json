@@ -13,6 +13,7 @@
     "test:news-feed-fanout": "node scripts/test-news-feed-fanout.mjs",
     "test:media-prefetch": "node scripts/test-media-prefetch.mjs",
     "test:news-media-null-paths": "node scripts/test-news-media-null-paths.mjs",
+    "test:admin-create-user": "node scripts/test-admin-create-user.mjs",
     "optimize-images": "node optimize-images.js",
     "prepare": "husky",
     "clean": "rm -rf dist"
