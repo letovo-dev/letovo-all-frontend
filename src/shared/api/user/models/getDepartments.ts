@@ -5,6 +5,7 @@ import { API_USER_SCHEME } from '../settings';
 export const getDepartments = async (): Promise<IApiReturn<{ result: DepartmentOption[] }>> => {
   const response = await API.apiQuery<{ result: DepartmentOption[] }>({
     method: API_USER_SCHEME.departments.method,
+    // /user/department/roles
     url: API_USER_SCHEME.departments.url,
   });
 
