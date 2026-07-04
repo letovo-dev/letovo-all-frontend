@@ -309,6 +309,17 @@ const userStore = create<IUserStore>()(
             }
           },
           transferMoney: async (data: { receiver: string; amount: number }) => {
+            const invalidTransferReceiverMessage = 'Нельзя выполнить перевод этому пользователю';
+            const isInvalidTransferReceiver = (response?: { code?: number; data?: unknown }) => {
+              const responseData =
+                typeof response?.data === 'string' ? response.data.toLowerCase() : undefined;
+
+              return (
+                response?.code === 406 &&
+                (responseData === 'receiver not found' ||
+                  responseData === 'receiver is not whireable')
+              );
+            };
             const transferErrorMessage = (
               step: string,
               response?: {
@@ -318,6 +329,10 @@ const userStore = create<IUserStore>()(
                 message?: string;
               },
             ) => {
+              if (isInvalidTransferReceiver(response)) {
+                return invalidTransferReceiverMessage;
+              }
+
               const body =
                 typeof response?.data === 'string'
                   ? response.data
