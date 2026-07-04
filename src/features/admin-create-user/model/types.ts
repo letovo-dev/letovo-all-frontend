@@ -18,7 +18,7 @@ export interface AdminCreateUserPayload {
 }
 
 export interface DepartmentOption {
-  departmentid: string;
+  departmentid: number | string;
   departmentname: string;
 }
 

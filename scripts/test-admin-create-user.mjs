@@ -45,6 +45,7 @@ assertContains(getDepartmentRoles, 'departmentId', 'src/shared/api/user/models/g
 
 assertContains(types, 'AdminRoleRights', 'src/features/admin-create-user/model/types.ts');
 assertContains(types, 'AdminCreateUserPayload', 'src/features/admin-create-user/model/types.ts');
+assertContains(types, 'departmentid: number | string;', 'src/features/admin-create-user/model/types.ts');
 assertContains(password, 'generateAdminPassword', 'src/features/admin-create-user/lib/password.ts');
 assertContains(password, 'crypto.getRandomValues', 'src/features/admin-create-user/lib/password.ts');
 assertNotContains(password, 'Math.random', 'src/features/admin-create-user/lib/password.ts');
