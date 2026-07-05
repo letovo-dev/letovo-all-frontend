@@ -15,6 +15,10 @@ ARG NEXT_PUBLIC_BASE_URL_UPLOAD=
 ARG NEXT_PUBLIC_BASE_URL_MEDIA=
 ARG NEXT_PUBLIC_UPLOAD_URL=
 ARG NEXT_PUBLIC_BASE_URL_CLEAR=
+ARG NEXT_PUBLIC_OTEL_ENABLED=
+ARG NEXT_PUBLIC_OTEL_EXPORTER_OTLP_TRACES_ENDPOINT=
+ARG NEXT_PUBLIC_OTEL_SERVICE_NAME=
+ARG NEXT_PUBLIC_LETOVO_BUILD_SHA=
 COPY --from=deps /app/node_modules ./node_modules
 COPY . .
 COPY ./front-env.env ./.env
@@ -23,6 +27,10 @@ RUN if [ -n "$NEXT_PUBLIC_BASE_URL" ]; then printf "\nNEXT_PUBLIC_BASE_URL='%s'\
     if [ -n "$NEXT_PUBLIC_BASE_URL_MEDIA" ]; then printf "NEXT_PUBLIC_BASE_URL_MEDIA='%s'\n" "$NEXT_PUBLIC_BASE_URL_MEDIA" >> ./.env; fi && \
     if [ -n "$NEXT_PUBLIC_UPLOAD_URL" ]; then printf "NEXT_PUBLIC_UPLOAD_URL='%s'\n" "$NEXT_PUBLIC_UPLOAD_URL" >> ./.env; fi && \
     if [ -n "$NEXT_PUBLIC_BASE_URL_CLEAR" ]; then printf "NEXT_PUBLIC_BASE_URL_CLEAR='%s'\n" "$NEXT_PUBLIC_BASE_URL_CLEAR" >> ./.env; fi && \
+    if [ -n "$NEXT_PUBLIC_OTEL_ENABLED" ]; then printf "NEXT_PUBLIC_OTEL_ENABLED='%s'\n" "$NEXT_PUBLIC_OTEL_ENABLED" >> ./.env; fi && \
+    if [ -n "$NEXT_PUBLIC_OTEL_EXPORTER_OTLP_TRACES_ENDPOINT" ]; then printf "NEXT_PUBLIC_OTEL_EXPORTER_OTLP_TRACES_ENDPOINT='%s'\n" "$NEXT_PUBLIC_OTEL_EXPORTER_OTLP_TRACES_ENDPOINT" >> ./.env; fi && \
+    if [ -n "$NEXT_PUBLIC_OTEL_SERVICE_NAME" ]; then printf "NEXT_PUBLIC_OTEL_SERVICE_NAME='%s'\n" "$NEXT_PUBLIC_OTEL_SERVICE_NAME" >> ./.env; fi && \
+    if [ -n "$NEXT_PUBLIC_LETOVO_BUILD_SHA" ]; then printf "NEXT_PUBLIC_LETOVO_BUILD_SHA='%s'\n" "$NEXT_PUBLIC_LETOVO_BUILD_SHA" >> ./.env; fi && \
     npm run build && rm -f .next/standalone/.env .next/standalone/.npmrc
 
 FROM node:22-alpine@sha256:968df39aedcea65eeb078fb336ed7191baf48f972b4479711397108be0966920 AS runner
