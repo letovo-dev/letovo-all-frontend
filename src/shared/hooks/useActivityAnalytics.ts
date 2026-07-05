@@ -3,6 +3,7 @@
 import { useCallback, useEffect, useRef } from 'react';
 import { usePathname } from 'next/navigation';
 import axiosInstance from '@/shared/lib/ApiSPA/axios/axios';
+import { withFrontendSpan } from '@/shared/lib/otel/browser';
 
 const baseUrl = process.env.NEXT_PUBLIC_BASE_URL;
 const HEARTBEAT_MS = 60_000;
@@ -20,19 +21,27 @@ export const sendActivityPing = async (event: ActivityEvent, route: string): Pro
     return;
   }
 
-  await axiosInstance({
-    method: 'POST',
-    url: `${baseUrl}/analytics/activity/ping`,
-    data: {
-      event,
-      route: normalizeRoute(route),
+  await withFrontendSpan(
+    'analytics.activity_ping',
+    {
+      'app.activity.event': event,
+      'app.route': normalizeRoute(route),
     },
-    transitional: {
-      silentJSONParsing: true,
-      forcedJSONParsing: true,
-      clarifyTimeoutError: false,
-    },
-  }).catch(error => {
+    async () =>
+      axiosInstance({
+        method: 'POST',
+        url: `${baseUrl}/analytics/activity/ping`,
+        data: {
+          event,
+          route: normalizeRoute(route),
+        },
+        transitional: {
+          silentJSONParsing: true,
+          forcedJSONParsing: true,
+          clarifyTimeoutError: false,
+        },
+      }),
+  ).catch(error => {
     console.error('Activity ping failed:', error);
   });
 };
