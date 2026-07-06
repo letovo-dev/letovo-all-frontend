@@ -36,13 +36,27 @@ if (store.includes('getCurrentNewsPics(news.post_id)')) {
 if (store.includes('getLimitNewsComments(news.post_id, 0, 500)')) {
   throw new Error('fetchNews still calls per-post comments endpoint');
 }
+if (store.includes('comment.parent_id === String(newsItem.post_id)')) {
+  throw new Error('fetchNews must not compare numeric parent_id to string post_id strictly');
+}
+if (!store.includes('String(comment.parent_id) === String(newsItem.post_id)')) {
+  throw new Error('fetchNews must normalize comment parent_id and post_id before matching');
+}
+if (!store.includes('parent_id: string | number')) {
+  throw new Error('RealComment.parent_id must allow numeric backend values');
+}
 
 const newsPagePath = path.join(root, 'src/app/news/page.tsx');
 const newsPage = fs.readFileSync(newsPagePath, 'utf8');
+const news26Path = path.join(root, 'src/pages_fsd/news/News26.tsx');
+const news26 = fs.readFileSync(news26Path, 'utf8');
 const loadMoreStart = newsPage.indexOf('const loadMore = useCallback');
 const loadMoreEnd = newsPage.indexOf('useEffect(() => {', loadMoreStart);
 const loadMoreBlock = newsPage.slice(loadMoreStart, loadMoreEnd);
 
 if (loadMoreBlock.includes('await getTitles()')) {
   throw new Error('loadMore must not reload all titles on every scroll page');
+}
+if (!news26.includes('normalizedComments[openComments] ?? []')) {
+  throw new Error('comments modal must fall back to an empty comment list');
 }
