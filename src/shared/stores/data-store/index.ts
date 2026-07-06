@@ -31,7 +31,7 @@ export interface RealComment {
   is_published: string;
   is_secret: string;
   likes: string;
-  parent_id: string;
+  parent_id: string | number;
   post_id: string;
   post_path: string;
   saved: string;
@@ -526,7 +526,7 @@ const dataStore = create<TDataStoreState>()(
           const related = relatedByPostId[String(newsItem.post_id)];
           const comments =
             (related?.comments ?? []).filter(
-              (comment: RealComment) => comment.parent_id === String(newsItem.post_id),
+              (comment: RealComment) => String(comment.parent_id) === String(newsItem.post_id),
             ) ?? [];
           const media = (related?.media ?? [])
             .map((item: { media: string | null }) => item.media)

@@ -230,7 +230,7 @@ const OneComment: React.FC<OneCommentProps> = ({
                   <DeleteOutlined
                     className={style.deleteCommentIcon}
                     onClick={() =>
-                      handleDeleteComment(commentState.post_id, commentState.parent_id)
+                      handleDeleteComment(commentState.post_id, String(commentState.parent_id))
                     }
                   />
                 )}

@@ -114,7 +114,7 @@ const News26: React.FC<NewsProps> = ({ children, onContainerRef, onDateSelect })
 
   useEffect(() => {
     if (openComments && normalizedComments) {
-      const comments = normalizedComments[openComments];
+      const comments = normalizedComments[openComments] ?? [];
       setComments(comments);
     }
   }, [openComments, normalizedComments]);
