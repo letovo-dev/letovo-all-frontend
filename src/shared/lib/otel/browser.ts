@@ -9,8 +9,17 @@ import { FetchInstrumentation } from '@opentelemetry/instrumentation-fetch';
 import { XMLHttpRequestInstrumentation } from '@opentelemetry/instrumentation-xml-http-request';
 import { registerInstrumentations } from '@opentelemetry/instrumentation';
 import { resourceFromAttributes } from '@opentelemetry/resources';
-import { BatchSpanProcessor, WebTracerProvider } from '@opentelemetry/sdk-trace-web';
-import { ATTR_SERVICE_NAME, ATTR_SERVICE_VERSION } from '@opentelemetry/semantic-conventions';
+import {
+  BatchSpanProcessor,
+  ParentBasedSampler,
+  TraceIdRatioBasedSampler,
+  WebTracerProvider,
+} from '@opentelemetry/sdk-trace-web';
+import {
+  ATTR_SERVICE_NAME,
+  ATTR_SERVICE_NAMESPACE,
+  ATTR_SERVICE_VERSION,
+} from '@opentelemetry/semantic-conventions';
 
 const FRONTEND_TRACER_NAME = 'letovo-frontend';
 const DEFAULT_EXPORTER_URL = '/otel/v1/traces';
@@ -27,6 +36,14 @@ const isTelemetryEnabled = (): boolean =>
 
 const exporterUrl = (): string =>
   process.env.NEXT_PUBLIC_OTEL_EXPORTER_OTLP_TRACES_ENDPOINT || DEFAULT_EXPORTER_URL;
+
+const samplerRatio = (): number => {
+  const parsed = Number(process.env.NEXT_PUBLIC_OTEL_TRACES_SAMPLER_RATIO || '0.1');
+  if (!Number.isFinite(parsed)) {
+    return 0.1;
+  }
+  return Math.min(1, Math.max(0, parsed));
+};
 
 const absoluteUrl = (value: string): string => new URL(value, window.location.origin).toString();
 
@@ -86,7 +103,12 @@ export const initBrowserTelemetry = (): void => {
   const provider = new WebTracerProvider({
     resource: resourceFromAttributes({
       [ATTR_SERVICE_NAME]: process.env.NEXT_PUBLIC_OTEL_SERVICE_NAME || 'letovo-frontend',
+      [ATTR_SERVICE_NAMESPACE]: process.env.NEXT_PUBLIC_OTEL_SERVICE_NAMESPACE || 'letovocorp',
+      'deployment.environment': process.env.NEXT_PUBLIC_OTEL_DEPLOYMENT_ENVIRONMENT || 'production',
       [ATTR_SERVICE_VERSION]: process.env.NEXT_PUBLIC_LETOVO_BUILD_SHA || 'development',
+    }),
+    sampler: new ParentBasedSampler({
+      root: new TraceIdRatioBasedSampler(samplerRatio()),
     }),
     spanProcessors: [
       new BatchSpanProcessor(
@@ -130,7 +152,7 @@ export const initBrowserTelemetry = (): void => {
 
 export const attachAxiosTelemetry = (instance: AxiosInstance): void => {
   instance.interceptors.request.use((config: InternalAxiosRequestConfig) => {
-    if (!isTelemetryEnabled() || initialized) {
+    if (!isTelemetryEnabled() || !initialized) {
       return config;
     }
 
