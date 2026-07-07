@@ -3,6 +3,7 @@ import { immer } from 'zustand/middleware/immer';
 import { persist, createJSONStorage } from 'zustand/middleware';
 import { SERVICES_DATA } from '@/shared/api/data';
 import { Comment } from '../data-store';
+import { applySocialCountDelta, normalizeSocialCounters } from '@/shared/utils';
 
 export interface OneComment {
   author: string;
@@ -96,7 +97,9 @@ const commentsStore = create<TCommentsStoreState>()(
           const response = await SERVICES_DATA.Data.saveComments(comment, post_id, author);
 
           if (response.code === 200) {
-            const result = (response?.data as { result: OneComment[] })?.result;
+            const result = ((response?.data as { result: OneComment[] })?.result ?? []).map(
+              normalizeSocialCounters,
+            );
             set((state: TCommentsStoreState) => ({
               normalizedComments: {
                 ...state.normalizedComments,
@@ -131,11 +134,11 @@ const commentsStore = create<TCommentsStoreState>()(
               const next: OneComment = {
                 ...c,
                 is_liked: action === 'delete' ? 'f' : 't',
-                likes: String(Math.max(Number(c.likes || 0) + (action === 'delete' ? -1 : 1), 0)),
+                likes: applySocialCountDelta(c.likes, action === 'delete' ? -1 : 1),
               };
               if (c.is_disliked === 't' && action !== 'delete') {
                 next.is_disliked = 'f';
-                next.dislikes = String(Math.max(Number(c.dislikes || 0) - 1, 0));
+                next.dislikes = applySocialCountDelta(c.dislikes, -1);
               }
               return next;
             });
@@ -171,13 +174,11 @@ const commentsStore = create<TCommentsStoreState>()(
               const next: OneComment = {
                 ...c,
                 is_disliked: action === 'delete' ? 'f' : 't',
-                dislikes: String(
-                  Math.max(Number(c.dislikes || 0) + (action === 'delete' ? -1 : 1), 0),
-                ),
+                dislikes: applySocialCountDelta(c.dislikes, action === 'delete' ? -1 : 1),
               };
               if (c.is_liked === 't' && action !== 'delete') {
                 next.is_liked = 'f';
-                next.likes = String(Math.max(Number(c.likes || 0) - 1, 0));
+                next.likes = applySocialCountDelta(c.likes, -1);
               }
               return next;
             });
