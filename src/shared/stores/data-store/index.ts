@@ -4,6 +4,7 @@ import { SERVICES_DATA } from '@/shared/api/data';
 import commentsStore from '../comments-store';
 import { SERVICES_USERS } from '@/shared/api/user';
 import type { RelatedNewsItem } from '@/shared/api/data/models/getNewsRelated';
+import { applySocialCountDelta, normalizeSocialCounters } from '@/shared/utils';
 
 interface Author {
   id: string;
@@ -262,7 +263,9 @@ const dataStore = create<TDataStoreState>()(
       try {
         const response = await SERVICES_DATA.Data.createNews(news);
         if (response.success && response.code === 200) {
-          const savedNews = (response?.data as { result: RealNews[] })?.result;
+          const savedNews = ((response?.data as { result: RealNews[] })?.result ?? []).map(
+            normalizeSocialCounters,
+          );
           const { result } =
             (await commentsStore.getState().getCurrentNewsPics(savedNews[0].post_id)) ?? [];
           const updatedNormalizedNews = {
@@ -303,7 +306,9 @@ const dataStore = create<TDataStoreState>()(
       try {
         const response = await SERVICES_DATA.Data.editNews(news);
         if (response.success && response.code === 200) {
-          const editedNews = (response?.data as { result: RealNews[] })?.result;
+          const editedNews = ((response?.data as { result: RealNews[] })?.result ?? []).map(
+            normalizeSocialCounters,
+          );
           const media = await commentsStore.getState().getCurrentNewsPics(editedNews[0].post_id);
           const updatedTitles = get().data.newsTitles.map((el: Titles) =>
             String(el.post_id) === String(editedNews[0].post_id)
@@ -501,7 +506,9 @@ const dataStore = create<TDataStoreState>()(
           return response;
         }
 
-        const newsData = (response.data as { result: RealNews[] })?.result ?? [];
+        const newsData = ((response.data as { result: RealNews[] })?.result ?? []).map(
+          normalizeSocialCounters,
+        );
 
         const postIds = newsData?.map(news => news.post_id) ?? [];
         const relatedResponse =
@@ -525,9 +532,11 @@ const dataStore = create<TDataStoreState>()(
         const news = newsData.map(newsItem => {
           const related = relatedByPostId[String(newsItem.post_id)];
           const comments =
-            (related?.comments ?? []).filter(
-              (comment: RealComment) => String(comment.parent_id) === String(newsItem.post_id),
-            ) ?? [];
+            (related?.comments ?? [])
+              .filter(
+                (comment: RealComment) => String(comment.parent_id) === String(newsItem.post_id),
+              )
+              .map(normalizeSocialCounters) ?? [];
           const media = (related?.media ?? [])
             .map((item: { media: string | null }) => item.media)
             .filter((item): item is string => typeof item === 'string' && item.trim().length > 0);
@@ -617,11 +626,11 @@ const dataStore = create<TDataStoreState>()(
           const updatedNewsState = {
             ...news,
             is_liked: action === 'delete' ? 'f' : 't',
-            likes: String(Number(news.likes) + (action === 'delete' ? -1 : 1)),
+            likes: applySocialCountDelta(news.likes, action === 'delete' ? -1 : 1),
             ...(news.is_disliked === 't' &&
               action !== 'delete' && {
                 is_disliked: 'f',
-                dislikes: String(Number(news.dislikes) - 1),
+                dislikes: applySocialCountDelta(news.dislikes, -1),
               }),
           };
 
@@ -667,11 +676,11 @@ const dataStore = create<TDataStoreState>()(
           const updatedNewsState = {
             ...news,
             is_disliked: action === 'delete' ? 'f' : 't',
-            dislikes: String(Number(news.dislikes) + (action === 'delete' ? -1 : 1)),
+            dislikes: applySocialCountDelta(news.dislikes, action === 'delete' ? -1 : 1),
             ...(news.is_liked === 't' &&
               action !== 'delete' && {
                 is_liked: 'f',
-                likes: String(Number(news.likes) - 1),
+                likes: applySocialCountDelta(news.likes, -1),
               }),
           };
 
