@@ -62,5 +62,27 @@ assert(
   userStore.includes("'Нельзя выполнить перевод этому пользователю'"),
   'transfer store should show a dedicated invalid-recipient error',
 );
+assert(
+  transferModal.includes('const TRANSFER_COOLDOWN_SECONDS = 5;'),
+  'transfer modal should use the agreed five second cooldown',
+);
+assert(
+  transferModal.includes('getTransferCooldownRemaining'),
+  'transfer modal should derive cooldown state from the last outgoing payment time',
+);
+assert(
+  transferModal.includes('setCooldownStartedAt(transactionTime);'),
+  'transfer modal should start cooldown after a successful transfer',
+);
+assert(
+  transferModal.includes('Следующий перевод будет доступен через {transferCooldownRemaining} сек.'),
+  'transfer modal should show the remaining cooldown to the user',
+);
+assert(
+  transferModal.includes(
+    'disabled={isButtonDisable || Boolean(receiver && transferCooldownRemaining > 0)}',
+  ),
+  'transfer submit should be disabled while cooldown is active',
+);
 
 console.log('transfer modal payment state regression checks passed');

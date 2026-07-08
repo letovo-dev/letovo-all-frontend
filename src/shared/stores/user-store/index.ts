@@ -333,6 +333,10 @@ const userStore = create<IUserStore>()(
                 return invalidTransferReceiverMessage;
               }
 
+              if (response?.code === 429) {
+                return 'Следующий перевод будет доступен через несколько секунд';
+              }
+
               const body =
                 typeof response?.data === 'string'
                   ? response.data
