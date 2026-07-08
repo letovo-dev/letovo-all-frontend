@@ -23,6 +23,18 @@ interface FormValues {
 const hasAmount = (value: FormValues['sum']): value is number | string =>
   value !== undefined && value !== null && value !== '';
 
+const TRANSFER_COOLDOWN_SECONDS = 5;
+const TRANSFER_COOLDOWN_MS = TRANSFER_COOLDOWN_SECONDS * 1000;
+
+const getTransferCooldownRemaining = (transactionTime?: string) => {
+  if (!transactionTime) return 0;
+
+  const timestamp = Date.parse(transactionTime);
+  if (!Number.isFinite(timestamp)) return 0;
+
+  return Math.max(0, Math.ceil((TRANSFER_COOLDOWN_MS - (Date.now() - timestamp)) / 1000));
+};
+
 const TransferModal26: React.FC<ModalProps> = ({
   openTransferModal,
   setOpenTransferModal,
@@ -41,6 +53,10 @@ const TransferModal26: React.FC<ModalProps> = ({
   );
   const [finished, setFinished] = useState<boolean>(false);
   const [transferRemainingBalance, setTransferRemainingBalance] = useState<number>(selfMoney);
+  const [cooldownStartedAt, setCooldownStartedAt] = useState<string | undefined>(
+    userData?.last_outgoing_payment?.transactiontime,
+  );
+  const [transferCooldownRemaining, setTransferCooldownRemaining] = useState<number>(0);
   const [avatar, setAvatar] = useState<string | undefined>(undefined);
   const [isButtonDisable, setIsButtonDisable] = useState<boolean>(true);
   const [mounted, setMounted] = useState(false);
@@ -67,6 +83,22 @@ const TransferModal26: React.FC<ModalProps> = ({
       setReceiver(undefined);
     }
   }, [receiver, nick]);
+
+  useEffect(() => {
+    setCooldownStartedAt(userData?.last_outgoing_payment?.transactiontime);
+  }, [userData?.last_outgoing_payment?.transactiontime]);
+
+  useEffect(() => {
+    if (!openTransferModal) return;
+
+    const updateCooldown = () => {
+      setTransferCooldownRemaining(getTransferCooldownRemaining(cooldownStartedAt));
+    };
+
+    updateCooldown();
+    const intervalId = window.setInterval(updateCooldown, 1000);
+    return () => window.clearInterval(intervalId);
+  }, [cooldownStartedAt, openTransferModal]);
 
   useEffect(() => {
     const isButtonDisabled = () => {
@@ -125,13 +157,18 @@ const TransferModal26: React.FC<ModalProps> = ({
       form.resetFields();
     }
     if (values.nick && hasAmount(values.sum)) {
+      if (transferCooldownRemaining > 0) return;
+
       const amount = Math.floor(Number(values.sum));
       if (!Number.isFinite(amount)) return;
       if (!isAdmin && (amount <= 0 || amount > selfMoney)) return;
       const res = await transferMoney({ receiver: values.nick, amount });
       if (res && res === 'success') {
+        const transactionTime = new Date().toISOString();
         const remainingBalance = Number(selfMoney) - amount;
         setTransferRemainingBalance(remainingBalance);
+        setCooldownStartedAt(transactionTime);
+        setTransferCooldownRemaining(TRANSFER_COOLDOWN_SECONDS);
         userStore.setState((state: IUserStore) => ({
           store: {
             ...state.store,
@@ -143,7 +180,7 @@ const TransferModal26: React.FC<ModalProps> = ({
                 amount,
                 sender: state.store.userData.username,
                 receiver: values.nick,
-                transactiontime: new Date().toISOString(),
+                transactiontime: transactionTime,
               },
             },
           },
@@ -258,6 +295,11 @@ const TransferModal26: React.FC<ModalProps> = ({
                     <Text className={style.warnText}>{error}</Text>
                   </>
                 )}
+                {!error && receiver && transferCooldownRemaining > 0 && (
+                  <Text className={style.cooldownText}>
+                    Следующий перевод будет доступен через {transferCooldownRemaining} сек.
+                  </Text>
+                )}
               </div>
 
               <div className={style.buttonsRow}>
@@ -280,7 +322,7 @@ const TransferModal26: React.FC<ModalProps> = ({
                 <Form.Item style={{ flex: 1, marginBottom: 0 }}>
                   <Button
                     htmlType="submit"
-                    disabled={isButtonDisable}
+                    disabled={isButtonDisable || Boolean(receiver && transferCooldownRemaining > 0)}
                     className={style.submitButton}
                   >
                     {receiver ? 'Перевести' : 'Найти'}
@@ -300,14 +342,20 @@ const TransferModal26: React.FC<ModalProps> = ({
                 ? `Средства отправлены пользователю ${receiver ?? ''}`
                 : `Остаток: ${transferRemainingBalance} энк.`}
             </p>
+            {transferCooldownRemaining > 0 && (
+              <p className={style.successSubtext}>
+                Следующий перевод будет доступен через {transferCooldownRemaining} сек.
+              </p>
+            )}
             <div className={style.readyRow}>
               <Button
                 htmlType="button"
                 className={style.submitButton}
                 onClick={onClose}
+                disabled={transferCooldownRemaining > 0}
                 style={{ minWidth: 160, flex: 'unset' }}
               >
-                Готово
+                {transferCooldownRemaining > 0 ? `Готово (${transferCooldownRemaining})` : 'Готово'}
               </Button>
             </div>
           </div>
