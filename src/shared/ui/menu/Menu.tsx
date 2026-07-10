@@ -41,6 +41,14 @@ const items: MenuItem[] = [
     width: 30,
     height: 20,
   },
+  {
+    label: 'Создать аккаунт',
+    key: 'admin/users/create',
+    disabled: false,
+    icon: '/26_user_icon.png',
+    width: 30,
+    height: 23,
+  },
   { label: 'Чат', key: 'chat', disabled: false, icon: '/26_chat_icon.png', width: 27, height: 26 },
   {
     label: 'Личный кабинет',
@@ -62,8 +70,9 @@ const getFilteredItems = (
   userrights: string | undefined,
 ): MenuItem[] => {
   const isAdmin = ALLOWED_ROLES.includes(userrights || '');
+  const adminOnlyKeys = ['md-editor', 'admin/users/create'];
   if (variant === 'footer' || !isAdmin) {
-    return items.filter(item => item.key !== 'md-editor');
+    return items.filter(item => !adminOnlyKeys.includes(item.key));
   }
   return items;
 };
@@ -82,7 +91,9 @@ const Menu = ({ isFooter, variant }: { isFooter?: boolean; variant?: MenuVariant
   const [isReady, setIsReady] = useState(false);
 
   useEffect(() => {
-    const currentKey = pathname?.split('/')[1] || 'user';
+    const currentKey = pathname?.startsWith('/admin/users/create')
+      ? 'admin/users/create'
+      : pathname?.split('/')[1] || 'user';
     if (currentKey === 'user') {
       setActiveKey('user');
     }

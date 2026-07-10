@@ -1,5 +1,6 @@
 import re
 from pathlib import Path
+from urllib.parse import urljoin, urlparse, urlunparse
 
 ROOT = Path(__file__).resolve().parents[1]
 SOURCE_DIRS = [ROOT / "src"]
@@ -9,9 +10,13 @@ NEXT_CONFIG_FILE = ROOT / "next.config.mjs"
 AUTH_STORE_FILE = ROOT / "src/shared/stores/auth-store/index.ts"
 USER_STORE_FILE = ROOT / "src/shared/stores/user-store/index.ts"
 USER_PAGE_FILE = ROOT / "src/pages_fsd/user-page/UserPage26.tsx"
+OPEN_ACHIEVEMENT_PAGE_FILE = ROOT / "src/app/open-a/[username]/[id]/ClientAchievementPage.tsx"
 USER_API_SETTINGS_FILE = ROOT / "src/shared/api/user/settings.ts"
 USER_API_MODELS_INDEX_FILE = ROOT / "src/shared/api/user/models/index.ts"
 USER_FULL_DATA_MODEL_FILE = ROOT / "src/shared/api/user/models/getFullUserData.ts"
+BALANCE_WS_HOOK_FILE = ROOT / "src/shared/hooks/useBalanceWebSocket.ts"
+BALANCE_WS_BUILDER_FILE = ROOT / "src/shared/lib/buildBalanceWebSocketUrl.ts"
+DELETE_ARTICLE_MODEL_FILE = ROOT / "src/shared/api/data/models/deleteArticle.ts"
 API_SETTINGS_GLOB = "src/shared/api/**/settings.ts"
 
 
@@ -66,6 +71,13 @@ def _env_value(env_content: str, key: str) -> str | None:
     return None
 
 
+def _websocket_url_like_frontend(base_url: str | None, origin: str) -> str:
+    normalized_base_url = (base_url or origin).rstrip("/")
+    parsed = urlparse(urljoin(f"{normalized_base_url}/", "ws"))
+    scheme = "wss" if parsed.scheme == "https" else "ws"
+    return urlunparse((scheme, parsed.netloc, parsed.path, "", parsed.query, ""))
+
+
 def test_all_next_public_build_time_vars_used_by_source_are_declared_in_front_env():
     """Missing NEXT_PUBLIC_* build env bakes `undefined/...` API URLs into .next."""
     used_vars: set[str] = set()
@@ -78,6 +90,19 @@ def test_all_next_public_build_time_vars_used_by_source_are_declared_in_front_en
     assert used_vars <= declared_vars
 
 
+def test_open_achievement_page_uses_backend_award_permission_flag():
+    source = _read(OPEN_ACHIEVEMENT_PAGE_FILE)
+    user_store = _read(USER_STORE_FILE)
+
+    assert "can_award_achievements?: boolean | 'true' | 'false' | string;" in user_store
+    assert "const canAwardFlag = userData?.can_award_achievements;" in source
+    assert "canAwardFlag === true" in source
+    assert "canAwardFlag === 'true'" in source
+    assert "canAwardFlag === 't'" in source
+    assert "if (!canAwardAchievements)" in source
+    assert "userData.userrights !== 'admin' && userData.userrights !== 'moder'" not in source
+
+
 def test_login_api_base_url_is_declared_and_points_at_letovo_api_prefix():
     """Login must be built with a real API prefix, never with missing/empty env."""
     base_url = _env_value(_read(ENV_FILE), "NEXT_PUBLIC_BASE_URL")
@@ -85,6 +110,26 @@ def test_login_api_base_url_is_declared_and_points_at_letovo_api_prefix():
     assert base_url is not None
     assert base_url.endswith("/letovo-api")
     assert "undefined" not in base_url
+
+
+def test_balance_websocket_url_preserves_production_api_prefix():
+    """Production WS must use the same /letovo-api backend prefix as HTTP API calls."""
+    base_url = _env_value(_read(ENV_FILE), "NEXT_PUBLIC_BASE_URL")
+    hook_source = _read(BALANCE_WS_HOOK_FILE)
+    builder_source = _read(BALANCE_WS_BUILDER_FILE)
+
+    assert _websocket_url_like_frontend(base_url, "https://letovocorp.ru") == (
+        "wss://letovocorp.ru/letovo-api/ws"
+    )
+    assert _websocket_url_like_frontend(base_url, "https://letovocorp.ru") != (
+        "wss://letovocorp.ru/ws"
+    )
+    assert "/letovo-api/letovo-api" not in _websocket_url_like_frontend(
+        base_url, "https://letovocorp.ru"
+    )
+    assert "buildBalanceWebSocketUrl(process.env.NEXT_PUBLIC_BASE_URL" in hook_source
+    assert "new URL('ws'" in builder_source
+    assert "new URL('/ws'" not in builder_source
 
 
 def test_axios_instance_does_not_duplicate_the_api_scheme_base_url():
@@ -217,6 +262,14 @@ def test_password_change_payload_uses_backend_cookie_session_contract():
     assert "changePass" not in auth_settings
 
 
+def test_article_delete_payload_sends_numeric_ids_without_nan_nulling():
+    delete_article_source = _read(DELETE_ARTICLE_MODEL_FILE)
+
+    assert "const postId = Number(id)" in delete_article_source
+    assert "Number.isFinite(postId) ? postId : id" in delete_article_source
+    assert "data: { post_id: id }" not in delete_article_source
+
+
 def test_cookie_auth_logout_and_password_change_clear_server_session():
     auth_store_source = _read(ROOT / "src/shared/stores/auth-store/index.ts")
     auth_models_index = _read(ROOT / "src/shared/api/auth/models/index.ts")
@@ -272,3 +325,19 @@ def test_logged_in_profile_refreshes_user_data_before_loading_finance_widgets():
     assert "setUserData(currentData);" in load_data_block
     assert "setAvatar(currentData.avatar_pic);" in load_data_block
     assert load_data_block.index("await refreshUserData(initialData.username)") < load_data_block.index("getAllUserAchievements(initialData.username)")
+
+
+def test_profile_renders_scrollable_transfer_history_for_selected_period():
+    user_store_source = _read(USER_STORE_FILE)
+    user_page_source = _read(USER_PAGE_FILE)
+    user_settings_source = _read(USER_API_SETTINGS_FILE)
+
+    assert "transactionsMy" in user_settings_source
+    assert "url: `${baseUrl}/transactions/my`" in user_settings_source
+    assert "getMyTransactions: () => Promise<void>;" in user_store_source
+    assert "SERVICES_USERS.UsersData.getMyTransactions()" in user_store_source
+    assert "state.store.transactions = result ?? [];" in user_store_source
+    assert "История переводов" in user_page_source
+    assert "historyPeriodDays" in user_page_source
+    assert "recentTransactions.map" in user_page_source
+    assert "transactionList" in user_page_source

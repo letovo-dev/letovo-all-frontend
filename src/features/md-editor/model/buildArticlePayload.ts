@@ -1,16 +1,33 @@
+import type { OneArticle } from '@/shared/stores/articles-store';
+
 type ArticleCategory = {
   category: string;
   category_name: string;
 };
 
-type ArticleLike = {
-  post_id?: string;
-  post_path?: string;
-  is_secret?: string;
-  title?: string;
-  text?: string;
-  category?: string;
-  category_name?: string;
+type NullableString = string | null | undefined;
+
+type ArticleLike = Omit<
+  Partial<OneArticle>,
+  | 'post_id'
+  | 'is_secret'
+  | 'category'
+  | 'likes'
+  | 'dislikes'
+  | 'saved_count'
+  | 'author'
+  | 'parent_id'
+  | 'date'
+> & {
+  post_id?: string | number;
+  is_secret?: string | boolean;
+  category?: string | number;
+  likes?: string | number;
+  dislikes?: string | number;
+  saved_count?: string | number;
+  author?: NullableString;
+  parent_id?: NullableString;
+  date?: NullableString;
 };
 
 export type CategorySelectItem = {
@@ -35,12 +52,26 @@ type BuildArticlePayloadParams = {
 };
 
 export type BuildArticlePayloadResult = {
-  payload: Partial<ArticleLike>;
+  payload: Partial<OneArticle>;
   isNewRequest: boolean;
   shouldRefreshAfterSuccess: boolean;
 };
 
 const NEW_CATEGORY_MARKER = 'new';
+
+const stringValue = (value: string | number | boolean | undefined): string | undefined => {
+  if (value === undefined) {
+    return undefined;
+  }
+  return String(value);
+};
+
+const optionalStringValue = (value: NullableString): string | undefined => {
+  if (value === null || value === undefined) {
+    return undefined;
+  }
+  return value;
+};
 
 export const buildArticlePayload = ({
   article,
@@ -63,17 +94,34 @@ export const buildArticlePayload = ({
     : (selectedCategory?.category_name ?? selectedCategoryItem?.label ?? values.category);
   const categoryChanged =
     isEditArticle &&
-    (isNewCategory || (!!selectedCategoryId && selectedCategoryId !== article?.category));
+    (isNewCategory ||
+      (!!selectedCategoryId && selectedCategoryId !== stringValue(article?.category)));
 
   if (isEditArticle) {
-    const payload: Partial<ArticleLike> = {
-      ...article,
+    const author = optionalStringValue(article?.author);
+    const parentId = optionalStringValue(article?.parent_id);
+    const date = optionalStringValue(article?.date);
+    const payload: Partial<OneArticle> = {
+      post_id: stringValue(article?.post_id),
+      likes: stringValue(article?.likes),
+      dislikes: stringValue(article?.dislikes),
+      saved_count: stringValue(article?.saved_count),
       text: '',
       is_secret: values.isSecret,
       title: values.articleTitle ?? article?.title ?? '',
       post_path: uploadedFilePath ?? article?.post_path ?? '',
       category_name: categoryName,
     };
+
+    if (author !== undefined) {
+      payload.author = author;
+    }
+    if (parentId !== undefined) {
+      payload.parent_id = parentId;
+    }
+    if (date !== undefined) {
+      payload.date = date;
+    }
 
     if (selectedCategoryId) {
       payload.category = selectedCategoryId;
@@ -88,7 +136,7 @@ export const buildArticlePayload = ({
     };
   }
 
-  const payload: Partial<ArticleLike> = {
+  const payload: Partial<OneArticle> = {
     title: values.articleTitle ?? '',
     text: '',
     is_secret: values.isSecret,
