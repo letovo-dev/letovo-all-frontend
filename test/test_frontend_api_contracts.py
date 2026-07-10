@@ -95,8 +95,10 @@ def test_open_achievement_page_uses_backend_award_permission_flag():
     user_store = _read(USER_STORE_FILE)
 
     assert "can_award_achievements?: boolean | 'true' | 'false' | string;" in user_store
-    assert "userData?.can_award_achievements === true" in source
-    assert "userData?.can_award_achievements === 'true'" in source
+    assert "const canAwardFlag = userData?.can_award_achievements;" in source
+    assert "canAwardFlag === true" in source
+    assert "canAwardFlag === 'true'" in source
+    assert "canAwardFlag === 't'" in source
     assert "if (!canAwardAchievements)" in source
     assert "userData.userrights !== 'admin' && userData.userrights !== 'moder'" not in source
 

@@ -23,10 +23,13 @@ function ClientAchievementPage({ id, username }: ClientAchievementPageProps) {
   const hasLegacyAwardRights = userData?.userrights === 'admin' || userData?.userrights === 'moder';
   const hasLoadedAwardPermission =
     userData?.can_award_achievements !== undefined || userData?.userrights !== '';
+  const canAwardFlag = userData?.can_award_achievements;
   const canAwardAchievements =
     hasLegacyAwardRights ||
-    userData?.can_award_achievements === true ||
-    userData?.can_award_achievements === 'true';
+    canAwardFlag === true ||
+    canAwardFlag === 'true' ||
+    canAwardFlag === 't' ||
+    canAwardFlag === '1';
 
   useEffect(() => {
     if (!userData || !hasLoadedAwardPermission) return;
