@@ -26,6 +26,9 @@ const getDepartmentRoles = read('src/shared/api/user/models/getDepartmentRoles.t
 const types = read('src/features/admin-create-user/model/types.ts');
 const password = read('src/features/admin-create-user/lib/password.ts');
 const form = read('src/features/admin-create-user/ui/AdminCreateUserForm.tsx');
+const formStyles = read('src/features/admin-create-user/ui/AdminCreateUserForm.module.scss');
+const adminLayout = read('src/app/admin/layout.tsx');
+const adminLayoutStyles = read('src/app/admin/AdminLayout.module.scss');
 const page = read('src/app/admin/users/create/page.tsx');
 const menu = read('src/shared/ui/menu/Menu.tsx');
 const packageJson = read('package.json');
@@ -61,7 +64,15 @@ assertContains(form, 'name="userrights"', 'src/features/admin-create-user/ui/Adm
 assertContains(form, 'write_posts', 'src/features/admin-create-user/ui/AdminCreateUserForm.tsx');
 assertContains(form, 'main_page', 'src/features/admin-create-user/ui/AdminCreateUserForm.tsx');
 assertContains(form, 'router.push(`/user/${values.username}`)', 'src/features/admin-create-user/ui/AdminCreateUserForm.tsx');
+assertContains(form, "colorText: '#1F2937'", 'src/features/admin-create-user/ui/AdminCreateUserForm.tsx');
+assertContains(form, "colorBgContainer: '#FFFFFF'", 'src/features/admin-create-user/ui/AdminCreateUserForm.tsx');
+assertContains(formStyles, 'background: #ffffff', 'src/features/admin-create-user/ui/AdminCreateUserForm.module.scss');
+assertContains(formStyles, 'border-radius: 16px', 'src/features/admin-create-user/ui/AdminCreateUserForm.module.scss');
 
+assertContains(adminLayout, 'data-admin-shell', 'src/app/admin/layout.tsx');
+assertContains(adminLayout, 'style.page', 'src/app/admin/layout.tsx');
+assertContains(adminLayoutStyles, 'background: #f3f4f6', 'src/app/admin/AdminLayout.module.scss');
+assertContains(adminLayoutStyles, 'overflow-y: auto', 'src/app/admin/AdminLayout.module.scss');
 assertContains(page, '<AdminCreateUserForm />', 'src/app/admin/users/create/page.tsx');
 assertContains(menu, 'Создать аккаунт', 'src/shared/ui/menu/Menu.tsx');
 assertContains(menu, 'admin/users/create', 'src/shared/ui/menu/Menu.tsx');

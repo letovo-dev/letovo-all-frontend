@@ -159,7 +159,17 @@ export const AdminCreateUserForm = () => {
   }
 
   return (
-    <ConfigProvider theme={{ token: { colorPrimary: '#FB4724' } }}>
+    <ConfigProvider
+      theme={{
+        token: {
+          colorPrimary: '#FB4724',
+          colorText: '#1F2937',
+          colorTextHeading: '#111827',
+          colorBgContainer: '#FFFFFF',
+          colorBorder: '#D1D5DB',
+        },
+      }}
+    >
       {contextHolder}
       <main className={style.shell}>
         <div className={style.header}>
