@@ -325,3 +325,19 @@ def test_logged_in_profile_refreshes_user_data_before_loading_finance_widgets():
     assert "setUserData(currentData);" in load_data_block
     assert "setAvatar(currentData.avatar_pic);" in load_data_block
     assert load_data_block.index("await refreshUserData(initialData.username)") < load_data_block.index("getAllUserAchievements(initialData.username)")
+
+
+def test_profile_renders_scrollable_transfer_history_for_selected_period():
+    user_store_source = _read(USER_STORE_FILE)
+    user_page_source = _read(USER_PAGE_FILE)
+    user_settings_source = _read(USER_API_SETTINGS_FILE)
+
+    assert "transactionsMy" in user_settings_source
+    assert "url: `${baseUrl}/transactions/my`" in user_settings_source
+    assert "getMyTransactions: () => Promise<void>;" in user_store_source
+    assert "SERVICES_USERS.UsersData.getMyTransactions()" in user_store_source
+    assert "state.store.transactions = result ?? [];" in user_store_source
+    assert "История переводов" in user_page_source
+    assert "historyPeriodDays" in user_page_source
+    assert "recentTransactions.map" in user_page_source
+    assert "transactionList" in user_page_source
