@@ -97,6 +97,7 @@ export interface IUserStore {
     departmentAchievements: IUserAchData[] | undefined;
     allPostsAuthors: IUserData[];
     messageText: string;
+    transactions: IPayment[];
   };
   localeName: string;
   endPreload: boolean;
@@ -104,6 +105,7 @@ export interface IUserStore {
   getAchievementsDepartment: () => void;
   getUserAchievements: (name: string) => void;
   refreshUserData: (username?: string) => Promise<IUserData | undefined>;
+  getMyTransactions: () => Promise<void>;
   isRequireUserInDatabase: (value: string) => { userName: string; avatar?: string };
   transferMoney: (data: { receiver: string; amount: number }) => Promise<any>;
   applyBalanceUpdate: (event: IBalanceUpdateEvent) => void;
@@ -138,6 +140,7 @@ const initialState = {
   error: undefined,
   allPostsAuthors: [],
   messageText: '',
+  transactions: [],
 };
 
 const userStore = create<IUserStore>()(
@@ -197,6 +200,19 @@ const userStore = create<IUserStore>()(
               return undefined;
             } finally {
               set({ loading: false });
+            }
+          },
+          getMyTransactions: async () => {
+            try {
+              const response = await SERVICES_USERS.UsersData.getMyTransactions();
+              if (response?.success && response.code === 200) {
+                const { result } = response.data as { result?: IPayment[] };
+                set((state: IUserStore) => {
+                  state.store.transactions = result ?? [];
+                });
+              }
+            } catch (error) {
+              console.error(error);
             }
           },
           getMessageText: async () => {
@@ -414,23 +430,27 @@ const userStore = create<IUserStore>()(
               state.store.userData.balance = String(event.balance);
 
               if (event.direction === 'outgoing') {
-                state.store.userData.last_outgoing_payment = {
+                const transaction = {
                   transactionid: event.transaction_id,
                   amount: Math.abs(event.delta),
                   sender: username,
                   receiver: event.counterparty,
                   transactiontime: new Date().toISOString(),
                 };
+                state.store.userData.last_outgoing_payment = transaction;
+                state.store.transactions = [transaction, ...state.store.transactions].slice(0, 100);
               }
 
               if (event.direction === 'incoming') {
-                state.store.userData.last_incoming_payment = {
+                const transaction = {
                   transactionid: event.transaction_id,
                   amount: Math.abs(event.delta),
                   sender: event.counterparty,
                   receiver: username,
                   transactiontime: new Date().toISOString(),
                 };
+                state.store.userData.last_incoming_payment = transaction;
+                state.store.transactions = [transaction, ...state.store.transactions].slice(0, 100);
               }
             });
           },
