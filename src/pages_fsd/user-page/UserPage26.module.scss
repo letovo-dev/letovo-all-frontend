@@ -276,7 +276,7 @@
   width: 100%;
   max-width: 415px;
   box-sizing: border-box;
-  height: 145px;
+  height: auto;
   flex-shrink: 0;
   align-items: flex-start;
   padding: 22px 32px;
@@ -353,6 +353,72 @@
       .icon {
         margin-top: 2px;
       }
+    }
+  }
+  .transactionHistory {
+    width: 100%;
+    margin-top: 12px;
+    .transactionHistoryHeader {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      gap: 8px;
+    }
+    .transactionHistoryTitle,
+    .transactionEmpty,
+    .transactionRow p,
+    .transactionRow span {
+      margin: 0;
+    }
+    .transactionHistoryTitle {
+      font-size: 12px;
+      font-weight: 600;
+    }
+    .historyPeriods {
+      display: flex;
+      gap: 4px;
+    }
+    .historyPeriods button {
+      border: 0;
+      border-radius: 10px;
+      background: transparent;
+      color: var(--grey);
+      cursor: pointer;
+      font-size: 11px;
+      padding: 2px 5px;
+    }
+    .historyPeriods .historyPeriodActive {
+      background: var(--background);
+      color: var(--foreground);
+    }
+    .transactionList {
+      max-height: 128px;
+      overflow-y: auto;
+      margin-top: 6px;
+    }
+    .transactionRow {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      gap: 8px;
+      padding: 4px 0;
+    }
+    .transactionRow p {
+      font-size: 12px;
+    }
+    .transactionRow span,
+    .transactionEmpty {
+      color: var(--grey);
+      font-size: 10px;
+    }
+    .transactionRow strong {
+      font-size: 12px;
+    }
+    .transactionRow .moneyPlus {
+      color: var(--green);
+    }
+    .transactionRow .moneyMinus {
+      color: var(--foreground);
     }
   }
 
@@ -435,6 +501,19 @@
             color: var(--secondaryWhite);
           }
         }
+      }
+    }
+    .transactionHistory {
+      .transactionHistoryTitle,
+      .transactionRow p {
+        color: var(--secondaryWhite);
+      }
+      .transactionRow .moneyMinus {
+        color: var(--secondaryWhite);
+      }
+      .historyPeriods .historyPeriodActive {
+        background: rgba(255, 255, 255, 0.2);
+        color: var(--secondaryWhite);
       }
     }
   }

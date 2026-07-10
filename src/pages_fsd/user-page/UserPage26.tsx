@@ -2,7 +2,7 @@
 
 import React, { useCallback, useEffect, useMemo, useRef, useState } from 'react';
 import style from './UserPage26.module.scss';
-import userStore, { IUserAchData, IUserStore } from '@/shared/stores/user-store';
+import userStore, { IPayment, IUserAchData, IUserStore } from '@/shared/stores/user-store';
 import { message, Button, Avatar } from 'antd';
 import { useRouter } from 'next/navigation';
 import authStore from '@/shared/stores/auth-store';
@@ -83,7 +83,9 @@ const UserPage26 = () => {
     getAchievementsDepartment,
     getUserAchievements,
     refreshUserData,
+    getMyTransactions,
   } = userStore((state: IUserStore) => state);
+  const transactions = userStore((state: IUserStore) => state.store.transactions);
   const changeAvatar = userStore((state: IUserStore) => state.setAvatar);
   const getAvatars = dataStore(state => state.getAvatars);
   const userStatus = authStore(state => state.userStatus);
@@ -104,6 +106,7 @@ const UserPage26 = () => {
   const avatarRef = useRef<HTMLDivElement>(null);
   const completedProfileLoadUsernameRef = useRef<string | null>(null);
   const [openTransferModal, setOpenTransferModal] = useState(false);
+  const [historyPeriodDays, setHistoryPeriodDays] = useState<1 | 3 | 7>(7);
   const { getAllPostsAuthors } = userStore.getState();
   const [messageApi, contextHolder] = message.useMessage();
 
@@ -223,6 +226,7 @@ const UserPage26 = () => {
         const currentData = freshData ?? userStore.getState().store.userData;
         setUserData(currentData);
         setAvatar(currentData.avatar_pic);
+        await getMyTransactions();
 
         getAllUserAchievements(initialData.username);
         completedProfileLoadUsernameRef.current = initialData.username;
@@ -259,11 +263,30 @@ const UserPage26 = () => {
     avatars,
     refreshUserData,
     getAllUserAchievements,
+    getMyTransactions,
     getAchievementsDepartment,
     getUserAchievements,
     getAllPostsAuthors,
     getAvatars,
   ]);
+
+  const recentTransactions = useMemo(() => {
+    const earliest = Date.now() - historyPeriodDays * 24 * 60 * 60 * 1000;
+    return transactions.filter(
+      transaction => new Date(transaction.transactiontime).getTime() >= earliest,
+    );
+  }, [historyPeriodDays, transactions]);
+
+  const formatTransactionTime = (value: string) =>
+    new Intl.DateTimeFormat('ru-RU', {
+      day: 'numeric',
+      month: 'short',
+      hour: '2-digit',
+      minute: '2-digit',
+    }).format(new Date(value));
+
+  const isIncomingTransaction = (transaction: IPayment) =>
+    transaction.receiver === userData.username;
 
   const logout = () => {
     authStore.getState().logout();
@@ -489,6 +512,44 @@ const UserPage26 = () => {
                   className={style.moneyMinus}
                 >{`-${userData.last_outgoing_payment?.amount ?? 0}`}</p>
               </div>
+            </div>
+          </div>
+          <div className={style.transactionHistory}>
+            <div className={style.transactionHistoryHeader}>
+              <p className={style.transactionHistoryTitle}>История переводов</p>
+              <div className={style.historyPeriods} aria-label="Период истории переводов">
+                {([1, 3, 7] as const).map(days => (
+                  <button
+                    className={historyPeriodDays === days ? style.historyPeriodActive : undefined}
+                    key={days}
+                    onClick={() => setHistoryPeriodDays(days)}
+                    type="button"
+                  >
+                    {days === 1 ? 'день' : `${days} дн.`}
+                  </button>
+                ))}
+              </div>
+            </div>
+            <div className={style.transactionList}>
+              {recentTransactions.length === 0 ? (
+                <p className={style.transactionEmpty}>За этот период переводов не было</p>
+              ) : (
+                recentTransactions.map(transaction => {
+                  const incoming = isIncomingTransaction(transaction);
+                  const counterparty = incoming ? transaction.sender : transaction.receiver;
+                  return (
+                    <div className={style.transactionRow} key={transaction.transactionid}>
+                      <div>
+                        <p>{incoming ? `От ${counterparty}` : `Кому ${counterparty}`}</p>
+                        <span>{formatTransactionTime(transaction.transactiontime)}</span>
+                      </div>
+                      <strong className={incoming ? style.moneyPlus : style.moneyMinus}>
+                        {`${incoming ? '+' : '-'}${transaction.amount}`}
+                      </strong>
+                    </div>
+                  );
+                })
+              )}
             </div>
           </div>
         </section>
