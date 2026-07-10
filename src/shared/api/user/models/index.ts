@@ -11,6 +11,9 @@ import { isUser } from './isUser';
 import { setAvatar } from './setAvatar';
 import { transferPrepare } from './transferPrepare';
 import { transferSend } from './transferSend';
+import { getDepartments } from './getDepartments';
+import { getDepartmentRoles } from './getDepartmentRoles';
+import { getMyTransactions } from './getMyTransactions';
 
 // eslint-disable-next-line import/no-anonymous-default-export
 export default {
@@ -27,4 +30,7 @@ export default {
   transferSend,
   addAch,
   getMessage,
+  getDepartments,
+  getDepartmentRoles,
+  getMyTransactions,
 };

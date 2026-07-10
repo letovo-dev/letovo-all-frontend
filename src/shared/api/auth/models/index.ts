@@ -3,6 +3,7 @@ import { auth } from './auth';
 import { changeLogin } from './changeLogin';
 import { register } from './register';
 import { logout } from './logout';
+import { adminCreateUser } from './adminCreateUser';
 
 // eslint-disable-next-line import/no-anonymous-default-export
 export default {
@@ -11,4 +12,5 @@ export default {
   changeLogin,
   register,
   logout,
+  adminCreateUser,
 };

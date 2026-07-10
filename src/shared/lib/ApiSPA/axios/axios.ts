@@ -1,8 +1,11 @@
 import axios from 'axios';
+import { attachAxiosTelemetry } from '../../otel/browser';
 
 const instance = axios.create({
   withCredentials: true,
 });
+
+attachAxiosTelemetry(instance);
 
 instance.interceptors.response.use(
   function (dataResponse) {

@@ -3,6 +3,8 @@ import { immer } from 'zustand/middleware/immer';
 import { SERVICES_DATA } from '@/shared/api/data';
 import commentsStore from '../comments-store';
 import { SERVICES_USERS } from '@/shared/api/user';
+import type { RelatedNewsItem } from '@/shared/api/data/models/getNewsRelated';
+import { applySocialCountDelta, normalizeSocialCounters } from '@/shared/utils';
 
 interface Author {
   id: string;
@@ -30,7 +32,7 @@ export interface RealComment {
   is_published: string;
   is_secret: string;
   likes: string;
-  parent_id: string;
+  parent_id: string | number;
   post_id: string;
   post_path: string;
   saved: string;
@@ -261,7 +263,9 @@ const dataStore = create<TDataStoreState>()(
       try {
         const response = await SERVICES_DATA.Data.createNews(news);
         if (response.success && response.code === 200) {
-          const savedNews = (response?.data as { result: RealNews[] })?.result;
+          const savedNews = ((response?.data as { result: RealNews[] })?.result ?? []).map(
+            normalizeSocialCounters,
+          );
           const { result } =
             (await commentsStore.getState().getCurrentNewsPics(savedNews[0].post_id)) ?? [];
           const updatedNormalizedNews = {
@@ -302,7 +306,9 @@ const dataStore = create<TDataStoreState>()(
       try {
         const response = await SERVICES_DATA.Data.editNews(news);
         if (response.success && response.code === 200) {
-          const editedNews = (response?.data as { result: RealNews[] })?.result;
+          const editedNews = ((response?.data as { result: RealNews[] })?.result ?? []).map(
+            normalizeSocialCounters,
+          );
           const media = await commentsStore.getState().getCurrentNewsPics(editedNews[0].post_id);
           const updatedTitles = get().data.newsTitles.map((el: Titles) =>
             String(el.post_id) === String(editedNews[0].post_id)
@@ -500,34 +506,41 @@ const dataStore = create<TDataStoreState>()(
           return response;
         }
 
-        const newsData = (response.data as { result: RealNews[] })?.result;
+        const newsData = ((response.data as { result: RealNews[] })?.result ?? []).map(
+          normalizeSocialCounters,
+        );
 
-        let data;
-        try {
-          const promises = newsData?.map(async news => {
-            const media = await commentsStore.getState().getCurrentNewsPics(news.post_id);
-            const comments = await commentsStore
-              .getState()
-              .getLimitNewsComments(news.post_id, 0, 500);
-            return { media, comments, news };
-          });
-          data = await Promise.all(promises);
-        } catch (error) {
-          console.error('Error in Promise.all:', error);
-          set({
-            error: 'Не удалось загрузить новости',
-            loading: false,
-          });
-          return response;
-        }
+        const postIds = newsData?.map(news => news.post_id) ?? [];
+        const relatedResponse =
+          postIds.length > 0
+            ? await SERVICES_DATA.Data.getNewsRelated({ postIds, commentsSize: 3 })
+            : null;
 
-        const news = data.map(post => {
-          const newsComments =
-            (post.comments ?? []).filter(
-              (comment: RealComment) => comment.parent_id === String(post.news.post_id),
-            ) ?? [];
-          const newsMedia = post?.media?.map((media: RealMedia) => media.media);
-          return { ...post, comments: newsComments, media: newsMedia };
+        const relatedItems =
+          relatedResponse?.success && relatedResponse.code === 200
+            ? ((relatedResponse.data as { result: RelatedNewsItem[] })?.result ?? [])
+            : [];
+
+        const relatedByPostId = relatedItems.reduce<Record<string, RelatedNewsItem>>(
+          (acc, item) => {
+            acc[String(item.post_id)] = item;
+            return acc;
+          },
+          {},
+        );
+
+        const news = newsData.map(newsItem => {
+          const related = relatedByPostId[String(newsItem.post_id)];
+          const comments =
+            (related?.comments ?? [])
+              .filter(
+                (comment: RealComment) => String(comment.parent_id) === String(newsItem.post_id),
+              )
+              .map(normalizeSocialCounters) ?? [];
+          const media = (related?.media ?? [])
+            .map((item: { media: string | null }) => item.media)
+            .filter((item): item is string => typeof item === 'string' && item.trim().length > 0);
+          return { news: newsItem, comments, media };
         });
 
         const normalizedComments = news.reduce(
@@ -613,11 +626,11 @@ const dataStore = create<TDataStoreState>()(
           const updatedNewsState = {
             ...news,
             is_liked: action === 'delete' ? 'f' : 't',
-            likes: String(Number(news.likes) + (action === 'delete' ? -1 : 1)),
+            likes: applySocialCountDelta(news.likes, action === 'delete' ? -1 : 1),
             ...(news.is_disliked === 't' &&
               action !== 'delete' && {
                 is_disliked: 'f',
-                dislikes: String(Number(news.dislikes) - 1),
+                dislikes: applySocialCountDelta(news.dislikes, -1),
               }),
           };
 
@@ -663,11 +676,11 @@ const dataStore = create<TDataStoreState>()(
           const updatedNewsState = {
             ...news,
             is_disliked: action === 'delete' ? 'f' : 't',
-            dislikes: String(Number(news.dislikes) + (action === 'delete' ? -1 : 1)),
+            dislikes: applySocialCountDelta(news.dislikes, action === 'delete' ? -1 : 1),
             ...(news.is_liked === 't' &&
               action !== 'delete' && {
                 is_liked: 'f',
-                likes: String(Number(news.likes) - 1),
+                likes: applySocialCountDelta(news.likes, -1),
               }),
           };
 

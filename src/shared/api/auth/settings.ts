@@ -25,6 +25,17 @@ export const API_AUTH_SCHEME: IApiEntityScheme<IEndpoint> = {
     method: 'PUT',
     url: `${baseUrl}/auth/register_true`,
   },
+  adminCreateUser: {
+    method: 'POST',
+    url: `${baseUrl}/auth/admin_create_user`,
+  },
 };
 
-export const API_AUTH_ENDPOINTS = ['login', 'auth', 'logout', 'changeLogin', 'register'] as const;
+export const API_AUTH_ENDPOINTS = [
+  'login',
+  'auth',
+  'logout',
+  'changeLogin',
+  'register',
+  'adminCreateUser',
+] as const;

@@ -7,6 +7,11 @@ import { SERVICES_USERS } from '@/shared/api/user';
 import authStore, { TAuthStoreState } from '../auth-store';
 import { SERVICES_ACHIEVEMENTS } from '@/shared/api/achievements';
 import { SERVICES_DATA } from '@/shared/api/data';
+import {
+  applyBalanceUpdateToStore,
+  mergeUserStorePersistedState,
+  migrateUserStorePersistedState,
+} from './persistence';
 
 export interface IUserAchData {
   id: string;
@@ -73,11 +78,20 @@ export interface IUserData {
   userid: string;
   username: string;
   userrights: string;
+  can_award_achievements?: boolean | 'true' | 'false' | string;
   display_name: string;
   brigade: string;
   brigadename: string;
   last_incoming_payment?: IPayment;
   last_outgoing_payment?: IPayment;
+}
+
+export interface IBalanceUpdateEvent {
+  balance: number;
+  delta: number;
+  counterparty: string;
+  direction: 'incoming' | 'outgoing' | 'self';
+  transaction_id: number;
 }
 
 export interface IUserStore {
@@ -88,6 +102,7 @@ export interface IUserStore {
     departmentAchievements: IUserAchData[] | undefined;
     allPostsAuthors: IUserData[];
     messageText: string;
+    transactions: IPayment[];
   };
   localeName: string;
   endPreload: boolean;
@@ -95,8 +110,10 @@ export interface IUserStore {
   getAchievementsDepartment: () => void;
   getUserAchievements: (name: string) => void;
   refreshUserData: (username?: string) => Promise<IUserData | undefined>;
+  getMyTransactions: () => Promise<void>;
   isRequireUserInDatabase: (value: string) => { userName: string; avatar?: string };
   transferMoney: (data: { receiver: string; amount: number }) => Promise<any>;
+  applyBalanceUpdate: (event: IBalanceUpdateEvent) => void;
   setEndPreload: (value: boolean) => Promise<void>;
   setError: (error?: string) => void;
   resetState: () => void;
@@ -128,6 +145,7 @@ const initialState = {
   error: undefined,
   allPostsAuthors: [],
   messageText: '',
+  transactions: [],
 };
 
 const userStore = create<IUserStore>()(
@@ -187,6 +205,19 @@ const userStore = create<IUserStore>()(
               return undefined;
             } finally {
               set({ loading: false });
+            }
+          },
+          getMyTransactions: async () => {
+            try {
+              const response = await SERVICES_USERS.UsersData.getMyTransactions();
+              if (response?.success && response.code === 200) {
+                const { result } = response.data as { result?: IPayment[] };
+                set((state: IUserStore) => {
+                  state.store.transactions = result ?? [];
+                });
+              }
+            } catch (error) {
+              console.error(error);
             }
           },
           getMessageText: async () => {
@@ -299,6 +330,17 @@ const userStore = create<IUserStore>()(
             }
           },
           transferMoney: async (data: { receiver: string; amount: number }) => {
+            const invalidTransferReceiverMessage = 'Нельзя выполнить перевод этому пользователю';
+            const isInvalidTransferReceiver = (response?: { code?: number; data?: unknown }) => {
+              const responseData =
+                typeof response?.data === 'string' ? response.data.toLowerCase() : undefined;
+
+              return (
+                response?.code === 406 &&
+                (responseData === 'receiver not found' ||
+                  responseData === 'receiver is not whireable')
+              );
+            };
             const transferErrorMessage = (
               step: string,
               response?: {
@@ -308,6 +350,14 @@ const userStore = create<IUserStore>()(
                 message?: string;
               },
             ) => {
+              if (isInvalidTransferReceiver(response)) {
+                return invalidTransferReceiverMessage;
+              }
+
+              if (response?.code === 429) {
+                return 'Следующий перевод будет доступен через несколько секунд';
+              }
+
               const body =
                 typeof response?.data === 'string'
                   ? response.data
@@ -378,6 +428,11 @@ const userStore = create<IUserStore>()(
             } finally {
               set({ loading: false });
             }
+          },
+          applyBalanceUpdate: (event: IBalanceUpdateEvent) => {
+            set((state: IUserStore) => {
+              applyBalanceUpdateToStore(state.store, event);
+            });
           },
           setAvatar: async (avatar: string) => {
             set({ error: undefined, loading: true });
@@ -462,7 +517,12 @@ const userStore = create<IUserStore>()(
         })),
       ),
     ),
-    { name: 'userStore' },
+    {
+      name: 'userStore',
+      version: 1,
+      migrate: migrateUserStorePersistedState,
+      merge: mergeUserStorePersistedState,
+    },
   ),
 );
 
