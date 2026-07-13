@@ -79,6 +79,7 @@ export interface IUserData {
   username: string;
   userrights: string;
   can_award_achievements?: boolean | 'true' | 'false' | string;
+  can_upload_avatar?: boolean | 'true' | 'false' | 't' | 'f';
   display_name: string;
   brigade: string;
   brigadename: string;
@@ -118,6 +119,7 @@ export interface IUserStore {
   setError: (error?: string) => void;
   resetState: () => void;
   setAvatar: (avatar: string) => Promise<void>;
+  uploadPersonalAvatar: (file: File) => Promise<string | undefined>;
   changeLogin: (login: string) => Promise<void>;
   loading: boolean;
   error?: string | undefined;
@@ -456,6 +458,26 @@ const userStore = create<IUserStore>()(
             } catch (error) {
               console.error(error);
               set({ error: 'Network or system error' });
+            } finally {
+              set({ loading: false });
+            }
+          },
+          uploadPersonalAvatar: async (file: File) => {
+            set({ error: undefined, loading: true });
+            try {
+              const response = await SERVICES_USERS.UsersData.uploadPersonalAvatar(file);
+              if (!response?.success || response.code !== 200 || !response.data?.file) {
+                set({ error: response?.codeMessage ?? 'Не удалось загрузить аватар' });
+                return undefined;
+              }
+              const uploaded = response.data.file;
+              await get().setAvatar(uploaded);
+              return get().error ? undefined : uploaded;
+            } catch (error) {
+              set({
+                error: error instanceof Error ? error.message : 'Не удалось загрузить аватар',
+              });
+              return undefined;
             } finally {
               set({ loading: false });
             }

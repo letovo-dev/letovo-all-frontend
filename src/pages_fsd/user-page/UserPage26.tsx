@@ -382,14 +382,25 @@ const UserPage26 = () => {
     userStore.getState().loading = false;
   }, []);
 
+  const canUploadAvatar =
+    userData.can_upload_avatar === true ||
+    userData.can_upload_avatar === 'true' ||
+    userData.can_upload_avatar === 't';
   const uploadPhoto = () => {
     const input = document.createElement('input');
     input.type = 'file';
-    input.accept = 'image/*';
+    input.accept = 'image/png,image/jpeg,image/webp';
     input.onchange = async () => {
       const file = input.files?.[0];
       if (file) {
-        // await changeAvatar(file);
+        const uploaded = await userStore.getState().uploadPersonalAvatar(file);
+        if (uploaded) {
+          setAvatar(uploaded);
+          setVisible(false);
+          message.success('Аватар обновлён');
+        } else {
+          message.error(userStore.getState().error ?? 'Не удалось загрузить аватар');
+        }
       }
     };
     input.click();
@@ -427,6 +438,16 @@ const UserPage26 = () => {
                 avatars={avatars ?? []}
                 userPageSelectPosition={true}
               />
+              {visible && canUploadAvatar && (
+                <Button
+                  onClick={event => {
+                    event.stopPropagation();
+                    uploadPhoto();
+                  }}
+                >
+                  Загрузить фото
+                </Button>
+              )}
             </div>
             <Image
               className={`${style.depIcon} ${style.depIconMobile}`}

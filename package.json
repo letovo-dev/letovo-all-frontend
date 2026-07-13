@@ -18,6 +18,7 @@
     "test:opentelemetry": "node scripts/test-opentelemetry.mjs",
     "test:social-counters": "node --experimental-strip-types scripts/test-social-counters.mjs",
     "test:all-comments-pagination": "node scripts/test-all-comments-pagination.mjs",
+    "test:personal-avatar-upload": "node scripts/test-personal-avatar-upload.mjs",
     "optimize-images": "node optimize-images.js",
     "prepare": "husky",
     "clean": "rm -rf dist"
