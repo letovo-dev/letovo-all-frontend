@@ -1,6 +1,6 @@
 'use client';
 
-import React, { Suspense, useEffect, useMemo, useRef, useState } from 'react';
+import React, { Suspense, useCallback, useEffect, useMemo, useRef, useState } from 'react';
 import style from './News26.module.scss';
 import SideBarNews from '@/features/side-bar-news';
 import Burger from '@/shared/ui/burger-menu/Burger';
@@ -10,7 +10,7 @@ import dataStore, { RealComment } from '@/shared/stores/data-store';
 import InputModule from '@/entities/post/ui/InputModule';
 import OneComment from '@/entities/post/ui/OneComment';
 import Image from 'next/image';
-import { Divider } from 'antd';
+import { Button, Divider, Spin } from 'antd';
 import { useFooterContext } from '@/shared/ui/context/FooterContext';
 import userStore, { IUserStore } from '@/shared/stores/user-store';
 import commentsStore from '@/shared/stores/comments-store';
@@ -24,9 +24,17 @@ interface NewsProps {
   onDateSelect?: (date: string | null) => void;
 }
 
+const COMMENTS_PAGE_SIZE = 20;
+
 const News26: React.FC<NewsProps> = ({ children, onContainerRef, onDateSelect }) => {
-  const { newsTitles, postIds } = dataStore(state => state.data);
-  const { normalizedComments, saveComment } = commentsStore(state => state);
+  const { newsTitles, postIds, normalizedNews } = dataStore(state => state.data);
+  const {
+    normalizedComments,
+    saveComment,
+    getLimitNewsComments,
+    loading: commentsLoading,
+    error: commentsError,
+  } = commentsStore(state => state);
   const { likeNewsOrComment } = dataStore(state => state);
   const { scrollContainerRef } = useFooterContext();
   const [commentsToRender, setComments] = useState<RealComment[]>([]);
@@ -43,6 +51,9 @@ const News26: React.FC<NewsProps> = ({ children, onContainerRef, onDateSelect })
   const openComments = commentsStore(state => state.openComments);
   const [author, setAuthor] = useState<string | undefined>(undefined);
   const [avatarPic, setAvatarPic] = useState<string | undefined>(undefined);
+  const [hasMoreComments, setHasMoreComments] = useState(false);
+
+  const totalCommentsCount = Number(normalizedNews?.[openComments]?.commentsCount ?? 0);
 
   const items: MenuProps['items'] = useMemo(() => {
     return getAuthorsList(allPostsAuthors);
@@ -116,8 +127,51 @@ const News26: React.FC<NewsProps> = ({ children, onContainerRef, onDateSelect })
     if (openComments && normalizedComments) {
       const comments = normalizedComments[openComments] ?? [];
       setComments(comments);
+    } else if (!openComments) {
+      setComments([]);
     }
   }, [openComments, normalizedComments]);
+
+  useEffect(() => {
+    if (!openComments) {
+      setHasMoreComments(false);
+      return;
+    }
+
+    let cancelled = false;
+    const loadFirstPage = async () => {
+      const comments = await getLimitNewsComments(Number(openComments), 0, COMMENTS_PAGE_SIZE);
+      if (cancelled) return;
+      setHasMoreComments(
+        totalCommentsCount > 0
+          ? comments.length < totalCommentsCount
+          : comments.length === COMMENTS_PAGE_SIZE,
+      );
+    };
+
+    void loadFirstPage();
+    return () => {
+      cancelled = true;
+    };
+  }, [getLimitNewsComments, openComments, totalCommentsCount]);
+
+  const loadMoreComments = useCallback(async () => {
+    if (!openComments || commentsLoading) return;
+
+    const start = commentsStore.getState().normalizedComments?.[openComments]?.length ?? 0;
+    const comments = await getLimitNewsComments(
+      Number(openComments),
+      start,
+      COMMENTS_PAGE_SIZE,
+    );
+    const loadedCount =
+      commentsStore.getState().normalizedComments?.[openComments]?.length ?? start + comments.length;
+    setHasMoreComments(
+      totalCommentsCount > 0
+        ? loadedCount < totalCommentsCount
+        : comments.length === COMMENTS_PAGE_SIZE,
+    );
+  }, [commentsLoading, getLimitNewsComments, openComments, totalCommentsCount]);
 
   const isAdmin = userrights === 'admin';
   return (
@@ -180,6 +234,7 @@ const News26: React.FC<NewsProps> = ({ children, onContainerRef, onDateSelect })
                   <Divider className={style.inputDivider} />
                 </div>
                 <div className={style.commentsBox}>
+                  {commentsLoading && commentsToRender.length === 0 && <Spin size="large" />}
                   {commentsToRender.map(item => (
                     <OneComment
                       key={item.post_id}
@@ -198,6 +253,14 @@ const News26: React.FC<NewsProps> = ({ children, onContainerRef, onDateSelect })
                       allPostsAuthors={allPostsAuthors}
                     />
                   ))}
+                  {commentsError && (
+                    <p role="alert">Не удалось загрузить комментарии. Попробуйте ещё раз.</p>
+                  )}
+                  {hasMoreComments && (
+                    <Button onClick={loadMoreComments} loading={commentsLoading}>
+                      Загрузить ещё
+                    </Button>
+                  )}
                 </div>
                 <div style={{ marginBottom: '10px' }}>
                   <InputModule

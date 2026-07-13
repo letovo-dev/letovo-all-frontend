@@ -236,7 +236,7 @@ const OneComment: React.FC<OneCommentProps> = ({
                 )}
               </div>
             </div>
-            {comments && comments?.length > 1 && (
+            {showMore && (
               <p onClick={() => setOpenComments(newsId)} className={style.nextCommentText}>
                 Показать следующие комментарии...
               </p>

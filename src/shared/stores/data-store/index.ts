@@ -118,6 +118,7 @@ interface RequestConfig {
 interface NewsItem {
   media: any[];
   comments: RealComment[];
+  commentsCount: number;
   news: RealNews;
 }
 
@@ -540,7 +541,12 @@ const dataStore = create<TDataStoreState>()(
           const media = (related?.media ?? [])
             .map((item: { media: string | null }) => item.media)
             .filter((item): item is string => typeof item === 'string' && item.trim().length > 0);
-          return { news: newsItem, comments, media };
+          return {
+            news: newsItem,
+            comments,
+            commentsCount: related?.comments_count ?? comments.length,
+            media,
+          };
         });
 
         const normalizedComments = news.reduce(
