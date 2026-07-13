@@ -16,7 +16,7 @@ interface OnePostProps {
   newsId: string;
   lastNews: any;
   index: number;
-  el: { news: RealNews; media: string[] };
+  el: { news: RealNews; media: string[]; commentsCount?: number };
   likeNewsOrComment: (post_id: string, action: string) => Promise<void>;
   dislikeNews: (post_id: string, action: string) => Promise<void>;
   saveComment: (comment: string, post_id: string, author: string | undefined) => Promise<void>;
@@ -45,6 +45,7 @@ const NewsPost: React.FC<OnePostProps> = ({
     [newsId],
   );
   const [visible, setVisible] = useState(false);
+  const commentsCount = el.commentsCount ?? comments.length;
 
   const post = useMemo(() => {
     return {
@@ -54,8 +55,8 @@ const NewsPost: React.FC<OnePostProps> = ({
   }, [el]);
 
   const showMore = useMemo(() => {
-    return comments?.length > 1;
-  }, [comments]);
+    return commentsCount > 1;
+  }, [commentsCount]);
 
   const authors = useMemo(() => {
     return allPostsAuthors?.map((author: IUserData) => {
@@ -123,7 +124,7 @@ const NewsPost: React.FC<OnePostProps> = ({
       <NewsActionPanel
         postId={el.news.post_id}
         savedCount={10}
-        commentsCount={comments?.length}
+        commentsCount={commentsCount}
         likeNewsOrComment={likeNewsOrComment}
         dislikeNews={dislikeNews}
       />
@@ -156,6 +157,7 @@ const NewsPost: React.FC<OnePostProps> = ({
 const newsPostAreEqual = (prev: OnePostProps, next: OnePostProps): boolean => {
   if (prev.newsId !== next.newsId || prev.index !== next.index) return false;
   if (prev.el.media !== next.el.media) return false;
+  if (prev.el.commentsCount !== next.el.commentsCount) return false;
   const pn = prev.el.news;
   const nn = next.el.news;
   return (

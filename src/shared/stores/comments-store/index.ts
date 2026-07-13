@@ -2,7 +2,6 @@ import { create } from 'zustand';
 import { immer } from 'zustand/middleware/immer';
 import { persist, createJSONStorage } from 'zustand/middleware';
 import { SERVICES_DATA } from '@/shared/api/data';
-import { Comment } from '../data-store';
 import { applySocialCountDelta, normalizeSocialCounters } from '@/shared/utils';
 
 export interface OneComment {
@@ -27,13 +26,15 @@ export interface OneComment {
 export type TCommentsStoreState = {
   commentReply: '';
   openComments: string;
+  loading: boolean;
+  error: string | null;
   normalizedComments: Record<string, OneComment[]> | null;
   normalizedSavedComments: Record<string, OneComment[]> | null;
   normalizedSearchedComments: Record<string, OneComment[]> | null;
   addComment: (comment: string) => Promise<void>;
   setOpenComments: (id: string) => void;
   setCommentReply: (text: string) => void;
-  getLimitNewsComments: (post_id: number, start: number, size: number) => Promise<void>;
+  getLimitNewsComments: (post_id: number, start: number, size: number) => Promise<OneComment[]>;
   saveComment: (comment: string, post_id: string, author: string | undefined) => Promise<any>;
   deleteComment: (id: string, post_id: string) => void;
   getCurrentNewsPics: (id: number) => Promise<any>;
@@ -54,16 +55,40 @@ const commentsStore = create<TCommentsStoreState>()(
     immer((set: (partial: Partial<any>) => void, get: () => any) => ({
       ...initialState,
       getLimitNewsComments: async (post_id: number, start: number, size: number): Promise<any> => {
+        set({ error: null, loading: true });
         try {
           const response = await SERVICES_DATA.Data.getLimitNewsComments({ post_id, start, size });
-          if (response) {
-            const result = (response?.data as { result: Comment[] })?.result;
+          if (response?.success || response?.code === 200) {
+            const result = ((response?.data as { result: OneComment[] })?.result ?? []).map(
+              normalizeSocialCounters,
+            );
+            set((state: TCommentsStoreState) => {
+              const postId = String(post_id);
+              const existing = start === 0 ? [] : (state.normalizedComments?.[postId] ?? []);
+              const comments = [...existing, ...result];
+              const deduplicated = Array.from(
+                new Map(comments.map(comment => [String(comment.post_id), comment])).values(),
+              );
+              return {
+                normalizedComments: {
+                  ...state.normalizedComments,
+                  [postId]: deduplicated,
+                },
+              };
+            });
             return result;
           } else {
+            set({ error: response?.codeMessage || 'Не удалось загрузить комментарии' });
             return [];
           }
         } catch (error) {
-          console.error(error);
+          console.error('getLimitNewsComments error:', error);
+          set({
+            error: error instanceof Error ? error.message : 'Не удалось загрузить комментарии',
+          });
+          return [];
+        } finally {
+          set({ loading: false });
         }
       },
       getCurrentNewsPics: async (id: number): Promise<any> => {
