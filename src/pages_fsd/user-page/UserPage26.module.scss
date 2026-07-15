@@ -336,6 +336,20 @@
       }
     }
   }
+  .primaryMoneyActions {
+    display: flex;
+    flex-direction: column;
+    align-items: stretch;
+    gap: 6px;
+  }
+  .payoutButton {
+    height: 32px;
+    border-radius: 30px !important;
+    border: 1px solid var(--orange) !important;
+    background: transparent !important;
+    color: var(--orange) !important;
+    font-size: 12px;
+  }
   .transferButton {
     padding: 0px 6px 0px 45px;
     border-radius: 30px !important;

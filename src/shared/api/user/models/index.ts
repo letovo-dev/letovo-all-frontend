@@ -15,6 +15,7 @@ import { getDepartments } from './getDepartments';
 import { getDepartmentRoles } from './getDepartmentRoles';
 import { getMyTransactions } from './getMyTransactions';
 import { uploadPersonalAvatar } from './uploadPersonalAvatar';
+import { departmentPayout } from './departmentPayout';
 
 // eslint-disable-next-line import/no-anonymous-default-export
 export default {
@@ -35,4 +36,5 @@ export default {
   getDepartmentRoles,
   getMyTransactions,
   uploadPersonalAvatar,
+  departmentPayout,
 };
