@@ -22,6 +22,7 @@ import AchieveBlockMobile26 from './ui/AchieveBlockMobile26';
 import SpinModule from '@/shared/ui/spiner';
 import { Consts } from '@/shared/consts';
 import { getDepartmentMeta } from './model/departments';
+import { DepartmentPayoutModal } from '@/features/department-payout';
 
 const DONE_ACH = '/images/aceehimnstv/loched.png';
 
@@ -106,6 +107,7 @@ const UserPage26 = () => {
   const avatarRef = useRef<HTMLDivElement>(null);
   const completedProfileLoadUsernameRef = useRef<string | null>(null);
   const [openTransferModal, setOpenTransferModal] = useState(false);
+  const [openDepartmentPayoutModal, setOpenDepartmentPayoutModal] = useState(false);
   const [historyPeriodDays, setHistoryPeriodDays] = useState<1 | 3 | 7>(7);
   const { getAllPostsAuthors } = userStore.getState();
   const [messageApi, contextHolder] = message.useMessage();
@@ -510,16 +512,26 @@ const UserPage26 = () => {
             <p className={style.salarySum}>{`${userData?.paycheck} энк / д.`}</p>
           </div>
           <div className={style.transferBlock}>
-            <Button className={style.transferButton} onClick={() => setOpenTransferModal(true)}>
-              Перевести
-              <Image
-                className={style.icon}
-                src="/26_refresh.svg"
-                alt="wallet"
-                height={13}
-                width={20}
-              />
-            </Button>
+            <div className={style.primaryMoneyActions}>
+              <Button className={style.transferButton} onClick={() => setOpenTransferModal(true)}>
+                Перевести
+                <Image
+                  className={style.icon}
+                  src="/26_refresh.svg"
+                  alt="wallet"
+                  height={13}
+                  width={20}
+                />
+              </Button>
+              {userData?.userrights === 'admin' && (
+                <Button
+                  className={style.payoutButton}
+                  onClick={() => setOpenDepartmentPayoutModal(true)}
+                >
+                  Выдать премию
+                </Button>
+              )}
+            </div>
             <div className={style.moneyActions}>
               <div className={style.moneyActionLine}>
                 <p className={style.moneyText}>последний приход</p>
@@ -763,6 +775,17 @@ const UserPage26 = () => {
           title="Перевод"
           selfMoney={Number(userData?.balance) || 0}
           userData={userData}
+        />
+      )}
+
+      {userData?.userrights === 'admin' && (
+        <DepartmentPayoutModal
+          open={openDepartmentPayoutModal}
+          onClose={() => setOpenDepartmentPayoutModal(false)}
+          onApplied={async () => {
+            await refreshUserData(userData.username);
+            await getMyTransactions();
+          }}
         />
       )}
 
