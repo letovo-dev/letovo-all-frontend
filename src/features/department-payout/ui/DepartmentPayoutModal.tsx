@@ -17,7 +17,19 @@ interface FormValues {
   amount: number;
 }
 
+interface PayoutErrorBody {
+  error?: string;
+}
+
 const newRequestId = () => crypto.randomUUID();
+
+const payoutErrorMessages: Record<string, string> = {
+  'department not found': 'Департамент не найден',
+  'department has no eligible recipients': 'В департаменте нет получателей премии',
+  'recipient list changed; preview again':
+    'Состав получателей изменился. Рассчитайте начисление ещё раз',
+  'department payout failed': 'Не удалось начислить премию',
+};
 
 export const DepartmentPayoutModal: React.FC<DepartmentPayoutModalProps> = ({
   open,
@@ -61,8 +73,17 @@ export const DepartmentPayoutModal: React.FC<DepartmentPayoutModalProps> = ({
     [departments],
   );
 
-  const showError = (fallback: string, response: { codeMessage?: string; message?: string }) => {
-    void messageApi.error(response.codeMessage || response.message || fallback);
+  const showError = (
+    fallback: string,
+    response: { data?: unknown; codeMessage?: string; message?: string },
+  ) => {
+    const backendError = (response.data as PayoutErrorBody | undefined)?.error;
+    void messageApi.error(
+      (backendError && (payoutErrorMessages[backendError] || backendError)) ||
+        response.codeMessage ||
+        response.message ||
+        fallback,
+    );
   };
 
   const previewPayout = async (values: FormValues) => {
