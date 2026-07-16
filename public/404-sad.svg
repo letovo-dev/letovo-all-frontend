@@ -1,0 +1,16 @@
+<svg width="640" height="640" viewBox="0 0 640 640" fill="none" xmlns="http://www.w3.org/2000/svg" role="img" aria-labelledby="title desc">
+  <title id="title">Грустный документ</title>
+  <desc id="desc">Нейтральная иллюстрация документа с грустным лицом для страницы 404</desc>
+  <rect width="640" height="640" rx="64" fill="#EEF2F7"/>
+  <circle cx="320" cy="320" r="244" fill="#E1E8F0"/>
+  <path d="M216 150C216 132.327 230.327 118 248 118H361L432 189V458C432 475.673 417.673 490 400 490H248C230.327 490 216 475.673 216 458V150Z" fill="#FFFFFF" stroke="#8FA2B8" stroke-width="16" stroke-linejoin="round"/>
+  <path d="M360 118V190H432" fill="#D9E3EE"/>
+  <path d="M360 118V190H432" stroke="#8FA2B8" stroke-width="16" stroke-linejoin="round"/>
+  <path d="M269 263H379" stroke="#C4D0DD" stroke-width="18" stroke-linecap="round"/>
+  <path d="M269 307H345" stroke="#C4D0DD" stroke-width="18" stroke-linecap="round"/>
+  <circle cx="281" cy="368" r="16" fill="#52677D"/>
+  <circle cx="367" cy="368" r="16" fill="#52677D"/>
+  <path d="M276 424C290 405 309 396 324 396C339 396 358 405 372 424" stroke="#52677D" stroke-width="16" stroke-linecap="round"/>
+  <path d="M407 396C422 408 426 429 417 444C408 459 388 463 373 454C358 445 354 425 363 410C372 395 392 391 407 396Z" fill="#91B8DB"/>
+  <path d="M393 410C397 420 397 430 392 439" stroke="#FFFFFF" stroke-width="8" stroke-linecap="round"/>
+</svg>
