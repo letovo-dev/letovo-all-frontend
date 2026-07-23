@@ -9,6 +9,7 @@
     "start": "next start",
     "test:article-payload": "node --experimental-strip-types scripts/test-article-payload.mjs",
     "test:markdown-tables": "node scripts/test-markdown-tables.mjs",
+    "test:article-loading": "node scripts/test-article-loading.mjs",
     "test:balance-websocket-url": "node --experimental-strip-types scripts/test-balance-websocket-url.mjs",
     "test:transfer-payment-state": "node scripts/check-transfer-payment-state.cjs",
     "test:legacy-transactions-state": "node --experimental-strip-types scripts/test-legacy-transactions-state.mjs",

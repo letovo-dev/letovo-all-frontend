@@ -15,8 +15,14 @@ import authStore from '@/shared/stores/auth-store';
 import UserBlock26 from '@/pages/user-page/ui/UserBlock26';
 
 const Articles: React.FC = () => {
-  const { article, normalizedArticles, loading, articlesCategories, getArticlesCategories } =
-    articlesStore();
+  const {
+    article,
+    articleLoading,
+    normalizedArticles,
+    loading,
+    articlesCategories,
+    getArticlesCategories,
+  } = articlesStore();
   const router = useRouter();
   const { scrollContainerRef } = useFooterContext();
   const [processedText, setProcessedText] = useState('');
@@ -60,6 +66,9 @@ const Articles: React.FC = () => {
     const cancelTokenSource = axios.CancelToken.source();
 
     const fetchMedia = async () => {
+      setError(null);
+      setProcessedText(article?.text || '');
+
       if (!isMounted || !article?.text || !userStatus.logged || !userStatus.authed) {
         return;
       }
@@ -97,9 +106,11 @@ const Articles: React.FC = () => {
         }
       });
 
-      await Promise.allSettled(fetchPromises);
+      void Promise.allSettled(fetchPromises).then(() => {
+        if (!isMounted) {
+          return;
+        }
 
-      if (isMounted) {
         const updatedText = markdownText.replace(/!\[.*?\]\((.*?)\)/g, (match, url) => {
           const localUrl = newMediaCache[url];
           if (!localUrl) {
@@ -116,7 +127,7 @@ const Articles: React.FC = () => {
         mediaCacheRef.current = newMediaCache;
         setMediaCache(newMediaCache);
         setProcessedText(updatedText);
-      }
+      });
     };
 
     fetchMedia();
@@ -125,7 +136,7 @@ const Articles: React.FC = () => {
       isMounted = false;
       cancelTokenSource.cancel('Компонент размонтирован или статья изменена');
     };
-  }, [article?.text, userStatus.logged, userStatus.authed]);
+  }, [article?.post_id, article?.text, userStatus.logged, userStatus.authed]);
 
   useEffect(() => {
     return () => {
@@ -137,7 +148,7 @@ const Articles: React.FC = () => {
 
   const memoizedProcessedText = useMemo(() => processedText, [processedText]);
 
-  if (loading) {
+  if (loading && articlesCategories.length === 0) {
     return <SpinModule />;
   }
 
@@ -161,6 +172,13 @@ const Articles: React.FC = () => {
           )}
         </div>
         <div ref={innerWrapRef} className={style.wrap}>
+          {articleLoading && article && (
+            <div className={style.articleLoading} role="status" aria-live="polite">
+              <h1>{article.title || 'Статья без названия'}</h1>
+              <span>Загружаем статью…</span>
+            </div>
+          )}
+          {error && <p className={style.mediaError}>{error}</p>}
           <MarkdownContent content={memoizedProcessedText} />
         </div>
         <div className={style.desktopRightPanel}>

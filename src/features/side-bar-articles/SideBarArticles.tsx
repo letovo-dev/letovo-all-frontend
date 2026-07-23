@@ -226,7 +226,7 @@ const SideBarArticles = ({
 
   const handleArticleClick = (articleId: string, categoryId: string) => {
     const a = getOneArticle(articleId, categoryId);
-    setCurrentArticle(a);
+    void setCurrentArticle(a);
     setOpen(false);
   };
 

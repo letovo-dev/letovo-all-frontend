@@ -185,6 +185,52 @@ $overlay-color: rgba(0, 0, 0, 0.3);
   }
 }
 
+.articleLoading {
+  display: flex;
+  min-height: 220px;
+  padding: 40px 35px;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  gap: 12px;
+  text-align: center;
+
+  h1 {
+    margin: 0;
+    color: var(--graphics1, #fb4724);
+    filter: grayscale(1);
+    animation: revealArticleTitle 1.6s ease-in-out infinite alternate;
+  }
+
+  span {
+    color: #777;
+  }
+}
+
+.mediaError {
+  margin: 12px 35px 0;
+  color: #a61d24;
+}
+
+@keyframes revealArticleTitle {
+  from {
+    filter: grayscale(1);
+    opacity: 0.55;
+  }
+
+  to {
+    filter: grayscale(0);
+    opacity: 1;
+  }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .articleLoading h1 {
+    animation: none;
+    filter: none;
+  }
+}
+
 .burgerArticlesContainer {
   z-index: 1001;
   position: absolute;
