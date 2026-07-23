@@ -46,6 +46,8 @@ export type TCommentsStoreState = {
 const initialState = {
   commentReply: '',
   normalizedComments: {},
+  normalizedSavedComments: {},
+  normalizedSearchedComments: {},
   openComments: '',
   loading: false,
   error: null,

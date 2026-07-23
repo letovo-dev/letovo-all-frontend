@@ -314,6 +314,9 @@ def test_logout_awaits_server_revocation_and_clears_all_account_scoped_stores():
     assert "resetState: () => {" in user_store_source
     assert "resetChat: () => {" in chat_store_source
     assert "resetComments: () => {" in comments_store_source
+    comments_initial_state = _balanced_block_after(comments_store_source, "const initialState")
+    assert "normalizedSavedComments: {}" in comments_initial_state
+    assert "normalizedSearchedComments: {}" in comments_initial_state
     assert "resetArticles: () => {" in articles_store_source
 
 
