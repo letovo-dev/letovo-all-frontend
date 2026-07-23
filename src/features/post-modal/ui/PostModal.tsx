@@ -15,6 +15,11 @@ import {
 } from 'antd';
 import { UploadOutlined } from '@ant-design/icons';
 import type { UploadProps } from 'antd';
+import {
+  buildAuthorSelectOptions,
+  filterAuthorOption,
+  type AuthorOption,
+} from '../model/author-options';
 
 export interface Post {
   id?: string;
@@ -43,7 +48,7 @@ interface PostModalProps {
   onCancel: () => void;
   onSubmit: (values: Post) => Promise<void>;
   post?: Post | null;
-  authors: { id: string; name: string }[];
+  authors: AuthorOption[];
 }
 
 const PostModal: React.FC<PostModalProps> = ({ visible, onCancel, onSubmit, post, authors }) => {
@@ -205,10 +210,10 @@ const PostModal: React.FC<PostModalProps> = ({ visible, onCancel, onSubmit, post
           >
             <Select
               placeholder="Издание"
-              options={authors.map(author => ({
-                value: author.id,
-                label: author.name,
-              }))}
+              showSearch
+              filterOption={filterAuthorOption}
+              notFoundContent="Авторы не найдены"
+              options={buildAuthorSelectOptions(authors)}
             />
           </Form.Item>
           <Form.Item

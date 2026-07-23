@@ -22,6 +22,7 @@
     "test:all-comments-pagination": "node scripts/test-all-comments-pagination.mjs",
     "test:personal-avatar-upload": "node scripts/test-personal-avatar-upload.mjs",
     "test:department-payout": "node scripts/test-department-payout.mjs",
+    "test:author-search": "node --experimental-strip-types scripts/test-author-search.mjs",
     "optimize-images": "node optimize-images.js",
     "prepare": "husky",
     "clean": "rm -rf dist"
