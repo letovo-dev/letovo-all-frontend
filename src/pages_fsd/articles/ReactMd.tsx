@@ -105,6 +105,11 @@ const MarkdownContent: React.FC<{ content: string }> = React.memo(
               </a>
             );
           },
+          table: ({ children }) => (
+            <div className={style.tableWrapper} tabIndex={0} aria-label="Scrollable table">
+              <table>{children}</table>
+            </div>
+          ),
         }}
       >
         {content}

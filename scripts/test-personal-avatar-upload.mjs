@@ -1,0 +1,20 @@
+import assert from 'node:assert/strict';
+import fs from 'node:fs';
+
+const model = fs.readFileSync('src/shared/api/user/models/uploadPersonalAvatar.ts', 'utf8');
+const settings = fs.readFileSync('src/shared/api/user/settings.ts', 'utf8');
+const store = fs.readFileSync('src/shared/stores/user-store/index.ts', 'utf8');
+const page = fs.readFileSync('src/pages_fsd/user-page/UserPage26.tsx', 'utf8');
+assert.match(settings, /NEXT_PUBLIC_BASE_URL_UPLOAD/);
+assert.match(settings, /\/avatar/);
+assert.match(model, /new FormData/);
+assert.match(model, /append\(['"]file['"], file\)/);
+assert.match(model, /withCredentials:\s*true/);
+assert.doesNotMatch(model, /Content-Type/);
+assert.match(store, /can_upload_avatar/);
+assert.match(store, /uploadPersonalAvatar/);
+assert.match(store, /setAvatar\(uploaded/);
+assert.match(page, /image\/png,image\/jpeg,image\/webp/);
+assert.match(page, /canUploadAvatar/);
+assert.doesNotMatch(page, /userrights\s*!==?\s*['"]child/);
+console.log('personal avatar upload contracts: ok');

@@ -8,6 +8,7 @@
     "build": "npm run optimize-images && next build",
     "start": "next start",
     "test:article-payload": "node --experimental-strip-types scripts/test-article-payload.mjs",
+    "test:markdown-tables": "node scripts/test-markdown-tables.mjs",
     "test:balance-websocket-url": "node --experimental-strip-types scripts/test-balance-websocket-url.mjs",
     "test:transfer-payment-state": "node scripts/check-transfer-payment-state.cjs",
     "test:legacy-transactions-state": "node --experimental-strip-types scripts/test-legacy-transactions-state.mjs",
@@ -17,6 +18,9 @@
     "test:admin-create-user": "node scripts/test-admin-create-user.mjs",
     "test:opentelemetry": "node scripts/test-opentelemetry.mjs",
     "test:social-counters": "node --experimental-strip-types scripts/test-social-counters.mjs",
+    "test:all-comments-pagination": "node scripts/test-all-comments-pagination.mjs",
+    "test:personal-avatar-upload": "node scripts/test-personal-avatar-upload.mjs",
+    "test:department-payout": "node scripts/test-department-payout.mjs",
     "optimize-images": "node optimize-images.js",
     "prepare": "husky",
     "clean": "rm -rf dist"

@@ -3,6 +3,7 @@ import { IApiEntityScheme } from '../../lib/ApiSPA';
 type IEndpoint = (typeof API_USER_ENDPOINTS)[number];
 
 const baseUrl = process.env.NEXT_PUBLIC_BASE_URL;
+const uploadBaseUrl = process.env.NEXT_PUBLIC_BASE_URL_UPLOAD;
 
 export const API_USER_SCHEME: IApiEntityScheme<IEndpoint> = {
   userData: {
@@ -32,6 +33,10 @@ export const API_USER_SCHEME: IApiEntityScheme<IEndpoint> = {
   setAvatar: {
     method: 'PUT',
     url: `${baseUrl}/user/set_avatar`,
+  },
+  uploadPersonalAvatar: {
+    method: 'POST',
+    url: `${uploadBaseUrl?.replace(/\/$/, '')}/avatar`,
   },
   addRole: {
     method: 'POST',
@@ -65,6 +70,10 @@ export const API_USER_SCHEME: IApiEntityScheme<IEndpoint> = {
     method: 'GET',
     url: `${baseUrl}/transactions/my`,
   },
+  departmentPayout: {
+    method: 'POST',
+    url: `${baseUrl}/transactions/department-payout`,
+  },
   addAch: {
     method: 'POST',
     url: `${baseUrl}/achivements/add`,
@@ -91,6 +100,7 @@ export const API_USER_ENDPOINTS = [
   'userActives',
   'userAchivAllEnable',
   'setAvatar',
+  'uploadPersonalAvatar',
   'addRole',
   'changePass',
   'changeNick',
@@ -99,6 +109,7 @@ export const API_USER_ENDPOINTS = [
   'transactionsPrepare',
   'transactionsSend',
   'transactionsMy',
+  'departmentPayout',
   'addAch',
   'getMessage',
   'departments',

@@ -33,14 +33,13 @@ export default function NotFound() {
 
       <div className={styles.imageWrap}>
         <Image
-          src="/404.png"
-          alt="anime girl says no"
+          src="/404-sad.svg"
+          alt="Грустная иконка документа"
           fill
-          sizes="(max-width: 600px) 80vw, 400px"
+          sizes="(max-width: 600px) 80vw, 360px"
           priority
           className={styles.image}
         />
-        <div className={`${styles.speech} ${orbitron.className}`}>No</div>
       </div>
 
       <button className={styles.button} onClick={() => router.push('/')}>

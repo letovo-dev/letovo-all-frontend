@@ -108,7 +108,9 @@ const NewsActionPanel = ({
           </div>
           <div className={style.actionItem} onClick={() => handleComment(String(postId))}>
             <span className={style.commentIcon} aria-label="comment" role="img" />
-            <p className={style.commentsCount}>{currentNewsComments?.length ?? 0}</p>
+            <p className={style.commentsCount}>
+              {formatCount(Math.max(commentsCount, currentNewsComments?.length ?? 0))}
+            </p>
           </div>
         </div>
         <div className={style.actionItem} onClick={handleSave}>
