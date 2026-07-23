@@ -45,12 +45,12 @@ export default function DefaultLayout({ children }: { children: React.ReactNode 
             router.push('/login');
           }
         } else {
-          authStore.getState().logout();
+          await authStore.getState().logout();
           router.push('/login');
         }
       } catch (error) {
         console.error('Error during auth verification:', error);
-        authStore.getState().logout();
+        await authStore.getState().logout();
         router.push('/login');
       } finally {
         setIsAuthChecked(true);

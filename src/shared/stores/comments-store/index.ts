@@ -40,11 +40,14 @@ export type TCommentsStoreState = {
   getCurrentNewsPics: (id: number) => Promise<any>;
   likeComment: (comment_id: string, parent_id: string, action: string) => Promise<void>;
   dislikeComment: (comment_id: string, parent_id: string, action: string) => Promise<void>;
+  resetComments: () => void;
 };
 
 const initialState = {
   commentReply: '',
   normalizedComments: {},
+  normalizedSavedComments: {},
+  normalizedSearchedComments: {},
   openComments: '',
   loading: false,
   error: null,
@@ -244,6 +247,9 @@ const commentsStore = create<TCommentsStoreState>()(
         } finally {
           set({ loading: false });
         }
+      },
+      resetComments: () => {
+        set({ ...initialState });
       },
     })),
 

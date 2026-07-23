@@ -436,6 +436,14 @@ const userStore = create<IUserStore>()(
               applyBalanceUpdateToStore(state.store, event);
             });
           },
+          resetState: () => {
+            set({
+              store: { ...initialState },
+              endPreload: false,
+              loading: false,
+              error: undefined,
+            });
+          },
           setAvatar: async (avatar: string) => {
             set({ error: undefined, loading: true });
             try {
