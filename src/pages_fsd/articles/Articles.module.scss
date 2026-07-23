@@ -1,6 +1,7 @@
 @use '../../app/_mixins.scss';
 
 $overlay-color: rgba(0, 0, 0, 0.3);
+$article-horizontal-padding: 35px;
 
 .desktopLeftPanel {
   display: none;
@@ -119,13 +120,9 @@ $overlay-color: rgba(0, 0, 0, 0.3);
     max-width: 100%;
     margin: 0 auto;
     margin-bottom: 30px;
-    padding: 15px 35px 0px 35px;
+    padding: 15px $article-horizontal-padding 0;
     background: #fff;
-    img,
-    video {
-      width: 100%;
-      margin: 10px 0;
-    }
+
     /* Стили для конкретных элементов Markdown */
     h1 {
       color: #333;
@@ -135,13 +132,26 @@ $overlay-color: rgba(0, 0, 0, 0.3);
       margin: 10px 0;
       color: #555;
     }
-    img,
-    video {
-      border-radius: 8px;
-      margin: 10px;
+    img {
       display: block;
+      width: calc(100% + #{$article-horizontal-padding * 2});
+      max-width: calc(100% + #{$article-horizontal-padding * 2});
+      height: auto;
+      margin: 0 (-$article-horizontal-padding);
+      border-radius: 0;
+      transition: opacity 0.5s ease-in-out;
+      opacity: 1;
+      pointer-events: auto;
+      z-index: 2;
+    }
+
+    video {
+      display: block;
+      width: 100%;
       max-width: 100%;
       height: auto;
+      margin: 10px 0;
+      border-radius: 8px;
       transition: opacity 0.5s ease-in-out;
       opacity: 1;
       pointer-events: auto;
