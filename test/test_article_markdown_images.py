@@ -1,3 +1,4 @@
+import re
 from pathlib import Path
 
 
@@ -22,3 +23,24 @@ def test_article_images_keep_their_original_url_and_natural_aspect_ratio():
     assert "return src ? <img src={src} alt={alt || 'Image'} /> : null;" in markdown_renderer
     assert "max-width: 100%;" in article_styles
     assert "height: auto;" in article_styles
+
+
+def test_article_images_are_full_bleed_at_mobile_and_desktop_widths():
+    """Image edges must meet the article card edges at every supported width."""
+    article_styles = ARTICLE_STYLES.read_text(encoding="utf-8")
+    padding_match = re.search(r"\$article-horizontal-padding:\s*(\d+)px;", article_styles)
+
+    assert padding_match is not None
+    assert "width: calc(100% + #{$article-horizontal-padding * 2});" in article_styles
+    assert "max-width: calc(100% + #{$article-horizontal-padding * 2});" in article_styles
+    assert "margin: 0 (-$article-horizontal-padding);" in article_styles
+    assert "border-radius: 0;" in article_styles
+
+    horizontal_padding = int(padding_match.group(1))
+    for card_width in (390, 519):
+        text_width = card_width - 2 * horizontal_padding
+        image_left = horizontal_padding - horizontal_padding
+        image_right = image_left + text_width + 2 * horizontal_padding
+
+        assert image_left == 0
+        assert image_right == card_width
