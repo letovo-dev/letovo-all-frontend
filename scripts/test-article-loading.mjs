@@ -14,11 +14,11 @@ if (!store.includes('selectionSequence !== articleSelectionSequence')) {
 if (store.includes('await Promise.all(articlePromises)')) {
   throw new Error('category loading must not eagerly wait for every Markdown document');
 }
-if (!articles.includes("setProcessedText(article?.text || '')")) {
-  throw new Error('Markdown text must render before media prefetch completes');
+if (!articles.includes("<MarkdownContent content={article?.text ?? ''} />")) {
+  throw new Error('Markdown text must render directly from the selected article');
 }
-if (!articles.includes('void Promise.allSettled(fetchPromises).then')) {
-  throw new Error('media prefetch must continue independently after Markdown is rendered');
+if (articles.includes('URL.createObjectURL') || articles.includes("responseType: 'blob'")) {
+  throw new Error('article rendering must not wait for blob media prefetches');
 }
 if (!articles.includes('articleLoading && article')) {
   throw new Error('the selected article title must be visible while Markdown is loading');
