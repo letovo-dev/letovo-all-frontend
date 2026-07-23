@@ -9,6 +9,9 @@ AXIOS_FILE = ROOT / "src/shared/lib/ApiSPA/axios/axios.ts"
 NEXT_CONFIG_FILE = ROOT / "next.config.mjs"
 AUTH_STORE_FILE = ROOT / "src/shared/stores/auth-store/index.ts"
 USER_STORE_FILE = ROOT / "src/shared/stores/user-store/index.ts"
+CHAT_STORE_FILE = ROOT / "src/shared/stores/chat-store/index.ts"
+COMMENTS_STORE_FILE = ROOT / "src/shared/stores/comments-store/index.ts"
+ARTICLES_STORE_FILE = ROOT / "src/shared/stores/articles-store/index.ts"
 USER_PAGE_FILE = ROOT / "src/pages_fsd/user-page/UserPage26.tsx"
 OPEN_ACHIEVEMENT_PAGE_FILE = ROOT / "src/app/open-a/[username]/[id]/ClientAchievementPage.tsx"
 USER_API_SETTINGS_FILE = ROOT / "src/shared/api/user/settings.ts"
@@ -284,6 +287,34 @@ def test_cookie_auth_logout_and_password_change_clear_server_session():
     assert "Failed to revoke auth session" in auth_store_source
     assert "redirectToLogin()" in auth_store_source
     assert "window.location.assign('/login')" in auth_store_source
+
+
+def test_logout_awaits_server_revocation_and_clears_all_account_scoped_stores():
+    auth_store_source = _read(AUTH_STORE_FILE)
+    user_store_source = _read(USER_STORE_FILE)
+    chat_store_source = _read(CHAT_STORE_FILE)
+    comments_store_source = _read(COMMENTS_STORE_FILE)
+    articles_store_source = _read(ARTICLES_STORE_FILE)
+
+    assert "logout: () => Promise<void>;" in auth_store_source
+    logout_block = _balanced_block_after(auth_store_source, "logout: async")
+    assert "await SERVICES_AUTH.Auth.logout()" in logout_block
+    assert "finally" in logout_block
+    assert "await clearAccountScopedState()" in logout_block
+    assert "await authStore.persist.clearStorage()" in logout_block
+
+    cleanup_block = _balanced_block_after(auth_store_source, "const clearAccountScopedState")
+    assert "userStore.getState().resetState()" in cleanup_block
+    assert "chatStore.getState().resetChat()" in cleanup_block
+    assert "commentsStore.getState().resetComments()" in cleanup_block
+    assert "articlesStore.getState().resetArticles()" in cleanup_block
+    for store_name in ("userStore", "chatStore", "commentsStore", "articlesStore"):
+        assert f"{store_name}.persist.clearStorage()" in cleanup_block
+
+    assert "resetState: () => {" in user_store_source
+    assert "resetChat: () => {" in chat_store_source
+    assert "resetComments: () => {" in comments_store_source
+    assert "resetArticles: () => {" in articles_store_source
 
 
 def test_user_store_exposes_refresh_user_data_from_backend_full_profile_endpoint():

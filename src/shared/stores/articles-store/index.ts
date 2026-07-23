@@ -56,6 +56,7 @@ export type TArticlesStoreState = {
   setCurrentArticle: (article: OneArticle | undefined) => Promise<void>;
   refreshArticles: () => Promise<void>;
   createOrUpdateArticle: (article: Partial<OneArticle>, isNew: boolean) => Promise<string>;
+  resetArticles: () => void;
 };
 
 const initialState = {
@@ -421,6 +422,9 @@ const articlesStore = create<TArticlesStoreState>()(
       refreshArticles: async () => {
         set({ lastFetched: null });
         await get().getArticlesCategories();
+      },
+      resetArticles: () => {
+        set({ ...initialState, articlesCategories: [] });
       },
     })),
 

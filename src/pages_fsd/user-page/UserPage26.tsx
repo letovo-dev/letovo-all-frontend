@@ -290,8 +290,8 @@ const UserPage26 = () => {
   const isIncomingTransaction = (transaction: IPayment) =>
     transaction.receiver === userData.username;
 
-  const logout = () => {
-    authStore.getState().logout();
+  const logout = async () => {
+    await authStore.getState().logout();
     router.push(`/login`);
   };
 
@@ -491,7 +491,7 @@ const UserPage26 = () => {
             type="button"
             aria-label="Выйти"
             className={style.menuButtonDiv}
-            onClick={() => logout()}
+            onClick={() => void logout()}
           >
             <Image
               className={style.logout}
