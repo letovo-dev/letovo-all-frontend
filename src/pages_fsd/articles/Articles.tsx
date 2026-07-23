@@ -1,13 +1,11 @@
 'use client';
 
-import React, { useEffect, useRef, useState, useMemo } from 'react';
-import axios from 'axios';
+import React, { useEffect, useRef, useState } from 'react';
 import Image from 'next/image';
 import { useRouter } from 'next/navigation';
 import { useFooterContext } from '@/shared/ui/context/FooterContext';
 import articlesStore from '@/shared/stores/articles-store';
 import SpinModule from '@/shared/ui/spiner';
-import { extractImageUrls } from '@/shared/utils/utils';
 import style from './Articles.module.scss';
 import { SideBarArticles } from '@/features/side-bar-articles';
 import MarkdownContent from './ReactMd';
@@ -25,19 +23,11 @@ const Articles: React.FC = () => {
   } = articlesStore();
   const router = useRouter();
   const { scrollContainerRef } = useFooterContext();
-  const [processedText, setProcessedText] = useState('');
-  const [mediaCache, setMediaCache] = useState<Record<string, string>>({});
-  const [error, setError] = useState<string | null>(null);
   const wrapRef = useRef<HTMLDivElement>(null);
   const innerWrapRef = useRef<HTMLDivElement>(null);
-  const mediaCacheRef = useRef<Record<string, string>>({});
   const [windowWidth, setWindowWidth] = useState<number>(0);
   const isDesktop = windowWidth >= 961;
   const userStatus = authStore(state => state.userStatus);
-
-  const isVideoUrl = (url: string): boolean => {
-    return /\.(mp4|webm|ogg|mkv|avi)(\?.*)?$/i.test(url);
-  };
 
   useEffect(() => {
     if (!userStatus.logged || !userStatus.authed) {
@@ -60,93 +50,6 @@ const Articles: React.FC = () => {
       scrollContainerRef.current = null;
     };
   }, [scrollContainerRef, isDesktop]);
-
-  useEffect(() => {
-    let isMounted = true;
-    const cancelTokenSource = axios.CancelToken.source();
-
-    const fetchMedia = async () => {
-      setError(null);
-      setProcessedText(article?.text || '');
-
-      if (!isMounted || !article?.text || !userStatus.logged || !userStatus.authed) {
-        return;
-      }
-
-      const markdownText = article.text;
-      const mediaUrls = extractImageUrls(markdownText);
-      const newMediaCache = { ...mediaCacheRef.current };
-
-      const fetchPromises = mediaUrls.map(async url => {
-        if (newMediaCache[url]) {
-          return;
-        }
-        try {
-          const response = await axios.get(url, {
-            withCredentials: true,
-            responseType: 'blob',
-            cancelToken: cancelTokenSource.token,
-          });
-          const contentTypeHeader = response.headers['content-type'];
-          let mimeType = 'image/jpeg';
-          if (typeof contentTypeHeader === 'string') {
-            mimeType = contentTypeHeader;
-          } else if (isVideoUrl(url)) {
-            mimeType = `video/${url.split('.').pop()?.toLowerCase()}`;
-          }
-          const objectUrl = URL.createObjectURL(new Blob([response.data], { type: mimeType }));
-          newMediaCache[url] = objectUrl;
-        } catch (error) {
-          if (axios.isCancel(error)) {
-            console.warn(`Запрос отменён для ${url}`);
-          } else {
-            console.error(`Ошибка загрузки медиа ${url}:`, error);
-            setError(`Не удалось загрузить медиа: ${url}`);
-          }
-        }
-      });
-
-      void Promise.allSettled(fetchPromises).then(() => {
-        if (!isMounted) {
-          return;
-        }
-
-        const updatedText = markdownText.replace(/!\[.*?\]\((.*?)\)/g, (match, url) => {
-          const localUrl = newMediaCache[url];
-          if (!localUrl) {
-            console.warn(`Локальный URL не найден для ${url}`);
-            return match;
-          }
-          if (isVideoUrl(url)) {
-            const extension = url.split('.').pop()?.toLowerCase();
-            return `<video controls playsinline src="${localUrl}" type="video/${extension}" style="max-width: 100%; height: auto; z-index: 1;"></video>`;
-          }
-          return match.replace(url, localUrl);
-        });
-
-        mediaCacheRef.current = newMediaCache;
-        setMediaCache(newMediaCache);
-        setProcessedText(updatedText);
-      });
-    };
-
-    fetchMedia();
-
-    return () => {
-      isMounted = false;
-      cancelTokenSource.cancel('Компонент размонтирован или статья изменена');
-    };
-  }, [article?.post_id, article?.text, userStatus.logged, userStatus.authed]);
-
-  useEffect(() => {
-    return () => {
-      Object.values(mediaCacheRef.current).forEach(url => URL.revokeObjectURL(url));
-      mediaCacheRef.current = {};
-      setMediaCache({});
-    };
-  }, []);
-
-  const memoizedProcessedText = useMemo(() => processedText, [processedText]);
 
   if (loading && articlesCategories.length === 0) {
     return <SpinModule />;
@@ -178,8 +81,7 @@ const Articles: React.FC = () => {
               <span>Загружаем статью…</span>
             </div>
           )}
-          {error && <p className={style.mediaError}>{error}</p>}
-          <MarkdownContent content={memoizedProcessedText} />
+          <MarkdownContent content={article?.text ?? ''} />
         </div>
         <div className={style.desktopRightPanel}>
           <Image
