@@ -52,6 +52,13 @@ def _balanced_block_after(source: str, marker: str) -> str:
     raise AssertionError(f"could not find balanced block after {marker!r}")
 
 
+def _containing_effect(source: str, marker: str) -> str:
+    marker_index = source.index(marker)
+    effect_start = source.rfind("useEffect(() => {", 0, marker_index)
+    assert effect_start >= 0, f"could not find useEffect containing {marker!r}"
+    return _balanced_block_after(source[effect_start:], "useEffect(() =>")
+
+
 def _env_keys(env_content: str) -> set[str]:
     keys: set[str] = set()
     for line in env_content.splitlines():
@@ -375,3 +382,17 @@ def test_profile_renders_scrollable_transfer_history_for_selected_period():
     assert "historyPeriodDays" in user_page_source
     assert "recentTransactions.map" in user_page_source
     assert "transactionList" in user_page_source
+
+
+def test_authenticated_profile_loads_authors_independently_from_avatars():
+    source = _read(USER_PAGE_FILE)
+    authors_effect = _containing_effect(source, "loadedAuthorsUsernameRef.current = null")
+    profile_effect = _containing_effect(source, "const loadData = async () =>")
+
+    assert "if (!userStatus?.logged || !userStatus?.authed)" in authors_effect
+    assert "loadedAuthorsUsernameRef.current === username" in authors_effect
+    assert "loadedAuthorsUsernameRef.current = username" in authors_effect
+    assert "void getAllPostsAuthors()" in authors_effect
+    assert "avatars" not in authors_effect
+    assert "completedProfileLoadUsernameRef" not in authors_effect
+    assert "getAllPostsAuthors" not in profile_effect
