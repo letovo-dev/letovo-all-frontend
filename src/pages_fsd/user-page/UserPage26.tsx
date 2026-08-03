@@ -106,6 +106,7 @@ const UserPage26 = () => {
   const [avatar, setAvatar] = useState<string | undefined>(undefined);
   const avatarRef = useRef<HTMLDivElement>(null);
   const completedProfileLoadUsernameRef = useRef<string | null>(null);
+  const loadedAuthorsUsernameRef = useRef<string | null>(null);
   const [openTransferModal, setOpenTransferModal] = useState(false);
   const [openDepartmentPayoutModal, setOpenDepartmentPayoutModal] = useState(false);
   const [historyPeriodDays, setHistoryPeriodDays] = useState<1 | 3 | 7>(7);
@@ -203,6 +204,21 @@ const UserPage26 = () => {
 
   useEffect(() => {
     if (!userStatus?.logged || !userStatus?.authed) {
+      loadedAuthorsUsernameRef.current = null;
+      return;
+    }
+
+    const username = userData?.username;
+    if (!username || loadedAuthorsUsernameRef.current === username) {
+      return;
+    }
+
+    loadedAuthorsUsernameRef.current = username;
+    void getAllPostsAuthors();
+  }, [userStatus?.logged, userStatus?.authed, userData?.username, getAllPostsAuthors]);
+
+  useEffect(() => {
+    if (!userStatus?.logged || !userStatus?.authed) {
       return;
     }
 
@@ -242,11 +258,7 @@ const UserPage26 = () => {
         setIsLoading(false);
         getAchievementsDepartment();
         getUserAchievements(initialData.username);
-        getAllPostsAuthors();
       }
-      // if (initialData?.userrights === 'admin' || initialData?.userrights === 'moder') {
-      //   getAllPostsAuthors();
-      // }
     };
 
     loadData();
@@ -268,7 +280,6 @@ const UserPage26 = () => {
     getMyTransactions,
     getAchievementsDepartment,
     getUserAchievements,
-    getAllPostsAuthors,
     getAvatars,
   ]);
 
