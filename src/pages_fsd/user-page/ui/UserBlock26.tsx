@@ -7,101 +7,8 @@ import Image from 'next/image';
 import userStore, { IUserStore } from '@/shared/stores/user-store';
 import authStore from '@/shared/stores/auth-store';
 import style from './UserBlock26.module.scss';
-
-const departments: {
-  [key: string]: {
-    color: string;
-    borderColor: string;
-    iconColor: string;
-    name: string;
-    icon: string;
-  };
-} = {
-  '0': {
-    color: 'var(--x-header)',
-    borderColor: 'var(--x-border)',
-    iconColor: 'var(--x-icon)',
-    name: '[НЕТ ДОСТУПА]',
-    icon: '/26_x.svg',
-  },
-  '1': {
-    color: 'var(--it-header)',
-    borderColor: 'var(--it-border)',
-    iconColor: 'var(--it-icon)',
-    name: 'IT',
-    icon: '/26_it.svg',
-  },
-  '2': {
-    color: 'var(--management-header)',
-    borderColor: 'var(--management-border)',
-    iconColor: 'var(--management-icon)',
-    name: 'Менеджмент',
-    icon: '/26_management.svg',
-  },
-  '3': {
-    color: 'var(--enginery-header)',
-    borderColor: 'var(--enginery-border)',
-    iconColor: 'var(--enginery-icon)',
-    name: 'Инженерный',
-    icon: '/26_engineer.svg',
-  },
-  '4': {
-    color: 'var(--public-relations-header)',
-    borderColor: 'var(--public-relations-border)',
-    iconColor: 'var(--public-relations-icon)',
-    name: 'Связи с общественностью',
-    icon: '/26_x.svg',
-  },
-  '5': {
-    color: 'var(--design-header)',
-    borderColor: 'var(--design-border)',
-    iconColor: 'var(--design-icon)',
-    name: 'Арт',
-    icon: '/26_design.svg',
-  },
-  '6': {
-    color: 'var(--science-header)',
-    borderColor: 'var(--science-border)',
-    iconColor: 'var(--science-icon)',
-    name: 'Наука',
-    icon: '/26_science.svg',
-  },
-  '7': {
-    color: 'var(--proj-header)',
-    borderColor: 'var(--proj-border)',
-    iconColor: 'var(--proj-icon)',
-    name: 'Проект 11',
-    icon: '/26_proj11.svg',
-  },
-  '8': {
-    color: 'var(--proj-header)',
-    borderColor: 'var(--proj-border)',
-    iconColor: 'var(--proj-icon)',
-    name: 'Клуб',
-    icon: '/26_proj11.svg',
-  },
-  '9': {
-    color: 'var(--x-header)',
-    borderColor: 'var(--x-border)',
-    iconColor: 'var(--x-icon)',
-    name: '[БЕЗ НАЗВАНИЯ]',
-    icon: '/26_x.svg',
-  },
-  '10': {
-    color: 'var(--design-header)',
-    borderColor: 'var(--design-border)',
-    iconColor: 'var(--design-icon)',
-    name: 'Дизайн',
-    icon: '/26_design.svg',
-  },
-  '11': {
-    color: 'var(--x-header)',
-    borderColor: 'var(--x-border)',
-    iconColor: 'var(--x-icon)',
-    name: 'Х',
-    icon: '/26_x.svg',
-  },
-};
+import { getDepartmentMeta } from '../model/departments';
+import DepartmentEmblem from './DepartmentEmblem';
 
 const UserBlock26 = () => {
   const router = useRouter();
@@ -119,7 +26,7 @@ const UserBlock26 = () => {
   const parts = fullName.split(/\s+/);
   const surname = parts[0] ?? '';
   const givenName = parts.slice(1).join(' ');
-  const dep = departments[userData?.departmentid] ?? departments['1'];
+  const dep = getDepartmentMeta(userData.departmentid);
 
   return (
     <section aria-label="Профиль пользователя" className={style.userBlock}>
@@ -131,10 +38,10 @@ const UserBlock26 = () => {
             shape="circle"
           />
         </div>
-        <Image
+        <DepartmentEmblem
           className={`${style.depIcon} ${style.depIconMobile}`}
-          src={dep.icon}
-          alt="icon"
+          department={dep}
+          alt="Эмблема департамента"
           height={80}
           width={80}
         />
@@ -146,10 +53,9 @@ const UserBlock26 = () => {
         </h1>
         <p className={style.status}>{userOnBoard}</p>
         <div className={style.depData}>
-          <Image
+          <DepartmentEmblem
             className={`${style.depIcon} ${style.depIconDesktop}`}
-            src={dep.icon}
-            alt=""
+            department={dep}
             height={41}
             width={50}
           />
