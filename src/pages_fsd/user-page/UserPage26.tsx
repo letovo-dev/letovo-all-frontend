@@ -23,6 +23,7 @@ import SpinModule from '@/shared/ui/spiner';
 import { Consts } from '@/shared/consts';
 import { getDepartmentMeta } from './model/departments';
 import { DepartmentPayoutModal } from '@/features/department-payout';
+import DepartmentEmblem from './ui/DepartmentEmblem';
 
 const DONE_ACH = '/images/aceehimnstv/loched.png';
 
@@ -106,6 +107,7 @@ const UserPage26 = () => {
   const [avatar, setAvatar] = useState<string | undefined>(undefined);
   const avatarRef = useRef<HTMLDivElement>(null);
   const completedProfileLoadUsernameRef = useRef<string | null>(null);
+  const loadedAuthorsUsernameRef = useRef<string | null>(null);
   const [openTransferModal, setOpenTransferModal] = useState(false);
   const [openDepartmentPayoutModal, setOpenDepartmentPayoutModal] = useState(false);
   const [historyPeriodDays, setHistoryPeriodDays] = useState<1 | 3 | 7>(7);
@@ -203,6 +205,21 @@ const UserPage26 = () => {
 
   useEffect(() => {
     if (!userStatus?.logged || !userStatus?.authed) {
+      loadedAuthorsUsernameRef.current = null;
+      return;
+    }
+
+    const username = userData?.username;
+    if (!username || loadedAuthorsUsernameRef.current === username) {
+      return;
+    }
+
+    loadedAuthorsUsernameRef.current = username;
+    void getAllPostsAuthors();
+  }, [userStatus?.logged, userStatus?.authed, userData?.username, getAllPostsAuthors]);
+
+  useEffect(() => {
+    if (!userStatus?.logged || !userStatus?.authed) {
       return;
     }
 
@@ -242,11 +259,7 @@ const UserPage26 = () => {
         setIsLoading(false);
         getAchievementsDepartment();
         getUserAchievements(initialData.username);
-        getAllPostsAuthors();
       }
-      // if (initialData?.userrights === 'admin' || initialData?.userrights === 'moder') {
-      //   getAllPostsAuthors();
-      // }
     };
 
     loadData();
@@ -268,7 +281,6 @@ const UserPage26 = () => {
     getMyTransactions,
     getAchievementsDepartment,
     getUserAchievements,
-    getAllPostsAuthors,
     getAvatars,
   ]);
 
@@ -451,10 +463,10 @@ const UserPage26 = () => {
                 </Button>
               )}
             </div>
-            <Image
+            <DepartmentEmblem
               className={`${style.depIcon} ${style.depIconMobile}`}
-              src={currentDepartment.icon}
-              alt="icon"
+              department={currentDepartment}
+              alt="Эмблема департамента"
               height={80}
               width={80}
             />
@@ -474,10 +486,9 @@ const UserPage26 = () => {
             })()}
             <p className={style.status}>{userOnBoard}</p>
             <div className={style.depData}>
-              <Image
+              <DepartmentEmblem
                 className={`${style.depIcon} ${style.depIconDesktop}`}
-                src={currentDepartment.icon}
-                alt=""
+                department={currentDepartment}
                 height={41}
                 width={50}
               />
