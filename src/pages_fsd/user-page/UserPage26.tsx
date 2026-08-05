@@ -23,6 +23,7 @@ import SpinModule from '@/shared/ui/spiner';
 import { Consts } from '@/shared/consts';
 import { getDepartmentMeta } from './model/departments';
 import { DepartmentPayoutModal } from '@/features/department-payout';
+import DepartmentEmblem from './ui/DepartmentEmblem';
 
 const DONE_ACH = '/images/aceehimnstv/loched.png';
 
@@ -451,10 +452,10 @@ const UserPage26 = () => {
                 </Button>
               )}
             </div>
-            <Image
+            <DepartmentEmblem
               className={`${style.depIcon} ${style.depIconMobile}`}
-              src={currentDepartment.icon}
-              alt="icon"
+              department={currentDepartment}
+              alt="Эмблема департамента"
               height={80}
               width={80}
             />
@@ -474,10 +475,9 @@ const UserPage26 = () => {
             })()}
             <p className={style.status}>{userOnBoard}</p>
             <div className={style.depData}>
-              <Image
+              <DepartmentEmblem
                 className={`${style.depIcon} ${style.depIconDesktop}`}
-                src={currentDepartment.icon}
-                alt=""
+                department={currentDepartment}
                 height={41}
                 width={50}
               />

@@ -4,6 +4,7 @@ export interface DepartmentMeta {
   iconColor: string;
   name: string;
   icon: string;
+  hoverIcon?: string;
 }
 
 export const departments: { [key: string]: DepartmentMeta } = {
@@ -12,7 +13,8 @@ export const departments: { [key: string]: DepartmentMeta } = {
     borderColor: 'var(--x-border)',
     iconColor: 'var(--x-icon)',
     name: '[НЕТ ДОСТУПА]',
-    icon: '/26_x.svg',
+    icon: '/Ava_Defolt_Norm.svg',
+    hoverIcon: '/Ava_Defolt_smile.svg',
   },
   '1': {
     color: 'var(--it-header)',
@@ -75,7 +77,8 @@ export const departments: { [key: string]: DepartmentMeta } = {
     borderColor: 'var(--x-border)',
     iconColor: 'var(--x-icon)',
     name: '[БЕЗ НАЗВАНИЯ]',
-    icon: '/26_x.svg',
+    icon: '/Ava_Defolt_Norm.svg',
+    hoverIcon: '/Ava_Defolt_smile.svg',
   },
   '10': {
     color: 'var(--design-header)',
