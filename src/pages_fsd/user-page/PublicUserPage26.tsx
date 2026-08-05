@@ -11,6 +11,7 @@ import userStore from '@/shared/stores/user-store';
 import SpinModule from '@/shared/ui/spiner';
 import AchievementsGrid from './ui/AchievementsGrid';
 import ProfilePosts from './ui/ProfilePosts';
+import DepartmentEmblem from './ui/DepartmentEmblem';
 
 interface PublicUserPage26Props {
   username: string;
@@ -61,10 +62,10 @@ const PublicUserPage26: React.FC<PublicUserPage26Props> = ({ username }) => {
                 shape="circle"
               />
             </div>
-            <Image
+            <DepartmentEmblem
               className={`${style.depIcon} ${style.depIconMobile}`}
-              src={dep.icon}
-              alt="icon"
+              department={dep}
+              alt="Эмблема департамента"
               height={80}
               width={80}
             />
@@ -76,10 +77,9 @@ const PublicUserPage26: React.FC<PublicUserPage26Props> = ({ username }) => {
             </h1>
             <p className={style.status}>{userOnBoard}</p>
             <div className={style.depData}>
-              <Image
+              <DepartmentEmblem
                 className={`${style.depIcon} ${style.depIconDesktop}`}
-                src={dep.icon}
-                alt=""
+                department={dep}
                 height={41}
                 width={50}
               />
