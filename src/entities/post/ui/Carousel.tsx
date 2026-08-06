@@ -11,6 +11,7 @@ import 'swiper/css/pagination';
 
 import style from './Carousel.module.scss';
 import LazyVideo from './LazyVideo';
+import ImageLightbox from '@/shared/ui/image-lightbox';
 
 const CarouselElement = ({ imgs }: { imgs: Array<string | null | undefined> }) => {
   const isVideo = (src: string) => /\.(mp4|webm|ogg)$/i.test(src);
@@ -46,16 +47,18 @@ const CarouselElement = ({ imgs }: { imgs: Array<string | null | undefined> }) =
             ) : isPDF(item) ? (
               <iframe src={url} className={style.media} title={`pdf-${i}`} />
             ) : (
-              <div className={style.imageWrapper}>
-                <Image
-                  src={url}
-                  alt={`img-${i}`}
-                  fill
-                  unoptimized
-                  className={style.media}
-                  sizes="(max-width: 760px) 100vw, 760px"
-                />
-              </div>
+              <ImageLightbox src={url} alt={`Изображение новости ${i + 1}`}>
+                <div className={style.imageWrapper}>
+                  <Image
+                    src={url}
+                    alt={`img-${i}`}
+                    fill
+                    unoptimized
+                    className={style.media}
+                    sizes="(max-width: 760px) 100vw, 760px"
+                  />
+                </div>
+              </ImageLightbox>
             )}
           </SwiperSlide>
         );

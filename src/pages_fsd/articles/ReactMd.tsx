@@ -5,6 +5,7 @@ import ReactMarkdown from 'react-markdown';
 import remarkGfm from 'remark-gfm';
 import rehypeRaw from 'rehype-raw';
 import rehypeSanitize, { defaultSchema } from 'rehype-sanitize';
+import ImageLightbox from '@/shared/ui/image-lightbox';
 import style from './Articles.module.scss';
 
 const SAFE_PROTOCOLS = /^(https?|mailto|tel):/i;
@@ -56,7 +57,11 @@ const MarkdownContent: React.FC<{ content: string }> = React.memo(
             }
             // Article uploads can be dynamic blob URLs, which Next Image cannot size correctly.
             // eslint-disable-next-line @next/next/no-img-element
-            return src ? <img src={src} alt={alt || 'Image'} /> : null;
+            return src ? (
+              <ImageLightbox src={src} alt={alt || 'Изображение статьи'}>
+                <img src={src} alt={alt || 'Изображение статьи'} />
+              </ImageLightbox>
+            ) : null;
           },
           video: ({ src, ...props }) => {
             const extension = src?.split('.').pop()?.toLowerCase();

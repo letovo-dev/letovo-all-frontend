@@ -1,0 +1,13 @@
+import assert from 'node:assert/strict';
+import fs from 'node:fs';
+import path from 'node:path';
+const root = process.cwd();
+const lightbox = fs.readFileSync(path.join(root, 'src/shared/ui/image-lightbox/ImageLightbox.tsx'), 'utf8');
+const styles = fs.readFileSync(path.join(root, 'src/shared/ui/image-lightbox/ImageLightbox.module.scss'), 'utf8');
+const carousel = fs.readFileSync(path.join(root, 'src/entities/post/ui/Carousel.tsx'), 'utf8');
+const markdown = fs.readFileSync(path.join(root, 'src/pages_fsd/articles/ReactMd.tsx'), 'utf8');
+for (const value of ['createPortal', "document.body.style.overflow = 'hidden'", "event.key === 'Escape'", 'aria-modal="true"', 'download']) assert.ok(lightbox.includes(value));
+for (const value of ['position: fixed', 'max-width: 80vw', 'max-height: 80vh']) assert.ok(styles.includes(value));
+assert.ok(carousel.includes('<ImageLightbox src={url}'));
+assert.ok(markdown.includes('<ImageLightbox src={src}'));
+console.log('image lightbox tests passed');
