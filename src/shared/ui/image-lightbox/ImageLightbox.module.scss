@@ -1,9 +1,71 @@
-.trigger { display: block; width: 100%; padding: 0; border: 0; background: transparent; cursor: zoom-in; }
-.overlay { position: fixed; z-index: 3000; inset: 0; display: flex; align-items: center; justify-content: center; padding: 20px; background: rgba(0, 0, 0, 0.78); }
-.dialog { position: relative; display: flex; max-width: 80vw; max-height: 80vh; outline: none; }
-.image { display: block; max-width: 80vw; max-height: 80vh; width: auto; height: auto; object-fit: contain; }
-.actions { position: absolute; z-index: 1; top: 8px; right: 8px; display: flex; align-items: center; gap: 8px; }
-.close, .download { min-height: 36px; border: 0; border-radius: 18px; padding: 7px 12px; background: rgba(0, 0, 0, 0.7); color: #fff; font: inherit; }
-.close { min-width: 36px; padding: 4px 10px; font-size: 24px; line-height: 1; cursor: pointer; }
-.download { text-decoration: none; }
-.close:focus-visible, .download:focus-visible, .trigger:focus-visible { outline: 3px solid #fff; outline-offset: 3px; }
+.trigger {
+  display: block;
+  width: 100%;
+  padding: 0;
+  border: 0;
+  background: transparent;
+  cursor: zoom-in;
+}
+.overlay {
+  position: fixed;
+  z-index: 3000;
+  inset: 0;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  padding: 20px;
+  background: rgba(0, 0, 0, 0.78);
+}
+.dialog {
+  position: relative;
+  display: flex;
+  max-width: 80vw;
+  max-height: 80vh;
+  outline: none;
+}
+.image {
+  display: block;
+  max-width: 80vw;
+  max-height: 80vh;
+  width: auto;
+  height: auto;
+  object-fit: contain;
+  touch-action: none;
+  transform-origin: center;
+  transition: transform 120ms ease-out;
+}
+.actions {
+  position: absolute;
+  z-index: 1;
+  top: 8px;
+  right: 8px;
+  display: flex;
+  align-items: center;
+  gap: 8px;
+}
+.close,
+.download {
+  min-height: 36px;
+  border: 0;
+  border-radius: 18px;
+  padding: 7px 12px;
+  background: rgba(0, 0, 0, 0.7);
+  color: #fff;
+  font: inherit;
+}
+.close {
+  min-width: 36px;
+  padding: 4px 10px;
+  font-size: 24px;
+  line-height: 1;
+  cursor: pointer;
+}
+.download {
+  text-decoration: none;
+}
+.close:focus-visible,
+.download:focus-visible,
+.trigger:focus-visible {
+  outline: 3px solid #fff;
+  outline-offset: 3px;
+}
