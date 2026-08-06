@@ -22,6 +22,8 @@ test('opens, traps focus, closes, restores focus, and downloads the original sou
   const trigger = getByRole('button', { name: /Открыть изображение/ }); trigger.focus(); fireEvent.click(trigger);
   const dialog = getByRole('dialog'); const download = getByRole('link', { name: /Скачать оригинал/ }); const close = getByRole('button', { name: /Закрыть просмотр/ });
   assert.equal(document.body.style.overflow, 'hidden'); assert.equal(download.getAttribute('href'), source); assert.ok(download.hasAttribute('download'));
+  assert.equal(document.activeElement, dialog);
+  fireEvent.keyDown(dialog, { key: 'Tab', shiftKey: true }); assert.equal(document.activeElement, close);
   close.focus(); fireEvent.keyDown(dialog, { key: 'Tab' }); assert.equal(document.activeElement, download);
   download.focus(); fireEvent.keyDown(dialog, { key: 'Tab', shiftKey: true }); assert.equal(document.activeElement, close);
   fireEvent.keyDown(window, { key: 'Escape' }); await new Promise(resolve => setTimeout(resolve, 0));
