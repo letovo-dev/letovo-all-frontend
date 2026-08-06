@@ -1,0 +1,27 @@
+import assert from 'node:assert/strict';
+import { rm } from 'node:fs/promises';
+import path from 'node:path';
+import test from 'node:test';
+import { build } from 'esbuild';
+import { JSDOM } from 'jsdom';
+import React from 'react';
+import { fireEvent, render } from '@testing-library/react';
+const dom = new JSDOM('<!doctype html><html><body></body></html>', { url: 'https://portal.test/' });
+Object.assign(globalThis, { window: dom.window, document: dom.window.document, HTMLElement: dom.window.HTMLElement, KeyboardEvent: dom.window.KeyboardEvent, MouseEvent: dom.window.MouseEvent });
+Object.defineProperty(globalThis, 'navigator', { configurable: true, value: dom.window.navigator });
+globalThis.requestAnimationFrame = callback => setTimeout(callback, 0) as unknown as number;
+const outputPath = path.resolve('scripts/.image-lightbox-test-bundle.mjs');
+await build({ entryPoints: [path.resolve('src/shared/ui/image-lightbox/ImageLightbox.tsx')], bundle: true, platform: 'node', format: 'esm', packages: 'external', loader: { '.scss': 'empty' }, outfile: outputPath });
+const { default: ImageLightbox } = await import(outputPath);
+test('opens, traps focus, closes, restores focus, and downloads the original source', async () => {
+  const source = 'https://cdn.test/original/photo.png';
+  const { unmount, getByRole, queryByRole } = render(<ImageLightbox src={source} alt="Тест"><img src={source} alt="Тест" /></ImageLightbox>);
+  const trigger = getByRole('button', { name: /Открыть изображение/ }); trigger.focus(); fireEvent.click(trigger);
+  const dialog = getByRole('dialog'); const download = getByRole('link', { name: /Скачать оригинал/ }); const close = getByRole('button', { name: /Закрыть просмотр/ });
+  assert.equal(document.body.style.overflow, 'hidden'); assert.equal(download.getAttribute('href'), source); assert.ok(download.hasAttribute('download'));
+  close.focus(); fireEvent.keyDown(dialog, { key: 'Tab' }); assert.equal(document.activeElement, download);
+  download.focus(); fireEvent.keyDown(dialog, { key: 'Tab', shiftKey: true }); assert.equal(document.activeElement, close);
+  fireEvent.keyDown(window, { key: 'Escape' }); await new Promise(resolve => setTimeout(resolve, 0));
+  assert.equal(queryByRole('dialog'), null); assert.equal(document.activeElement, trigger); assert.equal(document.body.style.overflow, ''); unmount();
+});
+test.after(async () => { await rm(outputPath, { force: true }); });
