@@ -13,6 +13,9 @@ globalThis.requestAnimationFrame = callback => setTimeout(callback, 0) as unknow
 const outputPath = path.resolve('scripts/.image-lightbox-test-bundle.mjs');
 await build({ entryPoints: [path.resolve('src/shared/ui/image-lightbox/ImageLightbox.tsx')], bundle: true, platform: 'node', format: 'esm', packages: 'external', loader: { '.scss': 'empty' }, outfile: outputPath });
 const { default: ImageLightbox } = await import(outputPath);
+const markdownOutputPath = path.resolve('scripts/.markdown-lightbox-test-bundle.mjs');
+await build({ entryPoints: [path.resolve('src/pages_fsd/articles/ReactMd.tsx')], bundle: true, platform: 'node', format: 'esm', packages: 'external', loader: { '.scss': 'empty' }, outfile: markdownOutputPath });
+const { default: MarkdownContent } = await import(markdownOutputPath);
 test('opens, traps focus, closes, restores focus, and downloads the original source', async () => {
   const source = 'https://cdn.test/original/photo.png';
   const { unmount, getByRole, queryByRole } = render(<ImageLightbox src={source} alt="Тест"><img src={source} alt="Тест" /></ImageLightbox>);
@@ -24,4 +27,13 @@ test('opens, traps focus, closes, restores focus, and downloads the original sou
   fireEvent.keyDown(window, { key: 'Escape' }); await new Promise(resolve => setTimeout(resolve, 0));
   assert.equal(queryByRole('dialog'), null); assert.equal(document.activeElement, trigger); assert.equal(document.body.style.overflow, ''); unmount();
 });
-test.after(async () => { await rm(outputPath, { force: true }); });
+test('linked Markdown image opens the lightbox without an outer navigation link', () => {
+  const image = 'https://cdn.test/original/linked.png';
+  const target = 'https://example.test/article';
+  const { container, getByRole, unmount } = render(<MarkdownContent content={`[![linked](${image})](${target})`} />);
+  assert.equal(container.querySelector(`a[href="${target}"]`), null);
+  fireEvent.click(getByRole('button', { name: /Открыть изображение/ }));
+  assert.ok(getByRole('dialog'));
+  unmount();
+});
+test.after(async () => { await Promise.all([rm(outputPath, { force: true }), rm(markdownOutputPath, { force: true })]); });

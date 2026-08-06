@@ -81,6 +81,12 @@ const MarkdownContent: React.FC<{ content: string }> = React.memo(
             );
           },
           a: ({ href, children, ...props }) => {
+            const isLinkedImage = Boolean(
+              props.node?.children?.some(
+                child => child.type === 'element' && child.tagName === 'img',
+              ),
+            );
+            if (isLinkedImage) return <>{children}</>;
             const isSecretLink =
               typeof children === 'string' && children.toLowerCase().includes('secret link');
             const isDownloadLink = href ? isDownloadableFile(href) : false;
