@@ -38,4 +38,19 @@ test('linked Markdown image opens the lightbox without an outer navigation link'
   assert.ok(getByRole('dialog'));
   unmount();
 });
+test("supports pinch zoom and one-finger pan inside the lightbox", () => {
+  const source = "https://cdn.test/original/pinch.png";
+  const { getByRole, unmount } = render(<ImageLightbox src={source} alt="Pinch"><img src={source} alt="Pinch" /></ImageLightbox>);
+  fireEvent.click(getByRole("button", { name: /Открыть изображение/ }));
+  const image = getByRole("dialog").querySelector("img")!;
+  fireEvent.touchStart(image, { touches: [{ clientX: 20, clientY: 20 }, { clientX: 40, clientY: 20 }] });
+  fireEvent.touchMove(image, { touches: [{ clientX: 10, clientY: 20 }, { clientX: 70, clientY: 20 }] });
+  assert.match(image.getAttribute("style") ?? "", /scale\(3\)/);
+  fireEvent.touchEnd(image);
+  fireEvent.touchStart(image, { touches: [{ clientX: 20, clientY: 20 }] });
+  fireEvent.touchMove(image, { touches: [{ clientX: 35, clientY: 45 }] });
+  assert.match(image.getAttribute("style") ?? "", /translate\(15px, 25px\)/);
+  unmount();
+});
+
 test.after(async () => { await Promise.all([rm(outputPath, { force: true }), rm(markdownOutputPath, { force: true })]); });
