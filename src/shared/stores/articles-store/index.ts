@@ -36,6 +36,7 @@ export type TArticlesStoreState = {
   normalizedArticles: Record<string, OneArticle[]> | null;
   articlesCategories: ArticleCategory[];
   article: OneArticle | undefined;
+  articleLoading: boolean;
   isEditArticle: boolean;
   loading: boolean;
   error: string | null;
@@ -52,14 +53,16 @@ export type TArticlesStoreState = {
   getOneArticle: (id: string, categoryId: string) => OneArticle;
   getArticleMd: (fileName: string) => Promise<any>;
   loadAllArticlesByCategory: (id: string) => Promise<void>;
-  setCurrentArticle: (article: OneArticle | undefined) => void;
+  setCurrentArticle: (article: OneArticle | undefined) => Promise<void>;
   refreshArticles: () => Promise<void>;
   createOrUpdateArticle: (article: Partial<OneArticle>, isNew: boolean) => Promise<string>;
+  resetArticles: () => void;
 };
 
 const initialState = {
   normalizedArticles: {},
   article: undefined,
+  articleLoading: false,
   loading: false,
   error: null,
   lastFetched: null,
@@ -67,14 +70,43 @@ const initialState = {
 };
 
 const CACHE_DURATION = 1000 * 60 * 0.5; // 0,5 minutes
+let articleSelectionSequence = 0;
 
 const articlesStore = create<TArticlesStoreState>()(
   persist(
     immer((set: (partial: Partial<any>) => void, get: () => any) => ({
       ...initialState,
-      setCurrentArticle: (article: OneArticle) => {
+      setCurrentArticle: async (article: OneArticle | undefined) => {
+        const selectionSequence = ++articleSelectionSequence;
         set((draft: TArticlesStoreState) => {
           draft.article = article;
+          draft.articleLoading = Boolean(article && !article.text);
+        });
+
+        if (!article || article.text) {
+          return;
+        }
+
+        const { markdown } = await get().getArticleMd(article.post_path);
+        if (
+          selectionSequence !== articleSelectionSequence ||
+          get().article?.post_id !== article.post_id
+        ) {
+          return;
+        }
+
+        set((draft: TArticlesStoreState) => {
+          const loadedArticle = { ...article, text: markdown };
+          draft.article = loadedArticle;
+          draft.articleLoading = false;
+
+          const categoryArticles = draft.normalizedArticles?.[article.category];
+          const articleIndex = categoryArticles?.findIndex(
+            item => item.post_id === article.post_id,
+          );
+          if (categoryArticles && articleIndex !== undefined && articleIndex >= 0) {
+            categoryArticles[articleIndex] = loadedArticle;
+          }
         });
       },
       createOrUpdateArticle: async (article: Partial<OneArticle>, isNew: boolean) => {
@@ -321,31 +353,22 @@ const articlesStore = create<TArticlesStoreState>()(
             response.code === 200 ||
             (response.code === 203 && (response.data as { result: OneArticle[] }).result)
           ) {
-            const articles = (response.data as { result: OneArticle[] }).result;
-            const articlePromises = articles?.map(async articleData => {
-              try {
-                const { markdown } = await get().getArticleMd(articleData.post_path);
-                return { ...articleData, text: markdown };
-              } catch (err) {
-                console.error(`Failed to load Markdown for article ${articleData.post_id}:`, err);
-                return {
-                  ...articleData,
-                  text: '# Ошибка\nНе удалось загрузить содержимое',
-                };
-              }
-            });
-
-            const articleResults = await Promise.all(articlePromises);
+            const articleResults = (response.data as { result: OneArticle[] }).result.map(
+              articleData => ({
+                ...articleData,
+                text: articleData.text || '',
+              }),
+            );
 
             set((draft: TArticlesStoreState) => {
               if (!draft.normalizedArticles) {
                 draft.normalizedArticles = {};
               }
               draft.normalizedArticles[id] = articleResults;
-              if (!draft.article && articleResults.length > 0) {
-                draft.article = articleResults[0];
-              }
             });
+            if (!get().article && articleResults.length > 0) {
+              void get().setCurrentArticle(articleResults[0]);
+            }
           } else {
             console.warn(`No articles found for category ${id}, code: ${response?.code}`);
             set((draft: TArticlesStoreState) => {
@@ -399,6 +422,9 @@ const articlesStore = create<TArticlesStoreState>()(
       refreshArticles: async () => {
         set({ lastFetched: null });
         await get().getArticlesCategories();
+      },
+      resetArticles: () => {
+        set({ ...initialState, articlesCategories: [] });
       },
     })),
 

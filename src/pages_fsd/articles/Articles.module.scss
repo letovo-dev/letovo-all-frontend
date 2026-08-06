@@ -1,6 +1,7 @@
 @use '../../app/_mixins.scss';
 
 $overlay-color: rgba(0, 0, 0, 0.3);
+$article-horizontal-padding: 35px;
 
 .desktopLeftPanel {
   display: none;
@@ -119,13 +120,9 @@ $overlay-color: rgba(0, 0, 0, 0.3);
     max-width: 100%;
     margin: 0 auto;
     margin-bottom: 30px;
-    padding: 15px 35px 0px 35px;
+    padding: 15px $article-horizontal-padding 0;
     background: #fff;
-    img,
-    video {
-      width: 100%;
-      margin: 10px 0;
-    }
+
     /* Стили для конкретных элементов Markdown */
     h1 {
       color: #333;
@@ -135,13 +132,26 @@ $overlay-color: rgba(0, 0, 0, 0.3);
       margin: 10px 0;
       color: #555;
     }
-    img,
-    video {
-      border-radius: 8px;
-      margin: 10px;
+    img {
       display: block;
+      width: calc(100% + #{$article-horizontal-padding * 2});
+      max-width: calc(100% + #{$article-horizontal-padding * 2});
+      height: auto;
+      margin: 0 (-$article-horizontal-padding);
+      border-radius: 0;
+      transition: opacity 0.5s ease-in-out;
+      opacity: 1;
+      pointer-events: auto;
+      z-index: 2;
+    }
+
+    video {
+      display: block;
+      width: 100%;
       max-width: 100%;
       height: auto;
+      margin: 10px 0;
+      border-radius: 8px;
       transition: opacity 0.5s ease-in-out;
       opacity: 1;
       pointer-events: auto;
@@ -182,6 +192,52 @@ $overlay-color: rgba(0, 0, 0, 0.3);
       background: #f5f5f5;
       font-weight: 600;
     }
+  }
+}
+
+.articleLoading {
+  display: flex;
+  min-height: 220px;
+  padding: 40px 35px;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  gap: 12px;
+  text-align: center;
+
+  h1 {
+    margin: 0;
+    color: var(--graphics1, #fb4724);
+    filter: grayscale(1);
+    animation: revealArticleTitle 1.6s ease-in-out infinite alternate;
+  }
+
+  span {
+    color: #777;
+  }
+}
+
+.mediaError {
+  margin: 12px 35px 0;
+  color: #a61d24;
+}
+
+@keyframes revealArticleTitle {
+  from {
+    filter: grayscale(1);
+    opacity: 0.55;
+  }
+
+  to {
+    filter: grayscale(0);
+    opacity: 1;
+  }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .articleLoading h1 {
+    animation: none;
+    filter: none;
   }
 }
 

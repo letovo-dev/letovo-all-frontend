@@ -14,8 +14,8 @@ const UserBlock26 = () => {
   const router = useRouter();
   const userData = userStore((state: IUserStore) => state.store.userData);
 
-  const logout = () => {
-    authStore.getState().logout();
+  const logout = async () => {
+    await authStore.getState().logout();
     router.push('/login');
   };
 
@@ -69,7 +69,7 @@ const UserBlock26 = () => {
         type="button"
         aria-label="Выйти"
         className={style.menuButtonDiv}
-        onClick={() => logout()}
+        onClick={() => void logout()}
       >
         <Image className={style.logout} src="/26_logout.svg" alt="exit" height={20} width={20} />
       </button>

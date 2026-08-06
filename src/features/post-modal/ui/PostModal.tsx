@@ -1,6 +1,6 @@
 'use client';
 
-import React, { useEffect } from 'react';
+import React, { useEffect, useRef } from 'react';
 import {
   Modal,
   Form,
@@ -15,6 +15,12 @@ import {
 } from 'antd';
 import { UploadOutlined } from '@ant-design/icons';
 import type { UploadProps } from 'antd';
+import {
+  buildAuthorSelectOptions,
+  filterAuthorOption,
+  type AuthorOption,
+} from '../model/author-options';
+import { mediaPathsFromUploadFiles, sortFilesByUploadOrder } from '../model/media-order';
 
 export interface Post {
   id?: string;
@@ -43,16 +49,32 @@ interface PostModalProps {
   onCancel: () => void;
   onSubmit: (values: Post) => Promise<void>;
   post?: Post | null;
-  authors: { id: string; name: string }[];
+  authors: AuthorOption[];
 }
 
 const PostModal: React.FC<PostModalProps> = ({ visible, onCancel, onSubmit, post, authors }) => {
   const [form] = Form.useForm();
   const [fileList, setFileList] = React.useState<any[]>([]);
   const [messageApi, contextHolder] = message.useMessage();
+  const uploadOrder = useRef(new Map<string, number>());
+  const nextUploadOrder = useRef(0);
+
+  const rememberUpload = (uid: string) => {
+    if (!uploadOrder.current.has(uid)) {
+      uploadOrder.current.set(uid, nextUploadOrder.current);
+      nextUploadOrder.current += 1;
+    }
+  };
+
+  const preserveUploadOrder = (files: any[]) => {
+    files.forEach(file => rememberUpload(String(file.uid)));
+    return sortFilesByUploadOrder(files, uploadOrder.current);
+  };
 
   useEffect(() => {
     if (visible) {
+      uploadOrder.current.clear();
+      nextUploadOrder.current = 0;
       if (post) {
         form.setFieldsValue({
           author: post.author,
@@ -63,14 +85,14 @@ const PostModal: React.FC<PostModalProps> = ({ visible, onCancel, onSubmit, post
           saved_count: post.saved_count,
         });
         if (post.mediaUrl && Array.isArray(post.mediaUrl) && post.mediaUrl.length > 0) {
-          setFileList(
-            post.mediaUrl.map((url, index) => ({
-              uid: `-${index + 1}`,
-              name: url.split('/').pop() || `file-${index + 1}`,
-              status: 'done',
-              url,
-            })),
-          );
+          const existingFiles = post.mediaUrl.map((url, index) => ({
+            uid: `-${index + 1}`,
+            name: url.split('/').pop() || `file-${index + 1}`,
+            status: 'done',
+            url,
+          }));
+          existingFiles.forEach(file => rememberUpload(file.uid));
+          setFileList(existingFiles);
         } else {
           setFileList([]);
         }
@@ -99,7 +121,7 @@ const PostModal: React.FC<PostModalProps> = ({ visible, onCancel, onSubmit, post
         dislikes: String(values.dislikes),
         likes: String(values.likes),
         saved_count: String(values.saved_count),
-        media: fileList.map(file => file.response?.file),
+        media: mediaPathsFromUploadFiles(fileList),
       };
       await onSubmit(formData);
       message.success(post ? 'Пост успешно изменен' : 'Пост успешно сохранен');
@@ -131,14 +153,14 @@ const PostModal: React.FC<PostModalProps> = ({ visible, onCancel, onSubmit, post
             throw new Error(errorData.message || `Не удалось удалить файл: ${response.status}`);
           }
           message.info(`${file.name} удалён`);
-          setFileList(newFileList);
+          setFileList(preserveUploadOrder(newFileList));
         } catch (error) {
           const errorMsg = error instanceof Error ? error.message : String(error);
           message.error(`Не удалось удалить файл: ${errorMsg}`);
           console.error('Delete error:', error);
         }
       } else {
-        setFileList(newFileList);
+        setFileList(preserveUploadOrder(newFileList));
         if (file.status === 'done') {
           const filePath = file.response;
           if (filePath) {
@@ -166,6 +188,7 @@ const PostModal: React.FC<PostModalProps> = ({ visible, onCancel, onSubmit, post
       }
     },
     beforeUpload: file => {
+      rememberUpload(String(file.uid));
       const isValid = file.type.startsWith('image/') || file.type.startsWith('video/');
       if (!isValid) {
         message.error('Можно загружать только изображения или видео!');
@@ -205,10 +228,10 @@ const PostModal: React.FC<PostModalProps> = ({ visible, onCancel, onSubmit, post
           >
             <Select
               placeholder="Издание"
-              options={authors.map(author => ({
-                value: author.id,
-                label: author.name,
-              }))}
+              showSearch
+              filterOption={filterAuthorOption}
+              notFoundContent="Авторы не найдены"
+              options={buildAuthorSelectOptions(authors)}
             />
           </Form.Item>
           <Form.Item

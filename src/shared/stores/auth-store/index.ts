@@ -3,6 +3,9 @@ import { persist, PersistOptions } from 'zustand/middleware';
 import { immer } from 'zustand/middleware/immer';
 import { SERVICES_AUTH } from '@/shared/api/auth';
 import { SERVICES_USERS } from '@/shared/api/user';
+import articlesStore from '../articles-store';
+import chatStore from '../chat-store';
+import commentsStore from '../comments-store';
 import userStore, { IUserStore } from '../user-store';
 
 const AUTH_STORE_VERSION = 1;
@@ -19,7 +22,7 @@ export interface TAuthStoreState {
   auth: () => Promise<{ success: boolean; message?: string }>;
   register: () => Promise<{ success: boolean }>;
   changePass: (data: { current_password: string; new_password: string }) => Promise<void>;
-  logout: () => void;
+  logout: () => Promise<void>;
   resetState: () => void;
 }
 
@@ -51,6 +54,20 @@ const redirectToLogin = (): void => {
   if (typeof window !== 'undefined') {
     window.location.assign('/login');
   }
+};
+
+const clearAccountScopedState = async (): Promise<void> => {
+  userStore.getState().resetState();
+  chatStore.getState().resetChat();
+  commentsStore.getState().resetComments();
+  articlesStore.getState().resetArticles();
+
+  await Promise.all([
+    userStore.persist.clearStorage(),
+    chatStore.persist.clearStorage(),
+    commentsStore.persist.clearStorage(),
+    articlesStore.persist.clearStorage(),
+  ]);
 };
 
 const sanitizePersistedAuthState = (persistedState: unknown): PersistedAuthStoreState => {
@@ -133,11 +150,11 @@ const authStore = create<TAuthStoreState>()(
               }));
               return { success: true, message: 'Authenticated' };
             } else {
-              get().logout();
+              await get().logout();
               return { success: false, message: 'Invalid status' };
             }
           } else {
-            get().logout();
+            await get().logout();
             return { success: false, message: 'Request failed' };
           }
         } catch (error) {
@@ -189,15 +206,16 @@ const authStore = create<TAuthStoreState>()(
           set({ loading: false });
         }
       },
-      logout: (): void => {
-        void SERVICES_AUTH.Auth.logout().catch(error => {
+      logout: async (): Promise<void> => {
+        try {
+          await SERVICES_AUTH.Auth.logout();
+        } catch (error) {
           console.error('Failed to revoke auth session:', error);
-        });
-        set({
-          userStatus: { logged: false, authed: false, registered: false },
-          error: undefined,
-          loading: false,
-        });
+        } finally {
+          await clearAccountScopedState();
+          set(initialState);
+          await authStore.persist.clearStorage();
+        }
       },
       resetState: (): void => {
         set(initialState);

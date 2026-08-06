@@ -9,6 +9,9 @@ AXIOS_FILE = ROOT / "src/shared/lib/ApiSPA/axios/axios.ts"
 NEXT_CONFIG_FILE = ROOT / "next.config.mjs"
 AUTH_STORE_FILE = ROOT / "src/shared/stores/auth-store/index.ts"
 USER_STORE_FILE = ROOT / "src/shared/stores/user-store/index.ts"
+CHAT_STORE_FILE = ROOT / "src/shared/stores/chat-store/index.ts"
+COMMENTS_STORE_FILE = ROOT / "src/shared/stores/comments-store/index.ts"
+ARTICLES_STORE_FILE = ROOT / "src/shared/stores/articles-store/index.ts"
 USER_PAGE_FILE = ROOT / "src/pages_fsd/user-page/UserPage26.tsx"
 OPEN_ACHIEVEMENT_PAGE_FILE = ROOT / "src/app/open-a/[username]/[id]/ClientAchievementPage.tsx"
 USER_API_SETTINGS_FILE = ROOT / "src/shared/api/user/settings.ts"
@@ -47,6 +50,13 @@ def _balanced_block_after(source: str, marker: str) -> str:
             if depth == 0:
                 return source[brace_start + 1 : index]
     raise AssertionError(f"could not find balanced block after {marker!r}")
+
+
+def _containing_effect(source: str, marker: str) -> str:
+    marker_index = source.index(marker)
+    effect_start = source.rfind("useEffect(() => {", 0, marker_index)
+    assert effect_start >= 0, f"could not find useEffect containing {marker!r}"
+    return _balanced_block_after(source[effect_start:], "useEffect(() =>")
 
 
 def _env_keys(env_content: str) -> set[str]:
@@ -286,6 +296,37 @@ def test_cookie_auth_logout_and_password_change_clear_server_session():
     assert "window.location.assign('/login')" in auth_store_source
 
 
+def test_logout_awaits_server_revocation_and_clears_all_account_scoped_stores():
+    auth_store_source = _read(AUTH_STORE_FILE)
+    user_store_source = _read(USER_STORE_FILE)
+    chat_store_source = _read(CHAT_STORE_FILE)
+    comments_store_source = _read(COMMENTS_STORE_FILE)
+    articles_store_source = _read(ARTICLES_STORE_FILE)
+
+    assert "logout: () => Promise<void>;" in auth_store_source
+    logout_block = _balanced_block_after(auth_store_source, "logout: async")
+    assert "await SERVICES_AUTH.Auth.logout()" in logout_block
+    assert "finally" in logout_block
+    assert "await clearAccountScopedState()" in logout_block
+    assert "await authStore.persist.clearStorage()" in logout_block
+
+    cleanup_block = _balanced_block_after(auth_store_source, "const clearAccountScopedState")
+    assert "userStore.getState().resetState()" in cleanup_block
+    assert "chatStore.getState().resetChat()" in cleanup_block
+    assert "commentsStore.getState().resetComments()" in cleanup_block
+    assert "articlesStore.getState().resetArticles()" in cleanup_block
+    for store_name in ("userStore", "chatStore", "commentsStore", "articlesStore"):
+        assert f"{store_name}.persist.clearStorage()" in cleanup_block
+
+    assert "resetState: () => {" in user_store_source
+    assert "resetChat: () => {" in chat_store_source
+    assert "resetComments: () => {" in comments_store_source
+    comments_initial_state = _balanced_block_after(comments_store_source, "const initialState")
+    assert "normalizedSavedComments: {}" in comments_initial_state
+    assert "normalizedSearchedComments: {}" in comments_initial_state
+    assert "resetArticles: () => {" in articles_store_source
+
+
 def test_user_store_exposes_refresh_user_data_from_backend_full_profile_endpoint():
     user_store_source = _read(USER_STORE_FILE)
     user_settings_source = _read(USER_API_SETTINGS_FILE)
@@ -341,3 +382,17 @@ def test_profile_renders_scrollable_transfer_history_for_selected_period():
     assert "historyPeriodDays" in user_page_source
     assert "recentTransactions.map" in user_page_source
     assert "transactionList" in user_page_source
+
+
+def test_authenticated_profile_loads_authors_independently_from_avatars():
+    source = _read(USER_PAGE_FILE)
+    authors_effect = _containing_effect(source, "loadedAuthorsUsernameRef.current = null")
+    profile_effect = _containing_effect(source, "const loadData = async () =>")
+
+    assert "if (!userStatus?.logged || !userStatus?.authed)" in authors_effect
+    assert "loadedAuthorsUsernameRef.current === username" in authors_effect
+    assert "loadedAuthorsUsernameRef.current = username" in authors_effect
+    assert "void getAllPostsAuthors()" in authors_effect
+    assert "avatars" not in authors_effect
+    assert "completedProfileLoadUsernameRef" not in authors_effect
+    assert "getAllPostsAuthors" not in profile_effect

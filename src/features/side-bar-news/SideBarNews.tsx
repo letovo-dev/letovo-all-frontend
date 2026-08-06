@@ -256,7 +256,11 @@ const SideBarNews = ({
 
   const authors = useMemo(() => {
     return allPostsAuthors?.map((author: IUserData) => {
-      return { id: author.username, name: author.username };
+      return {
+        id: author.username,
+        name: author.username,
+        displayName: author.display_name,
+      };
     });
   }, [allPostsAuthors]);
 
