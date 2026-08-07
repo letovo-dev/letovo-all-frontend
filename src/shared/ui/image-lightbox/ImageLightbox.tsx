@@ -90,7 +90,7 @@ const ImageLightbox = ({ src, alt, children }: ImageLightboxProps) => {
             pinchRef.current.distance,
         ),
       );
-      setTransform(current => ({ ...current, scale }));
+      setTransform(current => (scale === 1 ? initialTransform : { ...current, scale }));
     } else if (event.touches.length === 1 && panRef.current) {
       event.preventDefault();
       setTransform({

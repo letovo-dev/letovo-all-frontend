@@ -50,6 +50,10 @@ test("supports pinch zoom and one-finger pan inside the lightbox", () => {
   fireEvent.touchStart(image, { touches: [{ clientX: 20, clientY: 20 }] });
   fireEvent.touchMove(image, { touches: [{ clientX: 35, clientY: 45 }] });
   assert.match(image.getAttribute("style") ?? "", /translate\(15px, 25px\)/);
+  fireEvent.touchEnd(image);
+  fireEvent.touchStart(image, { touches: [{ clientX: 10, clientY: 20 }, { clientX: 70, clientY: 20 }] });
+  fireEvent.touchMove(image, { touches: [{ clientX: 25, clientY: 20 }, { clientX: 45, clientY: 20 }] });
+  assert.match(image.getAttribute("style") ?? "", /translate\(0px, 0px\) scale\(1\)/);
   unmount();
 });
 
