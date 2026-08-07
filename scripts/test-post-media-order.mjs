@@ -26,10 +26,17 @@ assert.deepEqual(
     orderedFiles[0],
     { uid: 'existing-a', url: '/images/a-existing.jpg' },
     { uid: 'string-m', response: '/images/m-string.jpg' },
-    { uid: 'still-uploading' },
+    { uid: 'still-uploading', status: 'uploading', response: { file: '/videos/must-not-publish.mp4' } },
+    { uid: 'failed', status: 'error', response: { file: '/videos/must-not-publish-error.mp4' } },
   ]),
   ['/images/z-last.jpg', '/images/a-existing.jpg', '/images/m-string.jpg'],
   'create and edit payloads must preserve ordered uploaded and existing media paths',
 );
 
+const modal = (await import('node:fs/promises')).readFile(
+  new URL('../src/features/post-modal/ui/PostModal.tsx', import.meta.url), 'utf8');
+const modalSource = await modal;
+assert.match(modalSource, /accept: 'image\/\*,video\/\*,\.mov,video\/quicktime'/);
+assert.match(modalSource, /disabled=\{hasPendingUpload\}/);
+assert.match(modalSource, /file\.response\?\.file/);
 console.log('post media order regression checks passed');
