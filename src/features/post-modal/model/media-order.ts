@@ -2,6 +2,7 @@ export interface UploadMediaFile {
   uid: string;
   response?: string | { file?: unknown };
   url?: string;
+  status?: string;
 }
 
 export const sortFilesByUploadOrder = <T extends { uid: string }>(
@@ -29,6 +30,7 @@ export const sortFilesByUploadOrder = <T extends { uid: string }>(
 
 export const mediaPathsFromUploadFiles = (files: UploadMediaFile[]): string[] =>
   files.flatMap(file => {
+    if (file.status && file.status !== 'done') return [];
     const responsePath =
       typeof file.response === 'object' && file.response !== null
         ? file.response.file
