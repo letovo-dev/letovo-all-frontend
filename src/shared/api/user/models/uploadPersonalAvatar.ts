@@ -7,9 +7,13 @@ export interface UploadPersonalAvatarResponse {
 
 export const uploadPersonalAvatar = async (
   file: File,
+  username?: string,
 ): Promise<IApiReturn<UploadPersonalAvatarResponse>> => {
   const formData = new FormData();
   formData.append('file', file);
+  if (username) {
+    formData.append('username', username);
+  }
   try {
     const response = await axios.post<UploadPersonalAvatarResponse>(
       API_USER_SCHEME.uploadPersonalAvatar.url,

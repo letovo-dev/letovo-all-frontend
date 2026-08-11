@@ -3,6 +3,7 @@ import { API_USER_SCHEME } from '../settings';
 
 interface IPayload {
   avatar: string;
+  username?: string;
 }
 
 export const setAvatar = async (payload: IPayload): Promise<IApiReturn<any>> => {

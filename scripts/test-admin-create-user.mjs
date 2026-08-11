@@ -38,6 +38,9 @@ assertContains(authSettings, '/auth/admin_create_user', 'src/shared/api/auth/set
 assertContains(authModels, 'adminCreateUser', 'src/shared/api/auth/models/index.ts');
 assertContains(adminApi, 'AdminCreateUserPayload', 'src/shared/api/auth/models/adminCreateUser.ts');
 assertContains(adminApi, 'API_AUTH_SCHEME.adminCreateUser', 'src/shared/api/auth/models/adminCreateUser.ts');
+assertContains(userModels, 'uploadPersonalAvatar', 'src/shared/api/user/models/index.ts');
+assertContains(types, 'whireable: boolean;', 'src/features/admin-create-user/model/types.ts');
+assertContains(types, 'ava_upload: boolean;', 'src/features/admin-create-user/model/types.ts');
 
 assertContains(userSettings, 'departments', 'src/shared/api/user/settings.ts');
 assertContains(userSettings, 'departmentRoles', 'src/shared/api/user/settings.ts');
@@ -59,10 +62,18 @@ assertContains(form, 'SERVICES_USERS.UsersData.getDepartments', 'src/features/ad
 assertContains(form, 'SERVICES_USERS.UsersData.getDepartmentRoles', 'src/features/admin-create-user/ui/AdminCreateUserForm.tsx');
 assertContains(form, 'SERVICES_USERS.UsersData.isUser', 'src/features/admin-create-user/ui/AdminCreateUserForm.tsx');
 assertContains(form, 'generateAdminPassword', 'src/features/admin-create-user/ui/AdminCreateUserForm.tsx');
-assertContains(form, 'name="chattable"', 'src/features/admin-create-user/ui/AdminCreateUserForm.tsx');
+assertContains(form, "field: 'chattable'", 'src/features/admin-create-user/ui/AdminCreateUserForm.tsx');
 assertContains(form, 'name="userrights"', 'src/features/admin-create-user/ui/AdminCreateUserForm.tsx');
 assertContains(form, 'write_posts', 'src/features/admin-create-user/ui/AdminCreateUserForm.tsx');
 assertContains(form, 'main_page', 'src/features/admin-create-user/ui/AdminCreateUserForm.tsx');
+assertContains(form, 'whireable', 'src/features/admin-create-user/ui/AdminCreateUserForm.tsx');
+assertContains(form, 'ava_upload', 'src/features/admin-create-user/ui/AdminCreateUserForm.tsx');
+assertContains(form, "value: 'child'", 'src/features/admin-create-user/ui/AdminCreateUserForm.tsx');
+assertContains(form, "label: 'Администратор'", 'src/features/admin-create-user/ui/AdminCreateUserForm.tsx');
+assertContains(form, 'uploadPersonalAvatar', 'src/features/admin-create-user/ui/AdminCreateUserForm.tsx');
+assertContains(form, 'username: values.username', 'src/features/admin-create-user/ui/AdminCreateUserForm.tsx');
+assertContains(form, 'MAX_AVATAR_SIZE', 'src/features/admin-create-user/ui/AdminCreateUserForm.tsx');
+assertContains(form, 'image/png,image/jpeg,image/webp', 'src/features/admin-create-user/ui/AdminCreateUserForm.tsx');
 assertContains(form, 'router.push(`/user/${values.username}`)', 'src/features/admin-create-user/ui/AdminCreateUserForm.tsx');
 assertContains(form, "colorText: '#1F2937'", 'src/features/admin-create-user/ui/AdminCreateUserForm.tsx');
 assertContains(form, "colorBgContainer: '#FFFFFF'", 'src/features/admin-create-user/ui/AdminCreateUserForm.tsx');
