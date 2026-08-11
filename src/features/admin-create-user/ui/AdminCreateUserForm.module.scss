@@ -29,6 +29,23 @@
   gap: 12px;
 }
 
+.accessDescription,
+.permissionDescription,
+.avatarHint {
+  display: block;
+  margin-top: 4px;
+}
+
+.permissionLabel {
+  display: block;
+  font-weight: 600;
+  color: #1f2937;
+}
+
+.rightsGrid :global(.ant-form-item) {
+  margin-bottom: 0;
+}
+
 .actions {
   display: flex;
   justify-content: flex-end;
