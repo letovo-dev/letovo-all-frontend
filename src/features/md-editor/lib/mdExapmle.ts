@@ -1,7 +1,7 @@
 export const mdExample = `
 # Creating a Stunning Article with Markdown
 
-Welcome to this showcase of Markdown capabilities using the @uiw/react-md-editor! This article demonstrates how to create rich content with text, images, videos, and more.
+Welcome to this showcase of Markdown capabilities! This article demonstrates how to create rich content with text, images, videos, and more.
 
 ## Introduction
 

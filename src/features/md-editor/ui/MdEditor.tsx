@@ -1,13 +1,26 @@
 'use client';
 
-import React, { useState, ChangeEvent, useRef, useEffect } from 'react';
-import MDEditor from '@uiw/react-md-editor';
+import React, { useState, ChangeEvent, useRef, useEffect, useCallback } from 'react';
 import style from './MdEditor.module.scss';
 import { mdExample } from '../lib/mdExapmle';
 import { buildArticlePayload, type CategorySelectItem } from '../model/buildArticlePayload';
 import UploadFiles from './upload-file/UploadFiles';
+import MarkdownMode from './MarkdownMode';
+import VisualMode from './VisualMode';
 import articlesStore from '@/shared/stores/articles-store';
-import { Button, ConfigProvider, Input, message, Radio, Space, Select, Form, Divider } from 'antd';
+import { ArticleContent } from '@/shared/ui/article-content';
+import {
+  Button,
+  ConfigProvider,
+  Input,
+  message,
+  Radio,
+  Space,
+  Select,
+  Form,
+  Divider,
+  Segmented,
+} from 'antd';
 import { PlusOutlined, SaveOutlined } from '@ant-design/icons';
 import { usePathname } from 'next/navigation';
 import type { UploadFile } from 'antd';
@@ -15,12 +28,15 @@ import { uniqueId } from 'lodash';
 import { useRouter } from 'next/navigation';
 import type { InputRef } from 'antd';
 
-interface VideoComponentProps extends React.VideoHTMLAttributes<HTMLVideoElement> {
-  src?: string;
-}
-
 const EDIT_ARTICLE_TITLE = 'Отредактируйте название статьи';
 const INPUT_ARTICLE_TITLE = 'Введите название статьи';
+
+type EditorMode = 'markdown' | 'visual';
+
+const EDITOR_MODE_STORAGE_KEY = 'letovo:article-editor-mode';
+
+const isEditorMode = (value: unknown): value is EditorMode =>
+  value === 'markdown' || value === 'visual';
 
 const MarkdownEditor: React.FC = () => {
   const router = useRouter();
@@ -28,6 +44,18 @@ const MarkdownEditor: React.FC = () => {
   const [markdown, setMarkdown] = useState<string>(mdExample);
   const [articleTitle, setArticleTitle] = useState<string>('');
   const [fileList, setFileList] = useState<UploadFile[] | undefined>(undefined);
+  const [mode, setMode] = useState<EditorMode>('markdown');
+  const [mobilePreview, setMobilePreview] = useState(false);
+  /**
+   * Счётчик «текст пришёл извне»: визуальный режим пересобирает свой DOM только
+   * по нему, иначе курсор прыгал бы на каждый набранный символ.
+   */
+  const [syncKey, setSyncKey] = useState(0);
+
+  const replaceMarkdown = useCallback((value: string) => {
+    setMarkdown(value);
+    setSyncKey(key => key + 1);
+  }, []);
 
   const {
     article,
@@ -82,9 +110,30 @@ const MarkdownEditor: React.FC = () => {
     });
   };
 
+  // Выбранный режим запоминается: автор обычно пишет всегда в одном и том же.
+  useEffect(() => {
+    try {
+      const stored = window.localStorage.getItem(EDITOR_MODE_STORAGE_KEY);
+      if (isEditorMode(stored)) setMode(stored);
+    } catch (err) {
+      console.error('Не удалось прочитать режим редактора:', err);
+    }
+  }, []);
+
+  const handleModeChange = (nextMode: EditorMode) => {
+    setMode(nextMode);
+    // Визуальный режим строится из текущего Markdown — пересобираем его DOM.
+    if (nextMode === 'visual') setSyncKey(key => key + 1);
+    try {
+      window.localStorage.setItem(EDITOR_MODE_STORAGE_KEY, nextMode);
+    } catch (err) {
+      console.error('Не удалось сохранить режим редактора:', err);
+    }
+  };
+
   useEffect(() => {
     if (isEditArticle && article) {
-      setMarkdown(article.text || '');
+      replaceMarkdown(article.text || '');
       setArticleTitle(article.title || '');
       form.setFieldsValue({
         isSecret: article.is_secret || 'f',
@@ -92,11 +141,11 @@ const MarkdownEditor: React.FC = () => {
         articleTitle: article.title || undefined,
       });
     } else {
-      setMarkdown(mdExample);
+      replaceMarkdown(mdExample);
       setArticleTitle('');
       form.resetFields();
     }
-  }, [isEditArticle, article, form]);
+  }, [isEditArticle, article, form, replaceMarkdown]);
 
   const handleFileUpload = (event: ChangeEvent<HTMLInputElement>): void => {
     const file = event.target.files?.[0];
@@ -113,7 +162,7 @@ const MarkdownEditor: React.FC = () => {
     const reader = new FileReader();
     reader.onload = (e: ProgressEvent<FileReader>): void => {
       if (e.target?.result) {
-        setMarkdown(e.target.result as string);
+        replaceMarkdown(e.target.result as string);
       }
     };
     reader.readAsText(file);
@@ -196,14 +245,6 @@ const MarkdownEditor: React.FC = () => {
     setArticleTitle(e.target.value);
   };
 
-  const videoComponent = ({ src, ...props }: VideoComponentProps) => {
-    return src ? (
-      <video controls src={src} style={{ maxWidth: '100%' }} {...props}>
-        Your browser does not support the video tag.
-      </video>
-    ) : null;
-  };
-
   const fileInputRef = useRef<HTMLInputElement>(null);
 
   const handleButtonClick = () => {
@@ -219,23 +260,6 @@ const MarkdownEditor: React.FC = () => {
       await renameArticle(article.category, article.post_id, articleTitle);
       success('Название статьи обновлено');
     }
-  };
-
-  const SAFE_HREF = /^(https?|mailto|tel):/i;
-
-  const linkComponent = ({
-    href,
-    children,
-    ...props
-  }: React.AnchorHTMLAttributes<HTMLAnchorElement>) => {
-    const isSecretLink =
-      typeof children === 'string' && children.toLowerCase().includes('secret link');
-    const safeHref = href && SAFE_HREF.test(href) ? href : '#';
-    return (
-      <a href={safeHref} className={isSecretLink ? style.secretLink : undefined} {...props}>
-        {children}
-      </a>
-    );
   };
 
   const onNameChange = (event: React.ChangeEvent<HTMLInputElement>) => {
@@ -257,7 +281,7 @@ const MarkdownEditor: React.FC = () => {
   return (
     <div className={style.markdownEditorContainer}>
       {contextHolder}
-      <h2>Редактор Markdown</h2>
+      <h2>Редактор статьи</h2>
       <div className={style.titlesContainer}>
         <div>
           <input
@@ -374,22 +398,58 @@ const MarkdownEditor: React.FC = () => {
         </Form>
       </div>
       {articleTitle && <h3>{articleTitle}</h3>}
-      <MDEditor
-        value={markdown}
-        onChange={(value: string | undefined) => setMarkdown(value || '')}
-        preview="live"
-        className={style.markdownEditor}
-        visibleDragbar={true}
-        previewOptions={{
-          components: {
-            video: videoComponent,
-            a: linkComponent,
-          },
-          urlTransform: (uri: string) => {
-            return uri.endsWith('.mp4') ? uri : uri;
-          },
-        }}
-      />
+
+      <div className={style.workArea}>
+        <section className={style.panel}>
+          <div className={style.panelHead}>
+            Текст статьи
+            <span className={style.panelHint}>
+              {mode === 'markdown'
+                ? 'Разметка Markdown, справа — превью статьи'
+                : 'Пишите прямо в статье — разметку набирать не нужно'}
+            </span>
+            <span className={style.panelSpacer} />
+            <ConfigProvider theme={{ token: { colorPrimary: '#fb4724' } }}>
+              <Segmented<EditorMode>
+                value={mode}
+                onChange={handleModeChange}
+                options={[
+                  { value: 'markdown', label: 'Разметка' },
+                  { value: 'visual', label: 'Как на сайте' },
+                ]}
+              />
+            </ConfigProvider>
+          </div>
+
+          {mode === 'markdown' ? (
+            <MarkdownMode value={markdown} onChange={setMarkdown} />
+          ) : (
+            <VisualMode value={markdown} onChange={setMarkdown} syncKey={syncKey} />
+          )}
+        </section>
+
+        {mode === 'markdown' && (
+          <div className={style.previewColumn}>
+            <div className={style.previewToolbar}>
+              <strong>Так статья будет выглядеть на сайте</strong>
+              <span className={style.panelSpacer} />
+              <Button size="small" onClick={() => setMobilePreview(false)}>
+                Десктоп
+              </Button>
+              <Button size="small" onClick={() => setMobilePreview(true)}>
+                Мобильный
+              </Button>
+            </div>
+            <div
+              className={`${style.articleShell} ${style.previewScroll} ${
+                mobilePreview ? style.mobilePreview : ''
+              }`}
+            >
+              <ArticleContent content={markdown} interactive={false} />
+            </div>
+          </div>
+        )}
+      </div>
       <p className={style.inputTitleInstruction}>
         Для того, чтобы ваше изображение или видео появились в статье, их нужно предварительно
         загрузить в базу данных. После загрузки файла появиться сообщение с адресом для доступа к

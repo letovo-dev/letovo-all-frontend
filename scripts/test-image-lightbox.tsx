@@ -14,7 +14,7 @@ const outputPath = path.resolve('scripts/.image-lightbox-test-bundle.mjs');
 await build({ entryPoints: [path.resolve('src/shared/ui/image-lightbox/ImageLightbox.tsx')], bundle: true, platform: 'node', format: 'esm', packages: 'external', loader: { '.scss': 'empty' }, outfile: outputPath });
 const { default: ImageLightbox } = await import(outputPath);
 const markdownOutputPath = path.resolve('scripts/.markdown-lightbox-test-bundle.mjs');
-await build({ entryPoints: [path.resolve('src/pages_fsd/articles/ReactMd.tsx')], bundle: true, platform: 'node', format: 'esm', packages: 'external', loader: { '.scss': 'empty' }, outfile: markdownOutputPath });
+await build({ entryPoints: [path.resolve('src/shared/ui/article-content/ArticleContent.tsx')], bundle: true, platform: 'node', format: 'esm', packages: 'external', loader: { '.scss': 'empty' }, outfile: markdownOutputPath });
 const { default: MarkdownContent } = await import(markdownOutputPath);
 test('opens, traps focus, closes, restores focus, and downloads the original source', async () => {
   const source = 'https://cdn.test/original/photo.png';
