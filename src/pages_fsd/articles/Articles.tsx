@@ -8,7 +8,7 @@ import articlesStore from '@/shared/stores/articles-store';
 import SpinModule from '@/shared/ui/spiner';
 import style from './Articles.module.scss';
 import { SideBarArticles } from '@/features/side-bar-articles';
-import MarkdownContent from './ReactMd';
+import { ArticleContent } from '@/shared/ui/article-content';
 import authStore from '@/shared/stores/auth-store';
 import UserBlock26 from '@/pages/user-page/ui/UserBlock26';
 
@@ -81,7 +81,7 @@ const Articles: React.FC = () => {
               <span>Загружаем статью…</span>
             </div>
           )}
-          <MarkdownContent content={article?.text ?? ''} />
+          <ArticleContent content={article?.text ?? ''} />
         </div>
         <div className={style.desktopRightPanel}>
           <Image

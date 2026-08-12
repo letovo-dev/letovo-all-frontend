@@ -10,6 +10,7 @@ import {
   Select,
   Space,
   Typography,
+  Upload,
   message,
 } from 'antd';
 import { useRouter } from 'next/navigation';
@@ -26,6 +27,86 @@ import {
 import style from './AdminCreateUserForm.module.scss';
 
 const USERNAME_RE = /^[A-Za-z0-9_-]{4,32}$/;
+const MAX_AVATAR_SIZE = 5 * 1024 * 1024;
+const AVATAR_TYPES = new Set(['image/png', 'image/jpeg', 'image/webp']);
+
+const accessLevels: Array<{
+  value: AdminCreateUserPayload['userrights'];
+  label: string;
+  description: string;
+}> = [
+  {
+    value: 'user',
+    label: 'Пользователь',
+    description: 'Обычный аккаунт без полномочий управления.',
+  },
+  {
+    value: 'child',
+    label: 'Ребёнок',
+    description: 'Детский аккаунт: только одобренные общие аватары, без личной загрузки.',
+  },
+  {
+    value: 'author',
+    label: 'Автор (устаревший)',
+    description:
+      'Исторический уровень автора. Для новых аккаунтов предпочтителен «Публичный автор».',
+  },
+  {
+    value: 'public_author',
+    label: 'Публичный автор',
+    description: 'Может публиковаться от своего имени в разрешённых разделах.',
+  },
+  {
+    value: 'moder',
+    label: 'Модератор',
+    description:
+      'Уровень интерфейса модератора. Отдельно включите право «Модерация», если оно требуется.',
+  },
+  {
+    value: 'admin',
+    label: 'Администратор',
+    description:
+      'Уровень интерфейса администратора. Отдельно включите право «Администрирование»; оба назначения критически важны.',
+  },
+];
+
+const permissionCatalog = [
+  {
+    field: 'chattable',
+    label: 'Доступ к чату',
+    description: 'Разрешает другим пользователям начинать диалог с аккаунтом.',
+  },
+  {
+    field: 'write_posts',
+    label: 'Публикация записей',
+    description: 'Разрешает создавать записи и новости.',
+  },
+  {
+    field: 'admin',
+    label: 'Администрирование',
+    description: 'Даёт административные возможности. Высокий риск.',
+  },
+  {
+    field: 'moder',
+    label: 'Модерация',
+    description: 'Разрешает модерировать пользовательский контент.',
+  },
+  {
+    field: 'main_page',
+    label: 'Главная страница',
+    description: 'Разрешает управлять материалами главной страницы.',
+  },
+  {
+    field: 'whireable',
+    label: 'Участник переводов',
+    description: 'Позволяет аккаунту участвовать в денежных переводах.',
+  },
+  {
+    field: 'ava_upload',
+    label: 'Загрузка личного аватара',
+    description: 'Разрешает загружать собственные изображения профиля; недоступно детям.',
+  },
+] as const;
 
 type FormValues = Omit<AdminCreateUserPayload, 'role_id' | 'role_rights'> & {
   department_id?: number;
@@ -38,6 +119,8 @@ const defaultRoleRights: AdminRoleRights = {
   admin: false,
   moder: false,
   main_page: false,
+  whireable: false,
+  ava_upload: true,
 };
 
 export const AdminCreateUserForm = () => {
@@ -47,10 +130,21 @@ export const AdminCreateUserForm = () => {
   const [roles, setRoles] = useState<DepartmentRoleOption[]>([]);
   const [loadingDictionaries, setLoadingDictionaries] = useState(false);
   const [submitting, setSubmitting] = useState(false);
+  const [avatarFile, setAvatarFile] = useState<File>();
+  const [createdUsername, setCreatedUsername] = useState<string>();
   const userrights = userStore(state => state.store.userData.userrights);
   const [messageApi, contextHolder] = message.useMessage();
 
   const isAdmin = userrights === 'admin';
+  const selectedUserrights = Form.useWatch('userrights', form);
+  const selectedAccessLevel = accessLevels.find(option => option.value === selectedUserrights);
+
+  useEffect(() => {
+    if (selectedUserrights === 'child') {
+      form.setFieldValue(['role_rights', 'ava_upload'], false);
+      setAvatarFile(undefined);
+    }
+  }, [form, selectedUserrights]);
 
   useEffect(() => {
     if (!isAdmin) {
@@ -90,7 +184,7 @@ export const AdminCreateUserForm = () => {
     () =>
       roles.map(role => ({
         value: Number(role.roleid),
-        label: `${role.rolename} (${role.rang})`,
+        label: `${role.rolename} · ранг ${role.rang} · выплата ${role.payment}`,
       })),
     [roles],
   );
@@ -124,6 +218,12 @@ export const AdminCreateUserForm = () => {
   };
 
   const onFinish = async (values: FormValues) => {
+    if (createdUsername && createdUsername !== values.username) {
+      void messageApi.error(
+        `Аккаунт ${createdUsername} уже создан. Верните прежний username, чтобы повторить загрузку аватара.`,
+      );
+      return;
+    }
     setSubmitting(true);
     const payload: AdminCreateUserPayload = {
       username: values.username,
@@ -139,19 +239,51 @@ export const AdminCreateUserForm = () => {
         admin: values.role_rights?.admin ?? false,
         moder: values.role_rights?.moder ?? false,
         main_page: values.role_rights?.main_page ?? false,
+        whireable: values.role_rights?.whireable ?? false,
+        ava_upload:
+          values.userrights === 'child' ? false : (values.role_rights?.ava_upload ?? false),
       },
     };
 
-    const response = await SERVICES_AUTH.Auth.adminCreateUser(payload);
-    setSubmitting(false);
-
-    if (response.success && response.code === 201) {
-      void messageApi.success('Аккаунт создан');
-      router.push(`/user/${values.username}`);
-      return;
+    if (!createdUsername) {
+      const response = await SERVICES_AUTH.Auth.adminCreateUser(payload);
+      if (!response.success || response.code !== 201) {
+        setSubmitting(false);
+        void messageApi.error(response.codeMessage || 'Не удалось создать аккаунт');
+        return;
+      }
+      setCreatedUsername(values.username);
     }
 
-    void messageApi.error(response.codeMessage || 'Не удалось создать аккаунт');
+    if (avatarFile) {
+      const upload = await SERVICES_USERS.UsersData.uploadPersonalAvatar(
+        avatarFile,
+        values.username,
+      );
+      if (!upload.success || upload.code !== 200 || !upload.data?.file) {
+        setSubmitting(false);
+        void messageApi.error(
+          upload.codeMessage ||
+            'Аккаунт создан, но загрузить аватар не удалось. Повторите попытку.',
+        );
+        return;
+      }
+      const assignment = await SERVICES_USERS.UsersData.setAvatar({
+        avatar: upload.data.file,
+        username: values.username,
+      });
+      if (!assignment.success || assignment.code !== 200) {
+        setSubmitting(false);
+        void messageApi.error(
+          assignment.codeMessage || 'Файл загружен, но аватар не установлен. Повторите попытку.',
+        );
+        return;
+      }
+    }
+
+    setSubmitting(false);
+    void messageApi.success(avatarFile ? 'Аккаунт и аватар созданы' : 'Аккаунт создан');
+    router.push(`/user/${values.username}`);
   };
 
   if (!isAdmin) {
@@ -219,16 +351,19 @@ export const AdminCreateUserForm = () => {
                 }
               />
             </Form.Item>
-            <Form.Item name="userrights" label="Права пользователя" rules={[{ required: true }]}>
-              <Select
-                options={[
-                  { value: 'user', label: 'user' },
-                  { value: 'moder', label: 'moder' },
-                  { value: 'public_author', label: 'public_author' },
-                  { value: 'admin', label: 'admin' },
-                ]}
-              />
-            </Form.Item>
+            <div>
+              <Form.Item name="userrights" label="Уровень доступа" rules={[{ required: true }]}>
+                <Select
+                  options={accessLevels.map(option => ({
+                    value: option.value,
+                    label: `${option.label} (${option.value})`,
+                  }))}
+                />
+              </Form.Item>
+              <Typography.Text type="secondary" className={style.accessDescription}>
+                {selectedAccessLevel?.description}
+              </Typography.Text>
+            </div>
             <Form.Item
               name="department_id"
               label="Департамент"
@@ -247,34 +382,74 @@ export const AdminCreateUserForm = () => {
             >
               <Select disabled={!roles.length} options={roleOptions} />
             </Form.Item>
-            <Form.Item name="chattable" valuePropName="checked">
-              <Checkbox>Доступ к чату</Checkbox>
-            </Form.Item>
             <div className={style.fullWidth}>
-              <Typography.Text>Дополнительные права</Typography.Text>
+              <Typography.Title level={5}>Права доступа</Typography.Title>
               <div className={style.rightsGrid}>
-                <Form.Item name={['role_rights', 'write_posts']} valuePropName="checked">
-                  <Checkbox>write_posts</Checkbox>
-                </Form.Item>
-                <Form.Item name={['role_rights', 'admin']} valuePropName="checked">
-                  <Checkbox>admin</Checkbox>
-                </Form.Item>
-                <Form.Item name={['role_rights', 'moder']} valuePropName="checked">
-                  <Checkbox>moder</Checkbox>
-                </Form.Item>
-                <Form.Item name={['role_rights', 'main_page']} valuePropName="checked">
-                  <Checkbox>main_page</Checkbox>
-                </Form.Item>
+                {permissionCatalog.map(permission => (
+                  <Form.Item
+                    key={permission.field}
+                    name={
+                      permission.field === 'chattable'
+                        ? 'chattable'
+                        : ['role_rights', permission.field]
+                    }
+                    valuePropName="checked"
+                  >
+                    <Checkbox
+                      disabled={permission.field === 'ava_upload' && selectedUserrights === 'child'}
+                    >
+                      <span className={style.permissionLabel}>{permission.label}</span>
+                      <Typography.Text type="secondary" className={style.permissionDescription}>
+                        {permission.description}
+                      </Typography.Text>
+                    </Checkbox>
+                  </Form.Item>
+                ))}
               </div>
+            </div>
+            <div className={style.fullWidth}>
+              <Typography.Title level={5}>Аватар (необязательно)</Typography.Title>
+              <Upload
+                accept="image/png,image/jpeg,image/webp"
+                maxCount={1}
+                showUploadList={false}
+                disabled={selectedUserrights === 'child'}
+                beforeUpload={file => {
+                  if (!AVATAR_TYPES.has(file.type)) {
+                    void messageApi.error('Поддерживаются только PNG, JPEG и WebP');
+                    return Upload.LIST_IGNORE;
+                  }
+                  if (file.size > MAX_AVATAR_SIZE) {
+                    void messageApi.error('Размер аватара не должен превышать 5 МБ');
+                    return Upload.LIST_IGNORE;
+                  }
+                  setAvatarFile(file);
+                  return Upload.LIST_IGNORE;
+                }}
+              >
+                <Button disabled={selectedUserrights === 'child'}>Выбрать изображение</Button>
+              </Upload>
+              <Typography.Text type="secondary" className={style.avatarHint}>
+                {selectedUserrights === 'child'
+                  ? 'Для детского аккаунта личная загрузка запрещена политикой безопасности.'
+                  : avatarFile?.name || 'PNG, JPEG или WebP, не более 5 МБ'}
+              </Typography.Text>
             </div>
           </div>
           <Form.Item className={style.actions}>
             <Space>
-              <Button htmlType="button" onClick={() => form.resetFields()}>
+              <Button
+                htmlType="button"
+                onClick={() => {
+                  form.resetFields();
+                  setAvatarFile(undefined);
+                  setCreatedUsername(undefined);
+                }}
+              >
                 Сбросить
               </Button>
               <Button type="primary" htmlType="submit" loading={submitting}>
-                Создать аккаунт
+                {createdUsername ? 'Повторить загрузку аватара' : 'Создать аккаунт'}
               </Button>
             </Space>
           </Form.Item>

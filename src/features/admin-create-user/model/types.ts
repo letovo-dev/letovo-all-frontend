@@ -3,6 +3,8 @@ export interface AdminRoleRights {
   admin: boolean;
   moder: boolean;
   main_page: boolean;
+  whireable: boolean;
+  ava_upload: boolean;
 }
 
 export interface AdminCreateUserPayload {
@@ -10,7 +12,7 @@ export interface AdminCreateUserPayload {
   display_name: string;
   password: string;
   chattable: boolean;
-  userrights: 'user' | 'moder' | 'public_author' | 'admin';
+  userrights: 'user' | 'child' | 'author' | 'moder' | 'public_author' | 'admin';
   role_id: number;
   active: boolean;
   registered: boolean;
