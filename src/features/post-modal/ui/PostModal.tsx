@@ -114,7 +114,13 @@ const PostModal: React.FC<PostModalProps> = ({ visible, onCancel, onSubmit, post
     };
   }, [visible]);
 
+  const hasPendingUpload = fileList.some(file => file.status === 'uploading' || file.status === 'error');
+
   const handleSubmit = async (values: any) => {
+    if (hasPendingUpload) {
+      message.error('Дождитесь завершения загрузки или удалите файлы с ошибкой');
+      return;
+    }
     try {
       const formData = {
         ...values,
@@ -133,7 +139,7 @@ const PostModal: React.FC<PostModalProps> = ({ visible, onCancel, onSubmit, post
   };
   const uploadProps: UploadProps = {
     name: 'file',
-    accept: 'image/*,video/*',
+    accept: 'image/*,video/*,.mov,video/quicktime',
     fileList,
     action: `${process.env.NEXT_PUBLIC_BASE_URL_UPLOAD}`,
     withCredentials: true,
@@ -162,7 +168,7 @@ const PostModal: React.FC<PostModalProps> = ({ visible, onCancel, onSubmit, post
       } else {
         setFileList(preserveUploadOrder(newFileList));
         if (file.status === 'done') {
-          const filePath = file.response;
+          const filePath = file.response?.file;
           if (filePath) {
             message.success(`${file.name} загружен успешно по пути: ${filePath}`);
           } else {
@@ -189,7 +195,8 @@ const PostModal: React.FC<PostModalProps> = ({ visible, onCancel, onSubmit, post
     },
     beforeUpload: file => {
       rememberUpload(String(file.uid));
-      const isValid = file.type.startsWith('image/') || file.type.startsWith('video/');
+      const extension = file.name.split('.').pop()?.toLowerCase();
+      const isValid = file.type.startsWith('image/') || file.type.startsWith('video/') || extension === 'mov';
       if (!isValid) {
         message.error('Можно загружать только изображения или видео!');
         return Upload.LIST_IGNORE;
@@ -292,7 +299,7 @@ const PostModal: React.FC<PostModalProps> = ({ visible, onCancel, onSubmit, post
                 },
               }}
             >
-              <Button htmlType="submit" block>
+              <Button htmlType="submit" block disabled={hasPendingUpload}>
                 Опубликовать
               </Button>
             </ConfigProvider>
